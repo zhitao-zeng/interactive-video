@@ -43,24 +43,122 @@ def export_planning_bundle(
     root = settings.output_root.resolve() / novel.novel_id
     root.mkdir(parents=True, exist_ok=True)
 
-    bible = planner.build_bible(novel)
     bible_path = root / "story_bible.json"
-    atomic_write_json(bible_path, bible.model_dump(mode="json"))
+    bible_request_path = root / "story_bible.request.json"
+    bible_identity = {
+        "contract": "novel-manga-story-bible-resume/v1",
+        "novel_id": novel.novel_id,
+        "novel_title": novel.title,
+        "source_sha256": _sha256_text(novel.text),
+        "planner_backend": settings.planner_backend,
+    }
+    bible = None
+    if bible_path.is_file():
+        try:
+            candidate = StoryBible.model_validate_json(
+                bible_path.read_text(encoding="utf-8")
+            )
+            saved_identity = (
+                json.loads(bible_request_path.read_text(encoding="utf-8"))
+                if bible_request_path.is_file()
+                else {}
+            )
+            active_path = root / "series_development" / "active.json"
+            active = (
+                json.loads(active_path.read_text(encoding="utf-8"))
+                if active_path.is_file()
+                else {}
+            )
+            active_source_identity = _sha256_text(
+                novel.text
+                + candidate.style_fingerprint
+                + "series-development-v2"
+            )
+            identity_matches = all(
+                saved_identity.get(key) == value
+                for key, value in bible_identity.items()
+            )
+            recovered_from_active_development = (
+                candidate.novel_title == novel.title
+                and active.get("source_identity") == active_source_identity
+                and active.get("review_passed") is True
+            )
+            if identity_matches or recovered_from_active_development:
+                bible = candidate
+        except (ValueError, json.JSONDecodeError):
+            bible = None
+    if bible is None:
+        bible = planner.build_bible(novel)
+        atomic_write_json(bible_path, bible.model_dump(mode="json"))
+    atomic_write_json(
+        bible_request_path,
+        {
+            **bible_identity,
+            "style_fingerprint": bible.style_fingerprint,
+            "artifact_sha256": _sha256_file(bible_path),
+        },
+    )
 
     episode_rows = []
     previous_state: SeriesState | None = None
     for episode in novel.episodes:
-        bundle = planner.plan_episode_bundle(novel, episode, bible, previous_state)
-        plan = bundle.plan
-        previous_state = bundle.updated_series_state
         plan_path = root / f"episode_{episode.index:03d}_plan.json"
         diagnosis_path = root / f"episode_{episode.index:03d}_diagnosis.json"
         quality_path = root / f"episode_{episode.index:03d}_script_quality.json"
         state_path = root / f"episode_{episode.index:03d}_series_state.json"
-        atomic_write_json(plan_path, plan.model_dump(mode="json"))
-        atomic_write_json(diagnosis_path, bundle.diagnosis.model_dump(mode="json"))
-        atomic_write_json(quality_path, bundle.quality_report.model_dump(mode="json"))
-        atomic_write_json(state_path, previous_state.model_dump(mode="json"))
+        plan = diagnosis = quality = state = None
+        if all(
+            path.is_file()
+            for path in (plan_path, diagnosis_path, quality_path, state_path)
+        ):
+            try:
+                candidate_plan = EpisodePlan.model_validate_json(
+                    plan_path.read_text(encoding="utf-8")
+                )
+                candidate_diagnosis = ChapterDiagnosis.model_validate_json(
+                    diagnosis_path.read_text(encoding="utf-8")
+                )
+                stored_quality = ScriptQualityReport.model_validate_json(
+                    quality_path.read_text(encoding="utf-8")
+                )
+                candidate_quality = evaluate_script_quality(
+                    candidate_plan,
+                    candidate_diagnosis,
+                    episode,
+                    qualitative=stored_quality,
+                    previous_state=previous_state,
+                )
+                candidate_state = validate_series_state(
+                    SeriesState.model_validate_json(
+                        state_path.read_text(encoding="utf-8")
+                    ),
+                    episode,
+                    previous_state,
+                )
+                if candidate_quality.passed:
+                    plan = candidate_plan
+                    diagnosis = candidate_diagnosis
+                    quality = candidate_quality
+                    state = candidate_state
+            except (ValueError, json.JSONDecodeError):
+                pass
+        if plan is None:
+            bundle = planner.plan_episode_bundle(
+                novel, episode, bible, previous_state
+            )
+            plan = bundle.plan
+            diagnosis = bundle.diagnosis
+            quality = bundle.quality_report
+            state = bundle.updated_series_state
+            atomic_write_json(plan_path, plan.model_dump(mode="json"))
+            atomic_write_json(
+                diagnosis_path, diagnosis.model_dump(mode="json")
+            )
+            atomic_write_json(
+                quality_path, quality.model_dump(mode="json")
+            )
+            atomic_write_json(state_path, state.model_dump(mode="json"))
+        previous_state = state
         episode_rows.append(
             {
                 "index": episode.index,

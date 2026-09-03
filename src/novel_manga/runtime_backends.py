@@ -223,6 +223,42 @@ class RuntimeEvidenceBackends:
             "speaker_ids": speaker_ids,
         }
 
+    def generate_director_review(
+        self,
+        *,
+        episode_dir: Path,
+        manifest: Path,
+        plan: Path,
+        output: Path,
+    ) -> dict | None:
+        """Invoke an external director/VLM without turning weak evidence into pass."""
+
+        if not self.settings.director_review_command:
+            return None
+        try:
+            subprocess.run(
+                shlex.split(self.settings.director_review_command)
+                + [
+                    "--episode-dir",
+                    str(episode_dir.resolve()),
+                    "--manifest",
+                    str(manifest.resolve()),
+                    "--plan",
+                    str(plan.resolve()),
+                    "--output",
+                    str(output.resolve()),
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            if not output.is_file():
+                return None
+            result = json.loads(output.read_text(encoding="utf-8"))
+            return result if isinstance(result, dict) else None
+        except (OSError, ValueError, json.JSONDecodeError):
+            return None
+
 def aggregate_asr(rows: list[dict]) -> dict:
     errors = sum(int(row.get("errors", 0)) for row in rows if math.isfinite(float(row.get("cer", math.inf))))
     reference_chars = sum(

@@ -9,7 +9,10 @@ from novel_manga.production_models import (
     RuntimeUnit,
     RuntimeVisualGroup,
 )
-from novel_manga.video_quality import evaluate_generated_video_quality
+from novel_manga.video_quality import (
+    build_video_quality_manifest,
+    evaluate_generated_video_quality,
+)
 
 
 def _plan() -> ProductionPlan:
@@ -137,6 +140,34 @@ def _make_clip(path: Path) -> None:
     )
 
 
+def test_video_quality_manifest_uses_runtime_groups_and_locked_references() -> None:
+    manifest = build_video_quality_manifest(_plan())
+
+    assert manifest == {
+        "schema_version": 1,
+        "groups": [
+            {
+                "group_id": "visual_001",
+                "generation_duration": 4.0,
+                "references": [
+                    {
+                        "asset_id": "character_001",
+                        "role": "character_identity_costume",
+                    },
+                    {
+                        "asset_id": "character_002",
+                        "role": "character_identity_costume",
+                    },
+                    {
+                        "asset_id": "location_001",
+                        "role": "location_space_lighting",
+                    },
+                ],
+            }
+        ],
+    }
+
+
 def test_video_side_gate_requires_action_and_exact_visible_cast(tmp_path: Path) -> None:
     _make_clip(tmp_path / "work/raw.mp4")
     review = {
@@ -149,6 +180,10 @@ def test_video_side_gate_requires_action_and_exact_visible_cast(tmp_path: Path) 
                 "unexpected_objects": [],
                 "screen_direction_ok": True,
                 "identity_consistency_score": 0.2,
+                "style_match": True,
+                "style_consistency_score": 0.9,
+                "render_medium": "3d_cg_animation",
+                "style_issues": [],
             }
         ]
     }
@@ -180,3 +215,68 @@ def test_video_side_gate_requires_action_and_exact_visible_cast(tmp_path: Path) 
     assert "visual_001:planned-action-not-observed" in failed["failures"]
     assert "visual_001:visible-cast-mismatch" in failed["failures"]
     assert "visual_001:unexpected-object" in failed["failures"]
+
+
+def test_video_side_gate_rejects_inconclusive_vlm_review(tmp_path: Path) -> None:
+    _make_clip(tmp_path / "work/raw.mp4")
+    review = {
+        "groups": [
+            {
+                "group_id": "visual_001",
+                "review_status": "inconclusive",
+                "action_observed": True,
+                "visible_asset_ids": ["character_001", "character_002"],
+                "unexpected_named_characters": [],
+                "unexpected_objects": [],
+                "screen_direction_ok": True,
+                "style_match": True,
+                "style_consistency_score": 0.9,
+                "render_medium": "3d_cg_animation",
+            }
+        ]
+    }
+
+    report = evaluate_generated_video_quality(
+        episode_dir=tmp_path,
+        manifest=_manifest(),
+        plan=_plan(),
+        director_review=review,
+        report_path=tmp_path / "inconclusive.json",
+    )
+
+    assert report["passed"] is False
+    assert "visual_001:director-review-inconclusive" in report["failures"]
+
+
+def test_video_side_gate_blocks_style_drift(tmp_path: Path) -> None:
+    _make_clip(tmp_path / "work/raw.mp4")
+    review = {
+        "groups": [
+            {
+                "group_id": "visual_001",
+                "review_status": "passed",
+                "action_observed": True,
+                "visible_asset_ids": ["character_001", "character_002"],
+                "unexpected_named_characters": [],
+                "unexpected_objects": [],
+                "screen_direction_ok": True,
+                "style_match": False,
+                "style_consistency_score": 0.61,
+                "render_medium": "photoreal",
+                "style_issues": ["真人照片感"],
+            }
+        ]
+    }
+
+    report = evaluate_generated_video_quality(
+        episode_dir=tmp_path,
+        manifest=_manifest(),
+        plan=_plan(),
+        director_review=review,
+        report_path=tmp_path / "style-failed.json",
+    )
+
+    assert report["passed"] is False
+    assert "visual_001:style-mismatch" in report["failures"]
+    assert "visual_001:style-score" in report["failures"]
+    assert "visual_001:render-medium" in report["failures"]

@@ -5,6 +5,10 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
+import httpx
+import pytest
+
+import novel_manga.providers.phanrouter as phanrouter_module
 from novel_manga.api import ApiConfig, JobManager
 from novel_manga.config import Settings
 from novel_manga.models import Character, StoryBible
@@ -12,6 +16,39 @@ from novel_manga.production import SeriesAssetFactory
 from novel_manga.providers.base import ImageResult
 from novel_manga.providers.command import CommandMediaProvider
 from novel_manga.providers.phanrouter import PhanRouterMediaProvider
+
+
+def test_phanrouter_image_poll_retries_transient_tls_eof(monkeypatch) -> None:
+    attempts = 0
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        nonlocal attempts
+        attempts += 1
+        if attempts == 1:
+            raise httpx.ConnectError("TLS EOF", request=request)
+        return httpx.Response(
+            200,
+            json={"data": {"status": "succeeded", "url": "https://media.test/final.jpeg"}},
+        )
+
+    provider = object.__new__(PhanRouterMediaProvider)
+    provider.settings = SimpleNamespace(
+        phanrouter_base_url="https://cloud.test/phanrouter",
+        poll_timeout=10.0,
+    )
+    provider.image_headers = {"Authorization": "Bearer runtime-only"}
+    provider.client = httpx.Client(
+        transport=httpx.MockTransport(handle),
+        timeout=2.0,
+    )
+    monkeypatch.setattr(phanrouter_module.time, "sleep", lambda _: None)
+    try:
+        url = provider._poll_image_url("durable-task")
+    finally:
+        provider.client.close()
+
+    assert url == "https://media.test/final.jpeg"
+    assert attempts == 2
 
 
 def test_series_assets_batch_base_before_edit(tmp_path: Path) -> None:
@@ -195,6 +232,7 @@ def test_phanrouter_forwards_gpt_image_references_as_two_urls(tmp_path: Path) ->
         image_model="gpt-image-2",
         phanrouter_base_url="https://example.invalid",
         inline_reference_images=False,
+        poll_timeout=2.0,
     )
     provider.client = Client()
     provider.image_headers = {}
@@ -219,3 +257,93 @@ def test_phanrouter_forwards_gpt_image_references_as_two_urls(tmp_path: Path) ->
     assert len(provider.client.payload["base64Files"]) == 2
     assert all(value == "anBlZw==" for value in provider.client.payload["base64Files"])
     assert "base64File" not in provider.client.payload
+    task = json.loads(
+        (tmp_path / "keyframe.jpeg.task.json").read_text(encoding="utf-8")
+    )
+    assert task["model"] == "gpt-image-2"
+    assert len(task["request_sha256"]) == 64
+
+
+def test_phanrouter_image_task_rejects_changed_request(tmp_path: Path) -> None:
+    class Client:
+        def post(self, *args, **kwargs):
+            raise AssertionError("a mismatched cached task must not submit or resume")
+
+    provider = object.__new__(PhanRouterMediaProvider)
+    provider.settings = SimpleNamespace(
+        image_model="gpt-image-2",
+        phanrouter_base_url="https://example.invalid",
+    )
+    provider.client = Client()
+    provider.image_headers = {}
+    output = tmp_path / "keyframe.jpeg"
+    output.with_suffix(output.suffix + ".task.json").write_text(
+        json.dumps(
+            {
+                "task_id": "paid-old-task",
+                "kind": "image",
+                "model": "gpt-image-2",
+                "request_sha256": "0" * 64,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(RuntimeError, match="does not match current request"):
+        provider.create_image("revised prompt", output)
+
+
+def test_phanrouter_image_download_retries_same_paid_task(
+    tmp_path: Path, monkeypatch
+) -> None:
+    poll_requests = 0
+    media_requests = 0
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        nonlocal poll_requests, media_requests
+        if request.method == "POST":
+            return httpx.Response(200, json={"task_id": "paid-image-task"})
+        if request.url.path.endswith("/v3/images/generations/paid-image-task"):
+            poll_requests += 1
+            return httpx.Response(
+                200,
+                json={
+                    "data": {
+                        "status": "succeeded",
+                        "url": "https://media.test/result.jpeg",
+                    }
+                },
+            )
+        if request.url == httpx.URL("https://media.test/result.jpeg"):
+            media_requests += 1
+            if media_requests == 1:
+                raise httpx.RemoteProtocolError("TLS EOF", request=request)
+            return httpx.Response(200, content=b"generated-image")
+        raise AssertionError(f"unexpected request: {request.method} {request.url}")
+
+    provider = object.__new__(PhanRouterMediaProvider)
+    provider.settings = SimpleNamespace(
+        image_model="gpt-image-2",
+        phanrouter_base_url="https://cloud.test/phanrouter",
+        poll_timeout=2.0,
+    )
+    provider.image_headers = {"Authorization": "Bearer runtime-only"}
+    provider.client = httpx.Client(
+        transport=httpx.MockTransport(handle),
+        timeout=2.0,
+    )
+    monkeypatch.setattr(phanrouter_module.time, "sleep", lambda _: None)
+    output = tmp_path / "frame.jpeg"
+    try:
+        result = provider.create_image("stable 3D frame", output)
+    finally:
+        provider.client.close()
+
+    assert result.path.read_bytes() == b"generated-image"
+    assert media_requests == 2
+    assert poll_requests == 2
+    task = json.loads(
+        output.with_suffix(output.suffix + ".task.json").read_text(encoding="utf-8")
+    )
+    assert task["task_id"] == "paid-image-task"
+    assert len(task["request_sha256"]) == 64

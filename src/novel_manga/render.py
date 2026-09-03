@@ -304,28 +304,45 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     f"asetpts=PTS-STARTPTS[a{index}]",
                 ]
             )
-        offsets = [0.0]
-        video_label = "v0"
-        audio_label = "a0"
-        cumulative = durations[0]
-        for index in range(1, len(sequence)):
-            fade = min(
-                crossfade_seconds,
-                max(0.01, durations[index - 1] / 4),
-                max(0.01, durations[index] / 4),
-            )
-            start = cumulative - fade
+        # Long xfade chains on the deployment FFmpeg can freeze alternating
+        # inputs at their first frame even though every normalized segment is
+        # animated. Use deterministic hard cuts for long episodes; short
+        # sequences retain the intended audiovisual crossfade.
+        if len(sequence) > 16 or crossfade_seconds <= 0:
+            labels = "".join(f"[v{index}][a{index}]" for index in range(len(sequence)))
             filters.append(
-                f"[{video_label}][v{index}]xfade=transition=fade:duration={fade:.3f}:"
-                f"offset={start:.6f}[vx{index}]"
+                f"{labels}concat=n={len(sequence)}:v=1:a=1[vcat][acat]"
             )
-            filters.append(
-                f"[{audio_label}][a{index}]acrossfade=d={fade:.3f}:c1=tri:c2=tri[ax{index}]"
-            )
-            video_label = f"vx{index}"
-            audio_label = f"ax{index}"
-            offsets.append(start)
-            cumulative = start + durations[index]
+            video_label = "vcat"
+            audio_label = "acat"
+            offsets = []
+            cumulative = 0.0
+            for duration in durations:
+                offsets.append(cumulative)
+                cumulative += duration
+        else:
+            offsets = [0.0]
+            video_label = "v0"
+            audio_label = "a0"
+            cumulative = durations[0]
+            for index in range(1, len(sequence)):
+                fade = min(
+                    crossfade_seconds,
+                    max(0.01, durations[index - 1] / 4),
+                    max(0.01, durations[index] / 4),
+                )
+                start = cumulative - fade
+                filters.append(
+                    f"[{video_label}][v{index}]xfade=transition=fade:duration={fade:.3f}:"
+                    f"offset={start:.6f}[vx{index}]"
+                )
+                filters.append(
+                    f"[{audio_label}][a{index}]acrossfade=d={fade:.3f}:c1=tri:c2=tri[ax{index}]"
+                )
+                video_label = f"vx{index}"
+                audio_label = f"ax{index}"
+                offsets.append(start)
+                cumulative = start + durations[index]
         output.parent.mkdir(parents=True, exist_ok=True)
         command.extend(
             [

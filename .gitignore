@@ -14,3 +14,4 @@ delivery/
 vendor/
 .env
 .env.local
+.runtime/

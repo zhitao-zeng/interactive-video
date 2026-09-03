@@ -21,7 +21,11 @@ from novel_manga.models import (
     TurnDelivery,
     VisualStrategy,
 )
-from novel_manga.production import SeriesAssetFactory, compile_production_plan
+from novel_manga.production import (
+    SeriesAssetFactory,
+    _action_physics_plan_for,
+    compile_production_plan,
+)
 from novel_manga.production_models import (
     AssetRecord,
     ProductionPlan,
@@ -31,13 +35,22 @@ from novel_manga.production_models import (
 )
 from novel_manga.production_runtime import (
     EpisodeProductionRuntime,
+    _is_compiled_provider_motion_prompt,
+    _native_quality_attempt_snapshot,
+    anime_image_safety_fallback_policy,
+    anime_image_safety_fallback_prompt,
+    anime_privacy_repair_policy,
+    anime_privacy_repair_prompt,
     build_visual_groups,
     compile_phanrouter_runtime_motion_prompt,
     compile_seedance_native_audio_prompt,
     copy_keyframe,
+    is_image_generation_safety_rejection,
+    is_real_person_privacy_rejection,
     keyframe_brightness_report,
 )
 from novel_manga.providers.base import ImageResult
+from novel_manga.util import atomic_write_json
 
 
 def _bible() -> StoryBible:
@@ -77,6 +90,20 @@ def _assets() -> SeriesAssetManifest:
         ],
         voice_assignments={"narrator": "alloy", "林晚": "coral"},
     )
+
+
+def test_native_quality_attempt_snapshot_does_not_create_report_cycle() -> None:
+    audio_row = {"group_id": "visual_001", "selected_source": "native_dialogue"}
+    snapshot = _native_quality_attempt_snapshot(
+        quality_attempt=0,
+        asr_row={"status": "passed", "cer": 0.0},
+        route={"passed": True},
+        audio_row=audio_row,
+    )
+    audio_row["quality_attempts"] = [snapshot]
+
+    json.dumps(audio_row, ensure_ascii=False)
+    assert snapshot["audio"] is not audio_row
 
 
 def test_api_visual_groups_keep_each_shot_as_one_generation_unit() -> None:
@@ -634,6 +661,67 @@ def test_action_shot_compiles_physics_chain_and_environment_feedback() -> None:
     adapter = runtime._build_provider_prompt_adapter(group, proxy)
     assert "裂纹" in adapter.video_prompt
     assert "环境只响应" in adapter.video_prompt
+    assert "全程画面必须恰好1名人物" in adapter.image_prompt
+    assert "全程画面必须恰好1名人物" in adapter.video_prompt
+    assert "不得新增群众、官员、守卫" in adapter.video_prompt
+    assert "已登记角色自身的影子不计作新增人物" not in adapter.video_prompt
+
+    shadow_group = group.model_copy(
+        update={
+            "keyframe_prompt": group.keyframe_prompt + "。人物长影必须清楚可见。",
+            "motion_prompt": group.motion_prompt + "。保留已登记角色自身的影子。",
+        }
+    )
+    shadow_proxy = runtime._visual_group_proxy(
+        shadow_group,
+        {unit.unit_id: unit},
+    )
+    shadow_adapter = runtime._build_provider_prompt_adapter(
+        shadow_group,
+        shadow_proxy,
+    )
+    assert "已登记角色自身的影子不计作新增人物" in shadow_adapter.video_prompt
+
+    state_group = group.model_copy(
+        update={
+            "motion_prompt": (
+                group.motion_prompt
+                + "【持续可见状态】角色全程佩戴同一木枷，不得中途消失"
+                "【/持续可见状态】"
+            )
+        }
+    )
+    state_proxy = runtime._visual_group_proxy(
+        state_group,
+        {unit.unit_id: unit},
+    )
+    state_adapter = runtime._build_provider_prompt_adapter(
+        state_group,
+        state_proxy,
+    )
+    assert "持续可见状态硬合同：角色全程佩戴同一木枷" in state_adapter.video_prompt
+    assert "持续可见状态硬合同" not in state_adapter.image_prompt
+    assert "【持续可见状态】" not in state_adapter.video_prompt
+    assert "【/持续可见状态】" not in state_adapter.video_prompt
+
+    prop_group = group.model_copy(
+        update={
+            "keyframe_prompt": (
+                group.keyframe_prompt
+                + "前景不得出现测试碑、发光金盒或发光方块。"
+            )
+        }
+    )
+    prop_proxy = runtime._visual_group_proxy(
+        prop_group,
+        {unit.unit_id: unit},
+    )
+    prop_adapter = runtime._build_provider_prompt_adapter(
+        prop_group,
+        prop_proxy,
+    )
+    assert "无关道具硬合同" in prop_adapter.image_prompt
+    assert "禁止测试碑、发光金盒、发光方块" in prop_adapter.video_prompt
 
 
 def test_missing_battle_energy_question_does_not_emit_energy_physics() -> None:
@@ -670,6 +758,31 @@ def test_missing_battle_energy_question_does_not_emit_energy_physics() -> None:
     )
 
     assert runtime.units[0].action_physics_plan is None
+
+
+def test_abstract_relationship_break_and_negative_prop_guard_emit_no_physics() -> None:
+    shot = Shot(
+        index=1,
+        narration="她听完真相，关系不可逆地破裂",
+        subtitle="她没有再说话。",
+        visual_prompt="她只看着对面的人，双手轻放木枷边缘",
+        motion_prompt=(
+            "手指完全不发力；木枷无裂纹、无碎屑，"
+            "不得断裂、粉碎或消失"
+        ),
+        characters=["沈玲玲"],
+        location="御审公堂",
+        source_quote="她没有再说话。",
+    )
+    turn = ScriptTurn(
+        role="narrator",
+        speaker_name="旁白",
+        speaking=False,
+        text="她听完真相，关系不可逆地破裂",
+        source_quote="她没有再说话。",
+    )
+
+    assert _action_physics_plan_for(shot, turn) is None
 
 
 def test_story_keyframe_keeps_all_visible_characters_and_exact_subject_count() -> None:
@@ -729,6 +842,174 @@ def test_story_keyframe_keeps_all_visible_characters_and_exact_subject_count() -
         "character_001@v001",
     ]
     assert "恰好保留2名已绑定具名角色" in group.keyframe_prompt
+
+
+def test_multi_character_reference_order_has_per_actor_identity_and_costume_bindings(
+    tmp_path: Path,
+) -> None:
+    assets = _two_character_assets()
+    assets.characters[0].name = "皇帝"
+    assets.characters[1].name = "沈玲玲"
+    assets.locations[0].name = "御审公堂"
+    novel_dir = tmp_path / "novel"
+    specs = {
+        "character_001": {
+            "name": "皇帝",
+            "age": "四十八岁",
+            "appearance": "面容清癯，眉骨明确，颌下短须",
+            "hair": "黑发夹少量灰，束于简洁帝冠",
+            "base_costume": "深褐黑暗金龙纹常服",
+            "palette": "深褐、黑、暗金",
+        },
+        "character_002": {
+            "name": "沈玲玲",
+            "age": "二十二岁",
+            "appearance": "鹅蛋脸，清亮杏眼",
+            "hair": "乌黑长发低束",
+            "episode_costumes": ["第1至3集戴木枷的青灰囚服"],
+            "base_costume": "青灰粗布囚服",
+            "palette": "青灰、冷白、旧褐",
+        },
+    }
+    for record in assets.characters:
+        path = novel_dir / record.spec_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps(specs[record.asset_id], ensure_ascii=False),
+            encoding="utf-8",
+        )
+
+    anchor = EpisodeProductionRuntime._multi_character_asset_text_anchor(
+        novel_dir,
+        assets,
+        ["character_001", "character_002"],
+        "location_001",
+    )
+
+    assert anchor.startswith("【多角色逐图强绑定】")
+    assert "图1严格且只对应皇帝（character_001）" in anchor
+    assert "四十八岁" in anchor
+    assert "颌下短须" in anchor
+    assert "图2严格且只对应沈玲玲（character_002）" in anchor
+    assert "第1至3集戴木枷的青灰囚服" in anchor
+    assert "图3严格且只对应空场御审公堂（location_001）" in anchor
+    assert "不得互换脸" in anchor
+    assert "不得把年长有须角色年轻化或去除胡须" in anchor
+
+
+@pytest.mark.parametrize(
+    "strategy",
+    [VisualStrategy.STORY_KEYFRAME, VisualStrategy.AUTO],
+)
+def test_silent_multi_character_keyframe_keeps_bound_character_first_order(
+    tmp_path: Path,
+    strategy: VisualStrategy,
+) -> None:
+    manifest = _two_character_assets()
+    novel_dir = tmp_path / "novel"
+    episode_dir = novel_dir / "episode"
+    character_paths = [
+        novel_dir / record.primary_image for record in manifest.characters
+    ]
+    location = novel_dir / manifest.locations[0].primary_image
+    for path, color in (
+        (character_paths[0], (55, 55, 60)),
+        (character_paths[1], (65, 65, 70)),
+        (location, (40, 40, 45)),
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        Image.new("RGB", (108, 192), color).save(path, "JPEG")
+    specs = [
+        {
+            "name": "林晚",
+            "age": "二十六岁",
+            "hair": "黑色齐肩短发",
+            "base_costume": "蓝色风衣",
+        },
+        {
+            "name": "周宇",
+            "age": "二十八岁",
+            "hair": "利落黑色短发",
+            "base_costume": "灰色夹克",
+        },
+    ]
+    for record, spec_payload in zip(manifest.characters, specs, strict=True):
+        spec = novel_dir / record.spec_path
+        spec.parent.mkdir(parents=True, exist_ok=True)
+        spec.write_text(
+            json.dumps(spec_payload, ensure_ascii=False),
+            encoding="utf-8",
+        )
+
+    class Assets:
+        calls: list[tuple[str, Path, tuple[Path, ...]]] = []
+
+        def reference_board(self, episode_dir, unit, series_assets, novel_dir):
+            return location
+
+        def _ensure_image(
+            self,
+            prompt,
+            output,
+            reference=None,
+            additional_references=(),
+        ):
+            self.calls.append((prompt, reference, additional_references))
+            output.parent.mkdir(parents=True, exist_ok=True)
+            Image.new("RGB", (108, 192), (50, 50, 55)).save(output, "JPEG")
+            return ImageResult(path=output)
+
+    unit = RuntimeUnit(
+        unit_id="visual_001",
+        episode_id="1_1",
+        scene_id="scene_001",
+        shot_id="shot_001",
+        shot_index=1,
+        turn_index=1,
+        role="narrator",
+        speaker_name="旁白",
+        speaking=False,
+        delivery_mode=TurnDelivery.SILENT_ACTION,
+        text="两人同时停步",
+        emotion="警惕",
+        source_quote="两人同时停步",
+        character_asset_ids=["character_001", "character_002"],
+        location_asset_id="location_001",
+        voice="narrator",
+        visual_prompt="3D国漫旧书店内，林晚与周宇同时停步",
+        motion_instruction="两人同时停步",
+        motion_prompt="固定机位",
+        keyframe_prompt="两人在旧书店内形成对峙",
+        composition_prompt="同一行动轴上的双人中景",
+        visual_strategy=strategy,
+        keyframe_path="work/keyframe.jpeg",
+        raw_video_path="work/video.mp4",
+        segment_path="work/segment.mp4",
+    )
+    generated = Assets()
+    runtime = EpisodeProductionRuntime(
+        Settings(
+            provider="phanrouter",
+            image_model="gpt-image-2",
+            video_model="sd2.5",
+        ),
+        None,
+        None,
+        generated,
+        None,
+    )  # type: ignore[arg-type]
+
+    runtime._prepare_keyframe(episode_dir, novel_dir, unit, manifest)
+
+    assert len(generated.calls) == 1
+    prompt, primary, additional = generated.calls[0]
+    assert primary == character_paths[0]
+    assert additional == (character_paths[1], location)
+    assert prompt.startswith("【多角色逐图强绑定】")
+    assert "图1严格且只对应林晚（character_001）" in prompt
+    assert "图2严格且只对应周宇（character_002）" in prompt
+    assert "图3严格且只对应空场旧书店（location_001）" in prompt
+    assert "图1只锁定空场" not in prompt
 
 
 def test_story_keyframe_discovers_visible_listener_from_visual_prompt() -> None:
@@ -1222,6 +1503,53 @@ def test_nonvisible_character_voice_keeps_voice_identity_without_driving_lips() 
     assert "口型必须与参考音频逐字同步" not in unit.motion_prompt
 
 
+def test_silent_action_contract_keeps_visible_character_asset() -> None:
+    source = "林晚抬眼看向门外。"
+    episode = Episode(
+        index=1,
+        source_title="第一章",
+        source_text=source,
+        text_count=len(source),
+        source_start=0,
+        source_end=len(source),
+    )
+    shot = Shot(
+        index=1,
+        narration=source,
+        subtitle=source,
+        visual_prompt="林晚抬眼看向旧书店门外，嘴巴闭合",
+        motion_prompt="林晚抬眼后停住",
+        characters=["林晚"],
+        location="旧书店",
+        source_quote=source,
+        turns=[
+            ScriptTurn(
+                role="action",
+                speaker_name="",
+                text=source,
+                delivery_mode=TurnDelivery.SILENT_ACTION,
+                derivation="derived",
+                device="consequence",
+                serves=["event_001"],
+                source_quote=source,
+            )
+        ],
+    )
+    runtime = compile_production_plan(
+        "1_1",
+        episode,
+        EpisodePlan(video_title="门外", hook="门外", summary="门外", shots=[shot]),
+        _bible(),
+        _assets(),
+    )
+    group = build_visual_groups(runtime, series_assets=_assets())[0]
+
+    assert group.shot_contract is not None
+    assert group.shot_contract.visible_asset_ids == ["character_001@v001"]
+    assert group.image_contract is not None
+    assert group.image_contract.exact_subject_count == 1
+
+
 def test_dialogue_unit_excludes_non_speaker_from_prompt_and_asset_ids() -> None:
     source = "周宇站在门边，林晚低声说：“不要开门。”"
     episode = Episode(
@@ -1369,7 +1697,13 @@ def test_locked_series_asset_survives_prompt_revision_without_image_call(tmp_pat
     class Provider:
         calls = 0
 
-        def create_image(self, prompt, output, reference=None):
+        def create_image(
+            self,
+            prompt,
+            output,
+            reference=None,
+            additional_references=(),
+        ):
             self.calls += 1
             raise AssertionError("locked series asset should be reused")
 
@@ -1452,6 +1786,17 @@ def test_cartoon_style_exclusion_does_not_select_2_5d_rendering() -> None:
 def test_production_settings_fail_closed_without_asr_backend() -> None:
     with pytest.raises(ValueError, match="NOVEL_ASR_COMMAND"):
         Settings(provider="mock", admission_mode="production").validate()
+
+
+def test_production_settings_fail_closed_when_asr_executable_is_missing(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(ValueError, match="executable not found"):
+        Settings(
+            provider="mock",
+            admission_mode="production",
+            asr_command=str(tmp_path / "missing-asr"),
+        ).validate()
 
 
 def test_latentsync_is_hard_disabled() -> None:
@@ -1985,12 +2330,19 @@ def test_sd25_privacy_rejection_redraws_anime_keyframe_before_retry(
         image_calls = 0
         keyframe_bytes: list[bytes] = []
 
-        def create_image(self, prompt, output, reference=None):
+        def create_image(
+            self,
+            prompt,
+            output,
+            reference=None,
+            additional_references=(),
+        ):
             self.image_calls += 1
             assert reference is not None
             assert reference.read_bytes() == b"photo-like-anime-keyframe"
             assert "明确的原创二维国风电视动画" in prompt
             assert "禁止真人照片" in prompt
+            assert tuple(additional_references) == (reference_path,)
             output.parent.mkdir(parents=True, exist_ok=True)
             output.write_bytes(b"flat-cel-anime-keyframe")
             return ImageResult(path=output)
@@ -2021,6 +2373,7 @@ def test_sd25_privacy_rejection_redraws_anime_keyframe_before_retry(
     episode_dir = tmp_path / "episode"
     audio = episode_dir / "work/audio.wav"
     reference = episode_dir / "work/reference.jpeg"
+    reference_path = reference
     audio.parent.mkdir(parents=True, exist_ok=True)
     audio.write_bytes(b"audio")
     reference.write_bytes(b"reference")
@@ -2067,7 +2420,57 @@ def test_sd25_privacy_rejection_redraws_anime_keyframe_before_retry(
     assert (episode_dir / "work/clip.mp4").read_bytes() == b"video-safe-retry"
     report = next(episode_dir.glob("work/visual_attempts/**/privacy_repair_report.json"))
     assert json.loads(report.read_text(encoding="utf-8"))["policy"] == (
-        "explicit-flat-2d-anime-redraw-v1"
+        "explicit-flat-2d-anime-redraw-v2-reference-locked"
+    )
+
+
+def test_sd25_privacy_repair_preserves_locked_3d_guoman_medium() -> None:
+    unit = RuntimeUnit(
+        unit_id="visual_001",
+        episode_id="1_1",
+        scene_id="scene_001",
+        shot_id="shot_001",
+        shot_index=1,
+        turn_index=1,
+        role="皇帝",
+        speaker_name="皇帝",
+        speaking=True,
+        text="沈玲玲。",
+        emotion="审视",
+        source_quote="沈玲玲。",
+        character_asset_ids=["character_001"],
+        location_asset_id="location_001",
+        voice="native",
+        visual_prompt="高品质中国3D国漫动画，皇帝在御审公堂看向堂下",
+        motion_instruction=(
+            "皇帝开口点名"
+            "【持续可见状态】角色全程佩戴同一木枷，仅一条铁链垂下"
+            "【/持续可见状态】"
+        ),
+        motion_prompt="皇帝开口点名",
+        keyframe_prompt="3D国漫公堂",
+        keyframe_path="work/keyframe.jpeg",
+        raw_video_path="work/clip.mp4",
+        segment_path="work/segment.mp4",
+    )
+
+    prompt = anime_privacy_repair_prompt(unit)
+
+    assert "原创、明显风格化的中国3D国漫动画" in prompt
+    assert "简化雕塑式东方面部" in prompt
+    assert "克制Toon-PBR材质" in prompt
+    assert "禁止真人照片" in prompt
+    assert "禁止二维线稿" in prompt
+    assert "最终画面必须恰好1名人物" in prompt
+    assert "背景必须完全无人" in prompt
+    assert "持续可见状态硬合同" in prompt
+    assert "角色全程佩戴同一木枷" in prompt
+    assert "不得用椅背、栏杆、衣领、项圈或新刑具替代" in prompt
+    assert "不得新增、删除、替换或发光化任何道具" in prompt
+    assert "桌面、地面与前景必须保持空净" in prompt
+    assert "禁止真人照片、写实皮肤" not in prompt
+    assert anime_privacy_repair_policy(unit) == (
+        "stylized-3d-guoman-privacy-redraw-v2-reference-locked"
     )
 
 
@@ -2147,6 +2550,142 @@ def test_image_safety_rejection_uses_calm_anime_start_frame(tmp_path: Path) -> N
     )
     assert json.loads(report.read_text(encoding="utf-8"))["policy"] == (
         "calm-single-subject-anime-start-frame-v1"
+    )
+
+
+def test_image_safety_rejection_recognizes_hosted_nsfw_status() -> None:
+    assert is_image_generation_safety_rejection(
+        RuntimeError("image generation failed: {'error': {'message': '422, failMsg=nsfw'}}")
+    )
+
+
+def test_video_privacy_rejection_recognizes_generic_sensitive_image_code() -> None:
+    assert is_real_person_privacy_rejection(
+        RuntimeError("InputImageSensitiveContentDetected.PrivacyInformation")
+    )
+    assert is_real_person_privacy_rejection(
+        RuntimeError("InputImageSensitiveContentDetected")
+    )
+
+
+def test_motion_only_change_can_reuse_matching_keyframe_request(
+    tmp_path: Path,
+) -> None:
+    settings = Settings(
+        provider="phanrouter",
+        image_model="gpt-image-2",
+        video_model="sd2.5",
+    )
+    runtime = EpisodeProductionRuntime(
+        settings,
+        None,
+        None,
+        None,
+        None,
+    )  # type: ignore[arg-type]
+    reference = tmp_path / "character.jpeg"
+    additional = tmp_path / "location.jpeg"
+    Image.new("RGB", (32, 32), "blue").save(reference)
+    Image.new("RGB", (32, 32), "yellow").save(additional)
+    group_root = tmp_path / "work/visual_attempts/visual_001"
+    previous = group_root / "old-video-identity/attempt_01/keyframe.jpeg"
+    previous.parent.mkdir(parents=True)
+    Image.new("RGB", (32, 32), "green").save(previous)
+    prompt = "same approved image prompt"
+    identity = runtime._keyframe_request_identity(
+        prompt=prompt,
+        reference=reference,
+        additional_references=(additional,),
+    )
+    atomic_write_json(
+        previous.with_suffix(previous.suffix + ".request.json"),
+        {**identity, "request_sha256": "provider-side-id"},
+    )
+
+    found = runtime._find_compatible_keyframe_attempt(
+        group_attempt_root=group_root,
+        output=group_root / "new-video-identity/attempt_01/keyframe.jpeg",
+        prompt=prompt,
+        reference=reference,
+        additional_references=(additional,),
+    )
+
+    assert found == previous
+
+
+def test_compiled_provider_motion_prompt_is_not_recompiled() -> None:
+    assert _is_compiled_provider_motion_prompt(
+        "4.0秒竖屏，高品质3D国漫。持续可见状态硬合同：木枷全程保留。"
+    )
+    assert not _is_compiled_provider_motion_prompt("这是一个完整连续表演镜头")
+
+
+def test_matching_privacy_repair_can_be_reused_across_motion_revision(
+    tmp_path: Path,
+) -> None:
+    group_root = tmp_path / "visual_035"
+    repaired = group_root / "old-motion/attempt_02/keyframe.jpeg"
+    repaired.parent.mkdir(parents=True)
+    Image.new("RGB", (32, 32), "green").save(repaired)
+    repair_sha256 = hashlib.sha256(repaired.read_bytes()).hexdigest()
+    atomic_write_json(
+        repaired.parent / "privacy_repair_report.json",
+        {
+            "repair_prompt": "state-locked-redraw",
+            "source_sha256": "approved-source",
+            "repair_sha256": repair_sha256,
+            "policy": "locked-v2",
+            "repair_reference_sha256s": ["asset-a", "location-b"],
+        },
+    )
+
+    found = EpisodeProductionRuntime._find_compatible_privacy_repair(
+        group_attempt_root=group_root,
+        prompt="state-locked-redraw",
+        source_sha256="approved-source",
+        policy="locked-v2",
+        reference_sha256s=["asset-a", "location-b"],
+    )
+
+    assert found is not None
+    assert found[0] == repaired
+
+
+def test_image_safety_fallback_preserves_3d_medium_and_exact_cast() -> None:
+    unit = RuntimeUnit(
+        unit_id="visual_033",
+        episode_id="1_1",
+        scene_id="scene_007",
+        shot_id="shot_033",
+        shot_index=33,
+        turn_index=1,
+        role="皇帝",
+        speaker_name="皇帝",
+        speaking=True,
+        text="带小雨上来。",
+        emotion="威严",
+        source_quote="带小雨上来。",
+        character_asset_ids=["character_004", "character_001"],
+        location_asset_id="location_003",
+        voice="native",
+        visual_prompt="高品质中国3D国漫动画，皇帝摆手，沈玲玲转向侧门",
+        motion_prompt="皇帝开口下令",
+        keyframe_prompt="3D国漫公堂双人镜头",
+        keyframe_path="work/keyframe.jpeg",
+        raw_video_path="work/clip.mp4",
+        segment_path="work/segment.mp4",
+    )
+
+    prompt = anime_image_safety_fallback_prompt(unit)
+
+    assert "高品质中国3D国漫动画" in prompt
+    assert "最终画面必须恰好2名人物" in prompt
+    assert "其余已登记人物只做安静反应并闭嘴" in prompt
+    assert "克制Toon-PBR材质" in prompt
+    assert "二维线稿" in prompt
+    assert "禁止真人照片" in prompt
+    assert anime_image_safety_fallback_policy(unit) == (
+        "calm-exact-cast-3d-guoman-start-frame-v1"
     )
 
 

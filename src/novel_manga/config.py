@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import os
+import shlex
+import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -60,9 +62,11 @@ class Settings:
     video_workers: int = 2
     max_unit_attempts: int = 2
     asr_command: str | None = None
+    director_review_command: str | None = None
     max_asr_cer: float = 0.12
     max_turn_cer: float = 0.35
     max_subtitle_cps: float = 15.0
+    min_style_consistency: float = 0.78
     request_timeout: float = 180.0
     poll_timeout: float = 900.0
 
@@ -165,7 +169,11 @@ class Settings:
             video_workers=int(os.getenv("NOVEL_VIDEO_WORKERS", "2")),
             max_unit_attempts=int(os.getenv("NOVEL_MAX_UNIT_ATTEMPTS", "2")),
             asr_command=os.getenv("NOVEL_ASR_COMMAND"),
+            director_review_command=os.getenv("NOVEL_DIRECTOR_REVIEW_COMMAND"),
             max_subtitle_cps=float(os.getenv("NOVEL_MAX_SUBTITLE_CPS", "15")),
+            min_style_consistency=float(
+                os.getenv("NOVEL_MIN_STYLE_CONSISTENCY", "0.78")
+            ),
             request_timeout=float(os.getenv("NOVEL_REQUEST_TIMEOUT", "180")),
             poll_timeout=float(os.getenv("NOVEL_POLL_TIMEOUT", "900")),
         )
@@ -222,6 +230,8 @@ class Settings:
             raise ValueError("NOVEL_MAX_UNIT_ATTEMPTS must be between 1 and 4")
         if self.request_timeout <= 0 or self.poll_timeout <= 0:
             raise ValueError("request and poll timeouts must be positive")
+        if not 0.0 < self.min_style_consistency <= 1.0:
+            raise ValueError("NOVEL_MIN_STYLE_CONSISTENCY must be in (0, 1]")
         if self.style_master_path is not None and not self.style_master_path.is_file():
             raise ValueError(
                 f"NOVEL_STYLE_MASTER_PATH not found: {self.style_master_path}"
@@ -280,6 +290,41 @@ class Settings:
                 raise ValueError(
                     "production admission requires executable evidence backends: "
                     + ", ".join(missing_quality)
+                )
+            assert self.asr_command is not None
+            try:
+                asr_argv = shlex.split(self.asr_command)
+            except ValueError as error:
+                raise ValueError("NOVEL_ASR_COMMAND has invalid shell quoting") from error
+            if not asr_argv:
+                raise ValueError("NOVEL_ASR_COMMAND is empty")
+            asr_executable = asr_argv[0]
+            asr_path = Path(asr_executable)
+            if not (
+                (asr_path.is_file() and os.access(asr_path, os.X_OK))
+                or shutil.which(asr_executable)
+            ):
+                raise ValueError(
+                    f"NOVEL_ASR_COMMAND executable not found: {asr_executable}"
+                )
+        if self.director_review_command:
+            try:
+                review_argv = shlex.split(self.director_review_command)
+            except ValueError as error:
+                raise ValueError(
+                    "NOVEL_DIRECTOR_REVIEW_COMMAND has invalid shell quoting"
+                ) from error
+            if not review_argv:
+                raise ValueError("NOVEL_DIRECTOR_REVIEW_COMMAND is empty")
+            review_executable = review_argv[0]
+            review_path = Path(review_executable)
+            if not (
+                (review_path.is_file() and os.access(review_path, os.X_OK))
+                or shutil.which(review_executable)
+            ):
+                raise ValueError(
+                    "NOVEL_DIRECTOR_REVIEW_COMMAND executable not found: "
+                    + review_executable
                 )
         if not self.font_path.is_file():
             raise ValueError(f"subtitle/card font not found: {self.font_path}")

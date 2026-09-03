@@ -82,8 +82,10 @@ from .util import atomic_write_json
 
 
 STYLE = (
-    "精致国漫动态漫画，二维赛璐璐手绘，清晰墨线，柔和电影光影，"
-    "人物五官稳定，服饰连续，竖屏中近景构图，禁止真人照片、3D和欧美卡通混入"
+    "高品质中国3D国漫动画，简化雕塑式东方面部结构，自然人体比例，"
+    "哑光无毛孔皮肤，束状设计发丝，克制Toon-PBR布料木石金属，"
+    "电影化但清楚的体积光；禁止真人照片、塑料玩偶、欧美卡通、"
+    "二维线稿、平面赛璐璐和游戏角色创建界面"
 )
 
 DIAGNOSIS_TOKEN_BUDGET = 6000
@@ -113,6 +115,22 @@ REVIEW_CONTENT_PATCH_TOKENS = {
 }
 
 ValidatedT = TypeVar("ValidatedT")
+
+
+def _evidence_quote_matches_event(candidate: str, event_quote: str) -> bool:
+    """Accept event inference only from a discriminative source excerpt."""
+
+    candidate_key = _quote_key(candidate)
+    event_key = _quote_key(event_quote)
+    if not candidate_key or not event_key:
+        return False
+    if event_key in candidate_key:
+        return True
+    return (
+        candidate_key in event_key
+        and len(candidate_key) >= 8
+        and len(candidate_key) / len(event_key) >= 0.15
+    )
 
 
 class EpisodePlanningFailed(ValueError):
@@ -302,11 +320,38 @@ def _validate_retention_beat_script(
         if diagnosis is not None
         else {}
     )
+    event_windows: dict[str, tuple[int, int]] = {}
+    if diagnosis is not None:
+        positioned_events = []
+        for event in sorted(diagnosis.events, key=lambda value: value.order):
+            position = episode_source_key.find(_quote_key(event.source_quote))
+            if position >= 0:
+                positioned_events.append((event.event_id, position))
+        for index, (event_id, position) in enumerate(positioned_events):
+            end = (
+                positioned_events[index + 1][1]
+                if index + 1 < len(positioned_events)
+                else len(episode_source_key)
+            )
+            event_windows[event_id] = (position, end)
+
+    def event_evidence_matches(candidate: str, event_id: str) -> bool:
+        event = diagnosis_events.get(event_id)
+        if event is None:
+            return False
+        if _evidence_quote_matches_event(candidate, event.source_quote):
+            return True
+        candidate_key = _quote_key(candidate)
+        if len(candidate_key) < 8 or event_id not in event_windows:
+            return False
+        candidate_position = episode_source_key.find(candidate_key)
+        start, end = event_windows[event_id]
+        return start <= candidate_position < end
 
     def anonymous_name(value: str) -> bool:
         return bool(
             re.search(
-                r"(?:人群|群众|群声|族人|少年|少女|姐妹|同伴|过客|路人|弟子|侍者|围观者|画外音|声音)",
+                r"(?:人群|群众|群声|族人|少年|少女|姐妹|同伴|过客|路人|弟子|侍者|测验员|围观者|画外音|声音)",
                 value,
             )
         )
@@ -321,7 +366,39 @@ def _validate_retention_beat_script(
             ),
         )
     )
+    location_names = [
+        str(location).split("：", 1)[0].strip()
+        for location in bible.locations
+        if str(location).strip()
+    ]
+    previous_location = ""
     for raw_shot in data.get("shots", []):
+        location = str(raw_shot.get("location", "")).strip()
+        if not location:
+            location_surface = " ".join(
+                (
+                    str(raw_shot.get("blocking", "")),
+                    str(raw_shot.get("change", "")),
+                    str(raw_shot.get("source_quote", "")),
+                )
+            )
+            mentioned_locations = [
+                name
+                for name in location_names
+                if name in location_surface
+                or (
+                    len(name) >= 2
+                    and name[-2:] in location_surface
+                )
+            ]
+            if len(mentioned_locations) == 1:
+                location = mentioned_locations[0]
+            elif previous_location:
+                location = previous_location
+            if location:
+                raw_shot["location"] = location
+        if location:
+            previous_location = location
         shot_quote_key = _quote_key(
             str(raw_shot.get("source_quote", ""))
         )
@@ -371,6 +448,39 @@ def _validate_retention_beat_script(
         ):
             raw_intent["dramatic_function"] = "reveal"
         for raw_turn in raw_shot.get("turns", []):
+            if (
+                native_dialogue
+                and raw_turn.get("role", "narrator")
+                in {"", "narrator", "旁白"}
+                and raw_turn.get("delivery_mode")
+                == TurnDelivery.OFFSCREEN_DIALOGUE
+            ):
+                surface = " ".join(
+                    (
+                        str(raw_turn.get("text", "")),
+                        str(raw_shot.get("blocking", "")),
+                        str(raw_shot.get("change", "")),
+                    )
+                )
+                shot_characters = {
+                    str(name).strip()
+                    for name in raw_shot.get("characters", [])
+                }
+                anonymous_speaker = (
+                    "无名测验员"
+                    if any("测验员" in name for name in shot_characters)
+                    or "测验员" in surface
+                    else "无名族人"
+                )
+                raw_turn.update(
+                    {
+                        "role": anonymous_speaker,
+                        "speaker_name": anonymous_speaker,
+                        "speaking": False,
+                        "device": raw_turn.get("device")
+                        or TurnDevice.CROWD_PROXY,
+                    }
+                )
             if (
                 native_dialogue
                 and anonymous_carrier_context
@@ -430,12 +540,47 @@ def _validate_retention_beat_script(
                         str(raw_shot.get("change", "")),
                     )
                 )
+                anonymous_characters = [
+                    str(name).strip()
+                    for name in raw_shot.get("characters", [])
+                    if str(name).strip() not in canonical_names
+                    and anonymous_name(str(name).strip())
+                ]
+                turn_text = str(raw_turn.get("text", ""))
+                anonymous_speaker = ""
+                if any("测验员" in name for name in anonymous_characters) and (
+                    re.search(r"(?:下一个|战之[气力]|级别|[一二三四五六七八九十\d]+段)", turn_text)
+                    or re.search(
+                        r"测验员[^。；，\s]{0,24}(?:说|道|喊|开口|宣读|宣布|公布|叫)",
+                        visible_surface,
+                    )
+                ):
+                    anonymous_speaker = "无名测验员"
+                elif any(
+                    re.search(
+                        re.escape(name)
+                        + r"[^。；，\s]{0,24}(?:说|道|喊|开口|宣读|宣布|问|答|叫|低声|高声)",
+                        visible_surface,
+                    )
+                    for name in anonymous_characters
+                ):
+                    anonymous_speaker = "无名族人"
+                if anonymous_speaker:
+                    speaker = anonymous_speaker
+                    raw_turn.update(
+                        {
+                            "role": speaker,
+                            "speaker_name": speaker,
+                            "speaking": False,
+                            "delivery_mode": TurnDelivery.OFFSCREEN_DIALOGUE,
+                        }
+                    )
                 speaking_candidates = [
                     name
                     for name in canonical_names
                     if re.search(
                         re.escape(name)
-                        + r"[^。；，]{0,24}(?:说|道|喊|开口|宣读|宣布|问|答|叫|低声|高声)",
+                        + r"[^。；，\s]{0,24}(?:说|道|喊|开口|宣读|宣布|问|答|叫|低声|高声)",
                         visible_surface,
                     )
                 ]
@@ -444,7 +589,9 @@ def _validate_retention_beat_script(
                     for name in canonical_names
                     if name in visible_surface
                 ]
-                if len(speaking_candidates) == 1:
+                if speaker:
+                    pass
+                elif len(speaking_candidates) == 1:
                     speaker = speaking_candidates[0]
                     raw_turn["speaker_name"] = speaker
                     raw_turn["role"] = speaker
@@ -452,6 +599,21 @@ def _validate_retention_beat_script(
                     speaker = visible_candidates[0]
                     raw_turn["speaker_name"] = speaker
                     raw_turn["role"] = speaker
+                elif len(visible_candidates) == 2:
+                    addressed = {
+                        name
+                        for name in visible_candidates
+                        if re.search(
+                            re.escape(name)
+                            + r"(?:哥哥|姐姐|弟弟|妹妹|父亲|母亲|叔叔|伯伯|大人|小姐|公子)",
+                            str(raw_turn.get("text", "")),
+                        )
+                    }
+                    possible_speakers = set(visible_candidates) - addressed
+                    if addressed and len(possible_speakers) == 1:
+                        speaker = possible_speakers.pop()
+                        raw_turn["speaker_name"] = speaker
+                        raw_turn["role"] = speaker
             if (
                 raw_turn.get("delivery_mode")
                 == TurnDelivery.VISIBLE_DIALOGUE
@@ -530,6 +692,16 @@ def _validate_retention_beat_script(
                     "",
                 )
             if (
+                _quote_key(str(raw_turn.get("source_quote", "")))
+                not in episode_source_key
+                and _quote_key(str(raw_shot.get("source_quote", "")))
+                in episode_source_key
+            ):
+                # A turn-level paraphrased citation is not useful evidence.
+                # Ground it to the already validated shot excerpt; verbatim
+                # text is still checked separately against that exact quote.
+                raw_turn["source_quote"] = raw_shot.get("source_quote", "")
+            if (
                 raw_turn.get("derivation") == TurnDerivation.ABRIDGED
                 and not _spoken_lines(
                     str(raw_turn.get("source_quote", ""))
@@ -555,6 +727,15 @@ def _validate_retention_beat_script(
                 and raw_turn.get("serves")
             ):
                 raw_turn["derivation"] = TurnDerivation.DERIVED
+    bounded_raw_shots = []
+    for raw_shot in data.get("shots", []):
+        raw_turns = list(raw_shot.get("turns", []))
+        for start in range(0, len(raw_turns), 6):
+            bounded = json.loads(json.dumps(raw_shot, ensure_ascii=False))
+            bounded["turns"] = raw_turns[start : start + 6]
+            bounded["local_index"] = len(bounded_raw_shots) + 1
+            bounded_raw_shots.append(bounded)
+    data["shots"] = bounded_raw_shots
     script = RetentionBeatScript.model_validate(data)
     beat_event_ids = set(beat.event_ids)
     normalized_shots = []
@@ -566,10 +747,7 @@ def _validate_retention_beat_script(
                 event_id
                 for event_id, event in diagnosis_events.items()
                 if turn_key
-                and (
-                    turn_key in _quote_key(event.source_quote)
-                    or _quote_key(event.source_quote) in turn_key
-                )
+                and event_evidence_matches(turn.source_quote, event_id)
             }
         inferred_inside = {
             event_id
@@ -577,10 +755,25 @@ def _validate_retention_beat_script(
             for event_id in matches
             if event_id in beat_event_ids
         }
+        explicit_inside = set(shot.event_ids) & beat_event_ids
+        if diagnosis_events:
+            explicit_inside = {
+                event_id
+                for event_id in explicit_inside
+                if event_id in diagnosis_events
+                and (
+                    event_evidence_matches(shot.source_quote, event_id)
+                    or any(
+                        event_id in turn.serves
+                        and turn.derivation == TurnDerivation.DERIVED
+                        for turn in shot.turns
+                    )
+                )
+            }
         inside_event_ids = [
             event_id
             for event_id in beat.event_ids
-            if event_id in set(shot.event_ids) | inferred_inside
+            if event_id in explicit_inside | inferred_inside
         ]
         if not inside_event_ids:
             continue
@@ -607,6 +800,7 @@ def _validate_retention_beat_script(
                 and clean_length > SHORT_DRAMA_TURN_HARD_MAX
             ):
                 remaining = turn.text
+                chunks = []
                 while remaining:
                     if len(re.sub(r"\s+", "", remaining)) <= SHORT_DRAMA_TURN_HARD_MAX:
                         chunk, remaining = remaining, ""
@@ -618,7 +812,7 @@ def _validate_retention_beat_script(
                                 for index, character in enumerate(
                                     remaining[:raw_end]
                                 )
-                                if character in "，。！？；：、…,.!?;:"
+                                if character in "，。！？；：、…—,.!?;:"
                             ),
                             default=raw_end,
                         )
@@ -626,7 +820,20 @@ def _validate_retention_beat_script(
                             remaining[:preferred],
                             remaining[preferred:],
                         )
-                    exact_turns.append(turn.model_copy(update={"text": chunk}))
+                    chunks.append(chunk)
+                if (
+                    len(chunks) > 1
+                    and not re.sub(r"[\s，。！？；：、…—,.!?;:]", "", chunks[-1])
+                    and len(chunks[-2]) > 4
+                ):
+                    punctuation = chunks.pop()
+                    previous = chunks.pop()
+                    chunks.extend((previous[:-3], previous[-3:] + punctuation))
+                exact_turns.extend(
+                    turn.model_copy(update={"text": chunk})
+                    for chunk in chunks
+                    if chunk.strip()
+                )
             else:
                 exact_turns.append(turn)
         shot = shot.model_copy(update={"turns": exact_turns})
@@ -640,6 +847,13 @@ def _validate_retention_beat_script(
                         "device": turn.device or TurnDevice.SPATIAL,
                         "serves": turn.serves or list(shot.event_ids),
                     }
+                )
+            elif turn.derivation == TurnDerivation.DERIVED and turn.device is None:
+                update["device"] = (
+                    TurnDevice.CROWD_PROXY
+                    if turn.delivery_mode == TurnDelivery.OFFSCREEN_DIALOGUE
+                    and anonymous_name(turn.speaker_name)
+                    else TurnDevice.LISTENER_QA
                 )
             if (
                 turn.derivation == TurnDerivation.DERIVED
@@ -657,20 +871,13 @@ def _validate_retention_beat_script(
                 if served_event is not None:
                     update["source_quote"] = served_event.source_quote
             normalized_turns.append(turn.model_copy(update=update))
-        turn_quote_keys = [
-            _quote_key(turn.source_quote)
-            for turn in normalized_turns
-            if _quote_key(turn.source_quote)
-        ]
         inferred_events = [
             event_id
             for event_id in beat.event_ids
             if event_id in diagnosis_events
             and any(
-                turn_key in _quote_key(diagnosis_events[event_id].source_quote)
-                or _quote_key(diagnosis_events[event_id].source_quote)
-                in turn_key
-                for turn_key in turn_quote_keys
+                event_evidence_matches(turn.source_quote, event_id)
+                for turn in normalized_turns
             )
         ]
         served_events = [
@@ -726,7 +933,22 @@ def _validate_retention_beat_script(
                 }
             )
         )
-    script = script.model_copy(update={"shots": normalized_shots})
+    bounded_normalized_shots = []
+    for shot in normalized_shots:
+        for start in range(0, len(shot.turns), 6):
+            bounded_normalized_shots.append(
+                shot.model_copy(
+                    update={
+                        "local_index": len(bounded_normalized_shots) + 1,
+                        "turns": shot.turns[start : start + 6],
+                    }
+                )
+            )
+    script = RetentionBeatScript.model_validate(
+        script.model_copy(
+            update={"shots": bounded_normalized_shots}
+        ).model_dump(mode="json")
+    )
     issues = []
     if script.beat_id != beat.beat_id:
         issues.append("beat_id must equal the requested retention beat")
@@ -939,6 +1161,11 @@ def _validate_retention_beat_direction(
     native_dialogue: bool,
 ) -> RetentionBeatDirection:
     data = json.loads(json.dumps(data, ensure_ascii=False))
+    script_source_surface = " ".join(
+        value
+        for shot in script.shots
+        for value in (shot.source_quote, shot.blocking, shot.change)
+    )
 
     def provider_safe_performance_text(value: str) -> str:
         value = re.sub(
@@ -969,6 +1196,18 @@ def _validate_retention_beat_direction(
             ("眼神空洞", "视线停住"),
         ):
             value = value.replace(source, replacement)
+        if not re.search(r"(?:古戒|戒指)", script_source_surface):
+            value = re.sub(
+                r"[^，。；]*(?:古戒|戒指)[^，。；]*[，。；]?",
+                "右手自然垂在身侧，",
+                value,
+            )
+        if not re.search(r"(?:书籍|书册)", script_source_surface):
+            value = re.sub(
+                r"[^，。；]*(?:书籍|书册)[^，。；]*[，。；]?",
+                "双手在身前收紧，",
+                value,
+            )
         return value
 
     def provider_safe_data(value):
@@ -2272,6 +2511,10 @@ class OpenAICompatiblePlanner(Planner):
             self._diagnose_episode(episode, bible, None)
             for episode in novel.episodes
         ]
+        atomic_write_json(
+            root / f"chapter_diagnoses.{version}.candidate.json",
+            [row.model_dump(mode="json") for row in diagnoses],
+        )
         system = (
             "你是系列故事开发负责人。输入只有各章紧凑诊断；输出一次性的系列压力引擎、"
             "主角默认策略为何制造新问题、升级阶梯、关系压力网、setup/payoff义务和逐章投影。"
@@ -4112,6 +4355,7 @@ class OpenAICompatiblePlanner(Planner):
         released_fact_ids: list[str],
         beat_root: Path,
         episode_contract: EpisodeContract | None = None,
+        initial_repair: dict | None = None,
     ) -> RetentionBeatScript:
         native_dialogue = self.settings.final_audio_policy == NATIVE_DIALOGUE_POLICY
         events = [
@@ -4181,6 +4425,8 @@ class OpenAICompatiblePlanner(Planner):
         def request(repair: dict | None) -> dict:
             nonlocal attempt
             attempt += 1
+            if repair is None and initial_repair is not None:
+                repair = initial_repair
             if repair is not None:
                 repair = {**repair, "resample": True}
             data = self._json(
@@ -4327,13 +4573,19 @@ class OpenAICompatiblePlanner(Planner):
                     if not stale.is_file():
                         shutil.copy2(accepted_script_path, stale)
             if script is None:
+                latest_invalid_data = None
+                latest_invalid_error = None
                 for attempt_path in sorted(
                     beat_root.glob("script_attempt_*.json"),
                     reverse=True,
                 ):
+                    attempt_data = None
                     try:
+                        attempt_data = json.loads(
+                            attempt_path.read_text(encoding="utf-8")
+                        )
                         script = _validate_retention_beat_script(
-                            json.loads(attempt_path.read_text(encoding="utf-8")),
+                            attempt_data,
                             beat=beat,
                             episode=episode,
                             bible=bible,
@@ -4346,7 +4598,10 @@ class OpenAICompatiblePlanner(Planner):
                             diagnosis=diagnosis,
                         )
                         break
-                    except (ValidationError, ValueError):
+                    except (ValidationError, ValueError) as error:
+                        if latest_invalid_error is None:
+                            latest_invalid_data = attempt_data
+                            latest_invalid_error = error
                         continue
                 if script is None:
                     try:
@@ -4359,6 +4614,16 @@ class OpenAICompatiblePlanner(Planner):
                             released_fact_ids=released_fact_ids,
                             beat_root=beat_root,
                             episode_contract=episode_contract,
+                            initial_repair=(
+                                _validation_retry(
+                                    0,
+                                    latest_invalid_data,
+                                    latest_invalid_error,
+                                    None,
+                                )
+                                if latest_invalid_error is not None
+                                else None
+                            ),
                         )
                     except EpisodePlanningFailed:
                         raise
@@ -4481,6 +4746,7 @@ class OpenAICompatiblePlanner(Planner):
                                     "collapse duplicate silent-action coverage to the final consequence direction",
                                     "inherit each shot open handoff from the previous close handoff",
                                     "translate nail/injury and literary micro-performance wording into visible large-action tension",
+                                    "remove future or invented ring/book props absent from the current beat evidence",
                                     "drop non-executable native audio beats",
                                     "bind moving-camera default motivation to the source shot change",
                                 ],
@@ -5119,6 +5385,10 @@ class CommandPlanner(Planner):
             )
             for episode in novel.episodes
         ]
+        atomic_write_json(
+            root / f"chapter_diagnoses.{version}.candidate.json",
+            [row.model_dump(mode="json") for row in diagnoses],
+        )
         development_attempt = max(
             (
                 int(match.group(1))
@@ -5174,10 +5444,6 @@ class CommandPlanner(Planner):
                 development_version=version,
             ),
         )
-        atomic_write_json(
-            root / f"series_development.{version}.candidate.json",
-            development.model_dump(mode="json"),
-        )
         review_attempt = max(
             (
                 int(match.group(1))
@@ -5218,24 +5484,80 @@ class CommandPlanner(Planner):
             )
             return data
 
-        review = _bounded_validate(
-            "review_series_development",
-            self.max_revisions,
-            request_review,
-            SeriesDevelopmentReview.model_validate,
-        )
-        atomic_write_json(
-            root / f"series_development_review.{version}.candidate.json",
-            review.model_dump(mode="json"),
-        )
-        if (
-            not review.passed
-            or not review.engine_coherent
-            or not review.projections_grounded
-            or review.future_fact_leakage
+        review = None
+        for review_cycle in range(self.max_revisions + 1):
+            atomic_write_json(
+                root / f"series_development.{version}.candidate.json",
+                development.model_dump(mode="json"),
+            )
+            review = _bounded_validate(
+                "review_series_development",
+                self.max_revisions,
+                request_review,
+                SeriesDevelopmentReview.model_validate,
+            )
+            atomic_write_json(
+                root / f"series_development_review.{version}.candidate.json",
+                review.model_dump(mode="json"),
+            )
+            review_passed = (
+                review.passed
+                and review.engine_coherent
+                and review.projections_grounded
+                and not review.future_fact_leakage
+            )
+            if review_passed:
+                break
+            if review_cycle >= self.max_revisions:
+                break
+            review_error = ValueError(
+                json.dumps(
+                    {
+                        "series_review_errors": review.issues,
+                        "engine_coherent": review.engine_coherent,
+                        "projections_grounded": review.projections_grounded,
+                        "future_fact_leakage": review.future_fact_leakage,
+                    },
+                    ensure_ascii=False,
+                )
+            )
+            initial_repair = _validation_retry(
+                review_cycle,
+                development.model_dump(mode="json"),
+                review_error,
+                None,
+            )
+            first_request = True
+
+            def request_review_repair(inner_repair: dict | None) -> dict:
+                nonlocal first_request
+                effective = inner_repair
+                if first_request and effective is None:
+                    effective = initial_repair
+                first_request = False
+                return request_development(effective)
+
+            development = _bounded_validate(
+                "develop_series_after_independent_review",
+                self.max_revisions,
+                request_review_repair,
+                lambda data: _validate_series_development(
+                    data,
+                    novel=novel,
+                    bible=bible,
+                    diagnoses=diagnoses,
+                    development_version=version,
+                ),
+            )
+        assert review is not None
+        if not (
+            review.passed
+            and review.engine_coherent
+            and review.projections_grounded
+            and not review.future_fact_leakage
         ):
             raise EpisodePlanningFailed(
-                "series development review failed",
+                "series development review failed after bounded revision",
                 episode_index=1,
                 failed_stage="series_development_review",
                 attempts=self.max_revisions + 1,
@@ -5372,6 +5694,7 @@ class CommandPlanner(Planner):
         released_fact_ids: list[str],
         beat_root: Path,
         episode_contract: EpisodeContract | None = None,
+        initial_repair: dict | None = None,
     ) -> RetentionBeatScript:
         attempt = max(
             (
@@ -5428,6 +5751,8 @@ class CommandPlanner(Planner):
         def request(repair: dict | None) -> dict:
             nonlocal attempt
             attempt += 1
+            if repair is None and initial_repair is not None:
+                repair = initial_repair
             if repair is not None:
                 repair = {**repair, "resample": True}
             data = self._invoke(

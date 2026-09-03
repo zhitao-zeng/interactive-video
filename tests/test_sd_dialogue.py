@@ -258,9 +258,10 @@ def test_seedance25_retries_succeeded_task_until_cdn_file_is_ready(
 ) -> None:
     submitted: dict = {}
     media_requests = 0
+    poll_requests = 0
 
     def handle(request: httpx.Request) -> httpx.Response:
-        nonlocal media_requests
+        nonlocal media_requests, poll_requests
         if request.method == "POST":
             assert request.url.path.endswith("/api/v3/contents/generations/tasks")
             assert request.headers["Authorization"] == "Bearer runtime-secret"
@@ -269,6 +270,9 @@ def test_seedance25_retries_succeeded_task_until_cdn_file_is_ready(
         if request.url.path.endswith(
             "/api/v3/contents/generations/tasks/cgt-seedance25-test"
         ):
+            poll_requests += 1
+            if poll_requests == 1:
+                raise httpx.RemoteProtocolError("TLS EOF", request=request)
             return httpx.Response(
                 200,
                 json={
@@ -317,6 +321,7 @@ def test_seedance25_retries_succeeded_task_until_cdn_file_is_ready(
 
     assert output.read_bytes() == b"seedance25-mp4"
     assert media_requests == 3
+    assert poll_requests == 4
     assert submitted["model"] == "sd2.5"
     assert submitted["watermark"] is False
     assert submitted["output_format"] == "mp4"

@@ -33,7 +33,20 @@ class PhanRouterMediaProvider(MediaProvider):
     def _download(self, url: str, output: Path, max_bytes: int = 512 * 1024 * 1024) -> None:
         output.parent.mkdir(parents=True, exist_ok=True)
         partial = output.with_suffix(output.suffix + ".partial")
-        with self.client.stream("GET", url, follow_redirects=True) as response:
+        # Generation polling may legitimately use an hour-long timeout, but a
+        # signed CDN object should start transferring promptly.  Reuse the paid
+        # task after a short CDN stall instead of letting one proxy socket hold
+        # the whole worker for an hour.
+        download_timeout = min(
+            120.0,
+            float(getattr(self.settings, "request_timeout", 120.0)),
+        )
+        with self.client.stream(
+            "GET",
+            url,
+            follow_redirects=True,
+            timeout=download_timeout,
+        ) as response:
             response.raise_for_status()
             total = 0
             with partial.open("wb") as stream:
@@ -51,13 +64,35 @@ class PhanRouterMediaProvider(MediaProvider):
 
     def _poll_image_url(self, task_id: str) -> str:
         deadline = time.monotonic() + self.settings.poll_timeout
+        last_error: str | None = None
         while time.monotonic() < deadline:
-            response = self.client.get(
-                f"{self.settings.phanrouter_base_url.rstrip('/')}/v3/images/generations/{task_id}",
-                headers=self.image_headers,
-            )
-            response.raise_for_status()
-            data = self._task_data(response.json())
+            try:
+                response = self.client.get(
+                    f"{self.settings.phanrouter_base_url.rstrip('/')}/v3/images/generations/{task_id}",
+                    headers=self.image_headers,
+                )
+                response.raise_for_status()
+                data = self._task_data(response.json())
+            except httpx.HTTPStatusError as error:
+                if error.response.status_code not in {
+                    408,
+                    425,
+                    429,
+                    500,
+                    502,
+                    503,
+                    504,
+                }:
+                    raise
+                last_error = f"HTTPStatusError:{error.response.status_code}"
+                time.sleep(5)
+                continue
+            except (httpx.TransportError, json.JSONDecodeError) as error:
+                # A task id is durable.  A proxy TLS EOF or a truncated polling
+                # body must not discard it and resubmit a paid image request.
+                last_error = type(error).__name__
+                time.sleep(5)
+                continue
             status = str(data.get("status", "")).lower()
             if status in {"succeeded", "success"}:
                 url = data.get("url")
@@ -67,7 +102,8 @@ class PhanRouterMediaProvider(MediaProvider):
             if status in {"failed", "failure", "cancelled"}:
                 raise RuntimeError(f"image generation failed: {data}")
             time.sleep(5)
-        raise TimeoutError(f"image task timed out: {task_id}")
+        detail = f" after {last_error}" if last_error else ""
+        raise TimeoutError(f"image task timed out: {task_id}{detail}")
 
     def _restore_image_url(self, image: ImageResult) -> str:
         if image.public_url:
@@ -125,6 +161,9 @@ class PhanRouterMediaProvider(MediaProvider):
             ]
         elif reference:
             payload["base64File"] = base64.b64encode(reference.read_bytes()).decode("ascii")
+        request_sha256 = hashlib.sha256(
+            json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
+        ).hexdigest()
 
         def submit() -> httpx.Response:
             response = self.client.post(
@@ -136,12 +175,23 @@ class PhanRouterMediaProvider(MediaProvider):
 
         task_path = output.with_suffix(output.suffix + ".task.json")
         if task_path.exists():
-            import json
-            task_id = json.loads(task_path.read_text(encoding="utf-8")).get("task_id")
+            cached = json.loads(task_path.read_text(encoding="utf-8"))
+            cached_request = cached.get("request_sha256")
+            if cached_request is not None and cached_request != request_sha256:
+                raise RuntimeError(
+                    f"cached image task request does not match current request: {task_path}"
+                )
+            task_id = cached.get("task_id")
         else:
             task_id = retry(submit).json().get("task_id")
             if task_id:
-                atomic_write_json(task_path, {"task_id": task_id, "kind": "image"})
+                cached = {
+                    "task_id": task_id,
+                    "kind": "image",
+                    "model": self.settings.image_model,
+                    "request_sha256": request_sha256,
+                }
+                atomic_write_json(task_path, cached)
         if not task_id:
             raise ValueError("image API returned no task_id")
         try:
@@ -149,7 +199,45 @@ class PhanRouterMediaProvider(MediaProvider):
         except RuntimeError:
             task_path.unlink(missing_ok=True)
             raise
-        self._download(url, output, max_bytes=64 * 1024 * 1024)
+        download_deadline = time.monotonic() + self.settings.poll_timeout
+        last_download_error: str | None = None
+        while time.monotonic() < download_deadline:
+            try:
+                self._download(url, output, max_bytes=64 * 1024 * 1024)
+                break
+            except httpx.TransportError as error:
+                last_download_error = type(error).__name__
+            except httpx.HTTPStatusError as error:
+                if error.response.status_code not in {
+                    404,
+                    408,
+                    425,
+                    429,
+                    500,
+                    502,
+                    503,
+                    504,
+                }:
+                    raise
+                last_download_error = f"HTTPStatusError:{error.response.status_code}"
+            time.sleep(5)
+            # Refresh the signed CDN URL without allocating another image task.
+            url = self._poll_image_url(str(task_id))
+        else:
+            detail = f" after {last_download_error}" if last_download_error else ""
+            raise TimeoutError(f"image download timed out: {task_id}{detail}")
+        if cached.get("request_sha256") is None:
+            # Upgrade legacy resumable task metadata after safely completing
+            # the already-paid task.  Future resumes can then reject a prompt
+            # or reference change instead of silently attaching the old task.
+            atomic_write_json(
+                task_path,
+                {
+                    **cached,
+                    "model": self.settings.image_model,
+                    "request_sha256": request_sha256,
+                },
+            )
         return ImageResult(path=output, public_url=url)
 
     def _create_seedream_image(
@@ -309,13 +397,35 @@ class PhanRouterMediaProvider(MediaProvider):
         if not task_id:
             raise ValueError("video API returned no task_id")
         deadline = time.monotonic() + self.settings.poll_timeout
+        last_error: str | None = None
         while time.monotonic() < deadline:
-            response = self.client.get(
-                f"{self.settings.phanrouter_base_url.rstrip('/')}/api/v3/contents/generations/tasks/{task_id}",
-                headers=self.video_headers,
-            )
-            response.raise_for_status()
-            data = self._task_data(response.json())
+            try:
+                response = self.client.get(
+                    f"{self.settings.phanrouter_base_url.rstrip('/')}/api/v3/contents/generations/tasks/{task_id}",
+                    headers=self.video_headers,
+                )
+                response.raise_for_status()
+                data = self._task_data(response.json())
+            except httpx.HTTPStatusError as error:
+                if error.response.status_code not in {
+                    408,
+                    425,
+                    429,
+                    500,
+                    502,
+                    503,
+                    504,
+                }:
+                    raise
+                last_error = f"HTTPStatusError:{error.response.status_code}"
+                time.sleep(5)
+                continue
+            except (httpx.TransportError, json.JSONDecodeError) as error:
+                # The task id and request hash are durable. Proxy TLS EOFs or
+                # truncated responses must keep polling this already-paid task.
+                last_error = type(error).__name__
+                time.sleep(5)
+                continue
             status = str(data.get("status", "")).lower()
             if status in {"succeeded", "success"}:
                 url = data.get("url") or data.get("video_url")
@@ -323,10 +433,10 @@ class PhanRouterMediaProvider(MediaProvider):
                     raise ValueError("successful video task returned no URL")
                 try:
                     self._download(str(url), output)
-                except httpx.TimeoutException:
-                    # The generation is already paid and succeeded; a slow
-                    # proxy/CDN read must resume the same task rather than
-                    # allocate a new generation attempt.
+                except httpx.TransportError as error:
+                    # A slow CDN read or TLS EOF must resume the same paid task
+                    # rather than allocate a new generation attempt.
+                    last_error = type(error).__name__
                     time.sleep(5)
                     continue
                 except httpx.HTTPStatusError as error:
@@ -334,7 +444,17 @@ class PhanRouterMediaProvider(MediaProvider):
                     # task API a few seconds before its signed CDN object is
                     # replicated. Keep polling this same paid task instead of
                     # consuming a fresh generation attempt.
-                    if error.response.status_code == 404:
+                    if error.response.status_code in {
+                        404,
+                        408,
+                        425,
+                        429,
+                        500,
+                        502,
+                        503,
+                        504,
+                    }:
+                        last_error = f"HTTPStatusError:{error.response.status_code}"
                         time.sleep(5)
                         continue
                     raise
@@ -343,4 +463,5 @@ class PhanRouterMediaProvider(MediaProvider):
                 task_path.unlink(missing_ok=True)
                 raise RuntimeError(f"video generation failed: {data}")
             time.sleep(5)
-        raise TimeoutError(f"video task timed out: {task_id}")
+        detail = f" after {last_error}" if last_error else ""
+        raise TimeoutError(f"video task timed out: {task_id}{detail}")

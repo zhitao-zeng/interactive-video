@@ -53,7 +53,12 @@ from .sd_dialogue import (
     performance_action_only,
     timed_subtitle_pages,
 )
+from .task_ledger import build_generation_task_ledger
 from .util import atomic_write_json, media_duration, run
+from .video_quality import (
+    build_video_quality_manifest,
+    evaluate_generated_video_quality,
+)
 
 
 SILENT_ACTION_MARKER = "【无对白动作镜】"
@@ -163,7 +168,7 @@ def copy_keyframe(source: Path, target: Path) -> None:
 def is_real_person_privacy_rejection(error: Exception) -> bool:
     """Match Seedance's specific false positive for photo-like input art."""
 
-    return "InputImageSensitiveContentDetected.PrivacyInformation" in str(error)
+    return "InputImageSensitiveContentDetected" in str(error)
 
 
 def is_image_generation_safety_rejection(error: Exception) -> bool:
@@ -173,6 +178,7 @@ def is_image_generation_safety_rejection(error: Exception) -> bool:
         for marker in (
             "flagged as sensitive",
             "blocked by safety review",
+            "nsfw",
         )
     )
 
@@ -180,10 +186,49 @@ def is_image_generation_safety_rejection(error: Exception) -> bool:
 def anime_privacy_repair_prompt(unit: RuntimeUnit) -> str:
     """Ask the image API for a video-safe redraw without changing the shot."""
 
+    visible_count = len(set(unit.character_asset_ids))
+    persistent_states = _persistent_visual_states(unit.motion_instruction)
+    state_guard = (
+        "【持续可见状态硬合同】"
+        + "；".join(dict.fromkeys(persistent_states))
+        + "。这些状态在重绘后也必须清楚可见；"
+        "不得用椅背、栏杆、衣领、项圈或新刑具替代已登记道具。"
+        if persistent_states
+        else ""
+    )
+    subject_guard = (
+        f"最终画面必须恰好{visible_count}名人物，逐一对应原图中的{visible_count}名人物；"
+        "背景必须完全无人，不得增加群众、官员、守卫、人影、镜中人或任何背景人脸。"
+        if visible_count
+        else ""
+    )
+    if _is_3d_guoman_unit(unit):
+        return (
+            "把参考图精确重绘成一张明确原创、明显风格化的中国3D国漫动画正片截图。"
+            "保持原图每个人物的身份、年龄、脸型差异、发型、服装、表情、动作、道具、"
+            "镜头机位、人物位置和背景结构不变，不新增、删除或互换人物。"
+            "不得新增、删除、替换或发光化任何道具；"
+            "原图没有核心道具时，桌面、地面与前景必须保持空净。"
+            f"{subject_guard}"
+            f"{state_guard}"
+            "人物必须使用简化雕塑式东方面部、略大但非Q版的表现型眼睛、哑光无毛孔皮肤、"
+            "束状设计发丝和自然动画比例；布料、木石与金属使用克制Toon-PBR材质，"
+            "保留体积与空间纵深，但纹理和明暗必须一眼可辨为CG动画而非真人摄影。"
+            "禁止真人照片、真实人物肖像、毛孔、相机噪点、写实皮肤纹理、实拍电影截图、"
+            "塑料玩偶、游戏捏脸界面，也禁止二维线稿、平面赛璐璐或改变既定3D画风。"
+            "除原始待修复帧外，额外提供的角色、场景和风格参考是硬约束："
+            "脸型、发型、服装、建筑、材质、色彩和光向必须逐项回到这些批准参考，不能自行重设计。"
+            "内容保持健康克制，不出现血液、伤口、裸露、文字、数字、字幕、Logo或水印。"
+            f"剧情和构图锚点：{unit.visual_prompt}"
+        )
     return (
         "把参考图精确重绘成一张明确的原创二维国风电视动画正片截图。"
         "保持原图人物身份、年龄、发型、服装、表情、动作、道具、镜头机位、"
         "人物位置和背景结构不变，不新增或删除人物。"
+        "不得新增、删除、替换或发光化任何道具；"
+        "原图没有核心道具时，桌面、地面与前景必须保持空净。"
+        f"{subject_guard}"
+        f"{state_guard}"
         "必须使用有粗细变化的清晰手绘轮廓线、纯色平涂、哑光皮肤色块和两级硬边赛璐璐阴影；"
         "五官与手部采用概括的动画形状，明亮青蓝与暖金日光，人物中间调明亮可读。"
         "必须让画面一眼可辨为绘制的二维动画：禁止真人照片、写实皮肤、毛孔、摄影景深、"
@@ -193,7 +238,41 @@ def anime_privacy_repair_prompt(unit: RuntimeUnit) -> str:
     )
 
 
+def anime_privacy_repair_policy(unit: RuntimeUnit) -> str:
+    return (
+        "stylized-3d-guoman-privacy-redraw-v2-reference-locked"
+        if _is_3d_guoman_unit(unit)
+        else "explicit-flat-2d-anime-redraw-v2-reference-locked"
+    )
+
+
 def anime_image_safety_fallback_prompt(unit: RuntimeUnit) -> str:
+    visible_count = len(set(unit.character_asset_ids))
+    subject_count_guard = (
+        f"最终画面必须恰好{visible_count}名人物，背景完全无人；不得新增、删除或复制人物。"
+        if visible_count
+        else "最终画面不得出现人物、人影或背景人脸。"
+    )
+    if _is_3d_guoman_unit(unit):
+        subject = (
+            "第一张参考图中的当前说话者位于胸像或中近景，完整嘴部无遮挡，处于开口前一刻；"
+            "其余已登记人物只做安静反应并闭嘴"
+            if unit.speaking
+            else "所有已登记人物处于下一段克制剧情动作开始前一刻，嘴巴自然闭合"
+        )
+        return (
+            "原创古代东方题材，健康克制的日常公堂或室内场面，竖屏9:16。"
+            "生成一张明显原创、非真人摄影的高品质中国3D国漫动画正片截图。"
+            "人物参考依次只锁定各自身份、年龄、脸型、发型和服装；最后一张场景参考只锁定建筑与光线。"
+            f"{subject}。{subject_count_guard}"
+            "人物使用简化雕塑式东方面部、略大但非Q版的表现型眼睛、哑光无毛孔皮肤、"
+            "束状发丝和自然动画比例；布料、木石、金属使用克制Toon-PBR材质，"
+            "明暗和纹理一眼可辨为CG动画。"
+            "不得照抄人物卡站姿，不表现冲突结果；皮肤和衣物完整洁净。"
+            "禁止真人照片、真实人物肖像、写实皮肤、毛孔、相机噪点、实拍电影截图、"
+            "塑料玩偶、游戏捏脸界面、二维线稿、平面赛璐璐、血液、伤口、裸露、"
+            "文字、数字、字幕、Logo或水印。"
+        )
     subject = (
         "只显示第一张参考图中的一名当前说话者，胸像或中近景，嘴部无遮挡，"
         "望向画外对话对象，处于开口前一刻"
@@ -205,11 +284,20 @@ def anime_image_safety_fallback_prompt(unit: RuntimeUnit) -> str:
         "生成一张明亮高完成度二维国风电视动画正片截图，竖屏9:16。"
         "第一张参考图只锁定主要人物身份、发型和服装；如有第二张参考图，只锁定空场建筑。"
         f"{subject}；姿态平静自然，皮肤和衣物完整洁净，不表现冲突结果。"
+        f"{subject_count_guard}"
         "清晰且有粗细变化的手绘轮廓线，纯色平涂，两级硬边赛璐璐阴影，"
         "暖白浅金日光，脸部和服装中间调明亮可读。"
         "不得照抄人物设定图姿势，不新增人物、分身或背景人脸。"
         "禁止真人照片、写实皮肤、毛孔、摄影景深、半写实厚涂、3D、PBR、塑料高光、"
         "黏土、暴力、伤口、裸露、文字、数字、字幕、Logo或水印。"
+    )
+
+
+def anime_image_safety_fallback_policy(unit: RuntimeUnit) -> str:
+    return (
+        "calm-exact-cast-3d-guoman-start-frame-v1"
+        if _is_3d_guoman_unit(unit)
+        else "calm-single-subject-anime-start-frame-v1"
     )
 
 
@@ -222,6 +310,26 @@ def _compact_prompt_clause(value: str | None, limit: int) -> str:
         text = text.replace(boilerplate, "")
     text = re.sub(r"[。；，,]+$", "", text)
     return text if len(text) <= limit else text[: limit - 1] + "…"
+
+
+_PERSISTENT_VISUAL_STATE_PATTERN = re.compile(
+    r"【持续可见状态】(.*?)【/持续可见状态】",
+    flags=re.DOTALL,
+)
+
+
+def _persistent_visual_states(value: str | None) -> list[str]:
+    if not value:
+        return []
+    return [
+        state.strip()
+        for state in _PERSISTENT_VISUAL_STATE_PATTERN.findall(value)
+        if state.strip()
+    ]
+
+
+def _strip_persistent_visual_states(value: str | None) -> str:
+    return _PERSISTENT_VISUAL_STATE_PATTERN.sub("", value or "").strip()
 
 
 def _is_3d_guoman_unit(unit: RuntimeUnit) -> bool:
@@ -275,7 +383,11 @@ def _visible_performance_action(unit: RuntimeUnit) -> str:
             110,
         )
     action = _compact_prompt_clause(
-        performance_action_only(unit.motion_instruction or unit.motion_prompt),
+        performance_action_only(
+            _strip_persistent_visual_states(
+                unit.motion_instruction or unit.motion_prompt
+            )
+        ),
         82,
     )
     concrete_tokens = (
@@ -407,6 +519,12 @@ def compile_seedance_native_audio_prompt(unit: RuntimeUnit) -> str:
     return prompt.replace(old, new)
 
 
+def _is_compiled_provider_motion_prompt(value: str | None) -> bool:
+    """Identify the compact prompt emitted by the provider adapter."""
+
+    return bool(re.match(r"^\d+(?:\.\d+)?秒竖屏，", value or ""))
+
+
 def keyframe_brightness_report(image: Path, location_reference: Path) -> dict:
     """Reject a dark reinterpretation only when the locked location is bright."""
 
@@ -494,15 +612,15 @@ def _build_shot_contract(
     story_keyframe = any(
         unit.visual_strategy == VisualStrategy.STORY_KEYFRAME for unit in units
     )
+    # Visibility comes from the compiled visual cast, not from who speaks.
+    # Silent reactions and action shots still contain their bound characters;
+    # treating them as empty made the video-side exact-cast gate reject the
+    # very identity asset used to generate the shot.
     visible_ids = list(
         dict.fromkeys(
             asset_id
-            for unit in (units if story_keyframe else visible_units)
-            for asset_id in (
-                unit.character_asset_ids
-                if story_keyframe
-                else unit.character_asset_ids[:1]
-            )
+            for unit in units
+            for asset_id in unit.character_asset_ids
         )
     )
     reference_character_ids = list(
@@ -618,7 +736,7 @@ def _build_shot_contract(
     beat_count = max(1, len(source_beats) or len(physics_beats))
     timing_actions = [
         (
-            source_beats[index].action
+            _strip_persistent_visual_states(source_beats[index].action)
             if source_beats
             else physics_beats[index][1]
             if physics_beats
@@ -675,9 +793,13 @@ def _build_shot_contract(
             physics_beat[1]
             if physics_beat is not None
             else (
-                beat.action
+                _strip_persistent_visual_states(beat.action)
                 if beat is not None
-                else performance_action_only(first.motion_instruction or first.motion_prompt)
+                else performance_action_only(
+                    _strip_persistent_visual_states(
+                        first.motion_instruction or first.motion_prompt
+                    )
+                )
             )
         )
         if any(
@@ -1002,7 +1124,7 @@ def build_visual_groups(
             visual_strategy = VisualStrategy.AUTO
         visuals = list(dict.fromkeys(unit.visual_prompt for unit in units))
         actions = [
-            beat.action
+            _strip_persistent_visual_states(beat.action)
             for unit in units
             if unit.performance_plan is not None
             for beat in unit.performance_plan.motion_beats
@@ -1010,7 +1132,9 @@ def build_visual_groups(
         if not actions:
             actions = list(
                 dict.fromkeys(
-                    performance_action_only(unit.motion_instruction)
+                    performance_action_only(
+                        _strip_persistent_visual_states(unit.motion_instruction)
+                    )
                     for unit in units
                     if unit.motion_instruction
                 )
@@ -1108,9 +1232,11 @@ def build_visual_groups(
             ) + gap * max(0, sum(row.shot_id == unit.shot_id for row in units) - 1)
             performance_plans.append(
                 f"{unit.shot_id}："
-                + compile_performance_prompt(
-                    unit.performance_plan,
-                    duration=max(0.8, min(14.0, shot_seconds + 0.2)),
+                + _strip_persistent_visual_states(
+                    compile_performance_prompt(
+                        unit.performance_plan,
+                        duration=max(0.8, min(14.0, shot_seconds + 0.2)),
+                    )
                 )
             )
         moving_candidates = [
@@ -1155,6 +1281,13 @@ def build_visual_groups(
             "所有人物皮肤和衣物完整洁净；握拳只表现肌肉受力，不得出现血液、伤口、破皮或污渍。"
             "测试碑只保留无字的金色发光纹路，禁止任何可读文字、数字、字幕、气泡、Logo和水印；"
             "禁止多人设定稿、分身和不同画风混杂。"
+        )
+        persistent_states = list(
+            dict.fromkeys(
+                state
+                for unit in units
+                for state in _persistent_visual_states(unit.motion_instruction)
+            )
         )
         motion_prompt = (
             "这是一个完整连续表演镜头，不是多张静态图片串联，也不是蒙太奇。"
@@ -1201,6 +1334,10 @@ def build_visual_groups(
             "眼睛先于头部，头部先于肩膀，衣发稍后响应；动作有停顿、加速和减速。"
             "参考图只锁定身份、服装、环境和画风，不锁定静态姿势；不得改变人物年龄、服饰和相对站位。"
             "全程不得出现血液、伤口、破皮或新增可读文字。"
+            + "".join(
+                f"【持续可见状态】{state}【/持续可见状态】"
+                for state in persistent_states
+            )
         )
         shot_contract = _build_shot_contract(
             units=units,
@@ -1291,6 +1428,23 @@ def _compile_group_camera_prompt(camera_plan) -> str:
         f"行动轴={camera_plan.action_axis}；屏幕方向={camera_plan.screen_direction}；"
         f"起点={camera_plan.start_position}；{beats}；终点={camera_plan.end_position}"
     )
+
+
+def _native_quality_attempt_snapshot(
+    *,
+    quality_attempt: int,
+    asr_row: dict,
+    route: dict,
+    audio_row: dict,
+) -> dict:
+    """Keep attempt evidence without linking the report back to itself."""
+
+    return {
+        "quality_attempt": quality_attempt,
+        "asr": asr_row,
+        "route": route,
+        "audio": dict(audio_row),
+    }
 
 
 class EpisodeProductionRuntime:
@@ -1506,6 +1660,111 @@ class EpisodeProductionRuntime:
             )
         )
 
+    def _keyframe_request_identity(
+        self,
+        *,
+        prompt: str,
+        reference: Path,
+        additional_references: tuple[Path, ...],
+    ) -> dict:
+        """Return the image-only cache contract used by ``_ensure_image``.
+
+        Visual attempt directories intentionally include the motion prompt so
+        a changed video contract cannot reuse an old clip.  That used to make
+        the approved still frame collateral damage: changing only motion or
+        dialogue created a new directory and paid for the same image again.
+        Match the image request sidecar independently so the still can move to
+        the new video attempt without weakening video cache invalidation.
+        """
+
+        return {
+            "prompt_sha256": sha256_text(prompt),
+            "reference_sha256": sha256_file(reference),
+            "additional_reference_sha256s": [
+                sha256_file(path) for path in additional_references
+            ],
+            "provider": self.settings.provider,
+            "image_model": self.settings.image_model,
+            "image_transport": (
+                "phanrouter-gpt-image-2"
+                if self.settings.provider == "command"
+                and "".join(
+                    character
+                    for character in self.settings.image_model.casefold()
+                    if character.isalnum()
+                )
+                == "gptimage2"
+                and (
+                    self.settings.phanrouter_image_api_key
+                    or self.settings.phanrouter_api_key
+                )
+                else self.settings.provider
+            ),
+            "image_command_sha256": (
+                sha256_text(self.settings.image_command)
+                if self.settings.image_command
+                else None
+            ),
+        }
+
+    def _find_compatible_keyframe_attempt(
+        self,
+        *,
+        group_attempt_root: Path,
+        output: Path,
+        prompt: str,
+        reference: Path,
+        additional_references: tuple[Path, ...],
+    ) -> Path | None:
+        expected = self._keyframe_request_identity(
+            prompt=prompt,
+            reference=reference,
+            additional_references=additional_references,
+        )
+        for candidate in sorted(group_attempt_root.glob("*/attempt_*/keyframe.jpeg")):
+            if candidate == output or not candidate.is_file():
+                continue
+            sidecar = candidate.with_suffix(candidate.suffix + ".request.json")
+            if not sidecar.is_file():
+                continue
+            try:
+                saved = json.loads(sidecar.read_text(encoding="utf-8"))
+            except (OSError, ValueError, TypeError):
+                continue
+            if all(saved.get(key) == value for key, value in expected.items()):
+                return candidate
+        return None
+
+    @staticmethod
+    def _find_compatible_privacy_repair(
+        *,
+        group_attempt_root: Path,
+        prompt: str,
+        source_sha256: str,
+        policy: str,
+        reference_sha256s: list[str],
+    ) -> tuple[Path, dict] | None:
+        """Reuse a manually accepted privacy redraw across motion revisions."""
+
+        for report_path in sorted(
+            group_attempt_root.glob("*/attempt_*/privacy_repair_report.json")
+        ):
+            try:
+                report = json.loads(report_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError, TypeError):
+                continue
+            candidate = report_path.parent / "keyframe.jpeg"
+            if (
+                report.get("repair_prompt") == prompt
+                and report.get("source_sha256") == source_sha256
+                and report.get("policy") == policy
+                and report.get("repair_reference_sha256s") == reference_sha256s
+                and candidate.is_file()
+                and report.get("repair_sha256") == sha256_file(candidate)
+            ):
+                return candidate, report
+        return None
+
     @staticmethod
     def _two_reference_keyframe_prompt(unit: RuntimeUnit) -> str:
         if _is_3d_guoman_unit(unit):
@@ -1515,7 +1774,7 @@ class EpisodeProductionRuntime:
                 f"把图1人物自然放入图2；场景必须明确是{_location_prompt_context(unit)}，不得改到其他地点。"
                 f"构图：{_compact_prompt_clause(unit.composition_prompt, 80)}。"
                 f"当前场面：{_compact_prompt_clause(unit.visual_prompt, 88)}。"
-                f"只表现“{_compact_prompt_clause(unit.motion_instruction, 72)}”开始前一瞬，"
+                f"只表现“{_compact_prompt_clause(_strip_persistent_visual_states(unit.motion_instruction), 72)}”开始前一瞬，"
                 f"神情为{_compact_prompt_clause(unit.emotion, 24)}，嘴巴闭合。"
                 "最终恰好一名人物，画面明亮、清楚、自然；不复制人物卡站姿，不新增人物、"
                 "背景人脸、分身、拼板、文字或水印。画法必须与图1、图2属于同一部高品质中国3D国漫："
@@ -1530,7 +1789,7 @@ class EpisodeProductionRuntime:
             "不得改到门外、庭院或其他地点。"
             f"构图：{_compact_prompt_clause(unit.composition_prompt, 80)}。"
             f"当前场面：{_compact_prompt_clause(unit.visual_prompt, 88)}。"
-            f"只表现“{_compact_prompt_clause(unit.motion_instruction, 72)}”开始前一瞬，"
+            f"只表现“{_compact_prompt_clause(_strip_persistent_visual_states(unit.motion_instruction), 72)}”开始前一瞬，"
             f"神情为{_compact_prompt_clause(unit.emotion, 24)}，嘴巴闭合。"
             "最终恰好一名人物，画面明亮、清楚、自然；不复制设定图姿势，不新增人物、"
             "背景人脸、分身、拼板、文字或水印。画法必须与图1、图2为同一部二维电视动画："
@@ -1555,7 +1814,7 @@ class EpisodeProductionRuntime:
                 f"场景必须明确是{_location_prompt_context(unit)}，不得改到未登记地点。"
                 f"场面：{_compact_prompt_clause(unit.visual_prompt, 110)}。"
                 f"构图：{_compact_prompt_clause(unit.composition_prompt, 76)}。"
-                f"只表现“{_compact_prompt_clause(unit.motion_instruction, 72)}”开始前一瞬。"
+                f"只表现“{_compact_prompt_clause(_strip_persistent_visual_states(unit.motion_instruction), 72)}”开始前一瞬。"
                 "保持高品质风格化中国3D国漫、清晰主体和统一电影光；画面内人物闭嘴。"
                 "角色使用简化雕塑式面部、哑光无毛孔皮肤、束状发丝和自然比例；环境使用克制Toon-PBR木石金属。"
                 "禁止二维线稿、真人照片、塑料玩偶、写实游戏截图、夜景、新增人物、分身、文字或水印。"
@@ -1571,11 +1830,35 @@ class EpisodeProductionRuntime:
             f"场景必须明确是{_location_prompt_context(unit)}，不得改到未登记地点。"
             f"场面：{_compact_prompt_clause(unit.visual_prompt, 110)}。"
             f"构图：{_compact_prompt_clause(unit.composition_prompt, 76)}。"
-            f"只表现“{_compact_prompt_clause(unit.motion_instruction, 72)}”开始前一瞬。"
+            f"只表现“{_compact_prompt_clause(_strip_persistent_visual_states(unit.motion_instruction), 72)}”开始前一瞬。"
             "保持明亮二维国风赛璐璐和清晰主体；画面内人物闭嘴。画法必须与参考为同一部"
             "二维电视动画：清晰有粗细的轮廓线、纯色平涂、最多两级硬边赛璐璐阴影、"
             "哑光皮肤与布料；禁止半写实厚涂、皮肤镜面高光、毛孔、玻璃眼、柔焦摄影景深、"
             "真人、3D、PBR或夜景，不新增人物、分身、文字或水印。"
+        )
+
+    @staticmethod
+    def _multi_character_keyframe_prompt(
+        unit: RuntimeUnit,
+        character_reference_count: int,
+    ) -> str:
+        rendering = (
+            "保持高品质风格化中国3D国漫、简化雕塑式面部、哑光无毛孔皮肤、"
+            "束状发丝、自然人体比例、克制Toon-PBR材质和统一电影光；"
+            "禁止二维线稿、真人照片、塑料玩偶或写实游戏截图。"
+            if _is_3d_guoman_unit(unit)
+            else "保持批准参考图的统一动画画法、稳定线条与色彩，不得混入真人或3D画风。"
+        )
+        return (
+            f"多角色剧情关键帧，最终恰好{character_reference_count}名已绑定具名角色，"
+            "每人只出现一次；所有角色参考只继承各自身份、发型和服装，场景参考只继承环境。"
+            f"场景必须明确是{_location_prompt_context(unit)}，不得改到未登记地点。"
+            f"当前场面：{_compact_prompt_clause(unit.visual_prompt, 120)}。"
+            f"构图：{_compact_prompt_clause(unit.composition_prompt, 80)}。"
+            f"只表现“{_compact_prompt_clause(_strip_persistent_visual_states(unit.motion_instruction), 76)}”开始前一瞬；"
+            "画面内所有人物闭嘴。"
+            + rendering
+            + "不得新增匿名前景人物、背景人脸、分身、拼板、文字或水印。"
         )
 
     @staticmethod
@@ -1637,6 +1920,91 @@ class EpisodeProductionRuntime:
             "角色硬锚点（与图1同等优先，逐项照做）："
             + "；".join(clauses)
             + f"。{hair_guard}，{costume_guard}。"
+        )
+
+    @staticmethod
+    def _multi_character_asset_text_anchor(
+        novel_dir: Path,
+        series_assets: SeriesAssetManifest,
+        asset_ids: list[str],
+        location_asset_id: str,
+    ) -> str:
+        """Bind every multi-reference image to one named actor or location.
+
+        A generic cast allow-list is not enough for image editors: with two
+        character references they can borrow one face or costume for the other
+        actor.  Encode the exact provider image order and the approved written
+        invariants before the creative prompt so each reference has one job.
+        """
+
+        character_map = {
+            record.asset_id: record for record in series_assets.characters
+        }
+        bindings: list[str] = []
+        names: list[str] = []
+        for image_index, asset_id in enumerate(asset_ids, start=1):
+            record = character_map.get(asset_id)
+            if record is None:
+                continue
+            spec: dict = {}
+            spec_path = novel_dir / record.spec_path
+            if spec_path.is_file():
+                try:
+                    spec = json.loads(spec_path.read_text(encoding="utf-8"))
+                except (OSError, ValueError, TypeError):
+                    spec = {}
+            episode_costumes = spec.get("episode_costumes") or []
+            episode_costume = (
+                episode_costumes[0]
+                if isinstance(episode_costumes, list) and episode_costumes
+                else episode_costumes
+            )
+            fields = [
+                ("年龄", spec.get("age")),
+                ("面容", spec.get("appearance")),
+                ("发型", spec.get("hair")),
+                (
+                    "本集服装",
+                    episode_costume
+                    or spec.get("base_costume")
+                    or spec.get("wardrobe")
+                    or record.state_variables.get("costume"),
+                ),
+                ("配色", spec.get("palette")),
+            ]
+            details = "；".join(
+                f"{label}={_compact_prompt_clause(str(value), 56)}"
+                for label, value in fields
+                if value
+            )
+            bindings.append(
+                f"图{image_index}严格且只对应{record.name}（{asset_id}）"
+                + (f"：{details}" if details else "")
+            )
+            names.append(record.name)
+        location = next(
+            (
+                record
+                for record in series_assets.locations
+                if record.asset_id == location_asset_id
+            ),
+            None,
+        )
+        if location is not None:
+            bindings.append(
+                f"图{len(asset_ids) + 1}严格且只对应空场{location.name}"
+                f"（{location.asset_id}），只继承建筑、空间、材质、色彩和光线"
+            )
+        if len(names) < 2:
+            return ""
+        return (
+            "【多角色逐图强绑定】参考图顺序是不可交换的硬合同，不是候选素材："
+            + "。".join(bindings)
+            + "。最终画面只允许"
+            + "、".join(names)
+            + "各出现一次；每人必须完整保留自己参考图的脸型、年龄、发型、服装结构和主色，"
+            "不得互换脸、借用另一人的发型或衣服，不得把年长有须角色年轻化或去除胡须，"
+            "不得把粗布囚服升级、漂白或替换为华服。"
         )
 
     def _direct_phanrouter_assets(
@@ -1710,24 +2078,56 @@ class EpisodeProductionRuntime:
             }
             fallback_reference = reference
             fallback_additional: tuple[Path, ...] = ()
+            fallback_character_paths: list[Path] = []
             for character_id in unit.character_asset_ids:
                 record = character_map.get(character_id)
                 if record is None:
                     continue
                 candidate = novel_dir / record.primary_image
                 if candidate.is_file():
-                    fallback_reference = candidate
-                    break
+                    fallback_character_paths.append(candidate)
             location = location_map.get(unit.location_asset_id)
+            location_path: Path | None = None
             if location is not None:
-                location_path = novel_dir / location.primary_image
-                if location_path.is_file():
-                    if fallback_reference == reference and not unit.character_asset_ids:
-                        fallback_reference = location_path
-                    elif location_path != fallback_reference:
-                        fallback_additional = (location_path,)
+                candidate = novel_dir / location.primary_image
+                if candidate.is_file():
+                    location_path = candidate
+            if fallback_character_paths:
+                fallback_reference = fallback_character_paths[0]
+                fallback_additional = tuple(
+                    [
+                        *fallback_character_paths[1:],
+                        *(
+                            [location_path]
+                            if location_path is not None
+                            and location_path != fallback_reference
+                            else []
+                        ),
+                    ]
+                )
+            elif location_path is not None:
+                fallback_reference = location_path
 
-            fallback_prompt = anime_image_safety_fallback_prompt(unit)
+            fallback_identity_anchor = (
+                self._multi_character_asset_text_anchor(
+                    novel_dir,
+                    series_assets,
+                    list(unit.character_asset_ids),
+                    unit.location_asset_id,
+                )
+                if len(unit.character_asset_ids) >= 2
+                else self._character_asset_text_anchor(
+                    novel_dir,
+                    series_assets,
+                    unit.character_asset_ids[0],
+                )
+                if unit.character_asset_ids
+                else ""
+            )
+            fallback_prompt = (
+                fallback_identity_anchor
+                + anime_image_safety_fallback_prompt(unit)
+            )
             fallback_kwargs: dict[str, object] = {"reference": fallback_reference}
             if fallback_additional:
                 fallback_kwargs["additional_references"] = fallback_additional
@@ -1751,7 +2151,8 @@ class EpisodeProductionRuntime:
                         for path in fallback_additional
                     ],
                     "fallback_sha256": sha256_file(result),
-                    "policy": "calm-single-subject-anime-start-frame-v1",
+                    "policy": anime_image_safety_fallback_policy(unit),
+                    "exact_subject_count": len(set(unit.character_asset_ids)),
                     "iteration_record": generation_iteration_record(
                         unit_id=unit.unit_id,
                         prompt_sha256=sha256_text(fallback_prompt),
@@ -1767,8 +2168,8 @@ class EpisodeProductionRuntime:
                             "calm start state should pass hosted image safety review."
                         ),
                         expected_improvement=(
-                            "A valid single-subject anime keyframe without changing the "
-                            "locked role or location references."
+                            "A valid non-photographic keyframe in the locked medium "
+                            "with the exact registered cast and location references."
                         ),
                         decision="new_prompt_version",
                         next_action="continue only if the fallback image is generated",
@@ -1882,9 +2283,10 @@ class EpisodeProductionRuntime:
             unit = unit.model_copy(
                 update={"keyframe_prompt": unit.keyframe_prompt + cast_guard}
             )
-        unit = unit.model_copy(
-            update={"motion_prompt": compile_seedance_native_audio_prompt(unit)}
-        )
+        if not _is_compiled_provider_motion_prompt(unit.motion_prompt):
+            unit = unit.model_copy(
+                update={"motion_prompt": compile_seedance_native_audio_prompt(unit)}
+            )
         canonical_video = self._resolve(episode_dir, unit.raw_video_path)
         canonical_keyframe = self._resolve(episode_dir, unit.keyframe_path)
         reference_board = self.assets.reference_board(
@@ -1912,11 +2314,15 @@ class EpisodeProductionRuntime:
                 series_assets.characters if series_assets is not None else ()
             )
         }
-        character_paths = tuple(
-            novel_dir / character_map[asset_id].primary_image
+        available_character_ids = tuple(
+            asset_id
             for asset_id in unit.character_asset_ids[:6]
             if asset_id in character_map
             and (novel_dir / character_map[asset_id].primary_image).is_file()
+        )
+        character_paths = tuple(
+            novel_dir / character_map[asset_id].primary_image
+            for asset_id in available_character_ids
         )
         single_character_anchor = (
             self._character_asset_text_anchor(
@@ -1927,11 +2333,37 @@ class EpisodeProductionRuntime:
             if len(unit.character_asset_ids) == 1
             else ""
         )
-        multi_character_story_keyframe = (
-            unit.visual_strategy == VisualStrategy.STORY_KEYFRAME
-            and len(character_paths) >= 2
+        multi_character_generated_keyframe = (
+            len(character_paths) >= 2
+            and unit.visual_strategy
+            not in {VisualStrategy.DIRECT_ASSETS, VisualStrategy.SCENE_ONLY}
         )
-        if multi_character_story_keyframe and self.settings.provider == "phanrouter":
+        if (
+            multi_character_generated_keyframe
+            and self.settings.provider == "phanrouter"
+        ):
+            multi_character_anchor = self._multi_character_asset_text_anchor(
+                novel_dir,
+                series_assets,
+                list(available_character_ids),
+                unit.location_asset_id,
+            )
+            if multi_character_anchor:
+                base_prompt = (
+                    unit.keyframe_prompt
+                    if unit.visual_strategy == VisualStrategy.STORY_KEYFRAME
+                    else self._multi_character_keyframe_prompt(
+                        unit,
+                        len(character_paths),
+                    )
+                )
+                unit = unit.model_copy(
+                    update={
+                        "keyframe_prompt": (
+                            multi_character_anchor + base_prompt
+                        )
+                    }
+                )
             reference_board = character_paths[0]
             additional_keyframe_references = tuple(
                 [
@@ -1953,7 +2385,7 @@ class EpisodeProductionRuntime:
         if (
             unit.speaking
             and additional_keyframe_references
-            and not multi_character_story_keyframe
+            and not multi_character_generated_keyframe
         ):
             unit = unit.model_copy(
                 update={
@@ -1963,7 +2395,11 @@ class EpisodeProductionRuntime:
                     )
                 }
             )
-        elif not unit.speaking and self.settings.provider == "phanrouter":
+        elif (
+            not unit.speaking
+            and self.settings.provider == "phanrouter"
+            and not multi_character_generated_keyframe
+        ):
             location = location_record
             if location is not None:
                 location_path = novel_dir / location.primary_image
@@ -2046,7 +2482,37 @@ class EpisodeProductionRuntime:
                 visual_input_strategy = "phanrouter-direct-series-assets"
             elif first_keyframe is None:
                 first_keyframe = attempt_root / "attempt_01" / "keyframe.jpeg"
-                if self.settings.reuse_existing_keyframes and canonical_keyframe.is_file():
+                first_generation_prompt = (
+                    unit.keyframe_prompt
+                    + " 本单元为独立构图第1次生成，禁止复用其他台词的完整构图。"
+                )
+                compatible_keyframe = self._find_compatible_keyframe_attempt(
+                    group_attempt_root=(
+                        episode_dir / "work" / "visual_attempts" / unit.unit_id
+                    ),
+                    output=first_keyframe,
+                    prompt=first_generation_prompt,
+                    reference=reference_board,
+                    additional_references=additional_keyframe_references,
+                )
+                if compatible_keyframe is not None:
+                    copy_keyframe(compatible_keyframe, first_keyframe)
+                    atomic_write_json(
+                        first_keyframe.parent / "keyframe_reuse_report.json",
+                        {
+                            "policy": "image-request-match-across-video-contract-v1",
+                            "source_keyframe": Path(
+                                os.path.relpath(compatible_keyframe, episode_dir)
+                            ).as_posix(),
+                            "source_sha256": sha256_file(compatible_keyframe),
+                            "reason": (
+                                "image prompt, references, provider, and image model "
+                                "match; only the combined video-attempt identity changed"
+                            ),
+                        },
+                    )
+                    reused_keyframe = True
+                elif self.settings.reuse_existing_keyframes and canonical_keyframe.is_file():
                     saved = json.loads(meta.read_text(encoding="utf-8")) if meta.is_file() else {}
                     expected_sha = saved.get("keyframe_sha256")
                     if not expected_sha or expected_sha == sha256_file(canonical_keyframe):
@@ -2059,10 +2525,7 @@ class EpisodeProductionRuntime:
                             unit=unit,
                             series_assets=series_assets,
                             output=first_keyframe,
-                            prompt=(
-                                unit.keyframe_prompt
-                                + " 本单元为独立构图第1次生成，禁止复用其他台词的完整构图。"
-                            ),
+                            prompt=first_generation_prompt,
                             reference=reference_board,
                             additional_references=additional_keyframe_references,
                         )
@@ -2073,10 +2536,7 @@ class EpisodeProductionRuntime:
                         unit=unit,
                         series_assets=series_assets,
                         output=first_keyframe,
-                        prompt=(
-                            unit.keyframe_prompt
-                            + " 本单元为独立构图第1次生成，禁止复用其他台词的完整构图。"
-                        ),
+                        prompt=first_generation_prompt,
                         reference=reference_board,
                         additional_references=additional_keyframe_references,
                     )
@@ -2151,6 +2611,7 @@ class EpisodeProductionRuntime:
         ).as_posix()
         visual_source = ""
         last_error: Exception | None = None
+        privacy_repair_error: Exception | None = None
 
         if selected_video is None:
             for attempt in range(1, self.settings.max_unit_attempts + 1):
@@ -2197,15 +2658,67 @@ class EpisodeProductionRuntime:
                             / identity[:8]
                             / f"attempt_{attempt + 1:02d}"
                         )
-                        repaired_source = next_directory / "privacy_safe_keyframe.jpeg"
+                        repair_prompt = anime_privacy_repair_prompt(unit)
+                        repair_policy = anime_privacy_repair_policy(unit)
+                        repair_reference_paths = []
+                        for candidate in (
+                            reference_board,
+                            *additional_keyframe_references,
+                            *additional_video_images,
+                            self.settings.style_master_path,
+                        ):
+                            if (
+                                candidate is not None
+                                and candidate.is_file()
+                                and candidate != keyframe_path
+                                and candidate not in repair_reference_paths
+                            ):
+                                repair_reference_paths.append(candidate)
+                        repair_reference_sha256s = [
+                            sha256_file(path) for path in repair_reference_paths
+                        ]
+                        repair_prompt_id = sha256_text(
+                            repair_prompt
+                            + "|"
+                            + repair_policy
+                            + "|"
+                            + "|".join(repair_reference_sha256s)
+                        )[:12]
+                        repaired_source = next_directory / (
+                            f"privacy_safe_keyframe_{repair_prompt_id}.jpeg"
+                        )
                         next_keyframe = next_directory / "keyframe.jpeg"
+                        source_sha256 = sha256_file(keyframe_path)
                         try:
-                            repaired = self.media.create_image(
-                                anime_privacy_repair_prompt(unit),
-                                repaired_source,
-                                reference=keyframe_path,
+                            compatible_repair = self._find_compatible_privacy_repair(
+                                group_attempt_root=(
+                                    episode_dir
+                                    / "work"
+                                    / "visual_attempts"
+                                    / unit.unit_id
+                                ),
+                                prompt=repair_prompt,
+                                source_sha256=source_sha256,
+                                policy=repair_policy,
+                                reference_sha256s=repair_reference_sha256s,
                             )
-                            copy_keyframe(repaired.path, next_keyframe)
+                            reused_from: str | None = None
+                            if compatible_repair is not None:
+                                repaired_path, _ = compatible_repair
+                                copy_keyframe(repaired_path, next_keyframe)
+                                reused_from = Path(
+                                    os.path.relpath(repaired_path, episode_dir)
+                                ).as_posix()
+                            else:
+                                repaired = self.media.create_image(
+                                    repair_prompt,
+                                    repaired_source,
+                                    reference=keyframe_path,
+                                    additional_references=tuple(
+                                        repair_reference_paths
+                                    ),
+                                )
+                                copy_keyframe(repaired.path, next_keyframe)
                             atomic_write_json(
                                 next_directory / "privacy_repair_report.json",
                                 {
@@ -2215,16 +2728,27 @@ class EpisodeProductionRuntime:
                                     ),
                                     "source_attempt": attempt,
                                     "source_keyframe": keyframe_path.name,
-                                    "source_sha256": sha256_file(keyframe_path),
+                                    "source_sha256": source_sha256,
                                     "repair_model": self.settings.image_model,
-                                    "repair_prompt": anime_privacy_repair_prompt(unit),
+                                    "repair_prompt": repair_prompt,
                                     "repair_sha256": sha256_file(next_keyframe),
-                                    "policy": "explicit-flat-2d-anime-redraw-v1",
+                                    "policy": repair_policy,
+                                    "repair_references": [
+                                        Path(
+                                            os.path.relpath(path, episode_dir)
+                                        ).as_posix()
+                                        for path in repair_reference_paths
+                                    ],
+                                    "repair_reference_sha256s": (
+                                        repair_reference_sha256s
+                                    ),
+                                    "reused_from": reused_from,
+                                    "exact_subject_count": len(
+                                        set(unit.character_asset_ids)
+                                    ),
                                     "iteration_record": generation_iteration_record(
                                         unit_id=unit.unit_id,
-                                        prompt_sha256=sha256_text(
-                                            anime_privacy_repair_prompt(unit)
-                                        ),
+                                        prompt_sha256=sha256_text(repair_prompt),
                                         batch_id=f"video-privacy-repair-{attempt + 1:02d}",
                                         failure_codes=["F-MATERIAL", "F-REF-SCOPE"],
                                         responsibility_layer="asset",
@@ -2232,9 +2756,10 @@ class EpisodeProductionRuntime:
                                             "keyframe.rendering_material",
                                         ],
                                         hypothesis=(
-                                            "Redrawing only the current keyframe as explicit flat "
-                                            "2D cel animation should remove the real-person false "
-                                            "positive while preserving the shot contract."
+                                            "Redrawing only the current keyframe in its locked "
+                                            "animation medium with explicitly non-photographic "
+                                            "materials should remove the real-person false positive "
+                                            "while preserving identity and the shot contract."
                                         ),
                                         expected_improvement=(
                                             "Seedance accepts the same shot without identity, "
@@ -2246,14 +2771,23 @@ class EpisodeProductionRuntime:
                                 },
                             )
                         except Exception as repair_error:
+                            privacy_repair_error = repair_error
                             last_error = repair_error
                         continue
                     if attempt == self.settings.max_unit_attempts:
                         if self.settings.admission_mode == "production":
+                            repair_detail = (
+                                "; privacy repair error: "
+                                f"{type(privacy_repair_error).__name__}: "
+                                f"{str(privacy_repair_error)[:500]}"
+                                if privacy_repair_error is not None
+                                else ""
+                            )
                             raise RuntimeError(
                                 f"{unit.unit_id} has no real generated video after "
                                 f"{attempt} attempts; static fallback is forbidden in production; "
                                 f"last error: {type(error).__name__}: {str(error)[:500]}"
+                                f"{repair_detail}"
                             ) from error
                         fallback_seconds = min(
                             14.0,
@@ -2485,6 +3019,13 @@ class EpisodeProductionRuntime:
                 *proxy.character_asset_ids[:character_count],
             ]
         video_prompt = compile_seedance_native_audio_prompt(proxy)
+        persistent_states = _persistent_visual_states(group.motion_prompt)
+        if persistent_states:
+            state_guard = _compact_prompt_clause(
+                "；".join(dict.fromkeys(persistent_states)),
+                220,
+            )
+            video_prompt += f" 持续可见状态硬合同：{state_guard}。"
         if group.image_contract is not None:
             if group.image_contract.spatial_anchors:
                 anchors = _compact_prompt_clause(
@@ -2503,6 +3044,42 @@ class EpisodeProductionRuntime:
             )
             if feedback:
                 video_prompt += f" 环境只响应：{feedback}。"
+        if any(
+            token in group.keyframe_prompt
+            for token in ("不得出现测试碑", "发光金盒", "发光方块")
+        ):
+            prop_guard = (
+                " 无关道具硬合同：前景、桌面与地面必须保持空净；"
+                "禁止测试碑、发光金盒、发光方块、无字金纹碑或任何新增道具。"
+            )
+            image_prompt += prop_guard
+            video_prompt += prop_guard
+        exact_subject_count = (
+            group.image_contract.exact_subject_count
+            if group.image_contract is not None
+            else len(proxy.character_asset_ids)
+        )
+        if exact_subject_count:
+            exact_cast_guard = (
+                f" 全程画面必须恰好{exact_subject_count}名人物，并逐一对应已登记角色资产；"
+                "不得新增群众、官员、守卫、随从、人影、镜中人或任何背景人脸。"
+            )
+            shadow_is_required = any(
+                token in (group.keyframe_prompt + group.motion_prompt)
+                for token in ("影子", "长影", "投影")
+            )
+            if shadow_is_required:
+                exact_cast_guard = (
+                    f" 全程画面必须恰好{exact_subject_count}名人物，并逐一对应已登记角色资产；"
+                    "不得新增群众、官员、守卫、随从、第三人影、第三镜中人或任何未登记背景人脸；"
+                    "已登记角色自身的影子不计作新增人物。"
+                )
+        else:
+            exact_cast_guard = (
+                " 全程必须保持空场，不得出现人物、人影、镜中人或背景人脸。"
+            )
+        image_prompt += exact_cast_guard
+        video_prompt += exact_cast_guard
         return ProviderPromptAdapter(
             provider=self.settings.provider,
             image_model=self.settings.image_model,
@@ -3045,12 +3622,12 @@ class EpisodeProductionRuntime:
                 )
                 asr_row["quality_route"] = route
                 quality_rows.append(
-                    {
-                        "quality_attempt": quality_attempt,
-                        "asr": asr_row,
-                        "route": route,
-                        "audio": audio_row,
-                    }
+                    _native_quality_attempt_snapshot(
+                        quality_attempt=quality_attempt,
+                        asr_row=asr_row,
+                        route=route,
+                        audio_row=audio_row,
+                    )
                 )
                 if route["passed"]:
                     native_dialogue_asr_rows.append(asr_row)
@@ -3201,6 +3778,39 @@ class EpisodeProductionRuntime:
             self.settings,
             episode_dir / "media_qc_report.json",
         )
+        video_quality_manifest = build_video_quality_manifest(plan)
+        atomic_write_json(
+            episode_dir / "video_quality_manifest.json",
+            video_quality_manifest,
+        )
+        final_director_review = episode_dir / "director_video_review_final.json"
+        vlm_director_review = episode_dir / "director_video_review_vlm.json"
+        if final_director_review.is_file():
+            director_review_path = final_director_review
+        elif self.settings.director_review_command:
+            self.evidence.generate_director_review(
+                episode_dir=episode_dir,
+                manifest=episode_dir / "video_quality_manifest.json",
+                plan=plan_path,
+                output=vlm_director_review,
+            )
+            director_review_path = vlm_director_review
+        else:
+            director_review_path = episode_dir / "director_video_review.json"
+        director_review = (
+            json.loads(director_review_path.read_text(encoding="utf-8"))
+            if director_review_path.is_file()
+            else None
+        )
+        video_quality_report = evaluate_generated_video_quality(
+            episode_dir=episode_dir,
+            manifest=video_quality_manifest,
+            plan=plan,
+            director_review=director_review,
+            report_path=episode_dir / "video_quality_report.json",
+            require_director_review=self.settings.admission_mode == "production",
+            min_style_consistency=self.settings.min_style_consistency,
+        )
         admission = evaluate_episode_admission(
             settings=self.settings,
             plan=plan,
@@ -3211,7 +3821,9 @@ class EpisodeProductionRuntime:
             subtitle_events=subtitle_events,
             asr_report=asr_report,
             face_consistency_report=face_consistency_report,
+            video_quality_report=video_quality_report,
         )
         atomic_write_json(episode_dir / "admission_report.json", admission)
         atomic_write_json(episode_dir / "qc_report.json", admission)
+        build_generation_task_ledger(episode_dir.parent)
         return admission

@@ -1122,16 +1122,39 @@ def _camera_plan_for(
 
 
 def _action_physics_plan_for(shot, turn: ScriptTurn) -> ActionPhysicsPlan | None:
-    text = " ".join(
-        filter(None, (shot.visual_prompt, shot.motion_prompt, turn.text))
+    # Physics must come from visible directing, never from dialogue or an
+    # abstract dramatic result.  A line such as "关系破裂" previously
+    # made the runtime shatter whatever prop happened to be on screen.
+    text = " ".join(filter(None, (shot.visual_prompt, shot.motion_prompt)))
+    non_destructive_contracts = (
+        "手指完全不发力",
+        "无裂纹",
+        "无碎屑",
+        "不得断裂",
+        "不得粉碎",
+        "不得破坏",
+        "禁止断裂",
+        "禁止粉碎",
+    )
+    if any(contract in text for contract in non_destructive_contracts):
+        return None
+    fracture_tokens = (
+        "碎裂",
+        "破裂",
+        "裂开",
+        "出现裂纹",
+        "裂纹扩散",
+        "粉碎",
+        "化为粉末",
+        "碎片",
     )
     action_tokens = (
-        "碎", "裂", "撞", "击", "拳", "爆", "冲", "跑", "追",
+        *fracture_tokens, "撞", "击", "拳", "爆", "冲", "跑", "追",
         "投", "扔", "推开", "拉开", "跌", "倒", "挥", "劈",
     )
     if not any(token in text for token in action_tokens):
         return None
-    if any(token in text for token in ("碎", "裂")):
+    if any(token in text for token in fracture_tokens):
         return ActionPhysicsPlan(
             trigger="人物对道具施加持续压力",
             preparation="手指与掌心先稳定接触唯一道具，手腕保持承力",
