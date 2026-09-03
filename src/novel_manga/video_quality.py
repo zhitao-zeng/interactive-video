@@ -9,6 +9,35 @@ from .production_models import ProductionPlan
 from .util import atomic_write_json, media_duration
 
 
+def build_video_quality_manifest(plan: ProductionPlan) -> dict:
+    return {
+        "schema_version": 1,
+        "groups": [
+            {
+                "group_id": group.group_id,
+                "generation_duration": min(
+                    14.0,
+                    max(4.0, float(group.planned_seconds)),
+                ),
+                "references": [
+                    *[
+                        {
+                            "asset_id": asset_id,
+                            "role": "character_identity_costume",
+                        }
+                        for asset_id in group.character_asset_ids
+                    ],
+                    {
+                        "asset_id": group.location_asset_id,
+                        "role": "location_space_lighting",
+                    },
+                ],
+            }
+            for group in plan.visual_groups
+        ],
+    }
+
+
 def _stream_contract(path: Path) -> dict:
     probe = subprocess.run(
         [
@@ -50,6 +79,7 @@ def evaluate_generated_video_quality(
     director_review: dict | None,
     report_path: Path,
     require_director_review: bool = True,
+    min_style_consistency: float = 0.78,
 ) -> dict:
     """Gate generated groups before final assembly.
 
@@ -111,6 +141,8 @@ def evaluate_generated_video_quality(
     multi_target_count = 0
     same_frame_pass_count = 0
     identity_scores: list[float] = []
+    style_scores: list[float] = []
+    style_reviewed_count = 0
     for item in manifest.get("groups", []):
         group_id = str(item["group_id"])
         expected_ids = {
@@ -126,6 +158,8 @@ def evaluate_generated_video_quality(
                 review_failures.append(f"{group_id}:director-review-missing")
             continue
         reviewed_count += 1
+        if review.get("review_status") not in {None, "passed"}:
+            review_failures.append(f"{group_id}:director-review-inconclusive")
         observed_ids = {str(value) for value in review.get("visible_asset_ids", [])}
         cast_ok = observed_ids == expected_ids
         if len(expected_ids) >= 2 and cast_ok:
@@ -140,6 +174,23 @@ def evaluate_generated_video_quality(
             review_failures.append(f"{group_id}:unexpected-object")
         if not bool(review.get("screen_direction_ok", True)):
             review_failures.append(f"{group_id}:screen-direction")
+        style_match = review.get("style_match")
+        style_score = review.get("style_consistency_score")
+        render_medium = str(review.get("render_medium", "")).strip()
+        if not isinstance(style_match, bool) or not isinstance(
+            style_score, (int, float)
+        ):
+            if require_director_review:
+                review_failures.append(f"{group_id}:style-review-missing")
+        else:
+            style_reviewed_count += 1
+            style_scores.append(float(style_score))
+            if not style_match:
+                review_failures.append(f"{group_id}:style-mismatch")
+            if float(style_score) < min_style_consistency:
+                review_failures.append(f"{group_id}:style-score")
+            if render_medium != "3d_cg_animation":
+                review_failures.append(f"{group_id}:render-medium")
         score = review.get("identity_consistency_score")
         if isinstance(score, (int, float)):
             identity_scores.append(float(score))
@@ -153,12 +204,24 @@ def evaluate_generated_video_quality(
     failures = [*automated_failures, *review_failures]
     report = {
         "schema_version": 1,
-        "policy": "episode-video-side-gates-v1",
+        "policy": "episode-video-side-gates-v2-style-blocking",
         "passed": not failures,
         "automated_passed": not automated_failures,
         "director_review_passed": not review_failures,
         "group_count": len(manifest.get("groups", [])),
         "reviewed_group_count": reviewed_count,
+        "style_reviewed_group_count": style_reviewed_count,
+        "min_style_consistency": min_style_consistency,
+        "style_consistency": {
+            "blocking": True,
+            "mean_score": (
+                round(sum(style_scores) / len(style_scores), 6)
+                if style_scores
+                else None
+            ),
+            "minimum_score": round(min(style_scores), 6) if style_scores else None,
+            "sample_count": len(style_scores),
+        },
         "multi_character_target_count": multi_target_count,
         "multi_character_same_frame_ratio": round(same_frame_ratio, 6),
         "identity_consistency_monitor": {

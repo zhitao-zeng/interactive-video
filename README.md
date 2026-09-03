@@ -117,6 +117,40 @@ uv run novel-manga generate /input/novel.docx \
   --provider phanrouter --admission-mode production --output /output
 ```
 
+## 项目专属 Qwen3.8 多模态服务
+
+本项目维护独立的 Qwen3.8-27B 服务，不借用其他任务的 27B 容器。该实例同时承担命令式剧本规划和
+导演视觉审查，默认开启思考、65K 上下文和图片输入；仅监听回环地址，且必须显式分配 GPU：
+
+```bash
+export QWEN38_VLM_GPUS=1,4  # 先确认这两张卡已分配给本项目
+scripts/qwen38_vlm_service.sh start
+scripts/qwen38_vlm_service.sh status
+```
+
+文本规划使用同一服务：
+
+```bash
+export NOVEL_PLANNER_BACKEND=command
+export NOVEL_PLANNER_COMMAND="$(pwd)/.venv/bin/python $(pwd)/scripts/qwen38_local_planner_command.py"
+export QWEN38_LOCAL_BASE_URL=http://127.0.0.1:18120/v1
+export QWEN38_LOCAL_MODEL=Qwen3.8-27B-Project
+```
+
+生产视觉审查也使用同一服务：
+
+```bash
+export NOVEL_DIRECTOR_REVIEW_COMMAND="$(pwd)/.venv/bin/python $(pwd)/scripts/qwen38_vlm_review_command.py"
+```
+
+视觉命令为每个视频组保留 12%/50%/88% 三帧联系表，并与锁定角色、场景参考一起送入模型。
+低置信度、接口失败或缺失结果一律记为 `inconclusive`，不能通过生产门禁。人工修订后的
+`director_video_review_final.json` 可以覆盖自动结果。停止服务只会删除带本项目所有权标签的容器：
+
+```bash
+scripts/qwen38_vlm_service.sh stop
+```
+
 `command` provider 的媒体协议不经过 shell：
 
 ```text
@@ -183,6 +217,7 @@ docker run --rm -p 8080:80 -v /path/to/output:/output \
 ```text
 /output/<novel_id>/
 ├── story_bible.json
+├── generation_task_ledger.json
 ├── series_development/
 │   ├── active.json
 │   ├── series_development.vNNN.json

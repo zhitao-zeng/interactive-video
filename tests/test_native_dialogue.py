@@ -227,7 +227,7 @@ def test_native_dialogue_production_configuration_does_not_require_tts() -> None
         final_audio_policy=NATIVE_DIALOGUE_POLICY,
         image_command="/models/image",
         video_command="/models/video",
-        asr_command="/models/asr",
+        asr_command="/bin/false",
         planner_backend="command",
         planner_command="/models/deepseek-planner",
     )
@@ -506,3 +506,53 @@ def test_native_assembly_crossfades_and_mixes_bgm_before_final_loudnorm(
     assert "loudnorm=I=-16:TP=-1.5:LRA=11" in final_graph
     assert events[1]["start"] == pytest.approx(4.05)
     assert all(event["subtitle_source"] == "native_audio_asr" for event in events)
+
+
+def test_long_native_assembly_uses_concat_to_avoid_chained_xfade_freezes(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    renderer = Renderer(
+        Settings(
+            final_audio_policy=NATIVE_DIALOGUE_POLICY,
+            intro_seconds=0,
+            outro_seconds=0,
+        )
+    )
+    commands: list[list[str]] = []
+
+    def fake_run(command: list[str]) -> None:
+        commands.append(command)
+        Path(command[-1]).parent.mkdir(parents=True, exist_ok=True)
+        Path(command[-1]).write_bytes(b"generated")
+
+    monkeypatch.setattr(render_module, "run", fake_run)
+    segments = []
+    rows = []
+    for index in range(17):
+        segment = tmp_path / f"segment-{index:02d}.mp4"
+        segment.write_bytes(b"segment")
+        segments.append(segment)
+        rows.append(
+            {
+                "unit_id": f"u{index:02d}",
+                "role": "旁白",
+                "segment": str(segment),
+                "duration": 4.0,
+                "subtitle_events": [],
+            }
+        )
+
+    _, _, _, events = renderer.assemble_production(
+        tmp_path / "intro.jpeg",
+        tmp_path / "ending.jpeg",
+        rows,
+        tmp_path / "final.mp4",
+        tmp_path / "work",
+    )
+
+    join_graph = commands[0][commands[0].index("-filter_complex") + 1]
+    assert "concat=n=17:v=1:a=1[vcat][acat]" in join_graph
+    assert "xfade=" not in join_graph
+    assert "acrossfade=" not in join_graph
+    assert events == []

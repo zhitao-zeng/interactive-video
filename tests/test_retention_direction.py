@@ -28,6 +28,7 @@ from novel_manga.planner import (
     OpenAICompatiblePlanner,
     _compile_retention_beat_episode,
     _downgrade_unremovable_review_deletion_claims,
+    _evidence_quote_matches_event,
     _prune_redundant_derived_shots,
     _validate_retention_beat_direction,
     _validate_retention_beat_script,
@@ -35,6 +36,17 @@ from novel_manga.planner import (
 
 
 SOURCE = "甲说：“一。”甲又说：“二。”甲最后说：“三。”"
+
+
+def test_event_inference_rejects_short_phrase_shared_by_multiple_events() -> None:
+    assert not _evidence_quote_matches_event(
+        "楚焱哥哥。",
+        "楚焱哥哥，虽然并不知道你究竟是怎么回事，不过烟儿相信你会重新站起来。",
+    )
+    assert _evidence_quote_matches_event(
+        "烟儿相信你会重新站起来。",
+        "楚焱哥哥，虽然并不知道你究竟是怎么回事，不过烟儿相信你会重新站起来。",
+    )
 
 
 def _retention_beat(index: int) -> RetentionBeat:
@@ -1148,3 +1160,90 @@ def test_beat_script_infers_missing_speaker_from_speech_action() -> None:
 
     assert accepted.shots[0].turns[0].speaker_name == "甲"
     assert accepted.shots[0].turns[0].role == "甲"
+
+
+def test_beat_script_infers_anonymous_examiner_and_does_not_cross_shot_fields() -> None:
+    beat = _retention_beat(1)
+    episode = Episode(
+        index=1,
+        source_title="第一章",
+        source_text=SOURCE,
+        text_count=len(SOURCE),
+        source_start=0,
+        source_end=len(SOURCE),
+    )
+    bible = StoryBible(
+        novel_title="测试",
+        genre="玄幻",
+        visual_style="3D国漫",
+        palette="冷青",
+        characters=[
+            Character(name="甲", appearance="黑发青年", wardrobe="蓝袍"),
+            Character(name="乙", appearance="白发青年", wardrobe="灰袍"),
+        ],
+        locations=["门前"],
+        style_fingerprint="speaker-boundary-test",
+    )
+
+    examiner_raw = _script(beat).model_dump(mode="json")
+    examiner_raw["shots"][0]["characters"] = ["测验员", "甲"]
+    examiner_raw["shots"][0]["blocking"] = "测验员面向甲宣读结果。"
+    examiner_raw["shots"][0]["change"] = "甲听见测验结果。"
+    examiner_raw["shots"][0]["turns"][0].update(
+        {"role": "", "speaker_name": "", "delivery_mode": "visible_dialogue"}
+    )
+    examiner = _validate_retention_beat_script(
+        examiner_raw,
+        beat=beat,
+        episode=episode,
+        bible=bible,
+        native_dialogue=True,
+    )
+    assert examiner.shots[0].turns[0].speaker_name == "无名测验员"
+    assert examiner.shots[0].turns[0].delivery_mode == "offscreen_dialogue"
+    assert examiner.shots[0].turns[0].speaking is False
+
+    crowd_raw = _script(beat).model_dump(mode="json")
+    crowd_raw["shots"][0]["blocking"] = "乙与姐妹在人群中议论七段成绩。"
+    crowd_raw["shots"][0]["change"] = "围观者赞叹七段成绩。"
+    crowd_raw["shots"][0]["turns"][0].update(
+        {
+            "role": "",
+            "speaker_name": "",
+            "speaking": True,
+            "delivery_mode": "offscreen_dialogue",
+        }
+    )
+    crowd = _validate_retention_beat_script(
+        crowd_raw,
+        beat=beat,
+        episode=episode,
+        bible=bible,
+        native_dialogue=True,
+    )
+    assert crowd.shots[0].turns[0].speaker_name == "无名族人"
+
+    boundary_raw = _script(beat).model_dump(mode="json")
+    boundary_raw["shots"][0]["characters"] = ["甲", "乙"]
+    boundary_raw["shots"][0]["blocking"] = "乙侧身，甲在画外"
+    boundary_raw["shots"][0]["change"] = "乙对同伴说出甲过去的经历"
+    boundary_raw["shots"][0]["turns"][0].update(
+        {
+            "role": "",
+            "speaker_name": "",
+            "delivery_mode": "visible_dialogue",
+            "derivation": "derived",
+            "device": None,
+            "serves": ["event_001"],
+        }
+    )
+    boundary = _validate_retention_beat_script(
+        boundary_raw,
+        beat=beat,
+        episode=episode,
+        bible=bible,
+        native_dialogue=True,
+    )
+    assert boundary.shots[0].turns[0].speaker_name == "乙"
+    assert boundary.shots[0].turns[0].role == "乙"
+    assert boundary.shots[0].turns[0].device == "listener_qa"

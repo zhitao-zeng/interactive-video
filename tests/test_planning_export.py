@@ -7,7 +7,8 @@ import pytest
 
 from novel_manga.config import Settings
 from novel_manga.models import Character, EpisodePlan, ScriptTurn, Shot, StoryBible
-from novel_manga.planner import OpenAICompatiblePlanner
+from novel_manga.planner import DeterministicPlanner, OpenAICompatiblePlanner
+from novel_manga import planning_export
 from novel_manga.planning_export import compile_planning_bundle, export_planning_bundle
 
 
@@ -36,6 +37,44 @@ def test_export_planning_bundle_uses_no_media_provider(tmp_path: Path) -> None:
         )
     )
     assert quality["passed"] is True
+
+
+def test_export_planning_bundle_resumes_validated_bible_and_episode(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "novel.txt"
+    source.write_text(
+        "第一章 起点\n\n林舟推开门，看见桌上的旧钥匙。",
+        encoding="utf-8",
+    )
+    settings = Settings(
+        provider="mock",
+        planner_backend="deterministic",
+        output_root=tmp_path / "plans",
+    )
+
+    class CountingPlanner(DeterministicPlanner):
+        bible_calls = 0
+        episode_calls = 0
+
+        def build_bible(self, novel):
+            self.bible_calls += 1
+            return super().build_bible(novel)
+
+        def plan_episode_bundle(self, novel, episode, bible, previous_state=None):
+            self.episode_calls += 1
+            return super().plan_episode_bundle(
+                novel, episode, bible, previous_state
+            )
+
+    planner = CountingPlanner()
+    monkeypatch.setattr(planning_export, "build_planner", lambda _settings: planner)
+
+    export_planning_bundle(settings, source, novel_id="demo", title="测试小说")
+    export_planning_bundle(settings, source, novel_id="demo", title="测试小说")
+
+    assert planner.bible_calls == 1
+    assert planner.episode_calls == 1
 
 
 def test_openai_planner_requires_endpoint_and_key() -> None:
