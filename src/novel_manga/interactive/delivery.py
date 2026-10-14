@@ -33,9 +33,10 @@ def requested_sampling(provider,profile):
 
 
 def evidence_events(overlays, script, plan, timeline, *, shot_spans=None):
-    labels = {row['index']: row['text'] for row in overlays}
+    labels = {row['index']: row for row in overlays}
     if shot_spans is not None:
-        return [{'text':labels[span['index']], 'start':span['start'], 'end':span['end']}
+        return [{**{k:v for k,v in labels[span['index']].items() if k in {'text','placement'}},
+                 'start':span['start'], 'end':span['end']}
                 for span in shot_spans if span['index'] in labels]
     seconds = {s.get('index', i): float(s['duration_seconds']) for i, s in enumerate(script['shots'], 1)}
     clips = {c['clip_id']:c for c in plan['clips']}
@@ -50,9 +51,24 @@ def evidence_events(overlays, script, plan, timeline, *, shot_spans=None):
         for index in indexes:
             end = cursor + (span['end']-span['start'])*seconds[index]/total
             if index in labels:
-                result.append({'text':labels[index], 'start':round(cursor,3), 'end':round(end,3)})
+                event={'text':labels[index]['text'], 'start':round(cursor,3), 'end':round(end,3)}
+                if labels[index].get('placement'):event['placement']=labels[index]['placement']
+                result.append(event)
             cursor = end
     return result
+
+
+def ambience_window(index, script, plan, timeline):
+    """Use three seconds inside an authored silent shot, never a spoken tail."""
+    shot = next(s for s in script['shots'] if s['index'] == index)
+    if any(t.get('delivery_mode') != 'silent_action' for t in shot.get('turns', [])):
+        raise ValueError('Interaction ambience must come from a silent shot')
+    span = evidence_events([{'index':index,'text':''}], script, plan, timeline)
+    if not span or span[0]['end'] - span[0]['start'] < 3:
+        raise ValueError('Silent ambience shot has fewer than three delivered seconds')
+    row=span[0]
+    return row['start'] + min(1.0, row['end']-row['start']-3.0), 3.0
+
 
 
 def _ass_time(seconds):
@@ -68,13 +84,15 @@ PlayResY: {height}
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Evidence,Noto Sans CJK SC,42,&H00E5F3F1,&H00FFFFFF,&H0021251C,&H8021251C,-1,0,0,0,100,100,0,0,3,12,0,8,80,80,150,1
+Style: EvidencePanel,Noto Sans CJK SC,{min(round(width*.055),round(height*.04))},&H00E5F3F1,&H00FFFFFF,&H0021251C,&H0021251C,-1,0,0,0,100,100,0,0,3,18,0,2,80,80,{round(height*.25)},1
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 '''
     lines=[]
     for event in events:
         text=event['text'].replace('{','').replace('}','').replace('\n',r'\N')
-        lines.append(f'Dialogue: 1,{_ass_time(event["start"])},{_ass_time(event["end"])},Evidence,,0,0,0,,{text}')
+        style='EvidencePanel' if event.get('placement')=='panel' else 'Evidence'
+        lines.append(f'Dialogue: 1,{_ass_time(event["start"])},{_ass_time(event["end"])},{style},,0,0,0,,{text}')
     path.write_text(header+'\n'.join(lines)+'\n')
 
 
@@ -157,8 +175,15 @@ def deliver(runner, report: dict, destination: Path) -> dict:
     card=destination/'interaction.jpeg'
     _card(card,interaction,ctx.settings.font_path,ctx.settings.width,ctx.settings.height)
     tail=destination/'interaction.mp4'
+    tail_audio=['-f','lavfi','-i','anullsrc=r=48000:cl=stereo']
+    if interaction.get('ambience_shot_index'):
+        start,length=ambience_window(interaction['ambience_shot_index'],ctx.script,ctx.clip_plan,assembly.get('timeline',[]))
+        ambient=destination/'interaction-ambience.wav'
+        run(['ffmpeg','-y','-v','error','-ss',str(start),'-i',str(body),'-t',str(length),
+             '-vn','-ar','48000','-ac','2','-c:a','pcm_s16le',str(ambient)])
+        tail_audio=['-i',str(ambient)]
     run(['ffmpeg','-y','-v','error','-threads','4','-loop','1','-i',str(card),
-         '-f','lavfi','-i','anullsrc=r=48000:cl=stereo','-t','3','-r','25',
+         *tail_audio,'-t','3','-r','25',
          '-c:v','libx264','-preset','fast','-crf','19','-pix_fmt','yuv420p','-c:a','aac','-b:a','192k',str(tail)])
     final=destination/'episode01.mp4'
     # Trim audio padding at each join so the card occupies exactly the final 75 frames.

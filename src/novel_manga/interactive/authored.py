@@ -23,7 +23,7 @@ def prepare_authored(project: Path, output: Path, *, family: str = 'adventure') 
         raise ValueError('Authored groups must cover every beat once, in order')
     episode=output/(output.name+'_1')
     episode.mkdir(parents=True)
-    (output/'owner').write_text('Codex 荒野会话 01a13346 / 用户选定旅行首集 / 独立完整制作 / 2026-10-13\n')
+    (output/'owner').write_text(f'Interactive studio / project={family} / imported screenplay / {project.resolve()}\n')
     for name,key in [('profile','profile'),('story_bible','bible'),('voice_specs','voice_specs')]:
         atomic_write_json(output/(name+'.json'),material[key])
     segments=[{'segment_id':s['segment_id'],'text':s['source_quote']} for s in shots]

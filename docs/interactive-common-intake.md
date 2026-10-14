@@ -38,3 +38,9 @@
 ## 2026-10-14 真实验证更新
 
 首次实测暴露抽帧未交接、Agent超时。本轮已接入同take抽帧与时间、对应请求/ASR，并附标准库帧查阅工具；只支持选择已提供帧，不声称任意时间解码。相同请求的续跑复用原审核。随后Agent在575秒内交出候选，荒野第26段自动修正英文空镜错误、重拍一次并复核通过；仍使用600秒及原视频预算。累计34→35，其余30段不变，SD未跑。整片仍有静音/静帧/后期文字问题。详见 delivery/adventure/laughing-country-h3-768/frame-handoff-evaluation.md。
+
+## 2026-10-14 悬疑工作目录同步
+
+已在 codex/suspense-reference-study-20261013 同步共用 Agent 修复入口、双模型请求适配和同 take 抽帧交接。保留悬疑已有 prepare/声音入口与 suspense_groups 专用打包，同时支持新的 --material/--edition 合约。明确传入 project=suspense，避免把 edition 名误当项目名。已有 runtime 中 run.py 是上轮执行记录；后续从 scripts/interactive_video.py 的 run --project suspense --edition ... --lane h3|sd25 入口执行，--resume 保留原任务与预算。
+
+3228 项全量本地回归通过。使用本集 clip08 实际已有视频验证导出：6 张带时间点审片帧、请求、ASR 与资料可读；仅模拟沙箱返回以验证交接，没有调用模型或启动新生成。原审片范围修正和证据叠字仍保留。整片连续性、声音及后期问题尚未因此自动接回重拍循环。本次未改旧版、历史、预算或共享配置，未提交推送。

@@ -56,7 +56,8 @@ def main():
             from novel_manga.interactive.romance import prepare_romance
             directory=prepare_romance(ROOT)
         elif args.project=='suspense':
-            raise ValueError('Suspense needs approved --material and --edition; raw archive import does not approve a screenplay')
+            from novel_manga.interactive.suspense import prepare_suspense
+            directory=prepare_suspense(ROOT)
         else:
             directory=prepare_episode(ROOT/'projects/adventure',ROOT/'outputs/adventure-master',ROOT/'inputs/packages/adventure')
         plan=pack(directory)
@@ -72,7 +73,10 @@ def main():
                 runner.build_assets()
             if args.kind in ('all','voice'):build_authored_voices(ROOT,novel,family=args.project)
             return 0
-        if args.project=='suspense':raise ValueError('Suspense assets require a prepared --edition')
+        if args.project=='suspense':
+            from novel_manga.interactive.suspense import build_suspense_voices
+            if args.kind in ('all','voice'):build_suspense_voices(ROOT)
+            return 0
         if args.project=='romance':
             from novel_manga.interactive.romance import build_romance_voices
             if args.kind in ('all','voice'):build_romance_voices(ROOT)

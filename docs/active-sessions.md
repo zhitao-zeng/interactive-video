@@ -21,3 +21,5 @@
 |Codex|恋综提示词结构修复＋Blender白模，SD2.5 26秒A/B|codex/romance-sd25-continuity|/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity；英文提示词保留空格、恋综源状态/动作整理、专用白模及小段实验|在途，预计30–60分钟；宋乔进门/落座/咖啡邀请原05+06，15+11秒；A旧提示词，B状态结构+几何参考，每臂两条、各一次。已继承未提交实现，与荒野隔离；主生产、旧产物/计数不改，无commit/push。|
 
 |Codex 荒野会话 01a13346|笑之国声音/音乐/原生中文改进＋SD2.5 480P完整版|codex/adventure-rhythm-20261013|本worktree通用声音与指定场景文字编译、独立SD版；旧H338次及恋综不变|在途：已定位强制无音乐、重复语气与禁止场景文字冲突；保留旧片、声线与全部历史，修复后跑完整SD有界流程；额度不足立即停，结束后统一评估。未提交推送。|
+
+|Codex integration|共用链路已合入main并同步本分支|adventure|保留本分支内容、运行配置与后续增量|main=0f49c49；共用3263测试和独立复核通过；无生成/推送。|

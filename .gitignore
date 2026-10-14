@@ -15,6 +15,7 @@ vendor/
 .env
 .env.local
 inputs/
+/inputs
 .runtime/
 
 # local rollback copies made while patching
@@ -29,3 +30,7 @@ assets/
 
 # Reused source package directory (including a worktree symlink).
 /inputs
+
+# Local package symlinks and supplied image trees
+/inputs
+/projects/**/source/images

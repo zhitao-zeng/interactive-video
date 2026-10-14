@@ -146,7 +146,7 @@ def load_context(episode_dir: Path, bible_path: Path, grammar_path: Path | None 
         two_view_cast_limit=0 if two_views == 'off' else 2,
         two_views=two_views,
         camera_policy=profile.get('camera_policy') or ('authored' if method else 'fixed'),
-        video_kind=resolved.style.get('video_kind', '中国国漫短剧片段'),
+        video_kind=resolved.style.get('video_kind') or ('真人短剧片段' if resolved.style.get('render_family') == 'photo' else '短剧片段'),
         allow_blood=bool(profile.get('allow_blood')))
     if limits is not None:
         options = replace(options, **limits)

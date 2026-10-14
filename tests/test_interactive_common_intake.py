@@ -8,13 +8,23 @@ from novel_manga.application.agents.episode.context import create_context
 from novel_manga.application.agents.episode.inputs import prepare_inputs
 
 ROOT = Path(__file__).resolve().parents[1]
-MATERIAL = ROOT/'projects/adventure/laughing-country'
+@pytest.fixture
+def material(tmp_path):
+    import json
+    from PIL import Image
+    data=json.loads((ROOT/'tests/fixtures/interactive/minimal-material.json').read_text())
+    project = tmp_path/'approved-material'; project.mkdir()
+    Image.new('RGB',(32,48),'gray').save(project/'identity.png')
+    data['reference_images'] = [{'source':'identity.png','path':'series_assets/characters/character_001/turnaround.jpeg','scope':'identity_portrait'}]
+    (project/'source.md').write_text('原始片段：先核对记录。')
+    (project/'material.json').write_text(json.dumps(data,ensure_ascii=False))
+    return project
 
 
 @pytest.mark.parametrize('project', ['adventure', 'romance', 'suspense'])
-def test_three_families_retain_source_state_and_interaction_in_agent_handoff(tmp_path, project):
+def test_three_families_retain_source_state_and_interaction_in_agent_handoff(tmp_path, project, material):
     # Same approved material exercises the shared contract, not a new story adaptation.
-    episode = prepare_authored(MATERIAL, tmp_path/f'{project}-test', family=project)
+    episode = prepare_authored(material, tmp_path/f'{project}-test', family=project)
     pack_authored(episode)
     before = read_json(episode/'chapter_script.json')
     ctx = create_context(episode.parent, episode.name, output_root=tmp_path/'agent')
@@ -32,10 +42,10 @@ def test_three_families_retain_source_state_and_interaction_in_agent_handoff(tmp
         assert all((episode/name).read_bytes()==data for name,data in old.items())
         assert read_json(ctx.work_dir/'input/interaction.json') == read_json(episode/'interaction.json')
         assert read_json(ctx.work_dir/'input/voice_specs.json') == read_json(episode.parent/'voice_specs.json')
-        assert (ctx.work_dir/'input/source.txt').read_text() == (MATERIAL/'source.md').read_text()
+        assert (ctx.work_dir/'input/source.txt').read_text() == (material/'source.md').read_text()
         assert manifest['source_kind']=='authored_document'
         assert 'input/source_documents/02-material.json' in manifest['authoritative_inputs']
-        assert read_json(ctx.work_dir/'input/source_documents/02-material.json') == read_json(MATERIAL/'material.json')
+        assert read_json(ctx.work_dir/'input/source_documents/02-material.json') == read_json(material/'material.json')
         assert read_json(ctx.work_dir/'input/intake.json')['project']==project
     assert ctx.source_episode_dir == episode.resolve()
     assert ctx.episode_dir != ctx.source_episode_dir

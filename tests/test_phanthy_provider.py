@@ -47,3 +47,8 @@ def test_shared_sandbox_arguments_are_provider_specific():
     args=sandbox.provider_container_args({'docker_network':'host','extra_body':{'reasoning_effort':'low'}})
     assert args[:2]==['--network','host']
     assert any(v.startswith('CLAUDE_CODE_EXTRA_BODY=') for v in args)
+
+
+def test_sandbox_declares_the_configured_custom_model_context_window():
+    args = sandbox.provider_container_args({'context_window': 1000000})
+    assert args == ['-e', 'CLAUDE_CODE_MAX_CONTEXT_TOKENS=1000000']

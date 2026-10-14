@@ -144,6 +144,9 @@ def prepare_romance(root: Path) -> Path:
 
 
 def pack_romance(directory: Path) -> dict:
+    if read_json(directory/'chapter_script.json', {}).get('production_mode') == 'romance_conversation':
+        from novel_manga.interactive.conversation import pack_conversation
+        return pack_conversation(directory)
     from novel_manga.application.packing.context import load_context,POLICY
     from novel_manga.application.packing.service import prepared_shots,clip_entry
     from novel_manga.story.compilation import plan_totals

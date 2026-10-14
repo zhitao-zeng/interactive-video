@@ -67,3 +67,18 @@ def test_authored_repair_rejects_unresolved_or_contract_changing_candidate(tmp_p
     monkeypatch.setattr(authored_request,'request_consistency',lambda *a:{'consistent':False,'problems':['wrong clothes']})
     with pytest.raises(ValueError):authored_request.propose(tmp_path,'a','fix')
     assert json.loads((tmp_path/'clip_plan.json').read_text())==plan
+
+
+def test_conversation_repair_keeps_its_compiled_request_and_turns(tmp_path,monkeypatch):
+    from novel_manga.application.packing import service
+    turn={'speaker_name':'甲','delivery_mode':'visible_dialogue','text':'你好。','emotion':'自然'}
+    script={'production_mode':'romance_conversation','shots':[{'index':4,'authored_frame':'Frame.','source_quote':'甲问好','turns':[turn]}]}
+    draft={'clip_id':'clip_04','location':'室内','request_seconds':8,'prompt_compiler':'romance_conversation_v1','shot_indexes':[4],'shot_timing':[{'stage':1,'seconds':8}],
+           'prompt':'连续交流，保留开始和结束状态。','references':[], 'dialogue_bindings':[{**turn,'stage':1}]}
+    before=copy.deepcopy(draft)
+    monkeypatch.setattr(service,'clip_entry',lambda *a,**k:pytest.fail('conversation must not rebuild through novel stages'))
+    authored_request.source_event_request(tmp_path,draft,script)
+    assert draft==before
+    draft['dialogue_bindings'][0]['text']='再见。'
+    with pytest.raises(ValueError,match='protected dialogue'):
+        authored_request.source_event_request(tmp_path,draft,script)

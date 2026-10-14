@@ -169,6 +169,10 @@ def subject_lines(clip: dict) -> tuple[list[str], dict]:
             defs.append(SUBJECT_DECLARATION.format(subject=subject, pictures=picture_phrase(numbers)) + ' ' + take +
                         f" When visible in a shot, exactly one <Subject {subject}> is present; "
                         "visibility and arrival or exit timing follow the shot description.")
+        elif ref.get('reference_scope') == 'spatial_layout':
+            defs.append(f"<Subject {asset_ids[picture]}> is the spatial layout guide in <Picture {picture}>. "
+                        'Its mannequins represent the already-defined people at their specified positions, not extra people. '
+                        'Use only geometry, camera and occupancy; finished faces, clothing, materials and lighting follow the photographic references.')
         elif ref.get("role") == "location":
             if clip.get('scene_ids'):
                 defs.append(f"<Subject {asset_ids[picture]}> is the setting in <Picture {picture}>, providing its architecture and terrain. "
@@ -320,6 +324,10 @@ def compose(clip: dict, english: list[str], stages: list, *, soundscape: str = "
     animation = ''
     locations = []
     for number, picture, ref in asset_subjects(clip):
+        if ref.get('reference_scope') == 'spatial_layout':
+            retention.append(f'<Subject {number}>: geometry_only - layout and occupancy from <Picture {picture}>; '
+                             'the clay mannequins and gray materials do not appear in the final live-action image.')
+            continue
         role = 'setting' if ref.get('role') == 'location' else 'prop design' if ref.get('role') == 'prop' else 'shared clothing design'
         retention.append(f'<Subject {number}>: fully_preserved - the {role} from <Picture {picture}> follows its defined role in the described shots.')
         if ref.get('role') == 'location':

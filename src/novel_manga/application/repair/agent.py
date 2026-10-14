@@ -18,7 +18,7 @@ from novel_manga.application.review.evidence import clip_frames
 from novel_manga.review.storage import take_identity
 from novel_manga.util import read_json, atomic_write_json
 
-FRAME_HANDOFF_POLICY = 'same-take-frames-v1'
+FRAME_HANDOFF_POLICY = 'same-take-frames-v2-primary-vision'
 
 SECTIONS = ('subject_definitions', 'summary', 'retention_analysis', 'detailed_description',
             'overall_soundscape', 'non_diegetic_music')
@@ -132,9 +132,27 @@ def provided_frames(directory: Path, clip_id: str, video: Path, target: Path):
     return clip_frames(video, target, 4), 'host_uniform_10_to_90_percent'
 
 
+def unique_takes(videos):
+    """An archived copy of the same managed render is not another comparison take."""
+    paths, seen, skipped = [], [], 0
+    for video in dict.fromkeys(videos):
+        marker = read_json(video.parent / 'request.json', {}).get('managed_generation')
+        if isinstance(marker, dict) and marker:
+            if marker in seen:
+                skipped += 1
+                continue
+            seen.append(marker)
+        paths.append(video)
+    return paths, skipped
+
+
 def propose(directory: Path, clip: dict, verdict: dict, *, config=None):
     """No production writes. Container sees evidence copies, never the production directory."""
     config = config or load_config()
+    if config.get('repair_extra_body'):
+        config = {**config, 'extra_body': {**(config.get('extra_body') or {}),
+                                         **config['repair_extra_body']}}
+    config = {**config, 'extra_args': [*config.get('extra_args', []), '--tools', 'Read,Bash,Write']}
     lane=request_lane(clip)
     field='prompt_h3' if lane=='h3' else 'prompt'
     if lane=='h3':sections(clip.get(field, ''))
@@ -163,9 +181,11 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None):
         source = directory.parent/ref['path']; target = inputs/f'reference-{i}{source.suffix}'
         shutil.copy2(source,target)
         evidence['references'].append({**ref,'path':str(target.relative_to(work))})
-    video = (row.get('selected') or {}).get('video')
+    video = (row.get('selected') or {}).get('video') or verdict.get('video')
     videos = ([Path(video)] if video else []) + sorted((directory/'repair_history/takes'/clip['clip_id']).glob('*/clip.mp4'))[-3:]
-    for i,source in enumerate(dict.fromkeys(videos),1):
+    videos, skipped = unique_takes(videos)
+    evidence['duplicate_generation_copies_skipped'] = skipped
+    for i,source in enumerate(videos,1):
         if not source.is_file(): continue
         target=inputs/f'take-{i}'; target.mkdir()
         for name in ('clip.mp4','request.json','asr.json'):
@@ -186,7 +206,7 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None):
     evidence['source_documents']=[]
     files=[(directory/name,Path(name)) for name in (*EPISODE_FILES,'source.txt')]
     trace=read_json(directory/'source_trace.json',{})
-    for key in ('original','storyboard'):
+    for key in ('original','storyboard','original_package','approved_editorial'):
         if trace.get(key):
             source=Path(trace[key])
             if source.is_file():files.append((source,Path('source_documents')/(key+source.suffix)))
@@ -205,12 +225,37 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None):
     shutil.copy2(Path(__file__).with_name('video_frames.py'),tools/'video_frames.py')
     evidence['video_reader']='python3 tools/video_frames.py take-1 --seconds 2.0'
     (work/'owner').write_text(f'Existing bounded repair / {directory.name} / {clip["clip_id"]} / proposal only\n')
+    current = next((t for t in evidence['takes'] if t['current']), {})
+    evidence['primary_reading'] = {
+        'request': 'input/prompt.txt',
+        'current_frames': current.get('frames', []),
+        'reference_images': [r['path'] for r in evidence['references'] if r.get('role') != 'voice'],
+        'source': 'Use inline shots_and_neighbours and corresponding segments first; read extra source documents only for a specific unresolved fact.'}
+    evidence['reading_scope'] = 'One failed request; history and full-episode documents are optional evidence, not a mandatory reading list.'
     atomic_write_json(inputs/'evidence.json',evidence)
-    (work/'prompt.txt').write_text('Read .claude/skills/video-repair/SKILL.md. Diagnose this failed clip from input/. '
+    related_segments = {str(value) for value in clip.get('segment_ids', [])}
+    related_segments.update(str(shot['segment_id']) for shot in shots if shot.get('segment_id'))
+    atomic_write_json(inputs/'primary.json', {
+        'current_frames': current.get('frames', []),
+        'current_request': current.get('request'),
+        'request': 'input/prompt.txt',
+        'shots_and_neighbours': shots,
+        'source_passages': [row for row in evidence['segments']
+                            if str(row.get('segment_id')) in related_segments],
+        'references': evidence['references'],
+        'verdict': verdict})
+    (work/'prompt.txt').write_text('Read input/primary.json first and immediately open its current_frames[].path JPEGs. '
+                                 'This compact file contains the current request, local shots, relevant source passages, references and verdict. '
+                                 'Read .claude/skills/video-repair/SKILL.md. Diagnose this failed clip from input/. '
                                  'Write output/decision.json and, only for edit, output/prompt.txt. '
-                                 'Actual video frames and timestamps are already in evidence.takes[].frames. Open current-take JPEGs first. '
+                                 'Use primary.current_frames for actual current-take JPEGs and timestamps. '
                                  'Use python3 tools/video_frames.py take-1 to list them. Do not read MP4 with the text reader, '
                                  'install packages, or prepare a decoder. If supplied evidence is insufficient, write stop with the missing evidence. '
+                                 'This is one request with a 600-second execution window. Use input/primary.json and its shot/source facts first. '
+                                 'input/evidence.json retains complete history and whole-episode evidence; read it only to resolve a specific remaining question. '
+                                 'Read history or whole-episode documents only when they resolve a specific contradiction; do not exhaust the file list. '
+                                 'Once current frames, request and selected reference support a decision, write the final output immediately. '
+                                 'For edit, write decision.json and the complete prompt.txt together in one tool turn, then finish; do not leave only a decision while waiting for another model response. '
                                  'Do not generate video. One proposal, no retries.\n',encoding='utf-8')
     attempt=run_agent(run,config=config,timeout=600)
     if not attempt.ok or 'decision.json' not in attempt.produced:
