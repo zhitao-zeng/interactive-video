@@ -45,6 +45,10 @@ ASK = (
     "The marker is replaced with the full bound utterance, speaker and voice reference. "
     "Write its vocal delivery once as a separate English sentence beside it, combining the supplied emotion "
     "with the dramatic intention; do not also narrate speaking/finishing or another vocal tone. "
+    "Express the specific spoken reaction: what word receives emphasis, how breath and pace change "
+    "at the authored discovery, and how the sentence ends. Preserve the same vocal identity while "
+    "following each line's supplied intention; do not turn observation, alarm and reflection into "
+    "one uniform recital or add pauses between every word. "
     "Use only supplied Subject tags and preserve visible versus off-screen people, wearing versus "
     "independent objects, anatomy and individual body counts. "
     "Write physical audio only in soundscape: include every authored action sound with its shot number "
@@ -211,6 +215,16 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
                    request_seconds=clip.get('request_seconds'),
                    shot_timing=clip.get('shot_timing', []))
     schema = copy.deepcopy(SCHEMA)
+    music_rules = ''
+    if clip.get('music_cues'):
+        context['music_cues'] = clip['music_cues']
+        schema['required'].append('music')
+        schema['properties']['music'] = {'type': 'string', 'minLength': 1,
+                                         'pattern': '^' + ENGLISH_CHARACTERS + '*$'}
+        music_rules = ('Translate every authored music cue into the music field, preserving its stage, '
+                       'entry, withdrawal and relationship to dialogue. Music stays below speech and '
+                       'does not mask physical sound. Explicit no-music stages remain unscored. '
+                       'Keep music out of soundscape; that field contains physical sound only.\n')
     schema['properties']['shots'].update(minItems=len(visuals), maxItems=len(visuals))
     directions = []
     for markers in slots:
@@ -227,7 +241,7 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
         try:
             feedback = ('\nPrevious response was rejected: ' + problem + '\n') if problem else ''
             overlay_rules=POST_OVERLAY_RULES if context.get('postproduction_overlays') else ''
-            text = (ASK + INPUT_RULES + overlay_rules + feedback + naming + '\nInput context:\n'
+            text = (ASK + INPUT_RULES + music_rules + overlay_rules + feedback + naming + '\nInput context:\n'
                     + json.dumps(context, ensure_ascii=False) + '\nShots:\n'
                     + '\n'.join(f'{i}. {visual}' for i, visual in enumerate(visuals, 1)))
             print(f"{clip.get('clip_id', 'clip')}: h3prompt model={endpoint.model}", file=sys.stderr, flush=True)
@@ -249,19 +263,22 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
                 raise ValueError('H3 soundscape must be an English string')
             english = [v.strip() for v in directions]
             soundscape = (answer.get('soundscape') or '').strip()
+            music = answer.get('music', '') if clip.get('music_cues') else ''
+            if clip.get('music_cues') and (not isinstance(music, str) or not music.strip()):
+                raise ValueError('authored music requires English music directions')
             if len(english) != len(visuals) or not all(english):
                 raise ValueError('one nonempty direction is required for each shot')
             for i, sentence in enumerate(english):
                 if re.findall(r'<DIALOGUE_\d+>', sentence) != slots[i]:
                     raise ValueError(f'shot {i+1} lost or reordered dialogue slots: {slots[i]}')
             from novel_manga.story.h3 import META
-            for field, value in [(f'shot {i}', v) for i, v in enumerate(english, 1)] + [('soundscape', soundscape)]:
+            for field, value in [(f'shot {i}', v) for i, v in enumerate(english, 1)] + [('soundscape', soundscape), ('music', music)]:
                 match = CJK.search(value) or META.search(value)
                 if match:
                     excerpt = value[max(0, match.start() - 40):match.end() + 80]
                     raise ValueError(f'{field} contains Chinese or task commentary: {excerpt!r}; '
                                      'write only English scene behavior and physical sound')
-            candidate = compose(clip, english, stages, soundscape=soundscape)
+            candidate = compose(clip, english, stages, soundscape=soundscape, music=music)
             conflicts = request_issues({**clip, 'prompt_h3': candidate})
             if conflicts:
                 raise ValueError('; '.join(conflicts))

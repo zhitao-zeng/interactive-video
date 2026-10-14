@@ -213,7 +213,7 @@ def voice_lines(clip: dict, subject_of: dict, speaker_ids: dict) -> list[str]:
     return lines
 
 
-def compose(clip: dict, english: list[str], stages: list, *, soundscape: str = "", authored: bool = False) -> str:
+def compose(clip: dict, english: list[str], stages: list, *, soundscape: str = "", music: str = "", authored: bool = False) -> str:
     """Bind the six sections without adding another correction or performance narrative. Speakers carry
     stable (Sx) ids next to their subject tag; an off-screen line uses the guide's exact phrase and is followed by
     the statement that the on-screen characters' lips stay closed (the "wrong mouth moves" defect)."""
@@ -344,7 +344,7 @@ def compose(clip: dict, english: list[str], stages: list, *, soundscape: str = "
               "retention_analysis:\n" + "\n".join(retention) + "\n\n"
               "detailed_description:\n" + (animation.strip() + '\n' if animation.strip() else '') + "\n".join(body)
             + "\n\noverall_soundscape:\n" + (soundscape.strip() or 'None.') + "\n\n"
-              "non_diegetic_music:\nNone.")
+              "non_diegetic_music:\n" + (music.strip() or 'None.'))
 
 
 def tag_names(text: str, naming: str) -> str:

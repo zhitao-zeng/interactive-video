@@ -564,9 +564,19 @@ class ClipCompiler:
                          f"只在阶段边界切镜，不为交替景别添加切镜；{frame['composition']}；人物、双手与道具的变化按动作过程连续发生。")
         else:
             lines.append(f"镜头采用{frame['text']}，按阶段切换景别（{scales}），每个阶段开始时切一次画面，阶段内机位固定不运镜；{frame['composition']}；同一场景内保持人物左右位置和视线方向不变。")
-        lines.append(f"声音包括角色对白、<{ambience_text}>和与动作同步的音效；无背景音乐。")
+        music = [(i, str((shot.get('audio_plan') or {}).get('music_cue') or '').strip())
+                 for i, shot in enumerate(shots, 1)]
+        music = [(i, cue) for i, cue in music if cue]
+        music_text = ('背景音乐按阶段执行：' + '；'.join(f'阶段{i}：{cue}' for i, cue in music)
+                      + '；音乐始终低于对白，动作音效保持可辨。') if music else '无背景音乐。'
+        lines.append(f"声音包括角色对白、<{ambience_text}>和与动作同步的音效；{music_text}")
         blood_clause = "" if self.options.allow_blood else "不出现血液和伤口；"
-        if any(self.chat_turns(shot) for shot in shots) and str(self.options.chat_screen.get("render", "card")) != "card":
+        native_text = list(dict.fromkeys(text for shot in shots for text in shot.get('native_text', [])))
+        if native_text:
+            lines.append("【场景文字】指定原生文字：" + '、'.join(f'「{text}」' for text in native_text)
+                         + "；文字只在本镜已指定的告示牌、纸张或屏幕实体表面，简体中文、准确可读；不生成台词字幕或悬浮文字。")
+            lines.append(f"【保持一致】保持人物身份、数量、服装、固定道具位置、空间方向和声音关系稳定；仅允许上述指定实体表面文字和数字，画面不出现其他文字、Logo或水印；{blood_clause}不新增具名人物。")
+        elif any(self.chat_turns(shot) for shot in shots) and str(self.options.chat_screen.get("render", "card")) != "card":
             group = f"群名「{self.options.chat_screen['group_name']}」、" if self.options.chat_screen.get("group_name") else ""
             lines.append(f"【保持一致】保持人物身份、数量、服装、固定道具位置、空间方向和声音关系稳定；除手机屏幕上的{group}昵称和指定的聊天消息外，画面中不出现其他文字、数字、字幕、Logo或水印；屏幕上的消息文字必须与指定内容逐字一致、简体中文、无乱码，昵称在气泡上方而不在气泡内；聊天界面在各阶段保持同一布局；{blood_clause}不新增具名人物。")
         else:

@@ -196,6 +196,11 @@ def clip_entry(clip: dict, clip_id: str, ctx: dict, override: dict | None = None
         "h3_style_line": ctx.get('h3_style_line') or '',
     }
     weights = [ClipCompiler(options).shot_seconds(s) for s in clip['shots']]
+    music = [{'stage': i, 'cue': str((shot.get('audio_plan') or {}).get('music_cue') or '').strip()}
+             for i, shot in enumerate(clip['shots'], 1)
+             if (shot.get('audio_plan') or {}).get('music_cue')]
+    if music:
+        entry['music_cues'] = music
     if inner_voice:
         entry.update(audio_delivery='postmix', inner_voice=inner_voice)
     total_weight = sum(weights) or len(weights)
