@@ -61,11 +61,13 @@ def romance_material(package: Path) -> dict:
             index=len(shots)+1;sid=f'seg_{index}';shot_id=f'{authored["id"]}-{cut_no:02d}'
             visible=[names[c] for c in cut['characters']]
             source='。'.join([cut['action'],cut.get('delivery',''),cut.get('note','')])
+            source+='\n原始剧本节拍：'+json.dumps(beat,ensure_ascii=False)
+            if who:source+=f'\n制作声源绑定：{who}；发声方式：{mode}'
             frame=cut['frame'].replace('film still','film footage').replace(
                 'woman in ivory sits northeast, wavy-haired man northwest, bob-haired woman southwest, tall man southeast. Preserve geography and only occupied seats at this point.',
                 'the four seats are northeast, northwest, southwest and southeast. Only the people explicitly present in this shot occupy the seats; this is a seating geography reference, not an instruction to add all participants.')
             shot={'index':index,'origin_index':index,'shot_id':shot_id,'label':shot_id,'segment_id':sid,
-                  'source_quote':source[:500],'location':location,'scene_id':f'scene_{authored["sceneIndex"]}',
+                  'source_quote':source,'location':location,'scene_id':f'scene_{authored["sceneIndex"]}',
                   'scene_time':scene['lighting'],'characters':visible,'in_frame':visible,'extras':[],'listeners':[],
                   'wears':{},'props':list(dict.fromkeys([*[asset_lookup[pid] for pid in cut['props']],
                        *[p['name'] for p in auxiliary if any(r['path'].endswith(p['file']) for r in cut['references'])]])),
@@ -136,6 +138,8 @@ def prepare_romance(root: Path) -> Path:
         with Image.open(package/source) as img:img.convert('RGB').save(path,quality=97)
         atomic_write_json(path.with_suffix(path.suffix+'.origin.json'),{'kind':'supplied-reference','source':str(package/source),'reference_scope':scope})
     atomic_write_json(novel/'imported_assets.json',{'assets':[{'source':s,'path':'series_assets/'+t,'scope':scope} for s,t,scope in imports]})
+    from novel_manga.interactive.intake import finalize
+    finalize(episode,'romance',documents=[package/'routes/shared/script.json',package/'routes/shared/storyboard.json'])
     return episode
 
 

@@ -319,3 +319,19 @@ def test_unselected_failed_take_is_exported_from_current_verdict(tmp_path, monke
     monkeypatch.setattr(agent, 'run_agent', execute)
     verdict = {'video': str(current), 'take': take_identity(current), 'severity': 'fail'}
     assert agent.propose(directory, clip, verdict, config=config)['action'] == 'stop'
+
+
+def test_actual_video_fallback_has_readable_images_and_timestamps(tmp_path,agent):
+    import subprocess
+    from PIL import Image
+    video=tmp_path/'actual.mp4'
+    subprocess.run(['ffmpeg','-y','-v','error','-f','lavfi','-i','color=c=blue:s=64x96:r=25:d=2',
+                    '-c:v','libx264','-pix_fmt','yuv420p',str(video)],check=True)
+    target=tmp_path/'run/frames'
+    frames,origin=agent.provided_frames(tmp_path,'x',video,target)
+    assert len(frames)==4 and origin=='host_uniform_10_to_90_percent'
+    record=json.loads((target/'frame-evidence.json').read_text())
+    assert record['frames'][0]['seconds']==pytest.approx(.2)
+    assert record['frames'][-1]['seconds']==pytest.approx(1.8)
+    for f in frames:
+        with Image.open(f) as image:assert image.height>image.width

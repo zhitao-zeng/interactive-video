@@ -1,0 +1,14 @@
+{
+  "name": "旅行规则悬疑真人摄影",
+  "video_kind": "现代真人旅行悬疑片段",
+  "render_family": "photo",
+  "visual_style": "真人电影摄影、固定旅行者身份、架空城市实景与真实材质",
+  "render_direction": "真实皮肤纹理、自然头发和现代服装，人物动作与观察自然，按本场日夜和灯光摄影",
+  "scene_style": "真人电影摄影的架空城市实景，地理与物件结构明确",
+  "scene_direction": "空间关系和行进方向明确，暖白与青绿建筑，里世界为同一空间的灰暗破损状态；时间、天气、实际光源以场景描述为准",
+  "h3_style_line": "Live-action cinematic travel footage with natural skin, modern clothing and realistic physical materials. Preserve the authored scene's time of day, light sources and spatial geography; the fictional city is photographed as a physical set.",
+  "card_suffix": "",
+  "prompt_fingerprint": false,
+  "tidy_prompts": true,
+  "location_empty_suffix": "空场参考，画面内无人，没有人影或剪影；牌面和屏幕不生成文字，由后期添加"
+}

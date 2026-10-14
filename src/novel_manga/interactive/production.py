@@ -26,7 +26,14 @@ def active_runner(root: Path, lane: str, project: str = 'adventure') -> int | No
 
 
 def pack(directory: Path):
+    if (directory/'suspense_groups.json').is_file():
+        from novel_manga.interactive.suspense import pack_suspense
+        return pack_suspense(directory)
     if (directory/'authored_groups.json').is_file():
+        script=read_json(directory/'chapter_script.json',{})
+        if not any(s.get('authored_frame') for s in script.get('shots',[])):
+            from novel_manga.interactive.authored import pack_authored
+            return pack_authored(directory)
         from novel_manga.interactive.romance import pack_romance
         return pack_romance(directory)
     from novel_manga.application.packing.context import load_context

@@ -110,3 +110,20 @@ def test_interactive_checks_follow_the_selected_available_endpoint(tmp_path, mon
         assert os.environ['NOVEL_H3_SHORT_EDGE']=='768'
         assert h3_translation_endpoint().model=='Qwen3.8-27B'
         assert not h3_translation_endpoint().stream
+
+
+def test_interactive_endpoint_recovery_is_process_local(tmp_path,monkeypatch):
+    from unittest.mock import patch
+    from novel_manga.interactive import runtime
+    from novel_manga.application import configuration
+    (tmp_path/'configs').mkdir()
+    (tmp_path/'configs/interactive.json').write_text(json.dumps({'services':{'text_endpoint':'phanthy-ds41'},'production':{'h3_short_edge':768}}))
+    original=(tmp_path/'configs/interactive.json').read_bytes()
+    monkeypatch.setattr(runtime,'environment',lambda *a:{})
+    monkeypatch.setattr(configuration,'model_resources_environment',lambda *a:{})
+    with patch.dict(os.environ,{'NOVEL_INTERACTIVE_TEXT_ENDPOINT':'qwen-gpu52-current'},clear=True):
+        runtime.configure(tmp_path,'h3',project='adventure')
+        assert h3_translation_endpoint().model=='Qwen3.8-27B'
+        assert os.environ['SECOND_REVIEW_JUDGE']=='qwen-gpu52-current'
+        assert os.environ['NOVEL_H3_SHORT_EDGE']=='768'
+    assert (tmp_path/'configs/interactive.json').read_bytes()==original

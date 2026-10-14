@@ -65,7 +65,7 @@ def source_event_request(directory, draft, script):
 def propose(directory, clip_id, issue):
     plan = read_json(directory/'clip_plan.json', {})
     original = next((c for c in plan.get('clips', []) if c['clip_id'] == clip_id), None)
-    if not original or not original.get('authored_english_source') or not (directory/'authored_groups.json').is_file():
+    if not original or not (original.get('authored_english_source') or original.get('source_authored_segment')) or not (directory/'authored_groups.json').is_file():
         return None
     script = read_json(directory/'chapter_script.json', {})
     notes = read_json(directory/'review_feedback.json', {})

@@ -152,6 +152,7 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None):
     if config.get('repair_extra_body'):
         config = {**config, 'extra_body': {**(config.get('extra_body') or {}),
                                          **config['repair_extra_body']}}
+    config = {**config, 'extra_args': [*config.get('extra_args', []), '--tools', 'Read,Bash,Write']}
     lane=request_lane(clip)
     field='prompt_h3' if lane=='h3' else 'prompt'
     if lane=='h3':sections(clip.get(field, ''))

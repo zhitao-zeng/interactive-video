@@ -27,3 +27,10 @@ models/
 assets/
 
 .venv
+
+# Reused source package directory (including a worktree symlink).
+/inputs
+
+# Local package symlinks and supplied image trees
+/inputs
+/projects/**/source/images
