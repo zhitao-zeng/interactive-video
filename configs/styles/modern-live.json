@@ -1,0 +1,13 @@
+{
+  "name": "现代电影写实",
+  "render_family": "photo",
+  "visual_style": "现代真人电影摄影，真实皮肤、现代服装、自然环境",
+  "render_direction": "真实皮肤纹理、自然头发与有接缝的现代户外织物，克制表演，自然光，低饱和电影调色",
+  "scene_style": "现代实景电影摄影，真实地形、石材、木料和现代建筑",
+  "scene_direction": "地形结构明确，真实材质、潮湿空气与柔和自然日光；苔绿、岩灰、旧纸黄、旧棕",
+  "h3_style_line": "Contemporary live-action cinematic documentary footage. Natural skin texture, modern outdoor clothing, soft overcast daylight, realistic terrain and materials, restrained moss green, rock grey and warm paper tones.",
+  "card_suffix": "",
+  "prompt_fingerprint": false,
+  "tidy_prompts": true,
+  "location_empty_suffix": "空场参考，画面内无人，没有人影或剪影；牌面不生成文字，由后期添加"
+}

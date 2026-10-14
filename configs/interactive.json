@@ -1,0 +1,43 @@
+{
+  "packages": {
+    "adventure": {
+      "title": "地图上不存在的村庄",
+      "root": "inputs/packages/adventure",
+      "frame": "9:16",
+      "entry": "试播集/EP01-地图上不存在的村庄.md"
+    },
+    "suspense": {
+      "title": "凌晨两点谁进过空房",
+      "root": "inputs/packages/suspense",
+      "frame": "9:16",
+      "entry": "试播集/EP01-凌晨两点谁进过空房.md"
+    },
+    "romance": {
+      "title": "心动未剪辑",
+      "root": "inputs/packages/romance/心动未剪辑-完整创作资产包-v2",
+      "frame": "16:9",
+      "entry": "routes/shared/storyboard.json",
+      "routes": [
+        "shared",
+        "A",
+        "B",
+        "C"
+      ]
+    }
+  },
+  "production": {
+    "h3_short_edge": 768,
+    "end_card_seconds": 3,
+    "target_seconds": 180,
+    "workers": 1,
+    "max_attempts": 2,
+    "workers_by_lane": {
+      "h3": 2,
+      "sd25": 4
+    }
+  },
+  "services": {
+    "text_endpoint": "phanthy-ds41",
+    "asset_publish_dir": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/outputs/.published-suspense"
+  }
+}

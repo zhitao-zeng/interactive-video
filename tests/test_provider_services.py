@@ -8,6 +8,33 @@ from novel_manga.providers.base import ImageResult
 from novel_manga.providers.phanrouter import PhanRouterMediaProvider
 
 
+def test_explicit_768_and_seed_are_sent_and_changed_seed_is_not_reused(tmp_path, monkeypatch):
+    from novel_manga.providers.local_h3 import LocalH3MediaProvider
+    monkeypatch.setenv('NOVEL_H3_SHORT_EDGE','768')
+    provider=LocalH3MediaProvider(Settings(video_model='minimax-h3-ref2va-turbo'),'http://h3.invalid')
+    calls=[]
+    def handle(request):
+        if request.method=='POST':
+            calls.append(json.loads(request.content))
+            return httpx.Response(200,json={'id':f'task-{len(calls)}'})
+        if request.url.path.endswith('/content'):return httpx.Response(200,content=b'video')
+        return httpx.Response(200,json={'status':'completed'})
+    provider.h3_client.close()
+    provider.h3_client=httpx.Client(transport=httpx.MockTransport(handle),trust_env=False)
+    try:
+        output=tmp_path/'a.mp4'
+        provider.create_video('shot A',None,output,13,seed=2101)
+        provider.create_video('shot A',None,output,13,seed=2101)
+        assert len(calls)==1
+        provider.create_video('shot A',None,output,13,seed=3101)
+        provider.create_video('shot B',None,tmp_path/'b.mp4',13,seed=2101)
+        assert [p['seed'] for p in calls]==[2101,3101,2101]
+        assert all(p['target']['short_edge']==768 and p['num_inference_steps']==9 for p in calls)
+        assert json.loads(output.with_suffix('.mp4.task.json').read_text())['seed']==3101
+    finally:
+        provider.client.close();provider.h3_client.close()
+
+
 def test_local_h3_reference_voice_reaches_the_video_request(tmp_path):
     import base64
     from novel_manga.providers.local_h3 import LocalH3MediaProvider

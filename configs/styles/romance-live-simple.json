@@ -1,0 +1,13 @@
+{
+  "name": "心动未剪辑·H3单镜头",
+  "render_family": "photo",
+  "visual_style": "现代真人恋爱综艺摄影，自然皮肤、现代休闲衣装、克制表演",
+  "render_direction": "真实皮肤与织物，柔和自然窗光或采访布光，暖白、木棕、深青和鼠尾草绿",
+  "scene_style": "海边小屋真实室内摄影，固定空间与木纹、棉麻材质",
+  "scene_direction": "傍晚自然窗光或前采中性受控布光，保留原场景布局",
+  "h3_style_line": "Contemporary photorealistic live-action relationship reality show. Natural skin texture, modern casual clothing, restrained acting, warm white, oak brown, deep teal and sage colors. Soft late-afternoon window light or neutral interview lighting. One coherent camera view with stable facial identity and current wardrobe.",
+  "card_suffix": "",
+  "prompt_fingerprint": false,
+  "tidy_prompts": true,
+  "location_empty_suffix": "空场的建筑与家具设计参考"
+}

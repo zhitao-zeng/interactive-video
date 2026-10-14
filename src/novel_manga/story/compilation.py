@@ -467,7 +467,7 @@ class ClipCompiler:
         # A clip that ends on an earlier part of a cut stage has no end of its own to arrive at.
         span = f"从“{start}”到“{end}”" if end else f"“{start}”"
         lines = [
-            f"【生成目标】生成一段{frame['text']}的中国国漫短剧片段，约{clip['request_seconds']}秒。核心主体是{cast_text}，主要事件是{span}。"
+            f"【生成目标】生成一段{frame['text']}的短剧片段，约{clip['request_seconds']}秒。核心主体是{cast_text}，主要事件是{span}。"
         ]
         if bindings:
             lines.append("【人物】" + "。".join(bindings) + "。")

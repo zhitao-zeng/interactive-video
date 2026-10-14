@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import novel_manga.llm.client as model_client
-REVIEW_POLICY = "thin-review-v1.23-current-phase-viewer-impact"
+REVIEW_POLICY = "thin-review-v1.24-scoped-portrait"
 
 
 POLICY = REVIEW_POLICY  # shared with scheduling and delivery: the judge reads the source passage

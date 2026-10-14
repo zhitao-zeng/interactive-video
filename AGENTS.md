@@ -1,3 +1,10 @@
+# Independent interactive-video-studio
+
+This is an independent repository forked on 2026-10-12 from 440bfdf.
+Use docs/interactive-design.md and docs/interactive-progress.md for the current task.
+Current authorized task runs on codex/adventure-demo in this isolated repository.
+Do not operate the parent novel production or inherited historical tasks.
+
 # Project instructions
 
 - Never store API keys in source, configuration examples, logs, or generated manifests.

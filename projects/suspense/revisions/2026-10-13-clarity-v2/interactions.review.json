@@ -1,0 +1,37 @@
+{
+  "status": "authoring_revision",
+  "question": "先查哪一条？",
+  "choices": [
+    {
+      "id": "A",
+      "text": "查监控",
+      "reason": "找实际来访者",
+      "source_shots": [
+        "B13"
+      ]
+    },
+    {
+      "id": "B",
+      "text": "问徐程",
+      "reason": "问密码是否共享",
+      "source_shots": [
+        "B10",
+        "B11",
+        "B14"
+      ]
+    },
+    {
+      "id": "C",
+      "text": "查门锁",
+      "reason": "核对旧临时密码及标签状态",
+      "source_shots": [
+        "B15"
+      ]
+    }
+  ],
+  "planned_start_seconds": 186,
+  "seconds": 3,
+  "frames": 75,
+  "route_selected": null,
+  "truth_revealed": false
+}

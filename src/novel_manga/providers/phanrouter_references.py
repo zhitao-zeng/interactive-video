@@ -83,7 +83,7 @@ class ReferenceMaterials:
         for attempt in range(3):
             name = stem if attempt == 0 else f"{stem}-{attempt + 1}"
             response = self.client.post(
-                f"{self._asset_base_url()}/open/CreateAsset", headers=self.video_headers,
+                f"{self._asset_base_url()}/open/CreateAsset", headers=self.image_headers,
                 json={"GroupId": group, "Name": name, "URL": hosted_url, "AssetType": "Image"},
                 timeout=min(self.settings.request_timeout, SUBMIT_TIMEOUT_SECONDS),
             )

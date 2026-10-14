@@ -1,0 +1,115 @@
+{
+  "status": "authored_translation",
+  "source": "storyboard.review.json",
+  "shots": [
+    {
+      "id": "S01",
+      "direction_en": "Wide establishing shot from the corridor facing two ADJACENT doors on the SAME wall. Apartment 801 is on the left, its door ajar. Apartment 802 is on the right, door open. {xu} stands just INSIDE the right doorway. {shen} stands immediately OUTSIDE that same right doorway facing him, holding one printed sheet. Both stay in these positions. No dialogue."
+    },
+    {
+      "id": "S02",
+      "direction_en": "Medium close-up of {xu} standing inside the right doorway. He points sideways toward the adjacent vacant apartment to his left, then addresses the investigator directly in front of him, outside the frame. Natural recollection, slightly uneasy. <DIALOGUE_1>"
+    },
+    {
+      "id": "S03",
+      "direction_en": "Medium close-up of {shen} standing in the corridor immediately outside apartment 802, holding the owner-provided printed sheet at waist level. He addresses the tenant directly in front of him, inside the doorway and outside this crop. Calm conversational delivery. <DIALOGUE_1>"
+    },
+    {
+      "id": "S04",
+      "direction_en": "Close-up of {xu} still inside his own open doorway. He shakes his head slightly and answers the investigator directly in front of him, off camera. Matter-of-fact, restrained. <DIALOGUE_1>"
+    },
+    {
+      "id": "S05",
+      "direction_en": "Medium shot of {shen} still facing the tenant at the right doorway. He gestures toward the adjacent left apartment, addresses the tenant, and only then turns toward that apartment. <DIALOGUE_1> The tenant stays off camera inside his own doorway."
+    },
+    {
+      "id": "S06",
+      "direction_en": "One continuous tracking medium shot of {shen}. Begin in the corridor just outside the RIGHT doorway, then follow him a few steps LEFT along the SAME wall to the adjacent ajar door. He pulls the outward-opening left door farther open and visibly steps across its threshold into apartment 801. End with him inside. The tenant remains outside the frame in apartment 802. Do not teleport between rooms. No dialogue."
+    },
+    {
+      "id": "S07",
+      "direction_en": "Wide interior shot from behind {shen}, who has already entered apartment 801. Only he is inside. Establish the right-wall table with a glass and thermos at left, a charging phone at center, and maintenance papers at right; the tool bag stays under the table. He looks toward the phone. Papers remain undisturbed, no numbers revealed. No dialogue."
+    },
+    {
+      "id": "S08",
+      "direction_en": "Close detail inside apartment 801: begin on the charger plugged into the right wall, and make one short camera move along the white cable to the black phone lying on the table. {shen} may be represented only by a charcoal sleeve at the edge. He does not unplug, pick up or browse the phone. No face added, no dialogue."
+    },
+    {
+      "id": "S09",
+      "direction_en": "Medium shot of {shen} alone beside the table inside apartment 801. He rises from his slight lean after checking the charger connection, glances across the table, then turns toward the exit. Leave all objects and papers where they were. No dialogue."
+    },
+    {
+      "id": "S10",
+      "direction_en": "One continuous tracking medium shot beginning with {shen} INSIDE apartment 801 near its exit. Follow him across the threshold INTO the corridor, then RIGHT along the SAME wall to the adjacent apartment 802. He stops immediately outside that right doorway, facing the tenant who stays inside and out of the crop. Finish the whole move before any later dialogue. No dialogue in this shot."
+    },
+    {
+      "id": "S11",
+      "direction_en": "Medium shot of {shen}, now stationary in the corridor immediately outside apartment 802 and facing the off-camera tenant. He first reports what he has just seen, then raises the owner-provided printed sheet when referring to the record. Clear natural speech. <DIALOGUE_1>"
+    },
+    {
+      "id": "S12",
+      "direction_en": "Steady close-up of the printed access-log sheet held in {shen} hands, in the corridor outside apartment 802. Only charcoal sleeves, hands and the sheet are visible. His finger indicates the time row first, then the password-label field. His voice is heard naturally from just outside the crop, addressed to the tenant standing opposite the paper. <DIALOGUE_1> Exact document lettering is supplied in postproduction."
+    },
+    {
+      "id": "S13",
+      "direction_en": "Close-up of {shen} immediately outside apartment 802. Keeping the sheet facing the tenant, he looks up from the printed name to the tenant directly in front of him, off camera. A short neutral confirmation question. <DIALOGUE_1>"
+    },
+    {
+      "id": "S14",
+      "direction_en": "Close-up of {xu} inside his own doorway. He finishes reading the sheet held just below this crop, then looks up at the investigator immediately outside. He confirms the name and explains it is an old temporary code, without a sinister smile. <DIALOGUE_1>"
+    },
+    {
+      "id": "S15",
+      "direction_en": "Close-up of {shen} outside the right doorway, the printed sheet at the lower edge of frame. He points to the single time row and asks the tenant directly in front of him about this particular entry. Neutral, precise delivery. <DIALOGUE_1>"
+    },
+    {
+      "id": "S16",
+      "direction_en": "Close-up of {xu} standing inside the right doorway. He firmly denies making the entry while facing the off-camera investigator immediately outside. Do not move him into the vacant apartment. <DIALOGUE_1>"
+    },
+    {
+      "id": "S17",
+      "direction_en": "Steady detail of the SAME printed sheet in {shen} hands outside apartment 802. His finger rests by the field heading for the password used. Only his hands and sleeves appear. His own voice continues naturally from outside the crop. <DIALOGUE_1> Exact lettering will be added later."
+    },
+    {
+      "id": "S18",
+      "direction_en": "Close-up of {shen} at the same position outside apartment 802. He looks directly at the off-camera tenant and calmly explains the distinction between a password label and the person using it. Restrained conversational tone, no triumphant reaction or assertion of innocence. <DIALOGUE_1>"
+    },
+    {
+      "id": "S19",
+      "direction_en": "Close-up of {xu} at his own doorway. He glances down at the old temporary label on the paper just outside the crop, then asks why his name is still there. His question is genuine uncertainty, not a new revelation. <DIALOGUE_1>"
+    },
+    {
+      "id": "S20",
+      "direction_en": "Close-up of {shen} facing the tenant at apartment 802. He separates the issue that needs the lock records from the concrete question the tenant can answer now, then waits. Calm but direct. <DIALOGUE_1>"
+    },
+    {
+      "id": "S21",
+      "direction_en": "Start on {xu} hand holding his own dark-cased phone inside apartment 802, then make a short continuous move to his face. His thumb stops along the phone edge and he averts his gaze. No new message, no speech and no movement into the corridor."
+    },
+    {
+      "id": "S22",
+      "direction_en": "Close-up of {shen} standing at the unchanged conversational distance immediately outside apartment 802. Without advancing, he acknowledges the previous answer and repeats the specific unanswered question. Firm but measured, no accusation shouted. <DIALOGUE_1>"
+    },
+    {
+      "id": "S23",
+      "direction_en": "Close-up of {xu} inside his doorway. He starts a reply, then stops and stays silent, without admitting anything or inventing a new answer. <DIALOGUE_1>"
+    },
+    {
+      "id": "S24",
+      "direction_en": "Medium shot of {shen} outside apartment 802. He lowers the printed sheet and looks up toward the corridor security camera. He considers the next investigative step without claiming the case is solved. <DIALOGUE_1>"
+    },
+    {
+      "id": "S25",
+      "direction_en": "Static close-up of the existing small white security camera high in the corridor. No people are visible. The investigator is still in this same corridor, speaking off camera. <DIALOGUE_1> No surveillance footage or new visitor is shown."
+    },
+    {
+      "id": "S26",
+      "direction_en": "Close-up of {xu} remaining inside apartment 802, holding his own phone and silently listening. His mouth stays closed. The investigator directly outside this doorway speaks from outside the crop. <DIALOGUE_1> Do not give the line to the visible tenant."
+    },
+    {
+      "id": "S27",
+      "direction_en": "Steady close detail of the SAME access-log sheet in {shen} hands in the corridor outside apartment 802, centered on its old temporary password label. No face visible. His voice comes from just outside the crop. <DIALOGUE_1> No new creation date, operator name, numeric password or explanation is shown; exact lettering is added in postproduction."
+    }
+  ],
+  "staging_note": "The supplied ajar-door image opens outward; S06 pulls it open. This mechanical correction does not change entry order or plot."
+}

@@ -1,0 +1,848 @@
+{
+  "status": "review_draft",
+  "title": "凌晨两点，谁进过空房？",
+  "created_date": "2026-10-13",
+  "source": {
+    "script": "/mnt/disk1/zengzhitao/interactive-video-studio/inputs/packages/suspense/试播集/EP01-凌晨两点谁进过空房.md",
+    "character_card": "/mnt/disk1/zengzhitao/interactive-video-studio/inputs/packages/suspense/角色资产/完整角色卡.md",
+    "version": "v0.2"
+  },
+  "body_seconds": 177,
+  "total_seconds": 180,
+  "final_format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 25,
+    "video_codec": "H.264",
+    "audio_codec": "AAC",
+    "container": "MP4"
+  },
+  "editorial_methods": [
+    "按用户确认的六段推进与片尾选择展开",
+    "事实、证词、假设区分",
+    "发现改变行动",
+    "旧案关联服从本集调查目标"
+  ],
+  "shots": [
+    {
+      "id": "S01",
+      "start_seconds": 0,
+      "end_seconds": 4,
+      "duration_seconds": 4,
+      "location": "801门外／徐程陈述画面",
+      "scale": "近景",
+      "action": "闭着的801房门与相邻802门框建立位置；共墙侧传来三下敲击。",
+      "speaker": "",
+      "dialogue": "",
+      "sound_events": "三下敲墙声，仅此一次；楼道底声",
+      "purpose": "用普通公寓中的具体异常开场",
+      "source_shots": [
+        "B01",
+        "B02"
+      ],
+      "camera": "固定机位，门牌与两户关系可辨认",
+      "start_state": "两户房门位置固定",
+      "end_state": "三下敲击结束",
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "801"
+      ],
+      "voice_delivery": "无对白；用有因果作用的动作和正常空间声推进。",
+      "source_note": "按徐程陈述呈现事发片段，不揭示801里的实际人物或敲击原因。"
+    },
+    {
+      "id": "S02",
+      "start_seconds": 4,
+      "end_seconds": 8,
+      "duration_seconds": 4,
+      "location": "802室内／徐程陈述画面",
+      "scale": "半身",
+      "action": "徐程停下手上动作，转头望向共墙；他的调查陈述作声桥。",
+      "speaker": "徐程",
+      "dialogue": "这屋空了半年。",
+      "sound_events": "室内底声，敲击不重放",
+      "purpose": "交代空置与声音的矛盾",
+      "source_shots": [
+        "B02"
+      ],
+      "camera": "室内侧面，保留共墙位置",
+      "start_state": "徐程在802内",
+      "end_state": "徐程看向共墙",
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S03",
+      "start_seconds": 8,
+      "end_seconds": 14,
+      "duration_seconds": 6,
+      "location": "走廊／调查时",
+      "scale": "证据特写",
+      "action": "切至沈序持有的门锁记录，先给观众阅读，再听他问话。",
+      "speaker": "沈序",
+      "dialogue": "记录写着你的名字。",
+      "sound_events": "连续楼道声",
+      "purpose": "先让观众看到指向徐程的记录",
+      "source_shots": [
+        "B03"
+      ],
+      "camera": "静止近景，后期叠字留足阅读时间",
+      "start_state": "沈序在走廊持记录",
+      "end_state": "记录面向徐程",
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "01:52",
+        "徐程（临时）"
+      ],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S04",
+      "start_seconds": 14,
+      "end_seconds": 20,
+      "duration_seconds": 6,
+      "location": "802门口",
+      "scale": "近景",
+      "action": "徐程站在门内，看完记录后抬眼；沈序仅肩缘入画。",
+      "speaker": "徐程",
+      "dialogue": "那是旧密码。我昨晚没出去。",
+      "sound_events": "楼道声，轻微衣料声",
+      "purpose": "建立记录与当事人说法的冲突",
+      "source_shots": [
+        "B09",
+        "B03"
+      ],
+      "camera": "固定反打，保持徐程在802门内",
+      "start_state": "徐程看记录",
+      "end_state": "徐程看向沈序",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S05",
+      "start_seconds": 20,
+      "end_seconds": 26,
+      "duration_seconds": 6,
+      "location": "801门口",
+      "scale": "中景",
+      "action": "沈序推开房门，在门口询问，等待一下再入内；徐程仍留在802门边。",
+      "speaker": "沈序",
+      "dialogue": "有人吗？",
+      "sound_events": "一次开门声、正常脚步，短暂等待",
+      "purpose": "调查者开始实际核验",
+      "source_shots": [
+        "B04",
+        "B05"
+      ],
+      "camera": "从走廊拍向801门口，不跨越两户轴线",
+      "start_state": "801门闭合，沈序位于走廊",
+      "end_state": "801门开启，沈序入内",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "新增执行前提：房主委托并允许查看现场与提供门锁材料；未赋予沈序警方权限。"
+    },
+    {
+      "id": "S06",
+      "start_seconds": 26,
+      "end_seconds": 32,
+      "duration_seconds": 6,
+      "location": "801室内",
+      "scale": "全景",
+      "action": "建立桌面、杯与保温杯、充电手机、工具资料和共墙小标记的位置；沈序朝门口问一句。",
+      "speaker": "沈序",
+      "dialogue": "你看见人了？",
+      "sound_events": "室内底声、两步自然脚步",
+      "purpose": "核对证词来自目击还是听觉，同时建立空间",
+      "source_shots": [
+        "B02",
+        "B05"
+      ],
+      "camera": "门口向室内固定全景；镜头内只有沈序",
+      "start_state": "沈序刚入801，徐程在802门边",
+      "end_state": "沈序走到桌侧",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S07",
+      "start_seconds": 32,
+      "end_seconds": 35,
+      "duration_seconds": 3,
+      "location": "802门口",
+      "scale": "近景",
+      "action": "徐程留在门内回应，手向共墙侧示意。",
+      "speaker": "徐程",
+      "dialogue": "我听到那三下。",
+      "sound_events": "不重放敲击，只保留正常空间声",
+      "purpose": "让观众区分听到声音与看到来访者",
+      "source_shots": [
+        "B02"
+      ],
+      "camera": "固定反打，门框持续可见",
+      "start_state": "徐程被问是否看见人",
+      "end_state": "徐程只陈述听觉信息",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "依据原稿听见三下的事实补写问答，不新增来访者目击证词。"
+    },
+    {
+      "id": "S08",
+      "start_seconds": 35,
+      "end_seconds": 42,
+      "duration_seconds": 7,
+      "location": "801桌边",
+      "scale": "手部与杯壁近景",
+      "action": "沈序以手背轻触杯壁，收手；杯子不离开桌面。",
+      "speaker": "沈序",
+      "dialogue": "水还是温的。",
+      "sound_events": "衣料轻响、室内底声",
+      "purpose": "给观众一个容易产生时间推断的现象",
+      "source_shots": [
+        "B06"
+      ],
+      "camera": "近景保留保温杯边缘；不使用夸张水汽",
+      "start_state": "杯与保温杯相邻",
+      "end_state": "沈序收回手，物件位置不变",
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S09",
+      "start_seconds": 42,
+      "end_seconds": 45,
+      "duration_seconds": 3,
+      "location": "802门口",
+      "scale": "近景",
+      "action": "徐程仍在自己门边，朝801方向回应。",
+      "speaker": "徐程",
+      "dialogue": "那人刚走？",
+      "sound_events": "连续空间底声",
+      "purpose": "将观众可能的推断交给人物提出",
+      "source_shots": [
+        "B06",
+        "B09"
+      ],
+      "camera": "门外反打，不把徐程放进801",
+      "start_state": "徐程听到沈序观察",
+      "end_state": "徐程等待回应",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "新增可修改的疑问，不是确认有人刚离开；徐程根据听到的说话提问，没有看见杯子。"
+    },
+    {
+      "id": "S10",
+      "start_seconds": 45,
+      "end_seconds": 50,
+      "duration_seconds": 5,
+      "location": "801桌边",
+      "scale": "半身近景",
+      "action": "沈序看向保温杯，再朝门口回应。",
+      "speaker": "沈序",
+      "dialogue": "旁边有保温杯，时间还不好说。",
+      "sound_events": "普通室内底声",
+      "purpose": "立即检验一个看似顺手的判断",
+      "source_shots": [
+        "B06"
+      ],
+      "camera": "固定半身，视线与保温杯位置匹配",
+      "start_state": "沈序在桌侧",
+      "end_state": "沈序视线回到桌面",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S11",
+      "start_seconds": 50,
+      "end_seconds": 55,
+      "duration_seconds": 5,
+      "location": "801桌边",
+      "scale": "证据近景",
+      "action": "显示手机连着充电线与插头；沈序低身核对，不打开消息。",
+      "speaker": "沈序",
+      "dialogue": "手机也留在这儿。",
+      "sound_events": "轻微衣料与空间声",
+      "purpose": "增加未解的停留痕迹",
+      "source_shots": [
+        "B07"
+      ],
+      "camera": "沿充电线作一次短平移",
+      "start_state": "手机始终在原处充电",
+      "end_state": "沈序确认连接，未移动手机",
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S12",
+      "start_seconds": 55,
+      "end_seconds": 60,
+      "duration_seconds": 5,
+      "location": "801桌边",
+      "scale": "俯拍近景",
+      "action": "沈序抬起维修资料最上页，读到清点单标题后放回；松脱纸条仍朝下。",
+      "speaker": "沈序",
+      "dialogue": "维修清点单。",
+      "sound_events": "一次翻纸声",
+      "purpose": "将注意力引向屋内活动的用途",
+      "source_shots": [
+        "B08"
+      ],
+      "camera": "俯拍仅突出标题与同区工具",
+      "start_state": "资料堆放在手机旁，纸条编号不可见",
+      "end_state": "上页放回，手机和纸条位置不变",
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "维修清点单"
+      ],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S13",
+      "start_seconds": 60,
+      "end_seconds": 65,
+      "duration_seconds": 5,
+      "location": "801共墙",
+      "scale": "近景到半身",
+      "action": "沈序循工具所在一侧看见墙面小检查标记，随后转向门口。",
+      "speaker": "沈序",
+      "dialogue": "墙上也做过标记。",
+      "sound_events": "轻微转身与脚步",
+      "purpose": "建立后续解释敲击可用的物证，不在此宣布答案",
+      "source_shots": [
+        "B08",
+        "B01"
+      ],
+      "camera": "从标记小范围移到沈序，普通维修记号",
+      "start_state": "沈序在桌旁",
+      "end_state": "沈序转身准备回走廊",
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S14",
+      "start_seconds": 65,
+      "end_seconds": 72,
+      "duration_seconds": 7,
+      "location": "801与802之间的走廊",
+      "scale": "双人中景",
+      "action": "沈序回走廊，在证词栏记徐程的说法；假设栏留下带问号的暂时判断。",
+      "speaker": "沈序",
+      "dialogue": "你说没出门，我记下了。",
+      "sound_events": "笔尖与纸面轻响",
+      "purpose": "让徐程被听见，也显露沈序偏信记录的倾向",
+      "source_shots": [
+        "B09",
+        "B12"
+      ],
+      "camera": "保留两人的距离和各自门口位置",
+      "start_state": "徐程仍在802门内，沈序返回",
+      "end_state": "沈序持本面对徐程",
+      "on_camera_dialogue": true,
+      "on_screen_text": [
+        "证词：徐程称未出门",
+        "假设：徐程进入？"
+      ],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S15",
+      "start_seconds": 72,
+      "end_seconds": 78,
+      "duration_seconds": 6,
+      "location": "802门口",
+      "scale": "沈序过肩近景",
+      "action": "沈序将记录转向徐程，提出具体问题。",
+      "speaker": "沈序",
+      "dialogue": "这个密码，还有谁知道？",
+      "sound_events": "楼道底声",
+      "purpose": "从行踪转到密码持有范围",
+      "source_shots": [
+        "B10"
+      ],
+      "camera": "沈序为可见说话者，徐程只肩缘入画",
+      "start_state": "记录在沈序手中",
+      "end_state": "记录再次朝向徐程",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S16",
+      "start_seconds": 78,
+      "end_seconds": 85,
+      "duration_seconds": 7,
+      "location": "802门内",
+      "scale": "徐程近景",
+      "action": "徐程抬眼解释自己没有出门，手仍抵着门框。",
+      "speaker": "徐程",
+      "dialogue": "我都说了，我昨晚没出去。",
+      "sound_events": "普通说话与底声",
+      "purpose": "用答非所问呈现缺口",
+      "source_shots": [
+        "B09",
+        "B11"
+      ],
+      "camera": "同侧固定反打",
+      "start_state": "徐程被问密码",
+      "end_state": "徐程回答行踪，未回答共享情况",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S17",
+      "start_seconds": 85,
+      "end_seconds": 91,
+      "duration_seconds": 6,
+      "location": "走廊",
+      "scale": "沈序近景",
+      "action": "沈序停半拍，接受已经听到的说法，再把问题拉回来。",
+      "speaker": "沈序",
+      "dialogue": "嗯。那密码呢？",
+      "sound_events": "停顿中仍有正常空间声",
+      "purpose": "让追问准确而不咄咄逼人",
+      "source_shots": [
+        "B10",
+        "B12"
+      ],
+      "camera": "固定近景，轻微抬眼",
+      "start_state": "沈序听完徐程回答",
+      "end_state": "沈序等待密码问题的回答",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S18",
+      "start_seconds": 91,
+      "end_seconds": 98,
+      "duration_seconds": 7,
+      "location": "802门内",
+      "scale": "手部到近景",
+      "action": "徐程低头，拇指停在手机边缘，另一手仍抵门框；不出现新消息。",
+      "speaker": "",
+      "dialogue": "",
+      "sound_events": "衣料轻响、室内外连续底声",
+      "purpose": "让观众观察回避，不替他解释动机",
+      "source_shots": [
+        "B11",
+        "B14"
+      ],
+      "camera": "从握手机的手短移到脸，动作连续",
+      "start_state": "徐程等待后未答",
+      "end_state": "徐程低头沉默，仍在原位",
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "voice_delivery": "无对白；用有因果作用的动作和正常空间声推进。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S19",
+      "start_seconds": 98,
+      "end_seconds": 105,
+      "duration_seconds": 7,
+      "location": "走廊",
+      "scale": "沈序半身",
+      "action": "沈序收回记录，看一眼临时标签，再温和厘清问题。",
+      "speaker": "沈序",
+      "dialogue": "你没出门，和密码被用了，是两件事。",
+      "sound_events": "自然说话与楼道声",
+      "purpose": "把行踪与记录的前提分开",
+      "source_shots": [
+        "B10",
+        "B12"
+      ],
+      "camera": "半身保留记录，不逼近徐程",
+      "start_state": "记录面向徐程",
+      "end_state": "记录回到沈序面前",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S20",
+      "start_seconds": 105,
+      "end_seconds": 112,
+      "duration_seconds": 7,
+      "location": "走廊",
+      "scale": "本子近景",
+      "action": "沈序划去假设栏的徐程进入问句；保留事实与证词两栏。",
+      "speaker": "",
+      "dialogue": "",
+      "sound_events": "一次划线和纸面声",
+      "purpose": "把判断修正变成可见动作",
+      "source_shots": [
+        "B12"
+      ],
+      "camera": "固定证据特写，文字后期呈现",
+      "start_state": "本子已有带问号的假设",
+      "end_state": "假设被划去；事实和证词各自保留",
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "事实：01:52，密码被使用",
+        "证词：徐程称未出门",
+        "假设：徐程进入？（划去）"
+      ],
+      "voice_delivery": "无对白；用有因果作用的动作和正常空间声推进。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S21",
+      "start_seconds": 112,
+      "end_seconds": 121,
+      "duration_seconds": 9,
+      "location": "走廊",
+      "scale": "沈序近景",
+      "action": "沈序说清能确定的范围，说完才抬头。",
+      "speaker": "沈序",
+      "dialogue": "记录只说明密码用过，不能说明是谁用的。",
+      "sound_events": "自然说话和楼道底声",
+      "purpose": "交付本集第一次认识上的进展",
+      "source_shots": [
+        "B12"
+      ],
+      "camera": "固定近景，克制自我修正",
+      "start_state": "沈序刚划去假设",
+      "end_state": "沈序抬头继续核验",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S22",
+      "start_seconds": 121,
+      "end_seconds": 127,
+      "duration_seconds": 6,
+      "location": "走廊摄像头位置",
+      "scale": "物件近景",
+      "action": "沈序视线落到走廊摄像头，只确认它的存在，不展示录像或断言覆盖范围。",
+      "speaker": "沈序",
+      "dialogue": "门口有监控。",
+      "sound_events": "楼道底声",
+      "purpose": "提前给A路线一个可理解的依据",
+      "source_shots": [
+        "B13"
+      ],
+      "camera": "按人物视线拍摄像头",
+      "start_state": "尚未查录像",
+      "end_state": "摄像头成为待调查方向",
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S23",
+      "start_seconds": 127,
+      "end_seconds": 132,
+      "duration_seconds": 5,
+      "location": "801门口至桌侧",
+      "scale": "中景",
+      "action": "沈序回801补记维修资料位置，徐程留在802。",
+      "speaker": "",
+      "dialogue": "",
+      "sound_events": "短脚步、翻开黑本的声音",
+      "purpose": "让后续旧编号发现由具体记录动作触发",
+      "source_shots": [
+        "B08",
+        "B16"
+      ],
+      "camera": "从801内看沈序回到桌侧",
+      "start_state": "沈序在走廊持本",
+      "end_state": "沈序回到桌侧准备记录",
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "voice_delivery": "无对白；用有因果作用的动作和正常空间声推进。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S24",
+      "start_seconds": 132,
+      "end_seconds": 139,
+      "duration_seconds": 7,
+      "location": "801桌边",
+      "scale": "俯拍证据近景",
+      "action": "沈序轻挪上层清点单以记下方资料标题，松脱纸条随纸角翻正，编号进入视线。",
+      "speaker": "",
+      "dialogue": "",
+      "sound_events": "一次纸张摩擦声",
+      "purpose": "先让观众读到新编号",
+      "source_shots": [
+        "B16"
+      ],
+      "camera": "俯拍手与纸，手机保持原位",
+      "start_state": "纸条在手机旁资料边缘，编号朝下",
+      "end_state": "纸条正面露出017／附件04",
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "017／附件04"
+      ],
+      "voice_delivery": "无对白；用有因果作用的动作和正常空间声推进。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S25",
+      "start_seconds": 139,
+      "end_seconds": 144,
+      "duration_seconds": 5,
+      "location": "801桌边",
+      "scale": "沈序近景",
+      "action": "沈序笔尖停住，视线固定在纸条上。",
+      "speaker": "沈序",
+      "dialogue": "017？",
+      "sound_events": "短停顿、连续底声",
+      "purpose": "让个人牵挂进入调查",
+      "source_shots": [
+        "B16",
+        "B17"
+      ],
+      "camera": "固定近景，短暂意外后收敛",
+      "start_state": "沈序刚看到编号",
+      "end_state": "沈序确认自己认得这个编号",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S26",
+      "start_seconds": 144,
+      "end_seconds": 150,
+      "duration_seconds": 6,
+      "location": "801桌边",
+      "scale": "手部近景",
+      "action": "沈序从黑本取出自己的017旧案卡，放在纸条旁，手按卡角。",
+      "speaker": "",
+      "dialogue": "",
+      "sound_events": "翻本、取卡与放卡轻响",
+      "purpose": "提供能供观众核对的另一份材料",
+      "source_shots": [
+        "B17"
+      ],
+      "camera": "固定手部近景，不加入新旧案照片",
+      "start_state": "旧卡在本中；纸条在桌上",
+      "end_state": "旧卡与纸条暂时并排",
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "017"
+      ],
+      "voice_delivery": "无对白；用有因果作用的动作和正常空间声推进。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S27",
+      "start_seconds": 150,
+      "end_seconds": 155,
+      "duration_seconds": 5,
+      "location": "801桌边",
+      "scale": "证据特写",
+      "action": "旧卡017与纸条017／附件04同框，观众有时间辨认；只有编号相同被显示。",
+      "speaker": "",
+      "dialogue": "",
+      "sound_events": "低电平空间底声",
+      "purpose": "给予可见的关联线索，不补旧案结论",
+      "source_shots": [
+        "B16",
+        "B17"
+      ],
+      "camera": "稳定俯拍，两份材料完整可读",
+      "start_state": "旧卡被手按住",
+      "end_state": "两份材料保持原样",
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "旧案卡：017",
+        "装订条：017／附件04"
+      ],
+      "voice_delivery": "无对白；用有因果作用的动作和正常空间声推进。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S28",
+      "start_seconds": 155,
+      "end_seconds": 160,
+      "duration_seconds": 5,
+      "location": "801桌边",
+      "scale": "沈序近景",
+      "action": "沈序看着资料，句中停一下，收住外露的意外。",
+      "speaker": "沈序",
+      "dialogue": "这份资料……怎么会在这里？",
+      "sound_events": "清楚对白、自然停顿",
+      "purpose": "把旧案关联保持为新问题",
+      "source_shots": [
+        "B17"
+      ],
+      "camera": "固定近景，无戏剧化表情",
+      "start_state": "沈序看到相同编号",
+      "end_state": "沈序决定继续核对，未宣布同案",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S29",
+      "start_seconds": 160,
+      "end_seconds": 164,
+      "duration_seconds": 4,
+      "location": "801门口",
+      "scale": "沈序半身",
+      "action": "沈序收回自己的旧卡，回到门口看向徐程；纸条留在801。",
+      "speaker": "沈序",
+      "dialogue": "下一步，先查哪儿？",
+      "sound_events": "合本声与楼道声",
+      "purpose": "把旧案情绪收回当前选择",
+      "source_shots": [
+        "B13",
+        "B14",
+        "B15",
+        "B17"
+      ],
+      "camera": "门口半身，徐程仍在对面门内",
+      "start_state": "旧卡暂在桌侧，手按卡角",
+      "end_state": "旧卡回黑本；沈序回门口",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S30",
+      "start_seconds": 164,
+      "end_seconds": 168,
+      "duration_seconds": 4,
+      "location": "走廊",
+      "scale": "摄像头近景",
+      "action": "再次显示此前看见的摄像头，出现简短A选项。",
+      "speaker": "沈序",
+      "dialogue": "查监控，看谁来过。",
+      "sound_events": "同一空间底声",
+      "purpose": "解释A想验证什么",
+      "source_shots": [
+        "B13"
+      ],
+      "camera": "固定物件近景",
+      "start_state": "尚未查看录像",
+      "end_state": "A作为备选行动呈现",
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "A 查监控"
+      ],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S31",
+      "start_seconds": 168,
+      "end_seconds": 173,
+      "duration_seconds": 5,
+      "location": "802门口",
+      "scale": "徐程近景",
+      "action": "徐程仍握手机站在门内，出现B选项；不新增回答。",
+      "speaker": "沈序",
+      "dialogue": "问租客，密码谁知道。",
+      "sound_events": "楼道底声",
+      "purpose": "解释B想验证什么",
+      "source_shots": [
+        "B14",
+        "B10"
+      ],
+      "camera": "徐程近景，画外为沈序",
+      "start_state": "共享情况仍未答清",
+      "end_state": "B作为备选行动呈现",
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "B 查租客"
+      ],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    },
+    {
+      "id": "S32",
+      "start_seconds": 173,
+      "end_seconds": 177,
+      "duration_seconds": 4,
+      "location": "走廊",
+      "scale": "门锁记录特写",
+      "action": "显示旧标签，叠加C选项，不展示新增管理信息。",
+      "speaker": "沈序",
+      "dialogue": "查门锁，核对旧标签。",
+      "sound_events": "楼道底声延续到尾卡",
+      "purpose": "解释C想验证什么",
+      "source_shots": [
+        "B15"
+      ],
+      "camera": "固定近景，文字后期叠加",
+      "start_state": "标签具体含义待查",
+      "end_state": "C作为备选行动呈现",
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "徐程（临时）",
+        "C 查门锁"
+      ],
+      "voice_delivery": "沈序中低音、克制、清楚，按角色卡175–205字/分钟预估；徐程为正常成年男性语气，紧张但不阴险。",
+      "source_note": "按原稿事实展开现场动作与表达；新增细节见adaptation-notes.md。"
+    }
+  ],
+  "interaction": {
+    "status": "review_draft",
+    "question": "先查哪一处？",
+    "choices": [
+      {
+        "id": "A",
+        "text": "查监控",
+        "reason": "核对实际来访者",
+        "source_shots": [
+          "B13"
+        ]
+      },
+      {
+        "id": "B",
+        "text": "查租客",
+        "reason": "核对密码是否共享",
+        "source_shots": [
+          "B10",
+          "B11",
+          "B14"
+        ]
+      },
+      {
+        "id": "C",
+        "text": "查门锁",
+        "reason": "核对旧临时标签的含义",
+        "source_shots": [
+          "B15"
+        ]
+      }
+    ],
+    "planned_start_seconds": 177,
+    "seconds": 3,
+    "frames": 75,
+    "route_selected": null,
+    "truth_revealed": false
+  },
+  "voice_budget_note": "按原角色卡读速做文字预估；未生成或听审样音。自然停顿和证据阅读已留空间，实际对白与片长需制作后验收。"
+}

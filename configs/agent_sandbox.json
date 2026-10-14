@@ -3,8 +3,8 @@
  "image": "agent-sandbox:0918",
  "runs_root": "/mnt/disk1/zengzhitao/tmp/agent-sandbox/runs",
  "base_url": "http://127.0.0.1:8789",
- "model": "glm-5.3-flash",
- "_model": "gpu81 的 Flash-Next。本地 27B 归并失败过两次（一次三小时超时，一次 391k 输入撞 262k 窗口），别用它跑归并。",
+ "model": "deepseek-v4.1-flash",
+ "_model": "2026-10-14：悬疑修复Agent统一为用户预期的Phanthy DeepSeek V4.1 Flash；图像兼容修复独立于模型选择。",
  "parallel": {
   "day": 2,
   "night": 4,
@@ -34,5 +34,15 @@
  },
  "_switch_note": "2026-10-10 用户指示全切 Phanthy GLM(Flash-Next 已从8038下线);旧配置备份在 .bak-flashnext-20261010",
  "docker_network": "host",
- "_docker_network_note": "2026-10-10: phanthy 网关只听本机 127.0.0.1:8789,容器必须 host 网络才够得着"
+ "_docker_network_note": "2026-10-10: phanthy 网关只听本机 127.0.0.1:8789,容器必须 host 网络才够得着",
+ "context_window": 1048576,
+ "repair_extra_body": {
+  "thinking": {
+   "type": "disabled"
+  },
+  "output_config": {
+   "effort": "low"
+  },
+  "max_tokens": 4096
+ }
 }
