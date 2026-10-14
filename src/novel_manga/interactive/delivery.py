@@ -23,8 +23,21 @@ def video_seconds(stream: dict) -> float:
     return int(stream['nb_frames']) / float(Fraction(stream['r_frame_rate']))
 
 
-def evidence_events(overlays, script, plan, timeline):
+def requested_sampling(provider,profile):
+    # The framed H3 adapter owns the local sampler; its inherited image/video
+    # profile resolution is the hosted lane's tier, not the H3 short edge.
+    sampling=provider.sampling_parameters() if hasattr(provider,'sampling_parameters') else {}
+    edge=sampling.get('short_edge') or getattr(provider,'short_edge',None)
+    label=f'{edge}P' if edge else profile.get('resolution','720p')
+    return label,not edge and label=='480p'
+
+
+def evidence_events(overlays, script, plan, timeline, *, shot_spans=None):
     labels = {row['index']: row for row in overlays}
+    if shot_spans is not None:
+        return [{**{k:v for k,v in labels[span['index']].items() if k in {'text','placement'}},
+                 'start':span['start'], 'end':span['end']}
+                for span in shot_spans if span['index'] in labels]
     seconds = {s.get('index', i): float(s['duration_seconds']) for i, s in enumerate(script['shots'], 1)}
     clips = {c['clip_id']:c for c in plan['clips']}
     result = []
@@ -38,10 +51,8 @@ def evidence_events(overlays, script, plan, timeline):
         for index in indexes:
             end = cursor + (span['end']-span['start'])*seconds[index]/total
             if index in labels:
-                label=labels[index]
-                event={'text':label['text'], 'start':round(cursor,3), 'end':round(end,3)}
-                if label.get('placement'):
-                    event['placement']=label['placement']
+                event={'text':labels[index]['text'], 'start':round(cursor,3), 'end':round(end,3)}
+                if labels[index].get('placement'):event['placement']=labels[index]['placement']
                 result.append(event)
             cursor = end
     return result
@@ -57,6 +68,7 @@ def ambience_window(index, script, plan, timeline):
         raise ValueError('Silent ambience shot has fewer than three delivered seconds')
     row=span[0]
     return row['start'] + min(1.0, row['end']-row['start']-3.0), 3.0
+
 
 
 def _ass_time(seconds):
@@ -96,8 +108,12 @@ def _card(path: Path, interaction: dict, font: Path, width: int, height: int):
         draw.text(((width-(box[2]-box[0]))/2,y),text,font=face,fill=fill)
     centered(interaction.get('series_title','林野探秘档案'),height*.20,42,secondary)
     centered(interaction['question'],height*.32,68,foreground)
+    complete = any(option.get('reason') for option in interaction['options'])
     for i,option in enumerate(interaction['options']):
-        centered(f'{option["id"]}  {option["label"]}',height*(.46+i*.10),56,foreground)
+        y=height*(.46+i*(.15 if complete else .10))
+        centered(f'{option["id"]}  {option["label"]}',y,56,foreground)
+        if option.get('reason'):
+            centered(option['reason'],y+80,38,secondary)
     centered('评论区留下你的选择',height*.84,38,secondary)
     image.save(path,quality=95)
 
@@ -122,13 +138,38 @@ def deliver(runner, report: dict, destination: Path) -> dict:
                                           'review_errors':review_errors}}
     if float(interaction['seconds']) != 3:
         raise ValueError('This release requires a 3-second interaction card')
-    events=evidence_events(json.loads((ctx.episode_dir/'overlays.json').read_text()),ctx.script,
-                           ctx.clip_plan,assembly.get('timeline',[]))
+    policy_path=ctx.episode_dir/'delivery_policy.json'
+    policy=json.loads(policy_path.read_text()) if policy_path.is_file() else {}
+    extra_overlays=policy.get('extra_visual_overlays',True)
+    postproduction = None
+    if extra_overlays and (ctx.episode_dir/'evidence_surfaces.json').is_file():
+        from novel_manga.interactive.evidence import prepare_evidence
+        try:
+            postproduction=prepare_evidence(ctx,report,destination)
+            source=Path(postproduction['body'])
+        except Exception as error:
+            postproduction={'passed':False, 'shot_spans':[],
+                            'errors':{'composite':f'{type(error).__name__}: {str(error)[:250]}'}}
+            atomic_write_json(destination/'evidence-review.json',postproduction)
+    events=evidence_events(json.loads((ctx.episode_dir/'overlays.json').read_text()) if extra_overlays else [],ctx.script,
+                           ctx.clip_plan,assembly.get('timeline',[]),
+                           shot_spans=postproduction['shot_spans'] if postproduction is not None else None)
     overlay=destination/'evidence.ass'
-    _overlay_ass(overlay,events,ctx.settings.width,ctx.settings.height)
+    if extra_overlays:_overlay_ass(overlay,events,ctx.settings.width,ctx.settings.height)
     body=destination/'body.mp4'
     # cwd-relative fixed filename avoids filesystem path escaping in the filter language.
-    subprocess.run(['ffmpeg','-y','-v','error','-threads','4','-i',str(source),'-vf','ass=evidence.ass',
+    filters='ass=evidence.ass' if extra_overlays else 'ass=subtitles.ass'
+    ass=Path(assembly.get('ass',''))
+    if not extra_overlays:
+        # The pre-caption join has native audio, no loudness processing or scene overlays.
+        source=ctx.work/'joined.mp4'
+        if not source.is_file() or not ass.is_file():
+            raise FileNotFoundError('Clean delivery requires the native joined video and dialogue subtitles')
+        shutil.copy2(ass,destination/'subtitles.ass')
+    if postproduction is not None and ass.is_file():
+        shutil.copy2(ass,destination/'subtitles.ass')
+        filters+=',ass=subtitles.ass'
+    subprocess.run(['ffmpeg','-y','-v','error','-threads','4','-i',str(source),'-vf',filters,
                     '-c:v','libx264','-preset','fast','-crf','19','-r','25','-pix_fmt','yuv420p',
                     '-c:a','aac','-ar','48000','-ac','2','-b:a','192k',str(body)],cwd=destination,check=True)
     card=destination/'interaction.jpeg'
@@ -182,7 +223,31 @@ def deliver(runner, report: dict, destination: Path) -> dict:
              'review_errors':review_errors,
              'overlay_timing':'authored timing scaled to actual compiled clip spans',
              'audio':'native mixed episode audio, not isolated vocals',
+             'delivery_policy':{'extra_visual_overlays':extra_overlays,'dialogue_subtitles':True,'interaction_card':True},
              'source_report':str(ctx.episode_dir/'thin_media_report.json')}
+    if not extra_overlays:
+        receipt['overlay_timing']='disabled by user; dialogue subtitles and interaction card retained'
+        receipt['audio_level_processing']=False
+    if postproduction is not None:
+        native=[]
+        for row in report.get('clips',[]):
+            selected=row.get('selected') or {}
+            video_path=Path(selected.get('video',''))
+            if not video_path.is_file():continue
+            streams=json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0',
+                                 '-show_streams','-of','json',str(video_path)],text=True))['streams']
+            native.append({'clip_id':row['clip_id'],'width':streams[0]['width'],'height':streams[0]['height'],
+                           'fps':streams[0]['r_frame_rate']})
+        requested,is_trial=requested_sampling(ctx.provider,ctx.profile)
+        receipt.update(postproduction=postproduction,
+                       overlay_timing=postproduction.get('timing_method','observations unavailable'),
+                       native_sampling={'requested':requested,'observed':native,
+                                        'trial':is_trial,
+                                        'export':f'{ctx.settings.width}x{ctx.settings.height}',
+                                        'note':'Delivery resize does not increase native generation detail.'})
+        # The native take's verdict does not certify newly composited evidence.
+        receipt['status']='candidate'
+        receipt['final_evidence_review_pending']=True
     atomic_write_json(destination/'interactions.json',receipt['interaction'])
     atomic_write_json(destination/'delivery.json',receipt)
     return receipt

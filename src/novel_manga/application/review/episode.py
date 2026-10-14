@@ -131,6 +131,7 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
         if verdict.get("severity") == "fail":
             tier = review_policy.fix_tier(verdict, bible, rules)
             if (tier == "must_fix" and "scripted" not in verdict
+                    and verdict.get("visual_defect_kind") not in review_policy.PRESENTATION_KINDS
                     and not review_policy.count_mismatches(verdict.get("verify") or {})
                     and not (verdict.get("story_ok") is False and verdict.get("story_kind") in review_contracts.STORY_FATAL)):
                 check = review_judges.script_check(clip, verdict, segments)

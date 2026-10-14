@@ -1,9 +1,17 @@
-# Independent interactive-video-studio
+# Interactive video studio: shared pipeline
 
-This is an independent repository forked on 2026-10-12 from 440bfdf.
-Use docs/interactive-design.md and docs/interactive-progress.md for the current task.
-Current authorized task runs on codex/adventure-demo in this isolated repository.
-Do not operate the parent novel production or inherited historical tasks.
+This is the independent interactive-video-studio repository, not the parent novel production project.
+Read `docs/branch-workflow.md` before changing common code. `main` owns the tested shared pipeline;
+`codex/feat/shared-pipeline` is its integration worktree. The romance, adventure and suspense branches
+own their approved material, experimental scripts and per-content runtime configuration.
+
+The current user explicitly authorized local snapshots, integration into main after tests, and merging
+those shared fixes back into all three content branches (2026-10-14). Preserve later edits made by
+other conversations. This authorization does not request a remote push, deployment or new generation.
+
+Review images/films and propose their artistic repairs through Agents. The coordinating session owns
+code integration, execution status and delivery, not manual frame-by-frame review. Keep measured
+failures and genre-specific production decisions explicit; never apply one episode's QC waiver globally.
 
 # Project instructions
 

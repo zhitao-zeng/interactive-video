@@ -1,0 +1,124 @@
+# Novel Manga Video
+
+将小说批量改编为漫剧视频。雾月、星海、诸天共用同一条生产线，视频生成后端支持 SD2.0、SD2.5 和本地 H3。
+
+## 安装与测试
+
+```bash
+uv sync --extra dev
+uv run pytest
+```
+
+需要 ffmpeg；运行时的模型地址与凭据通过项目 `.env` 和环境变量提供。模型、素材和生成视频不进入 Git。
+
+## 新书初始化
+
+```bash
+.venv/bin/python scripts/setup_book_thin.py inputs/book.txt \
+  --novel-id demo --title 示例 --style 3d --frame 16:9 --chapters 1-100
+```
+
+一条命令走完新书准入：切章建工作区 → 逐章精读（本地 Qwen 并行）→ 沙箱 agent 归并演员表 → 按名单重建圣经并写出 `reading_cast.json`。端点会在开跑前检查，圣经端点连不上自动改用归并端点。**不要**只用 `build_bible_thin.py` 直接初始化：它不会产出 `reading_cast.json`，新书的身份绑定校验（`props: true`）会在规划时把有未命名人物在场的章节全部拦停。随后在 `configs/pipeline.json` 中配置该书的章节范围、规划与视频资源。
+
+## 唯一生产管理入口
+
+```bash
+.venv/bin/python scripts/pipeline.py validate
+.venv/bin/python scripts/pipeline.py status
+.venv/bin/python scripts/pipeline.py status --novel zhutian-card --json
+.venv/bin/python scripts/pipeline.py start --novel xinghai
+.venv/bin/python scripts/pipeline.py stop --novel xinghai
+.venv/bin/python scripts/pipeline.py start --novel zhutian-card --flow prepare --chapters 2001-2660,2671-3848 --workers 6
+.venv/bin/python scripts/pipeline.py start --novel zhutian-card --flow repair
+.venv/bin/python scripts/pipeline.py stop --novel zhutian-card --flow repair
+```
+
+以上 start 是人工操作示例，不会在安装或查看状态时自动执行。
+
+| 流程 | 负责什么 | start / stop 的含义 |
+|---|---|---|
+| `production`（默认） | 原有批量读书、规划、建卡、渲染与审片 | 启动原生产调度器；停止调度器，已有任务自行完成 |
+| `prepare` | H3 开拍前的剧本和资产准备 | 复用上次章节范围和并发数，首次可从小说范围配置读取；停止派单并等待当前任务完成 |
+| `repair` | 已有成片的审查、修复、重拍与复审 | 恢复原管理器和历史状态；停止时写入原生暂停标记，当前步骤可以完成 |
+
+`status` 默认展示所有小说的三条流程，`--flow` 可过滤。JSON 与看板共用状态读取逻辑；在途按活着的工作进程统计，待办和阻塞按各流程保存的章节记录统计，三条流程不能直接相加当成交付总数。旧状态缺少计数时显示“未统计”。
+
+底层执行器继续使用原锁、任务记录、缓存、并发池和重试预算。生产管理入口不会另建任务队列，也不会因启动而清空历史。
+
+《十日终焉》的每日 18:00 启动配置在 `configs/schedules/shiri-daily.cron`，使用本机 Asia/Shanghai 时区。
+该书启用 `stop_on_quota_exhausted`：收到额度不足后停止新增生成提交，已受理任务继续取回结果并完成现有审查，
+随后调度器以 `waiting_quota` 退出，等待次日定时启动。纯额度中断不扣章级重试次数，已生成素材及片段重试历史保留。
+
+## 独立执行与自动审修
+
+规划、生成、审查仍可分别执行。批量 `thin_batch.py --stage render` 只生成，不触发整章重规划或内容审查；加 `--unattended` 才进入自动审查与修复。
+
+- `thin_batch.py --review-only` 只审已有视频，自动跳过规划、建卡、生成与修复；与 `--unattended` 同时指定时，以只审查为准。
+- `thin_review.py episode --episode-dir <目录>` 同样只审查，并更新当前成片的验收结果。
+- 批量 `--unattended` 与单集 `render_clips_thin.py --review` 共用执行器；当前计划对应的已有成片通过 `--repair` 进入原修复流程。批量层不再额外叠加一轮重拍。
+- `--cache-only` 不生成或修复素材；与自动审查组合时，可审已有素材，缺缓存时不会为补齐素材发起生成。
+
+以上参数需配合各入口原有的小说、章节或分集参数。显式自动审修适用于 fast 和 quality；技术合成完成不代表内容验收通过，最终看 `quality_review.passed`。修复预算、历史与缓存沿用原记录。
+
+## 看板
+
+```bash
+.venv/bin/python scripts/status_server.py 8765
+```
+
+访问本机 `http://127.0.0.1:8765/` 或 `/board`。导航中的「架构」（`/architecture`）提供可点击的流程图，可切换只规划、只生成、只审查、自动修复和缓存合成范围；还可展开 8 类内部流程的 51 个步骤，查看模型调用、输入输出、失败分支、代码位置与产物交接。页面只展示说明，不启动任务。看板独立于已移除的旧生成 API，继续展示交付进度、修复、资源及三条流程的运行状态。`/workbench` 是看板旁的工作台：磁盘上找到的书、分集内容和资产货架（含缩略图、实验货架和 agent 归因）。
+
+## 代码与维护
+
+章节规划有两层选择：`story_method` 选六种本地编剧/导演方法（`--story-method shanyin|community|drama|dream|leos|visual`，`scripts/plan_chapter_thin.py --list-methods` 查看用法，详见[本地剧本方法](docs/story-methods.md)）；`planning_backend` 选规划发生在本地还是沙箱 agent（在小说 `profile.json` 设置，详见[沙箱分镜](docs/authored-pipeline.md)）。沙箱后端还需在 `profile.json` 指定 `agent_skill`。
+
+本地章节规划通过 `NOVEL_PLANNER_ENDPOINT=flashnext|local|deepseek` 选模型，默认 `flashnext`。
+本地分镜、导演稿和各方法的完整分场剧本默认输出上限为 30,000 tokens，模型写完会提前结束。分镜/导演稿可用 `--max-tokens` 或 `NOVEL_PLAN_MAX_TOKENS` 覆盖，分场稿可用 `--outline-tokens` 覆盖；普通短提纲默认 4,096 tokens。
+`deepseek` 使用 GPU52 的 `DeepSeek-V4.1-Flash`（`http://172.28.4.52:8831/v1`），凭据从项目 `.env` 或环境变量 `GPU52_DEEPSEEK_API_KEY` 读取。
+例如在独立目录试跑首章：
+
+```bash
+NOVEL_PLANNER_ENDPOINT=deepseek .venv/bin/python scripts/plan_chapter_thin.py \
+  inputs/十日终焉.md --novel-id shiri-ds --episode-index 1 \
+  --bible outputs/shiri/story_bible.json --output-root outputs/experiments/deepseek \
+  --style 3d --frame 16:9
+```
+
+批量资源已在 `configs/pipeline.json` 的 `resources.planning_models.deepseek` 登记，初始单并发；在目标小说的 `planning` 中加入 `"deepseek": 1` 即可参与调度。正式小说的资源分配保持当前配置。规划选模型不改变判官、建档和 H3 翻译的模型。
+
+开拍前准备可通过 `NOVEL_PREPARATION_ENDPOINT=deepseek` 为本次命令选择 DS，覆盖共享准备模型配置，并传递给各集的子进程；未设置时沿用 `defaults.preparation`。需要全程用 DS 时，同时设置 `NOVEL_PLANNER_ENDPOINT=deepseek` 和 `SECOND_REVIEW_JUDGE=deepseek`，建圣经与逐章提取的端点也应显式选择 DS。图片仍由现有图片生成服务制作。
+
+普通改编分镜超过全集时长上限时，先复用原提纲和已有草稿进入专门压缩步骤，模型只返回逐条对白修改和冗余镜头的删除地址，程序保留其余画面字段及原文引用。最多两轮、共用180秒预算，每轮重新做原有结构、原文引用和实际台词时长检查；压缩仍超限就报告失败，不因时长继续重做整章提纲。已有失败草稿可用 `plan_chapter_thin.py --compress-existing <response_attempt_NN.raw.json>` 直接恢复压缩，需保留相邻的 `analysis_attempt_NN.txt`。作者定稿与创作方法持有的分场稿沿用各自流程。
+
+### 沙箱 agent 规划
+
+```bash
+.venv/bin/python scripts/run_agent_thin.py --run v3-drama-1 --skills drama   # 裸跑一个 agent
+.venv/bin/python scripts/agent_storyboard_thin.py --novel-dir outputs/<书> --chapter 3 --propose
+.venv/bin/python scripts/agent_storyboard_thin.py --novel-dir outputs/<书> --chapter 3 --accept output/分镜.xlsx
+.venv/bin/python scripts/agent_storyboard_batch_thin.py --novel-dir outputs/<书> --chapters 1-300
+```
+
+沙箱的容器、镜像、技能模板、端点和分时段并发在 `configs/agent_sandbox.json`。一次 run 的每次执行是独立 attempt，产出互不覆盖；选定的分镜以快照加 digest 固定在章节旁，重新提案不会改写已采用的版本。批量驱动把「提案→自动采用→绑定→对照」放在同一槽位，可安全中断续跑，进度和等人的章节写在 `agent_storyboard_batch.md`。自动采用只在唯一一份可读分镜时发生，其余情况留给人选。
+
+### 独立 Agent 产线
+
+`scripts/episode_agent.py prepare/run/status` 提供每集一个持续沙箱会话，由 Agent 自主调用检查、生成、审查和修复工具。默认复用已有读书资料、剧本与资产；显式选择 `--input-mode source` 才从完整原文重新创作。原小说目录和现有批量控制器保持原有操作方式，产物写入独立 Agent 工作区。单集与章范围用法见[独立 Agent 产线](docs/episode-agent.md)。
+
+主调度器支持 `pipeline.py start --novel BOOK_ID --executor episode_agent`，复用公共模型槽、H3 池和暂停恢复。每集仍归同一个 Agent；耗时工具交接后释放模型槽，由宿主执行并续接原会话。默认小说配置继续使用标准执行方式，详见[共享调度与验证边界](docs/episode-agent-scheduling.md)。
+
+正式入口保留在 `scripts/`；业务流程位于 `src/novel_manga/application/`，共享规则、媒体、模型接口和统计各自独立。
+31 个 `*_thin.py` 均是启动入口。原文读取/切章在 `source/`，基础渲染、音频证据和质检在 `media/`，初始人物库构建在 `application/planning/`；旧包路径已移除，具体映射见[当前架构](docs/architecture.md)。
+
+- [产线全景图](docs/pipeline-overview.md)：六层流水线、瓶颈与人工闸门、本周变更——新人/新会话先读这份。
+- [当前架构与修改位置](docs/architecture.md)：职责、依赖、配置来源和产物写入者。
+- [生产经验与排查入口](docs/production-lessons.md)：身份、资产、H3、语音和修复中已踩过的坑，以及最新实拍证据的边界。
+- [测试与回归](tests/README.md)：请求、缓存、修复、媒体和看板的验证入口。
+- [完整重构计划](docs/full-refactor-plan-20260917.md)与[实施记录](docs/full-refactor-progress-20260917.md)。
+- [实验说明](experiments/README.md)：A/B、测速、人物库重建试验及旧整集实验。
+
+看板页面和脚本位于 `src/novel_manga/dashboard/templates/` 与 `static/`；看板和用量命令共用 reporting 的统计。读取安装包中的服务时，用 `NOVEL_PROJECT_ROOT` 指向现有运行目录，产物不随安装位置迁移。
+
+无对白镜头仍进行 ASR 检查，发现意外说话；语音是否阻挡交付继续按小说及章节范围配置。
+
+早期上传/生成/下载 HTTP API、`novel-manga` 命令及旧整集控制器已移除。旧 shell 修复线的一次性接管入口也已退休；已有小说、人物库、视频、预算和任务历史保留。带日期的旧文档记录当时状态，当前操作以本 README 和架构说明为准。

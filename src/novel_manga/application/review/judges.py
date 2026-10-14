@@ -35,6 +35,49 @@ def judge_location_card(location: str, expected_time: str, view: Path, *, locati
     return model_client.ask_json(parts, review_contracts.LOCATION_CARD_SCHEMA, name="location_card", settings=judge_settings())
 
 
+def presentation_check(work_dir):
+    """Observe actual frame layout/body/space without a request explaining defects away."""
+    from novel_manga.util import read_json
+    rows=read_json(work_dir/'frame-evidence.json',{}).get('frames',[])
+    if not rows:
+        return None
+    parts=[]
+    for index,row in enumerate(rows,1):
+        parts.append({"type":"text","text":f"视频帧{index}，约{row['seconds']:.2f}秒"})
+        parts.append(model_client.image_part(Path(row['path']),review_contracts.FRAME_WIDTH))
+    parts.append({"type":"text","text":
+        "只描述这些实际视频帧的画面布局与明显身体/空间异常，不依据剧本或生成请求。"
+        "layout：single=同一镜头的完整画面；split=用硬分界线把两个独立相机画面并排或上下拼在同一帧；"
+        "collage=多块独立画面/参考卡拼图；uncertain=看不清。"
+        "请特别看整个画面是否有横向/竖向拼接边界、相同场景或人物同时在两块独立画面重复。"
+        "同一连续空间中的门窗、不同装修房间、镜子、手机屏幕、建筑柱子，以及镜头先后切换，不算分屏；"
+        "但同一街景在上下两块以白天/雨夜同时重复，是split，无须判断艺术意图。"
+        "body_scale：natural=人物比例正常或无人物；obvious_error=明显头身/肢体比例失常；uncertain=证据不足。"
+        "space_motion：natural=没有明确异常；obvious_error=明显穿模、断接、尺度/透视拼接或肢体运动异常；uncertain=无法判断。"
+        "近大远小、广角透视、裁切、遮挡与小幅动作变化不算异常。不根据抽帧臆测未出现的动作。"
+        "evidence写具体视频帧、分界位置或异常连接，不写修改指令。只输出JSON。"})
+    return model_client.ask_json(parts,review_contracts.PRESENTATION_SCHEMA,name="clip_presentation",max_tokens=500)
+
+
+def merge_presentation(verdict, observed):
+    if observed is None:
+        return verdict
+    result={**verdict,'presentation_check':observed}
+    if observed['layout'] in {'split','collage'}:
+        kind='split_view';instruction='保持一个完整的单相机画面，在同一画布中顺序切换镜头。'
+    elif observed['body_scale']=='obvious_error':
+        kind='proportion';instruction='人物头身、四肢与同场环境的尺度保持自然，透视关系连续。'
+    elif observed['space_motion']=='obvious_error':
+        kind='spatial';instruction='保持同一连续空间的透视和人物尺度，身体与物体连接自然。'
+    else:
+        kind=None
+    if kind:
+        result.update(severity='fail',visual_defects=True,visual_defect_kind=kind,
+                      defect_issue=observed['evidence'],reasonable_deviation=False,
+                      feedback=instruction)
+    return result
+
+
 def judge_clip(clip: dict, video: Path, bible: review_models_StoryBible, location_time: dict, hypothesis: str, work_dir: Path,
                *, cached_cast: dict | None = None, source_script=None, visor_states=None) -> dict:
     from novel_manga.application.packing.visor import recorded_clip_states
@@ -44,7 +87,8 @@ def judge_clip(clip: dict, video: Path, bible: review_models_StoryBible, locatio
     else:
         parts, evidence = review_evidence.collect_clip_evidence(clip, video, bible, work_dir)
         parts.append({"type": "text", "text": review_prompts.classic_prompt(clip, location_time, hypothesis, evidence)})
-        verdict = model_client.ask_json(parts, review_contracts.CLIP_SCHEMA, name="clip_review", max_tokens=600)
+        verdict = model_client.ask_json(parts, review_contracts.CLIP_SCHEMA, name="clip_review", max_tokens=1000)
+    verdict=merge_presentation(verdict,presentation_check(work_dir))
     # Frames miss what sits at the edge of the picture or turns up between them: when switched on, the whole take is
     # watched beside the cast's cards as well (cast_video.py).
     if cast_video.enabled():

@@ -27,7 +27,7 @@ def configure(root: Path, lane: str = 'h3', *, project: str = 'adventure') -> No
         'PHANROUTER_REFERENCE_ASSETS': '1' if lane == 'sd25' else '0',
         'PHANROUTER_INLINE_REFERENCE_IMAGES': '0' if lane == 'sd25' else '1',
         'PHANROUTER_ASSET_PUBLIC_BASE': channel.get('public_base', source.get('PHANROUTER_ASSET_PUBLIC_BASE', '')) if lane == 'sd25' else '',
-        'NOVEL_ASSET_PUBLISH_DIR': channel.get('publish_dir', services.get('asset_publish_dir', str(root/'outputs/.published'))),
+        'NOVEL_ASSET_PUBLISH_DIR': str((root / channel.get('publish_dir', services.get('asset_publish_dir', 'outputs/.published'))).resolve()),
     })
     # Reuse the existing shared LLM concurrency mechanism and H3 pool slot_dir.
     from novel_manga.llm.config import ENDPOINTS

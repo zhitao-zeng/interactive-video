@@ -166,6 +166,23 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
         source_before = read(directory/'chapter_script.json', {})
         notes_before = read(directory/'review_feedback.json', {})
         try:
+            # A repeated canvas layout can come from the actual reference sheet.
+            # Fix that input before spending another seed under the same limit.
+            from novel_manga.application.repair.reference_views import propose as reference_views_proposal
+            reference_proposal=reference_views_proposal(directory,clip,verdict)
+            if reference_proposal is not None:
+                updated=next(c for c in reference_proposal.plan['clips'] if c['clip_id']==cid)
+                check=agent.check_request(updated,directory.parent)
+                if not check.get('consistent') or check.get('problems'):
+                    raise ValueError('single-view reference input did not pass consistency check')
+                if read(directory/'clip_plan.json',{})!=plan or read(directory/'chapter_script.json',{})!=source_before:
+                    raise ValueError('episode inputs changed while selecting reference views')
+                publish_candidate(directory,reference_proposal,'reference_single_view',{cid})
+                changed.append(cid)
+                decisions[cid]={'at':time.strftime('%F %T'),'action':'reference_single_view','status':'prepared',
+                    'diagnosis':reference_proposal.changes,'inputs':before}
+                atomic_write_json(directory/'repair_routing.json',decisions)
+                continue
             decision = agent.propose(directory, clip, verdict)
             # Do not accept a proposal against a source changed while the sandbox was running.
             if (read(directory/'clip_plan.json', {}) != plan

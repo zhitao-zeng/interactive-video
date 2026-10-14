@@ -12,12 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def material(tmp_path):
     import json
     from PIL import Image
-    from novel_manga.interactive.suspense import suspense_material
-    data = suspense_material(ROOT)
-    data['script']['shots'] = data['script']['shots'][:1]
-    data['groups'] = [{'shot_indexes':[1], 'source_segment':'原镜头1'}]
-    data['source_seconds'] = data['script']['shots'][0]['duration_seconds']
-    data['voice_specs'] = {'沈序':{'sample_text':'先核对记录。','prompt':'成年男性','picture':'series_assets/characters/character_001/turnaround.jpeg'}}
+    data=json.loads((ROOT/'tests/fixtures/interactive/minimal-material.json').read_text())
     project = tmp_path/'approved-material'; project.mkdir()
     Image.new('RGB',(32,48),'gray').save(project/'identity.png')
     data['reference_images'] = [{'source':'identity.png','path':'series_assets/characters/character_001/turnaround.jpeg','scope':'identity_portrait'}]

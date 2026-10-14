@@ -19,3 +19,12 @@ def test_panel_is_large_and_sits_between_face_and_dialogue(tmp_path):
     assert int(style[18]) == 2
     assert 1920*.20 <= int(style[21]) <= 1920*.35
     assert '801 开门记录\\N01:52' in text
+
+
+def test_panel_placement_survives_observed_shot_timing():
+    events=evidence_events([{'index':2,'text':'证据','placement':'panel'}],
+        {'shots':[{'index':1,'duration_seconds':6},{'index':2,'duration_seconds':6}]},
+        {'clips':[{'clip_id':'clip_01','shot_indexes':[1,2]}]},
+        [{'unit_id':'clip_01','start':0,'end':12}],
+        shot_spans=[{'index':2,'start':8,'end':12}])
+    assert events==[{'text':'证据','placement':'panel','start':8,'end':12}]

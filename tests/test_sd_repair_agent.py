@@ -106,3 +106,14 @@ def test_rejected_same_input_does_not_restart_agent(monkeypatch,tmp_path,lane):
         again=managed.prepare_agent_batch(directory,['a'])
     assert first['blocked']==again['blocked']
     assert len(called)==1
+
+
+def test_sd_conversation_repairs_visuals_but_keeps_each_spoken_turn():
+    from novel_manga.interactive.conversation import compile_conversation_clip
+    from novel_manga.application.repair.sd_request import validate
+    from tests.test_romance_conversation import sample
+    c,s=sample();c=compile_conversation_clip(c,s,performance={'正常接话':'Respond naturally.'})
+    good=c['prompt'].replace('甲看桌面，乙示意杯子。丙静默听。','甲看桌面，乙轻轻示意杯子。丙静默听。')
+    validate(c,good)
+    with pytest.raises(ValueError):validate(c,good.replace('在桌上。','在椅子上。'))
+    with pytest.raises(ValueError):validate(c,good.replace('@图片1','@图片8'))

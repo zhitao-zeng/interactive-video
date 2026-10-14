@@ -110,3 +110,5 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | codex（光明76集正式验收接续） | 依用户2026-10-11指令核对身份协议收工状态、4并发推进已授权素材修复、800按稳定源顺序；599及shiri不动 | codex/guangming-acceptance-20261011；worktrees/guangming-acceptance-20261011 | 本会话runtime证据/驱动副本、原光明run_dir；不覆盖其他WIP、不重置计数额度 | 2026-10-11 | 进行中，预计随本轮有限批结束；identity-unification最新四章完整验证仍在途，446/473/648及800先挂起 |
 
 最终v28四章完整自动验证收口（2026-10-11）：107/115/244流程准备完成414.210/333.931/543.393秒，108场景复核上游502在296.889秒失败。无历史模型回复复用/作者hook/人工问题或补跑；运行中代码未改。独立源文/归档下游核对107聚焦通过，115核心ID/数量通过但seg8包在mentions有而主体资料缺项，244医生UNKNOWN/extra被误放行（原16/21/22同事件可证e005），所以四章自动验收未过。165实体/卡、57claims、25输入裁决全保留；本轮只实验/文档，无提交/推送/合并/切生产/媒体。证据目录.runtime/identity-unification-20261009/four-chapter-source-acceptance-20261010/four-chapter-fresh-final-v28-20261011/final-report.json；通用检索/复核与片段范围仍待修。
+
+|Codex integration|共用链路已合入main并同步本分支|suspense|保留本分支内容、运行配置与后续增量|main=0f49c49；共用3263测试和独立复核通过；无生成/推送。|
