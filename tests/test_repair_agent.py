@@ -111,6 +111,11 @@ def test_sandbox_exports_copies_and_requires_current_output(tmp_path,monkeypatch
         (work/'output/decision.json').write_text(json.dumps({'action':'retake','reason':'input correct','evidence':['input/take-1']}))
         return SimpleNamespace(ok=True,produced=['decision.json'],directory=work/'attempts/1')
     monkeypatch.setattr(agent,'run_agent',run)
+    def frames(directory,cid,video,target):
+        target.mkdir(parents=True)
+        frame=target/'frame_1.jpg';frame.write_bytes(b'fixture frame')
+        return [frame],'fixture'
+    monkeypatch.setattr(agent,'provided_frames',frames)
     decision=agent.propose(d,clips[0],review['a'],config=config)
     assert decision['action']=='retake'
 

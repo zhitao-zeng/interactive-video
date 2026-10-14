@@ -1,3 +1,11 @@
+# Independent interactive-video-studio
+
+This is an independent repository forked on 2026-10-12 from 440bfdf.
+Use docs/interactive-design.md and docs/interactive-progress.md for the current task.
+Current authorized romance task runs on codex/romance-sd25-continuity in this isolated worktree.
+The original studio/adventure workspace and its production media are read-only inputs for this task.
+Do not operate the parent novel production or inherited historical tasks.
+
 # Project instructions
 
 - Never store API keys in source, configuration examples, logs, or generated manifests.
@@ -15,3 +23,9 @@
 3. **小步快进**：分支活着就每天合一次 main，做完立刻回合。攒着不合的代价已付过（48 处冲突）。
 4. **别人的未提交改动 = 别人的工作**：不 reset、不覆盖、不代为提交；挡住你了就在在途板留言或问用户。
 5. **生产目录写归属**：`.runtime/` 和 `outputs/` 下新建的运行目录带一个 `owner` 说明（谁起的、在产还是实验）。
+
+## 用户最新职责约定（2026-10-14）
+
+本恋综任务的图像/成片复核和修复提案交给既有流程中的Agent。主会话负责协调、运行状态、代码接线和交付，不再自己逐镜看图、人工代写候选来替代Agent。用户本次已明确要求现有影片直接发送Mac并先不再人工复查；后续重新开启人工观片须有用户新指令。
+
+2026-10-14追加指令：用户授权流程Agent对当前19镜独立审片；失败镜头自动H3重生成并复审，通过后再合成发送Mac。主会话仍只负责运行、接线和交付，不自行逐帧复查；新授权覆盖前述本轮先不审片的临时安排。

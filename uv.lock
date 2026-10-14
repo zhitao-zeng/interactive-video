@@ -200,7 +200,7 @@ wheels = [
 ]
 
 [[package]]
-name = "novel-manga-video"
+name = "interactive-video-studio"
 version = "0.13.0"
 source = { editable = "." }
 dependencies = [

@@ -8,14 +8,12 @@ from novel_manga.application.configuration import RuntimePaths, config_for_novel
 from novel_manga.application.packing.context import compiler_options
 
 
-def test_registered_production_configuration_matches_original():
+def test_independent_studio_does_not_register_original_novel_jobs():
     root = Path(__file__).parents[1]
     pipeline = json.loads((root / 'configs/pipeline.json').read_text())
-    expected = json.loads((Path(__file__).parent / 'fixtures/runtime_config_before.json').read_text())
-    current = {n['id']: config_for_novel(pipeline, n['id'], root=root) for n in pipeline['novels']}
-    assert {name: {k: v for k, v in row.items() if k not in {'executor', 'agent', 'model_environment'}}
-            for name, row in current.items()} == expected
-    assert all(row['executor'] == 'standard' for row in current.values())
+    assert pipeline['novels'] == []
+    assert dashboard_novels(root) == []
+    assert set(pipeline['resources']['video_keys']) == {'h3pool', 'sd25'}
 
 
 def test_new_novel_uses_one_registration_for_dashboard_and_production(tmp_path):
@@ -94,3 +92,21 @@ def test_compiler_duration_options_follow_each_explicit_environment():
     assert (a.max_clip_seconds, a.max_stages, a.soft_cut_seconds) == (15, 3, 9)
     assert (b.max_clip_seconds, b.max_stages, b.soft_cut_seconds) == (30, 6, 18)
     assert compiler_options(environ={'NOVEL_CLIP_SECONDS_MAX': '15'}) == a
+
+
+def test_interactive_checks_follow_the_selected_available_endpoint(tmp_path, monkeypatch):
+    from unittest.mock import patch
+    from novel_manga.interactive import runtime
+    from novel_manga.application import configuration
+    (tmp_path/'configs').mkdir()
+    (tmp_path/'configs/interactive.json').write_text(json.dumps({'services':{'text_endpoint':'qwen-gpu52-current'},
+                                                              'production':{'h3_short_edge':768}}))
+    monkeypatch.setattr(runtime,'environment',lambda *a:{})
+    monkeypatch.setattr(configuration,'model_resources_environment',lambda *a:{})
+    with patch.dict(os.environ,{},clear=True):
+        runtime.configure(tmp_path,'h3',project='romance')
+        assert os.environ['NOVEL_H3_TRANSLATION_ENDPOINT']==os.environ['NOVEL_H3_REQUEST_CHECK_ENDPOINT']=='qwen-gpu52-current'
+        assert os.environ['SECOND_REVIEW_JUDGE']=='qwen-gpu52-current'
+        assert os.environ['NOVEL_H3_SHORT_EDGE']=='768'
+        assert h3_translation_endpoint().model=='Qwen3.8-27B'
+        assert not h3_translation_endpoint().stream

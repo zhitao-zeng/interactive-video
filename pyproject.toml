@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "novel-manga-video"
+name = "interactive-video-studio"
 version = "0.13.0"
-description = "Batch novel-to-manga video production, review and repair"
+description = "Interactive video production from external scripts and creative assets"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

@@ -15,9 +15,15 @@ vendor/
 .env
 .env.local
 inputs/
+/inputs
 .runtime/
 
 # local rollback copies made while patching
 *.bak-*
 
 .superpowers/
+
+models/
+assets/
+
+.venv

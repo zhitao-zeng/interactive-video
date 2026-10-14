@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+from novel_manga.review.verdicts import invalid_verdict_ids
 import novel_manga.llm.client as model_client
 from novel_manga.models.bible import StoryBible as review_models_StoryBible
 import novel_manga.review.contracts as review_contracts
@@ -91,7 +92,7 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
         try:
             # The very same file, not just the same path: split_long_stages renames clip directories, so after a
             # split the path names another clip's take - with its old mtime - and that clip's verdict landed on it.
-            same_take = (old and old.get("severity") != "review_error" and old.get("video") == str(video)
+            same_take = (old and not invalid_verdict_ids({clip_id: old}) and old.get("video") == str(video)
                     and take and old.get("take") == take
                     and (not cast_video.enabled() or
                          ((old.get('verify') or {}).get('cast_video') or {}).get('policy') == cast_video.POLICY))
@@ -118,6 +119,8 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
                           if same_take and (source_changed or speech_recovered or ledger_changed) else None)
                 options = {'cached_cast': cached} if cached and cast_video.enabled() else {}
                 verdict = review_judges.judge_clip(clip, video, bible, location_time, hypothesis, episode_dir / "work" / "review" / clip_id, **options)
+            if invalid_verdict_ids({clip_id: verdict}):
+                raise ValueError('review model returned no valid severity verdict')
         except Exception as error:  # noqa: BLE001 - a judge failure is reported, never fatal
             model_client.log(f"episode {episode_dir.name} {clip_id}: review error {type(error).__name__}: {str(error)[:120]}")
             report["clips"][clip_id] = {"video": str(video), "take": take, "severity": "review_error", "error": f"{type(error).__name__}: {str(error)[:300]}"}
@@ -128,6 +131,7 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
         if verdict.get("severity") == "fail":
             tier = review_policy.fix_tier(verdict, bible, rules)
             if (tier == "must_fix" and "scripted" not in verdict
+                    and verdict.get("visual_defect_kind") not in review_policy.PRESENTATION_KINDS
                     and not review_policy.count_mismatches(verdict.get("verify") or {})
                     and not (verdict.get("story_ok") is False and verdict.get("story_kind") in review_contracts.STORY_FATAL)):
                 check = review_judges.script_check(clip, verdict, segments)

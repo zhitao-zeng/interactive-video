@@ -4,32 +4,6 @@
   "round_gap_seconds": 120,
   "resources": {
     "video_keys": {
-      "sd25": {
-        "model": "sd2.5",
-        "key_var": "PHANROUTER_API_KEY",
-        "clip_cap": 30,
-        "pool": "",
-        "inflight_dir": "/mnt/disk1/zengzhitao/tmp/inflight/sd25",
-        "inflight": {
-          "min": 4,
-          "max": 56,
-          "start": 56
-        },
-        "parallel": 20
-      },
-      "sd20": {
-        "model": "sd2.0",
-        "key_var": "PHANROUTER_IMAGE_API_KEY",
-        "clip_cap": 15,
-        "pool": "sd20",
-        "inflight_dir": "/mnt/disk1/zengzhitao/tmp/inflight/sd20",
-        "inflight": {
-          "min": 4,
-          "max": 30,
-          "start": 16
-        },
-        "parallel": 6
-      },
       "h3pool": {
         "model": "minimax-h3-ref2va-turbo",
         "key_var": "",
@@ -45,65 +19,18 @@
         "parallel": 20,
         "note": "本地 H3 池（configs/h3_pool.json）：常驻实例 + 夜班 active 实例，按实例空位派活"
       },
-      "h3a": {
-        "model": "minimax-h3-ref2va-turbo",
-        "key_var": "",
-        "base_url": "http://172.28.4.52:30014",
-        "clip_cap": 15,
-        "pool": "h3a",
-        "inflight_dir": "/mnt/disk1/zengzhitao/tmp/inflight/h3a",
+      "sd25": {
+        "model": "sd2.5",
+        "key_var": "PHANROUTER_API_KEY",
+        "clip_cap": 30,
+        "pool": "",
+        "inflight_dir": "/mnt/disk1/zengzhitao/tmp/inflight/sd25",
         "inflight": {
-          "min": 1,
-          "max": 2,
-          "start": 1
+          "min": 4,
+          "max": 56,
+          "start": 56
         },
-        "parallel": 2,
-        "note": "GPU052 本地 H3 实例A，免费，单任务串行，960x544"
-      },
-      "h3b": {
-        "model": "minimax-h3-ref2va-turbo",
-        "key_var": "",
-        "base_url": "http://172.28.4.52:30016",
-        "clip_cap": 15,
-        "pool": "h3b",
-        "inflight_dir": "/mnt/disk1/zengzhitao/tmp/inflight/h3b",
-        "inflight": {
-          "min": 1,
-          "max": 2,
-          "start": 1
-        },
-        "parallel": 2,
-        "note": "GPU052 本地 H3 实例B，免费，单任务串行，960x544"
-      },
-      "h3c": {
-        "model": "minimax-h3-ref2va-turbo",
-        "key_var": "",
-        "base_url": "http://172.28.4.3:30020",
-        "clip_cap": 15,
-        "pool": "h3c",
-        "inflight_dir": "/mnt/disk1/zengzhitao/tmp/inflight/h3c",
-        "inflight": {
-          "min": 1,
-          "max": 2,
-          "start": 1
-        },
-        "parallel": 2,
-        "note": "GPU003 本地 H3，0-3 卡，免费，单任务串行，960x544"
-      },
-      "h3d": {
-        "model": "minimax-h3-ref2va-turbo",
-        "key_var": "",
-        "base_url": "http://172.28.4.3:30018",
-        "clip_cap": 15,
-        "pool": "h3d",
-        "inflight_dir": "/mnt/disk1/zengzhitao/tmp/inflight/h3d",
-        "inflight": {
-          "min": 1,
-          "max": 2,
-          "start": 1
-        },
-        "parallel": 2,
-        "note": "GPU003 本地 H3，5、6 卡，免费，单任务串行，960x544"
+        "parallel": 20
       }
     },
     "planning_models": {
@@ -215,171 +142,5 @@
       "clip_cap": 15
     }
   },
-  "novels": [
-    {
-      "id": "xinghai",
-      "title": "星海龙途",
-      "active": true,
-      "tmp_dir": "/mnt/disk1/zengzhitao/tmp/conductor-xinghai",
-      "render_keys": [
-        "h3pool"
-      ],
-      "planning": {
-        "phanthy-ds41": 1
-      },
-      "blocks_max": 0,
-      "blocks_min": 0,
-      "ranges": [
-        {
-          "chapters": "1-480",
-          "plan_mode": 30
-        },
-        {
-          "chapters": "481-800",
-          "plan_mode": 15
-        },
-        {
-          "chapters": "801-1200",
-          "plan_mode": 30
-        },
-        {
-          "chapters": "1201-1600",
-          "plan_mode": 30
-        }
-      ],
-      "plan_only": false,
-      "paused_keys": [
-        "sd20",
-        "sd25",
-        "h3a",
-        "h3b",
-        "h3c",
-        "h3d"
-      ],
-      "display_order": 1
-    },
-    {
-      "id": "wuyue",
-      "title": "雾月秘典",
-      "active": true,
-      "tmp_dir": "/mnt/disk1/zengzhitao/tmp/conductor-wuyue",
-      "render_keys": [],
-      "planning": {
-        "phanthy-ds41": 2
-      },
-      "blocks_max": 2,
-      "blocks_min": 1,
-      "ranges": [
-        {
-          "chapters": "1-2043",
-          "plan_mode": 15
-        }
-      ],
-      "paused_keys": [
-        "sd20",
-        "sd25",
-        "h3a",
-        "h3b",
-        "h3c",
-        "h3d"
-      ],
-      "plan_only": true,
-      "pending_render_keys": [
-        "h3pool"
-      ],
-      "display_order": 2,
-      "conductor_log": false
-    },
-    {
-      "id": "zhutian-card",
-      "title": "诸天万象录",
-      "active": true,
-      "plan_only": true,
-      "tmp_dir": "/mnt/disk1/zengzhitao/tmp/conductor",
-      "render_keys": [],
-      "planning": {},
-      "blocks_max": 4,
-      "blocks_min": 2,
-      "ranges": [
-        {
-          "chapters": "2001-3848",
-          "plan_mode": 15
-        }
-      ],
-      "paused_keys": [
-        "sd20",
-        "sd25",
-        "h3a",
-        "h3b",
-        "h3c",
-        "h3d"
-      ],
-      "pending_render_keys": [
-        "h3pool"
-      ],
-      "display_order": 0
-    },
-    {
-      "id": "shiri",
-      "title": "十日终焉",
-      "active": true,
-      "plan_only": false,
-      "stop_on_quota_exhausted": true,
-      "tmp_dir": "/mnt/disk1/zengzhitao/tmp/conductor-shiri",
-      "render_keys": [
-        "sd25"
-      ],
-      "planning": {
-        "phanthy-ds41": 3
-      },
-      "blocks_max": 3,
-      "blocks_min": 1,
-      "ranges": [
-        {
-          "chapters": "1-34",
-          "plan_mode": 30,
-          "min_seconds": 100
-        },
-        {
-          "chapters": "35-67",
-          "plan_mode": 30,
-          "min_seconds": 100
-        },
-        {
-          "chapters": "68-100",
-          "plan_mode": 30,
-          "min_seconds": 100
-        },
-        {
-          "chapters": "101-163",
-          "plan_mode": 30,
-          "min_seconds": 100
-        },
-        {
-          "chapters": "164-226",
-          "plan_mode": 30,
-          "min_seconds": 100
-        },
-        {
-          "chapters": "227-289",
-          "plan_mode": 30,
-          "min_seconds": 100
-        },
-        {
-          "chapters": "290-300",
-          "plan_mode": 30,
-          "min_seconds": 100
-        }
-      ],
-      "paused_keys": [
-        "sd20",
-        "h3a",
-        "h3b",
-        "h3c",
-        "h3d"
-      ],
-      "pending_render_keys": [],
-      "display_order": 3
-    }
-  ]
+  "novels": []
 }

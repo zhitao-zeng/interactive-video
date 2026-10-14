@@ -8,6 +8,22 @@ from . import contracts as review_contracts
 from novel_manga.models.bible import Character
 
 
+
+VIEWER_RULES = (
+    "\n审核重点：先看实际视频画面是否自然、是否有明显违和，分镜用于辅助理解，不作逐字复现验收。"
+    "重点检查：(1)人物头身或肢体比例明显失常，或同一人在帧间突然变形；"
+    "(2)单幅正常画面突然变成左右/上下分屏、重复双视图或参考卡拼图；"
+    "(3)人物与门、家具、地面或同场人物的尺度/透视明显不协调，像被贴上去；"
+    "(4)显著穿模、肢体连接或动作不自然。必须引用实际视频帧号/时间和可见特征，不能只引分镜差异。"
+    "判断比例要考虑景别、近大远小、广角和遮挡；近景裁切、过肩前景、镜子/手机屏幕、合理镜头切换不算分屏或比例错误。"
+    "角色卡本身有多个视图不表示视频可以变为角色卡拼图。即使实际生成请求误写了双视图或不合理比例，也不能因此放过实际违和。"
+    "有明确剧情理由且观看自然的对比/回忆呈现可以接受；仅仅请求写了split-screen不是剧情理由。"
+    "合理的机位、构图、动作方式、站位、背景细节偏差，只要人物仍可辨认、关键关系/因果能理解、画面自然，允许通过。"
+    "只有影响剧情理解的关键人物消失、动作对象/归属错乱、事件相反才构成剧情必修；不要为无影响的小动作未逐项复现要求重拍。"
+    "没有足够抽帧证据时写不确定/轻微，不臆断两帧之间的动作或瞬时缺陷。\n"
+)
+
+
 EVENT_LINE = re.compile(r"主要事件是(.+?)。\n")
 
 
@@ -77,7 +93,7 @@ def classic_prompt(clip: dict, location_time: dict, hypothesis: str, evidence: C
     elif chats and screen:
         chats += f"（群名「{screen.get('group_name', '')}」、发送者昵称和界面文字也允许出现）" if screen.get("group_name") else "（发送者昵称和界面文字也允许出现）"
     text = (
-        "这是一段动画短剧视频的抽帧，前面几张是本段人物的角色卡（身份依据）。\n" + "，".join(legend) + "。\n"
+        "这是一段短剧视频的抽帧，前面几张是本段人物的角色卡（身份依据）。\n" + "，".join(legend) + "。\n"
         f"本段设定：地点 {location}" + (f"（{expected_time}）" if expected_time else "") + f"；出场人物 {'、'.join(cast) or '无具名角色'}"
         + (f"；无参考图的配角（按描述画，他们在画面里不算多出的人）：{'、'.join(extras)}" if extras else "")
         + (f"；按分镜设计只露背影或不入镜的听者：{'、'.join(listeners)}（不在画面里不算缺席）" if listeners else "")
@@ -87,6 +103,7 @@ def classic_prompt(clip: dict, location_time: dict, hypothesis: str, evidence: C
         + story_block(clip, evidence.segments)
         + shot_contract(clip)
         + evidence.snapshot
+        + VIEWER_RULES
         + f"\n预期台词：{lines or '无'}\n语音识别出的台词：{hypothesis or '无'}\n"
         + (f"手机屏幕上应显示的群消息（这些文字允许出现）：{chats}\n" if chats else "")
         + "回答：visible_people 帧里清晰可见的人数（最多的一帧）；identity_ok 每个具名角色是否与其角色卡一致、没有两个角色长成同一人、没有角色被画成另一个角色的服装发型、近景里没有多出的具名角色（远处模糊背景里的人不算），不一致时在 identity_issue 写清是谁、哪一帧；"
@@ -98,8 +115,8 @@ def classic_prompt(clip: dict, location_time: dict, hypothesis: str, evidence: C
         "身份匹配的人物同时出现不是混淆。动作归属错误必须指出具体帧中实际的发起者和承受者，未覆盖动作的帧不能证明动作颠倒。"
         "ASR是辅助文字识别，专名同音或书写差异不能单独证明人物、动作或台词归属错误；"
         "location_ok 与 time_of_day_ok 是否符合地点和时间设定；text_or_watermark 画面是否出现手机屏幕聊天消息以外的文字、字幕、水印、Logo；"
-        "chat_text_ok：若本段有应显示的群消息，帧里手机屏幕上的文字是否是清晰的简体中文且内容与预期一致（允许只显示部分或截断，不允许乱码、错字连篇或无关文字），没有预期消息时填 true，不一致时在 chat_text_issue 写清；visual_defects 是否有明显崩坏（多手、面部扭曲、肢体错位、人物穿模）；"
-        "severity：identity 不一致、原文有动作的人物缺席或动作落在错误的人物身上、屏幕消息乱码或不符、文字水印或严重崩坏为 fail；仅地点时间存疑或轻微瑕疵为 minor；否则 pass。feedback 为一句给视频模型的修正指令（fail 时必填，指明谁应该长什么样、避免什么）。只输出JSON。"
+        "chat_text_ok：若本段有应显示的群消息，帧里手机屏幕上的文字是否是清晰的简体中文且内容与预期一致（允许只显示部分或截断，不允许乱码、错字连篇或无关文字），没有预期消息时填 true，不一致时在 chat_text_issue 写清；visual_defects 是否有上述明显违和；visual_defect_kind 填 proportion（明显比例）、split_view（无合理理由的分屏/双视图）、body_motion（结构/动作）、spatial（尺度透视/贴片感）、other 或 none；defect_issue 必须写具体视频帧/时间及看到了什么。合理或轻微偏差不填 visual_defects=true；reasonable_deviation 标记有偏差但观看合理且不影响关键人物/关系/因果的情况，deviation_note 简述偏差为何可接受，无偏差留空；"
+        "severity：上述明显视觉违和、主要人物身份明显错误、破坏剧情理解的关键事件/动作错误为 fail；轻微瑕疵、地点时间存疑、普通文字乱码只记 minor；合理分镜偏差为 pass，story_ok=true、story_kind=无问题；仅有文字或精确分镜差异不能判必修。feedback 为一句给视频模型的修正指令（fail 时必填，指明谁应该长什么样、避免什么）。只输出JSON。"
     )
     return text
 
@@ -114,7 +131,7 @@ def verify_prompt(clip: dict, location_time: dict, evidence: ClipEvidence) -> st
     legend = evidence.legend
     location = clip.get("location", ""); expected_time = location_time.get(location, "")
     lines = "；".join(f"{row.get('speaker_name') or '旁白'}：{row['text']}" for row in clip.get("lines", []))
-    text = ("这是一段动画短剧视频的抽帧。你是终审：判断一个没看过角色设定卡、顺着看剧的观众，看这一段会不会觉得画面不对劲。\n" + "，".join(legend) + "。\n"
+    text = ("这是一段短剧视频的抽帧。你是终审：判断一个没看过角色设定卡、顺着看剧的观众，看这一段会不会觉得画面不对劲。\n" + "，".join(legend) + "。\n"
             f"本段设定：地点 {location}" + (f"（{expected_time}）" if expected_time else "") + f"；出场人物 {'、'.join(cast) or '无具名角色'}"
             + (f"；无参考图的配角（按描述画，不算多出的人）：{'、'.join(extras)}" if extras else "")
             + (f"；按分镜只露背影或不入镜的听者：{'、'.join(listeners)}（不在画面里不算缺席）" if listeners else "")
@@ -127,6 +144,7 @@ def verify_prompt(clip: dict, location_time: dict, evidence: ClipEvidence) -> st
             + evidence.source_contract
             + f"\n预期台词：{lines or '无'}\n" + evidence.world
             + evidence.identity
+            + VIEWER_RULES
             + '\n验收尺度：当前原文、当前实际选用的阶段角色图优先于旧角色登记和历史判词。'
               '若旧文字性别/年龄与原文及当前图冲突，指出输入信息冲突，不要要求视频改成旧错误。'
               '不影响辨认人物和理解情节的色差、衣纹、发丝、轻微体型比例和背景装饰差异只记subtle；'

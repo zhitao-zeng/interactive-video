@@ -1,6 +1,7 @@
 """Content and technical outcomes, independent of files, models and scheduling."""
 from __future__ import annotations
 from dataclasses import dataclass
+from novel_manga.review.verdicts import invalid_verdict_ids
 
 
 @dataclass(frozen=True)
@@ -30,7 +31,7 @@ class EpisodeAcceptance:
 def evaluate_acceptance(planned, media, review, *, stale=False) -> EpisodeAcceptance:
     rows=review.get('clips') or {}
     missing=sorted(set(planned)-rows.keys())
-    errors=sorted(cid for cid,row in rows.items() if row.get('severity')=='review_error')
+    errors=invalid_verdict_ids(rows)
     content=bool(planned) and not media.get('failed_clips') and not media.get('gate_failed_clips') \
         and not review.get('feedback') and not missing and not errors and not stale
     technical=bool((media.get('assembly') or {}).get('thin_passed'))

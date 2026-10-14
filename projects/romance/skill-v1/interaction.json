@@ -1,0 +1,29 @@
+{
+  "id": "E01-shared-END",
+  "series_title": "心动未剪辑",
+  "question": "今晚十点，知意先做什么？",
+  "seconds": 3,
+  "theme": {
+    "background": "#F1ECE0",
+    "foreground": "#244B4C",
+    "secondary": "#9B7453"
+  },
+  "options": [
+    {
+      "id": "A",
+      "label": "去露台，问清过去",
+      "next": "第二集A线"
+    },
+    {
+      "id": "B",
+      "label": "去厨房，认识新人",
+      "next": "第二集B线"
+    },
+    {
+      "id": "C",
+      "label": "今晚独处，两张退回",
+      "next": "第二集C线"
+    }
+  ],
+  "selected": null
+}

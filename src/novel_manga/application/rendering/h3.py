@@ -137,6 +137,13 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
     if clip.get("prompt_h3_of") == stamp and clip.get("prompt_h3") and not request_issues(clip):
         return False
     stages = stages_of(prompt)
+    if not stages and clip.get('prompt_compiler') == 'romance_conversation_v1':
+        bindings = clip.get('dialogue_bindings', [])
+        if any(row.get('stage') != 1 for row in bindings):
+            return reject('FAILED: conversation dialogue must belong to its single authored take')
+        stages = [(prompt, [(row['speaker_name'], row['text'],
+                             row.get('delivery_mode') == 'offscreen_dialogue', row.get('emotion', ''))
+                            for row in bindings])]
     if not stages:
         return reject("FAILED: the Chinese prompt has no 【阶段】 block to translate")
     _, subject_of = subject_lines(clip)

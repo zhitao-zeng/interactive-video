@@ -15,7 +15,7 @@ def test_scope_recheck_rejects_pose_mislabeled_as_stable_appearance(monkeypatch)
                'subject_specific': True, 'relation': 'contradiction',
                'reason': '参考图站着，请求坐着；身份定义没有坐姿'}
     monkeypatch.setattr(request_check, 'ask_json', lambda *a, **k: {
-        'checks': [{'id': 0, 'scope': 'out_of_scope', 'reason': '角色参考不约束镜头坐站动作'}]})
+        'checks': [{'id': 0, 'scope': 'out_of_scope', 'relation': 'compatible', 'reason': '角色参考不约束镜头坐站动作'}]})
     lines = [('英文', 'Identity follows Picture 1.'), ('英文', 'The subject sits at the table.')]
     answer = request_check.recheck_scope({'findings': [finding]}, lines, [{'picture': 1, 'role': 'character'}])
     result = request_check.interpret(answer, lines, 1)
@@ -28,10 +28,37 @@ def test_scope_recheck_preserves_real_or_uncertain_input_conflicts(monkeypatch, 
     finding = {'basis': 'reference', 'aspect': 'appearance', 'picture': 1, 'lines': [1],
                'subject_specific': True, 'relation': 'contradiction', 'reason': '室内宿舍绑定室外街道'}
     monkeypatch.setattr(request_check, 'ask_json', lambda *a, **k: {
-        'checks': [{'id': 0, 'scope': scope, 'reason': '不是姿势问题，空间类型相反'}]})
+        'checks': [{'id': 0, 'scope': scope, 'relation': 'contradiction', 'reason': '不是姿势问题，空间类型相反'}]})
     answer = request_check.recheck_scope({'findings': [finding]}, [('英文', 'Interior dormitory.')],
                                        [{'picture': 1, 'role': 'location'}])
     assert request_check.interpret(answer, [('英文', 'Interior dormitory.')], 1)['consistent'] is False
+
+
+def test_scope_recheck_uses_exact_images_to_correct_invented_portrait_details(monkeypatch):
+    finding = {'basis': 'reference', 'aspect': 'appearance', 'picture': 1, 'lines': [1],
+               'subject_specific': True, 'relation': 'contradiction',
+               'reason': 'Portrait has long sleeves but request says short sleeves.'}
+    picture = {'type': 'image_url', 'image_url': {'url': 'data:image/jpeg;base64,test'}}
+    def ask(parts, *args, **kwargs):
+        assert picture in parts
+        return {'checks': [{'id': 0, 'scope': 'in_scope', 'relation': 'underspecified',
+                            'reason': 'Portrait ends at chest; neither sleeve cuff is visible.'}]}
+    monkeypatch.setattr(request_check, 'ask_json', ask)
+    answer = request_check.recheck_scope({'findings': [finding]}, [('英文', 'Short sleeves.')],
+        [{'picture': 1, 'role': 'character', 'reference_scope': 'identity_portrait'}], images=[picture])
+    assert request_check.interpret(answer, [('英文', 'Short sleeves.')], 1)['consistent']
+    assert finding['relation'] == 'contradiction'
+    assert answer['scope_check']['checks'][0]['relation'] == 'underspecified'
+
+
+def test_grounding_recheck_keeps_uncertain_facts_blocked(monkeypatch):
+    finding = {'basis': 'reference', 'aspect': 'appearance', 'picture': 1, 'lines': [1],
+               'subject_specific': True, 'relation': 'contradiction', 'reason': 'Outfit conflict.'}
+    monkeypatch.setattr(request_check, 'ask_json', lambda *a, **k: {'checks': [
+        {'id': 0, 'scope': 'uncertain', 'relation': 'uncertain', 'reason': 'Image unclear.'}]})
+    answer = request_check.recheck_scope({'findings': [finding]}, [('英文', 'Red coat.')],
+                                         [{'picture': 1, 'role': 'character'}])
+    assert not request_check.interpret(answer, [('英文', 'Red coat.')], 1)['consistent']
 
 
 def fixture(tmp_path):

@@ -66,6 +66,14 @@ def compact(value: str, limit: int | None = None) -> str:
         return text[: limit - 1] + "…"
     return text
 
+
+def prompt_text(value: str, limit: int | None = None) -> str:
+    """Normalize prose whitespace without joining English words together."""
+    text = re.sub(r"\s+", " ", value or "").strip().strip("；。")
+    if limit is not None and len(text) > limit:
+        return text[:limit - 1] + "…"
+    return text
+
 def is_title_card(shot: dict) -> bool:
     return all(turn["delivery_mode"] == "title_card" for turn in shot["turns"])
 
@@ -462,8 +470,8 @@ class ClipCompiler:
         shots = clip["shots"]
         cast_text = "、".join(cast) if cast else "无具名人物"
         # a part cut from a long stage before its event has none; its opening picture is where it starts
-        start = self.compact(shots[0]["motion_prompt"] or shots[0].get("visual_prompt", ""), 30)
-        end = self.compact(shots[-1]["end_state"], 30)
+        start = prompt_text(shots[0]["motion_prompt"] or shots[0].get("visual_prompt", ""), 30)
+        end = prompt_text(shots[-1]["end_state"], 30)
         # A clip that ends on an earlier part of a cut stage has no end of its own to arrive at.
         span = f"从“{start}”到“{end}”" if end else f"“{start}”"
         lines = [
@@ -501,11 +509,11 @@ class ClipCompiler:
             label = STAGE_LABELS[index]
             posture = posture_phrase(shot)
             if index == 0:
-                head = f"{shot['shot_scale']}开场。开始时：{self.compact(shot['visual_prompt'])}"
+                head = f"{shot['shot_scale']}开场。开始时：{prompt_text(shot['visual_prompt'])}"
             elif shot.get('scene_id'):
-                head = f"剪辑切至{shot['shot_scale']}。本镜起点：{self.compact(shot['visual_prompt'])}"
+                head = f"剪辑切至{shot['shot_scale']}。本镜起点：{prompt_text(shot['visual_prompt'])}"
             else:
-                head = f"切至{shot['shot_scale']}。本镜起点：{self.compact(shot['visual_prompt'])}"
+                head = f"切至{shot['shot_scale']}。本镜起点：{prompt_text(shot['visual_prompt'])}"
             # An authored sheet is a cut somebody made and has no story-time column; the local scene
             # method writes one.  Only say the time when there is one, rather than require every
             # directed path to invent a field so the sentence can be printed.
@@ -514,7 +522,7 @@ class ClipCompiler:
             if posture:
                 head += f"。人物姿态：{posture}"
             def carried(field: str, label: str) -> str:
-                value = self.compact(shot.get(field, ""))
+                value = prompt_text(shot.get(field, ""))
                 if not value:
                     return ""
                 return f"{label}：{value}。"
@@ -546,12 +554,12 @@ class ClipCompiler:
             blocking = ('' if listeners or 'in_frame' in shot else blocking_note(shot))
             # A part cut from a long stage, after its event, has no event of its own: say nothing
             # rather than 主要事件：。
-            stage_event = self.compact(shot['motion_prompt'])
+            stage_event = prompt_text(shot['motion_prompt'])
             lines.append(
                 f"【阶段{label}·{shot['shot_scale']}】{head}。{witness}{source_light}{('主要事件：' + stage_event + '。') if stage_event else ''}"
                 f"{('入镜：' + ('、'.join(shot.get('in_frame', shot['characters'])) or '无具名人物') + '。') if shot.get('scene_id') or 'in_frame' in shot else blocking}{extras_note}{props_note}{local_objects}{wears_note}{listen_note}"
                 f"{self.screen_clause(shot)}声音：{self._sound_clause(shot)}。"
-                + (f"结束时：{self.compact(shot['end_state'])}。" if self.compact(shot['end_state']) else "")
+                + (f"结束时：{prompt_text(shot['end_state'])}。" if self.compact(shot['end_state']) else "")
             )
         scales = "、".join(dict.fromkeys(shot["shot_scale"] for shot in shots))
         ambience = list(dict.fromkeys(cue.strip() for shot in shots if shot.get("sfx")

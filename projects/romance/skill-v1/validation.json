@@ -1,0 +1,14 @@
+{
+  "source_alignment": "63 of 63",
+  "dialogue_changes": 11,
+  "all_references_resolve": true,
+  "groups": 16,
+  "planned_body_seconds": 183,
+  "planned_total_seconds": 186,
+  "interaction": "three original options; selected=null",
+  "generation_submissions": 0,
+  "limitations": [
+    "No final request compilation",
+    "No new media or audiovisual acceptance"
+  ]
+}

@@ -1,0 +1,390 @@
+{
+  "source": "心动未剪辑",
+  "lang": "zh",
+  "style": "photographic",
+  "summary": "四位成年嘉宾来到海边小屋参加七天恋综。许知意希望重新认识自己的选择，陆屿与她轻松聊上，宋乔主动约了陆屿喝咖啡。最后入场的周叙是知意两年前分手的前任。首夜的两张邀请将由观众决定先如何回应。",
+  "characters": [
+    {
+      "id": "C01",
+      "name": "许知意",
+      "importance": "protagonist",
+      "aliases": [],
+      "oneLiner": "会接住玩笑，也在练习不替别人掩饰失望。",
+      "persona": {
+        "gender": "女",
+        "ageRange": "28岁（剧本已定）",
+        "identity": "自由插画师；当代中国海边城市生活背景（地域为设计补全）",
+        "appearance": "本次外观设计补全（推断）：166厘米，匀称纤细；柔和椭圆脸、深棕杏眼、偏平柔眉、圆润鼻尖、豆沙唇。深咖肩长发，角色自身左侧偏分，发尾内扣，无刘海。象牙白开衫与白圆领内搭、深青直筒中长裙、象牙白平底鞋；双耳小金圆钉，无项链戒指。开衫袖口轻挽至前臂。",
+        "personality": [
+          "幽默",
+          "敏感",
+          "克制",
+          "正在变得直接"
+        ],
+        "temperament": "能接住轻松的话题；不安时说话更礼貌、更短。",
+        "motivation": "确认自己想怎样恋爱，同时保有自己的职业计划。",
+        "arc": "从维持体面、替别人补解释，到明确表达自己的欲望与条件；可以复合、开始新关系，也可以独自离开。",
+        "relationships": [
+          {
+            "name": "周叙",
+            "relation": "两年前分手的前任"
+          },
+          {
+            "name": "陆屿",
+            "relation": "初次见面产生好奇"
+          },
+          {
+            "name": "宋乔",
+            "relation": "同住女嘉宾，可坦率交流"
+          }
+        ],
+        "evidence": [
+          "现在只记得一条：有话直说，别让我猜。"
+        ]
+      },
+      "image": {
+        "style": "真人影视写实；自然肤质、统一中性色彩",
+        "prompt": "Photorealistic live-action casting photography, anatomically grounded adult proportions, natural skin texture, restrained editorial color grading. A 28-year-old East Asian Chinese woman in contemporary coastal China. Height 166 cm, balanced slender build, gentle oval face, almond-shaped dark brown eyes, soft straight eyebrows, rounded natural nose tip, muted rose medium lips. Shoulder-length dark espresso hair parted on her left, inward ends, no bangs. Open ivory fine-knit cardigan with lightly pushed-up cuffs, white crew-neck tee, dark teal straight mid-calf skirt, ivory flats, paired tiny round gold studs. Approachable expression with natural facial asymmetry. Three-quarter bust portrait on a neutral studio background, soft natural key light.",
+        "promptLocal": "本次外观设计补全（推断）：166厘米，匀称纤细；柔和椭圆脸、深棕杏眼、偏平柔眉、圆润鼻尖、豆沙唇。深咖肩长发，角色自身左侧偏分，发尾内扣，无刘海。象牙白开衫与白圆领内搭、深青直筒中长裙、象牙白平底鞋；双耳小金圆钉，无项链戒指。开衫袖口轻挽至前臂。",
+        "negativePrompt": "illustration, anime, painterly brush strokes, waxy skin, over-smoothed complexion, identical faces, altered age, extra jewelry, celebrity likeness, malformed hands, extra fingers, cropped feet, text, logos, watermark",
+        "tags": [
+          "photographic",
+          "live-action",
+          "character sheet",
+          "natural skin",
+          "wardrobe continuity"
+        ],
+        "sheet": "Photorealistic live-action casting photography, anatomically grounded adult proportions, natural skin texture, restrained editorial color grading. A 28-year-old East Asian Chinese woman in contemporary coastal China. Height 166 cm, balanced slender build, gentle oval face, almond-shaped dark brown eyes, soft straight eyebrows, rounded natural nose tip, muted rose medium lips. Shoulder-length dark espresso hair parted on her left, inward ends, no bangs. Open ivory fine-knit cardigan with lightly pushed-up cuffs, white crew-neck tee, dark teal straight mid-calf skirt, ivory flats, paired tiny round gold studs. Approachable expression with natural facial asymmetry. ONE 16:9 landscape canvas, pure white background and thin hairline rules. LEFT ZONE about 34% of the canvas width: one straight-on head-and-shoulders portrait, both shoulders complete, the sole facial identity reference. RIGHT-TOP ZONE: three equal-height full-body front, left profile and back views on one baseline, all exactly the same individual. RIGHT-BOTTOM ZONE: four small close-ups of garment texture, hair, footwear and any fixed accessory. PROPORTIONS ARE CRITICAL: natural adult proportions and full feet, no compressed legs; the detail studies give way, not the figures. All views match the portrait. No text or names. LIGHTING IN THE LEFT ZONE ONLY: soft directional daylight. LIGHTING IN THE RIGHT ZONES: flat even orthographic lighting with minimal cast shadows."
+      },
+      "voice": {
+        "timbre": "温暖清晰的女中音，轻微气声",
+        "pitch": "中音区",
+        "pace": "自然，句尾留短停顿",
+        "accent": "标准普通话",
+        "emotion": "放松而有分寸",
+        "referenceHint": "成熟女性日常对话的清晰口吻（设计补全）",
+        "prompt": "Adult female, late twenties, warm clear mezzo voice, middle register, light breathiness and balanced chest resonance. Moderate conversational pace, gentle phrase endings, medium-low volume. Standard Mandarin. Calm, approachable baseline."
+      },
+      "continuity": {
+        "heightCm": 166,
+        "identityVersion": "v1",
+        "anchors": [
+          "柔和椭圆脸＋深棕杏眼",
+          "深咖肩长发＋自身左偏分＋无刘海",
+          "白开衫／白内搭／深青中长裙",
+          "双耳小金圆钉；无项链、戒指",
+          "166厘米；平底鞋；自然成年比例"
+        ],
+        "wardrobeId": "C01-W01",
+        "wardrobe": "象牙白开衫＋白圆领T恤＋深青中长裙＋象牙白平底鞋",
+        "palette": "#F1E8DA / #214A50",
+        "masterImage": "images/许知意-sheet.png",
+        "referenceStatus": "已生成并人工目视核对",
+        "provenance": "年龄职业沿用剧本；脸型、身高、头发、衣装和音色为本次创作设计补全。",
+        "allowedChanges": [
+          "表情",
+          "视线",
+          "姿势",
+          "镜头景别",
+          "符合场景的光照"
+        ],
+        "forbiddenChanges": [
+          "年龄或脸型改变",
+          "发色长度与分缝镜像",
+          "同场无理由换衣",
+          "首饰增减或左右颠倒",
+          "身高排序改变"
+        ]
+      }
+    },
+    {
+      "id": "C02",
+      "name": "周叙",
+      "importance": "major",
+      "aliases": [],
+      "oneLiner": "曾把安排当成负责，这次需要先听别人说完。",
+      "persona": {
+        "gender": "男",
+        "ageRange": "31岁（剧本已定）",
+        "identity": "建筑师；当代中国都市职业背景",
+        "appearance": "本次外观设计补全（推断）：184厘米，肩宽而不夸张；长方脸、清晰下颌、平直浓眉、深棕窄眼。黑色短发，自身左侧分，鬓角整齐，无胡须。炭灰敞穿衬衫式外套、浅石灰圆领T恤、灰褐直筒裤、黑皮乐福鞋；左腕银色圆盘钢带表，无戒指眼镜。",
+        "personality": [
+          "克制",
+          "有条理",
+          "回避冲突",
+          "正在学习倾听"
+        ],
+        "temperament": "语速不快，停顿比别人长，不用压低到不自然的低音。",
+        "motivation": "交代失约，并争取重新了解对方的机会。",
+        "arc": "从擅自安排两个人的未来，到承认隐瞒职业决定、失约的责任；学会提供可兑现的选择，并接受她拒绝。",
+        "relationships": [
+          {
+            "name": "许知意",
+            "relation": "想修复旧关系，但尚未得到接受"
+          },
+          {
+            "name": "陆屿",
+            "relation": "同场嘉宾，存在追求上的竞争"
+          },
+          {
+            "name": "宋乔",
+            "relation": "同住嘉宾"
+          }
+        ],
+        "evidence": [
+          "以前觉得，事情做完再解释，也来得及。"
+        ]
+      },
+      "image": {
+        "style": "真人影视写实；自然肤质、统一中性色彩",
+        "prompt": "Photorealistic live-action casting photography, anatomically grounded adult proportions, natural skin texture, restrained editorial color grading. A 31-year-old East Asian Chinese male architect in contemporary coastal China. Tall 184 cm frame, broad shoulders, lean adult torso, elongated rectangular face, angular jaw, straight dense brows, narrow deep brown eyes, straight nose and restrained thin-medium lips. Neat short black hair with his left side part, clean shaven. Charcoal unstructured pointed-collar overshirt open over a light stone-gray crew-neck tee, taupe straight trousers and black leather loafers. Plain silver round analog watch on his LEFT wrist only. Reserved still expression. Three-quarter bust portrait on a neutral studio background, soft natural key light.",
+        "promptLocal": "本次外观设计补全（推断）：184厘米，肩宽而不夸张；长方脸、清晰下颌、平直浓眉、深棕窄眼。黑色短发，自身左侧分，鬓角整齐，无胡须。炭灰敞穿衬衫式外套、浅石灰圆领T恤、灰褐直筒裤、黑皮乐福鞋；左腕银色圆盘钢带表，无戒指眼镜。",
+        "negativePrompt": "illustration, anime, painterly brush strokes, waxy skin, over-smoothed complexion, identical faces, altered age, extra jewelry, celebrity likeness, malformed hands, extra fingers, cropped feet, text, logos, watermark",
+        "tags": [
+          "photographic",
+          "live-action",
+          "character sheet",
+          "natural skin",
+          "wardrobe continuity"
+        ],
+        "sheet": "Photorealistic live-action casting photography, anatomically grounded adult proportions, natural skin texture, restrained editorial color grading. A 31-year-old East Asian Chinese male architect in contemporary coastal China. Tall 184 cm frame, broad shoulders, lean adult torso, elongated rectangular face, angular jaw, straight dense brows, narrow deep brown eyes, straight nose and restrained thin-medium lips. Neat short black hair with his left side part, clean shaven. Charcoal unstructured pointed-collar overshirt open over a light stone-gray crew-neck tee, taupe straight trousers and black leather loafers. Plain silver round analog watch on his LEFT wrist only. Reserved still expression. ONE 16:9 landscape canvas, pure white background and thin hairline rules. LEFT ZONE about 34% of the canvas width: one straight-on head-and-shoulders portrait, both shoulders complete, the sole facial identity reference. RIGHT-TOP ZONE: three equal-height full-body front, left profile and back views on one baseline, all exactly the same individual. RIGHT-BOTTOM ZONE: four small close-ups of garment texture, hair, footwear and any fixed accessory. PROPORTIONS ARE CRITICAL: natural adult proportions and full feet, no compressed legs; the detail studies give way, not the figures. All views match the portrait. No text or names. LIGHTING IN THE LEFT ZONE ONLY: soft directional daylight. LIGHTING IN THE RIGHT ZONES: flat even orthographic lighting with minimal cast shadows."
+      },
+      "voice": {
+        "timbre": "干净、偏干的男中低音，胸腔共鸣明确",
+        "pitch": "中低音区",
+        "pace": "偏缓，起句果断，停顿较长",
+        "accent": "标准普通话",
+        "emotion": "克制平稳",
+        "referenceHint": "三十岁职场男性的平静语气，不模仿真人（设计补全）",
+        "prompt": "Male aged thirty-one, dry clean baritone, lower-middle pitch, grounded chest resonance, limited breathiness. Deliberate measured rhythm, clear consonants, longer silent pauses, restrained dynamics. Neutral Mandarin pronunciation. Reserved composure."
+      },
+      "continuity": {
+        "heightCm": 184,
+        "identityVersion": "v1",
+        "anchors": [
+          "长方脸＋直浓眉＋清晰下颌",
+          "黑短发＋自身左侧分；无胡须",
+          "炭灰外套／浅石灰内搭／灰褐裤",
+          "银色圆盘钢带表只在左腕",
+          "184厘米；四人中最高"
+        ],
+        "wardrobeId": "C02-W01",
+        "wardrobe": "炭灰敞穿外套＋浅石灰T恤＋灰褐长裤＋黑乐福鞋；左腕银表",
+        "palette": "#454647 / #A79E91",
+        "masterImage": "images/周叙-sheet.png",
+        "referenceStatus": "已生成并人工目视核对",
+        "provenance": "年龄职业沿用剧本；脸型、身高、头发、衣装和音色为本次创作设计补全。",
+        "allowedChanges": [
+          "表情",
+          "视线",
+          "姿势",
+          "镜头景别",
+          "符合场景的光照"
+        ],
+        "forbiddenChanges": [
+          "年龄或脸型改变",
+          "发色长度与分缝镜像",
+          "同场无理由换衣",
+          "首饰增减或左右颠倒",
+          "身高排序改变"
+        ],
+        "wardrobeVariants": [
+          {
+            "id": "C02-W01-OFF",
+            "use": "第一集第4场前采",
+            "changes": "脱下炭灰外套放在画面外；浅石灰T恤、灰褐裤、黑鞋、左腕银表不变。",
+            "imageStatus": "已生成角色与场景合成验证图；未进行视频测试",
+            "referenceImage": "images/周叙-前采一致性验证.png"
+          }
+        ]
+      }
+    },
+    {
+      "id": "C03",
+      "name": "陆屿",
+      "importance": "major",
+      "aliases": [],
+      "oneLiner": "用玩笑靠近别人，也需要被认真回应。",
+      "persona": {
+        "gender": "男",
+        "ageRange": "27岁（剧本已定）",
+        "identity": "独立书店合伙人；当代中国海边城市生活背景（地域为设计补全）",
+        "appearance": "本次外观设计补全（推断）：180厘米，放松修长体型；长椭圆脸、圆润下颌、较圆深棕眼、较宽嘴角。深棕短卷发，碎刘海自然散落额前。浅橄榄短袖敞衬衫、白圆领内搭、米白直筒牛仔裤、砂棕低帮鞋；无手表、眼镜及首饰。",
+        "personality": [
+          "坦率",
+          "幽默",
+          "略紧张",
+          "需要回应"
+        ],
+        "temperament": "先用玩笑找共同话题，认真时收起笑意。",
+        "motivation": "建立有来有往的关系，不无限等待。",
+        "arc": "从用轻松和玩笑回避失落，到直接说出需要；不会无限等待，也不会用体贴索取亲密。",
+        "relationships": [
+          {
+            "name": "许知意",
+            "relation": "想继续认识，已发出首夜邀请"
+          },
+          {
+            "name": "宋乔",
+            "relation": "已接受次日八点的咖啡约"
+          },
+          {
+            "name": "周叙",
+            "relation": "刚得知他与知意的过去"
+          }
+        ],
+        "evidence": [
+          "我平时对着书说，它们不太搭理我。"
+        ]
+      },
+      "image": {
+        "style": "真人影视写实；自然肤质、统一中性色彩",
+        "prompt": "Photorealistic live-action casting photography, anatomically grounded adult proportions, natural skin texture, restrained editorial color grading. A contemporary East Asian Chinese man aged 27 living in a coastal Chinese city. Height 180 cm, relaxed lean silhouette, long oval face, softly rounded jaw, lively rounded dark-brown eyes, gently arched brows, medium rounded-tip nose and broad expressive mouth. Tousled short dark-brown wavy hair with loose uneven fringe over the forehead. Open light-olive cotton short-sleeve camp-collar shirt layered over a white crewneck, off-white straight denim trousers, sand-brown suede low-top sneakers. Bare wrists and ears, no glasses. A small unforced smile. Three-quarter bust portrait on a neutral studio background, soft natural key light.",
+        "promptLocal": "本次外观设计补全（推断）：180厘米，放松修长体型；长椭圆脸、圆润下颌、较圆深棕眼、较宽嘴角。深棕短卷发，碎刘海自然散落额前。浅橄榄短袖敞衬衫、白圆领内搭、米白直筒牛仔裤、砂棕低帮鞋；无手表、眼镜及首饰。",
+        "negativePrompt": "illustration, anime, painterly brush strokes, waxy skin, over-smoothed complexion, identical faces, altered age, extra jewelry, celebrity likeness, malformed hands, extra fingers, cropped feet, text, logos, watermark",
+        "tags": [
+          "photographic",
+          "live-action",
+          "character sheet",
+          "natural skin",
+          "wardrobe continuity"
+        ],
+        "sheet": "Photorealistic live-action casting photography, anatomically grounded adult proportions, natural skin texture, restrained editorial color grading. A contemporary East Asian Chinese man aged 27 living in a coastal Chinese city. Height 180 cm, relaxed lean silhouette, long oval face, softly rounded jaw, lively rounded dark-brown eyes, gently arched brows, medium rounded-tip nose and broad expressive mouth. Tousled short dark-brown wavy hair with loose uneven fringe over the forehead. Open light-olive cotton short-sleeve camp-collar shirt layered over a white crewneck, off-white straight denim trousers, sand-brown suede low-top sneakers. Bare wrists and ears, no glasses. A small unforced smile. ONE 16:9 landscape canvas, pure white background and thin hairline rules. LEFT ZONE about 34% of the canvas width: one straight-on head-and-shoulders portrait, both shoulders complete, the sole facial identity reference. RIGHT-TOP ZONE: three equal-height full-body front, left profile and back views on one baseline, all exactly the same individual. RIGHT-BOTTOM ZONE: four small close-ups of garment texture, hair, footwear and any fixed accessory. PROPORTIONS ARE CRITICAL: natural adult proportions and full feet, no compressed legs; the detail studies give way, not the figures. All views match the portrait. No text or names. LIGHTING IN THE LEFT ZONE ONLY: soft directional daylight. LIGHTING IN THE RIGHT ZONES: flat even orthographic lighting with minimal cast shadows."
+      },
+      "voice": {
+        "timbre": "明亮自然的男中音，口腔共鸣偏前",
+        "pitch": "中音偏高",
+        "pace": "较轻快，短句衔接自然",
+        "accent": "标准普通话",
+        "emotion": "轻松、略带笑意",
+        "referenceHint": "二十多岁青年自然聊天，避免播音腔（设计补全）",
+        "prompt": "27-year-old man, bright conversational tenor-baritone, forward oral resonance, flexible medium-high register. Brisk short phrases with buoyant inflection and audible natural breaths, moderate loudness. Clear everyday Mandarin. Easygoing energy."
+      },
+      "continuity": {
+        "heightCm": 180,
+        "identityVersion": "v1",
+        "anchors": [
+          "长椭圆脸＋柔下颌＋较圆眼睛",
+          "深棕短卷发＋碎刘海；不变成背头",
+          "橄榄短袖外衫／白内搭／米白长裤",
+          "无手表、项链、耳饰、眼镜",
+          "180厘米；放松站姿"
+        ],
+        "wardrobeId": "C03-W01",
+        "wardrobe": "浅橄榄短袖开领衬衫＋白T恤＋米白牛仔裤＋砂棕低帮鞋",
+        "palette": "#81856B / #EEECE2",
+        "masterImage": "images/陆屿-sheet.png",
+        "referenceStatus": "已生成并人工目视核对",
+        "provenance": "年龄职业沿用剧本；脸型、身高、头发、衣装和音色为本次创作设计补全。",
+        "allowedChanges": [
+          "表情",
+          "视线",
+          "姿势",
+          "镜头景别",
+          "符合场景的光照"
+        ],
+        "forbiddenChanges": [
+          "年龄或脸型改变",
+          "发色长度与分缝镜像",
+          "同场无理由换衣",
+          "首饰增减或左右颠倒",
+          "身高排序改变"
+        ]
+      }
+    },
+    {
+      "id": "C04",
+      "name": "宋乔",
+      "importance": "supporting",
+      "aliases": [],
+      "oneLiner": "喜欢会主动说，也会明确收回没有回应的邀请。",
+      "persona": {
+        "gender": "女",
+        "ageRange": "29岁（剧本已定）",
+        "identity": "陶艺工作室主理人；当代中国都市职业背景",
+        "appearance": "本次外观设计补全（推断）：169厘米，挺拔匀称；心形脸、明显颧骨、略上挑深棕眼、轮廓清晰的唇。乌黑齐下巴短直波波头，中分，两侧别耳后。焦糖棕高圆领无袖针织上衣、象牙白高腰阔腿裤、棕皮乐福鞋；双耳小金圈，无其他饰品。",
+        "personality": [
+          "直接",
+          "主动",
+          "清醒",
+          "在意回应"
+        ],
+        "temperament": "说话明确，玩笑里有自己的边界，不扮刻薄女配。",
+        "motivation": "认真约会，不以牺牲工作和自尊换结果。",
+        "arc": "从把主动当作必须有结果的投入，到坦然确认或结束关系；可以与知意竞争而不互相羞辱，有独立的工作和离开选项。",
+        "relationships": [
+          {
+            "name": "陆屿",
+            "relation": "主动邀约，次日八点喝咖啡"
+          },
+          {
+            "name": "许知意",
+            "relation": "同住嘉宾，可以竞争也可以交朋友"
+          },
+          {
+            "name": "周叙",
+            "relation": "刚认识，已得知前任身份"
+          }
+        ],
+        "evidence": [
+          "先别谈生意。我是来约会的。"
+        ]
+      },
+      "image": {
+        "style": "真人影视写实；自然肤质、统一中性色彩",
+        "prompt": "Photorealistic live-action casting photography, anatomically grounded adult proportions, natural skin texture, restrained editorial color grading. An adult East Asian Chinese woman aged 29, contemporary coastal Chinese setting, height 169 cm and upright athletic-slim posture. Heart-shaped face, defined cheekbones, gently tapered chin, slightly lifted dark-brown eyes, assertive straight brows, straight nose bridge and full outlined terracotta lips. Sleek jet-black chin-length blunt bob, CENTER part, sides tucked behind ears. Caramel sleeveless fine-knit high-round-neck top, ivory high-waisted wide-leg trousers, medium-brown leather loafers, tiny gold hoop earrings. No bangs, necklaces, bracelets or rings. Direct composed gaze. Three-quarter bust portrait on a neutral studio background, soft natural key light.",
+        "promptLocal": "本次外观设计补全（推断）：169厘米，挺拔匀称；心形脸、明显颧骨、略上挑深棕眼、轮廓清晰的唇。乌黑齐下巴短直波波头，中分，两侧别耳后。焦糖棕高圆领无袖针织上衣、象牙白高腰阔腿裤、棕皮乐福鞋；双耳小金圈，无其他饰品。",
+        "negativePrompt": "illustration, anime, painterly brush strokes, waxy skin, over-smoothed complexion, identical faces, altered age, extra jewelry, celebrity likeness, malformed hands, extra fingers, cropped feet, text, logos, watermark",
+        "tags": [
+          "photographic",
+          "live-action",
+          "character sheet",
+          "natural skin",
+          "wardrobe continuity"
+        ],
+        "sheet": "Photorealistic live-action casting photography, anatomically grounded adult proportions, natural skin texture, restrained editorial color grading. An adult East Asian Chinese woman aged 29, contemporary coastal Chinese setting, height 169 cm and upright athletic-slim posture. Heart-shaped face, defined cheekbones, gently tapered chin, slightly lifted dark-brown eyes, assertive straight brows, straight nose bridge and full outlined terracotta lips. Sleek jet-black chin-length blunt bob, CENTER part, sides tucked behind ears. Caramel sleeveless fine-knit high-round-neck top, ivory high-waisted wide-leg trousers, medium-brown leather loafers, tiny gold hoop earrings. No bangs, necklaces, bracelets or rings. Direct composed gaze. ONE 16:9 landscape canvas, pure white background and thin hairline rules. LEFT ZONE about 34% of the canvas width: one straight-on head-and-shoulders portrait, both shoulders complete, the sole facial identity reference. RIGHT-TOP ZONE: three equal-height full-body front, left profile and back views on one baseline, all exactly the same individual. RIGHT-BOTTOM ZONE: four small close-ups of garment texture, hair, footwear and any fixed accessory. PROPORTIONS ARE CRITICAL: natural adult proportions and full feet, no compressed legs; the detail studies give way, not the figures. All views match the portrait. No text or names. LIGHTING IN THE LEFT ZONE ONLY: soft directional daylight. LIGHTING IN THE RIGHT ZONES: flat even orthographic lighting with minimal cast shadows."
+      },
+      "voice": {
+        "timbre": "利落略带颗粒的女中音，共鸣结实",
+        "pitch": "中低女音区",
+        "pace": "中速偏快，收尾干净",
+        "accent": "标准普通话",
+        "emotion": "自信、直接",
+        "referenceHint": "工作室主理人式的清楚表达，不采用气泡音（设计补全）",
+        "prompt": "Woman of twenty-nine, firm textured alto, low-mid female pitch, solid supported resonance, crisp articulation. Steady quick cadence, decisive falling endings, minimal airy leakage, clear medium volume. Standard Mandarin accent. Confident relaxed tone."
+      },
+      "continuity": {
+        "heightCm": 169,
+        "identityVersion": "v1",
+        "anchors": [
+          "心形脸＋明确颧骨＋略上挑眼",
+          "黑色齐下巴直波波头＋中分",
+          "焦糖无袖上衣／象牙白阔腿裤",
+          "双耳小金圈；不换成知意的金圆钉",
+          "169厘米；挺拔站姿"
+        ],
+        "wardrobeId": "C04-W01",
+        "wardrobe": "焦糖无袖针织上衣＋象牙白高腰阔腿裤＋棕乐福鞋；小金圈",
+        "palette": "#A76D43 / #F1ECE0",
+        "masterImage": "images/宋乔-sheet.png",
+        "referenceStatus": "已生成并人工目视核对",
+        "provenance": "年龄职业沿用剧本；脸型、身高、头发、衣装和音色为本次创作设计补全。",
+        "allowedChanges": [
+          "表情",
+          "视线",
+          "姿势",
+          "镜头景别",
+          "符合场景的光照"
+        ],
+        "forbiddenChanges": [
+          "年龄或脸型改变",
+          "发色长度与分缝镜像",
+          "同场无理由换衣",
+          "首饰增减或左右颠倒",
+          "身高排序改变"
+        ],
+        "hairTolerance": "母图为下颌以下约1—2厘米的齐短发；以母图发尾为准，不变为齐肩长发。"
+      }
+    }
+  ]
+}
