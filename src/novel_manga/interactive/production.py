@@ -88,6 +88,8 @@ def run_episode(root: Path, lane: str, *, project: str = 'adventure', resume_uns
     episode=novel/(novel.name+'_1')
     runner=runner_for(root,novel,lane,project=project)
     report_path=episode/'thin_media_report.json'
+    label=edition.removeprefix(project+'-') if edition else lane
+    destination=root/f'delivery/{project}/{label}'
     # A completed attempt is inspected/exported, never silently given a new take budget.
     retry = resume_unsubmitted and report_path.is_file()
     if retry:
@@ -113,9 +115,9 @@ def run_episode(root: Path, lane: str, *, project: str = 'adventure', resume_uns
             if failed:raise RuntimeError(f'H3 translation not ready: {failed}')
             runner=runner_for(root,novel,lane,project=project)
         from novel_manga.interactive.agent import run
-        report=run(runner,lane,resume=resume)
-    from novel_manga.interactive.delivery import deliver
-    label=edition.removeprefix(project+'-') if edition else lane
-    receipt=deliver(runner,report,root/f'delivery/{project}/{label}')
+        report=run(runner,lane,resume=resume,destination=destination)
+    from novel_manga.interactive.delivery import deliver, finish_reviewed_delivery
+    receipt=(finish_reviewed_delivery(runner,report,destination)
+             if report.get('final_cut_review') else deliver(runner,report,destination))
     print(json.dumps(receipt,ensure_ascii=False,indent=2),flush=True)
     return receipt

@@ -178,8 +178,12 @@ def deliver(runner, report: dict, destination: Path) -> dict:
     _card(card,interaction,ctx.settings.font_path,ctx.settings.width,ctx.settings.height)
     tail=destination/'interaction.mp4'
     tail_audio=['-f','lavfi','-i','anullsrc=r=48000:cl=stereo']
+    ambience_source=None
     if interaction.get('ambience_shot_index'):
         start,length=ambience_window(interaction['ambience_shot_index'],ctx.script,ctx.clip_plan,assembly.get('timeline',[]))
+        ambience_source={'start':start,'end':start+length,
+                         'clip_id':next(c['clip_id'] for c in ctx.clip_plan['clips']
+                                        if interaction['ambience_shot_index'] in c.get('shot_indexes',[]))}
         ambient=destination/'interaction-ambience.wav'
         run(['ffmpeg','-y','-v','error','-ss',str(start),'-i',str(body),'-t',str(length),
              '-vn','-ar','48000','-ac','2','-c:a','pcm_s16le',str(ambient)])
@@ -188,14 +192,21 @@ def deliver(runner, report: dict, destination: Path) -> dict:
          *tail_audio,'-t','3','-r','25',
          '-c:v','libx264','-preset','fast','-crf','19','-pix_fmt','yuv420p','-c:a','aac','-b:a','192k',str(tail)])
     final=destination/'episode01.mp4'
+    packaging=policy.get('packaging') or {}
+    watermark=packaging.get('watermark')
+    if watermark:(destination/'watermark.txt').write_text(watermark['text'])
     # Trim audio padding at each join so the card occupies exactly the final 75 frames.
     body_info=json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0',
                          '-show_streams','-of','json',str(body)],text=True))['streams'][0]
     body_seconds=video_seconds(body_info)
-    run(['ffmpeg','-y','-v','error','-threads','4','-i',str(body),'-i',str(tail),
-         '-filter_complex',f'[0:v]setpts=PTS-STARTPTS[v0];[0:a]atrim=0:{body_seconds},asetpts=PTS-STARTPTS[a0];'
+    graph=(f'[0:v]setpts=PTS-STARTPTS[v0];[0:a]atrim=0:{body_seconds},asetpts=PTS-STARTPTS[a0];'
                           '[1:v]trim=duration=3,setpts=PTS-STARTPTS[v1];[1:a]atrim=duration=3,asetpts=PTS-STARTPTS[a1];'
-                          '[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]',
+                          f'[v0][a0][v1][a1]concat=n=2:v=1:a=1[{"plain" if watermark else "v"}][a]')
+    if watermark:
+        graph+=f';[plain]drawtext=fontfile={watermark["fontfile"]}:textfile={destination/"watermark.txt"}:'
+        graph+=':'.join(f'{k}={watermark[k]}' for k in ('fontsize','fontcolor','borderw','bordercolor','x','y'))+'[v]'
+    run(['ffmpeg','-y','-v','error','-threads','4','-i',str(body),'-i',str(tail),
+         '-filter_complex',graph,
          '-map','[v]','-map','[a]','-c:v','libx264','-preset','fast','-crf','19','-r','25','-pix_fmt','yuv420p',
          '-c:a','aac','-ar','48000','-ac','2','-b:a','192k','-movflags','+faststart',str(final)])
     run(['ffmpeg','-y','-v','error','-i',str(final),'-vn','-c:a','pcm_s16le',str(destination/'episode_audio.wav')])
@@ -205,6 +216,7 @@ def deliver(runner, report: dict, destination: Path) -> dict:
         run(['ffmpeg','-y','-v','error','-i',str(ass),str(destination/'subtitles.srt')])
     cover=Path(assembly.get('cover',''))
     if cover.is_file():shutil.copy2(cover,destination/'cover.jpeg')
+    if packaging.get('cover'):shutil.copy2(packaging['cover'],destination/'cover.jpeg')
     decode=subprocess.run(['ffmpeg','-v','error','-i',str(final),'-f','null','-'],capture_output=True,text=True)
     info=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(final)],text=True))
     video=next(s for s in info['streams'] if s['codec_type']=='video')
@@ -219,14 +231,14 @@ def deliver(runner, report: dict, destination: Path) -> dict:
              'production_media_passed':assembly.get('thin_passed',False),
              'production_media_issues':[k for k,v in (assembly.get('media_qc') or {}).get('checks',{}).items()
                                         if isinstance(v,dict) and v.get('passed') is False],
-             'interaction':{**interaction,**interaction_window(body_seconds)},'evidence_events':events,
+             'interaction':{**interaction,**interaction_window(body_seconds)},'ambience_source':ambience_source,'evidence_events':events,
              'planned_body_seconds':planned_body,'actual_body_seconds':body_seconds,
              'body_duration_delta':round(body_seconds-planned_body,3),'interaction_frames':75,
              'review_errors':review_errors,
              'overlay_timing':'authored timing scaled to actual compiled clip spans',
              'audio':'native mixed episode audio, not isolated vocals',
              'delivery_policy':{'extra_visual_overlays':extra_overlays,'dialogue_subtitles':True,'interaction_card':True},
-             'source_report':str(ctx.episode_dir/'thin_media_report.json')}
+             'source_report':str(ctx.episode_dir/'thin_media_report.json'),'packaging':packaging}
     if not extra_overlays:
         receipt['overlay_timing']='disabled by user; dialogue subtitles and interaction card retained'
         receipt['audio_level_processing']=False
@@ -251,5 +263,65 @@ def deliver(runner, report: dict, destination: Path) -> dict:
         receipt['status']='candidate'
         receipt['final_evidence_review_pending']=True
     atomic_write_json(destination/'interactions.json',receipt['interaction'])
+    atomic_write_json(destination/'delivery.json',receipt)
+    return receipt
+
+
+def reviewed_delivery(runner,report,destination):
+    """Export the actual captions/card first; return its failures to the shared loop."""
+    from novel_manga.application.review.final_cut import review_assembly
+    from novel_manga.util import read_json
+    destination=Path(destination)
+    pending={**report,'quality_review':{**report.get('quality_review',{}),'passed':False}}
+    inputs=export_context(runner,report)
+    receipt=read_json(destination/'delivery.json',{})
+    if receipt.get('export_context')!=inputs or not Path(receipt.get('final_video','')).is_file():
+        versions=destination/'versions';versions.mkdir(parents=True,exist_ok=True)
+        version=versions/f'export-{len(list(versions.glob("export-*")))+1:03d}'
+        receipt=deliver(runner,pending,version)
+        receipt['export_context']=inputs
+    if not receipt.get('final_video'):
+        return {'movie':str(Path(destination)/'episode01.mp4'),'complete':False,'passed':False,
+                'issues':[],'frames':[],'errors':['No current assembled movie available for delivered review']}
+    final=review_assembly(runner,report,receipt=receipt)
+    receipt.update(final_cut_review_passed=final.get('passed') is True,
+                   content_review_status='completed' if final.get('complete') else 'incomplete',
+                   final_cut_review=str(runner.context.episode_dir/'final_cut_review.json'))
+    atomic_write_json(Path(destination)/'delivery.json',receipt)
+    atomic_write_json(Path(destination)/'final-cut-review.json',final)
+    return final
+
+
+def export_context(runner,report):
+    """Reuse a movie only while its assembly, captions and packaging inputs agree."""
+    from novel_manga.application.review.final_cut import context
+    from novel_manga.review.storage import take_identity
+    from novel_manga.util import read_json
+    ctx=runner.context
+    inputs=context(ctx.episode_dir,report,(report.get('assembly') or {}).get('final_video',''))
+    inputs.pop('native_judgments',None)
+    inputs['assembly']=report.get('assembly')
+    inputs['delivery_inputs']={name:read_json(ctx.episode_dir/name,{}) for name in
+                              ('interaction.json','delivery_policy.json','overlays.json','evidence_surfaces.json')}
+    inputs['captions']=take_identity(Path((report.get('assembly') or {}).get('ass','')))
+    inputs['frame']=[ctx.settings.width,ctx.settings.height,str(ctx.settings.font_path)]
+    return inputs
+
+
+def finish_reviewed_delivery(runner,report,destination):
+    """Close the receipt for the exact reviewed movie without encoding it again."""
+    from novel_manga.application.review.final_cut import current
+    from novel_manga.util import read_json
+    destination=Path(destination);receipt=read_json(destination/'delivery.json',{})
+    final=report.get('final_cut_review') or {}
+    valid=(receipt.get('export_context')==export_context(runner,report)
+           and receipt.get('final_video')==final.get('movie')
+           and current(runner.context.episode_dir,report,final)
+           and final.get('complete') is True and final.get('passed') is True
+           and not final.get('issues') and not final.get('errors'))
+    receipt['content_passed']=bool(valid and report.get('quality_review',{}).get('content_passed'))
+    receipt['final_cut_review_passed']=bool(valid)
+    receipt['status']=delivery_status(report,receipt.get('technical_passed') is True) if valid else 'candidate'
+    if final.get('complete'):receipt['final_evidence_review_pending']=False
     atomic_write_json(destination/'delivery.json',receipt)
     return receipt

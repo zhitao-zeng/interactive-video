@@ -112,3 +112,8 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 最终v28四章完整自动验证收口（2026-10-11）：107/115/244流程准备完成414.210/333.931/543.393秒，108场景复核上游502在296.889秒失败。无历史模型回复复用/作者hook/人工问题或补跑；运行中代码未改。独立源文/归档下游核对107聚焦通过，115核心ID/数量通过但seg8包在mentions有而主体资料缺项，244医生UNKNOWN/extra被误放行（原16/21/22同事件可证e005），所以四章自动验收未过。165实体/卡、57claims、25输入裁决全保留；本轮只实验/文档，无提交/推送/合并/切生产/媒体。证据目录.runtime/identity-unification-20261009/four-chapter-source-acceptance-20261010/four-chapter-fresh-final-v28-20261011/final-report.json；通用检索/复核与片段范围仍待修。
 
 |Codex integration|共用链路已合入main并同步本分支|suspense|保留本分支内容、运行配置与后续增量|main=018e392；共用3263测试和独立复核通过，本分支3276完整测试通过；保留内容增量，无生成/推送。|
+|Codex shared integration|用户授权共用链路整合及同步三内容分支|codex/feat/shared-pipeline|本worktree src/tests/config/CLI；内容快照已保存|已完成：main共用3263项回归及独立复核通过，修复已同步三个内容分支，三边完整回归通过；荒野后续增量保留，无生成/改服务/推送。|
+
+| codex /root/backrooms_audio | 用户授权后室成片后期故障：空证据面回落普通字卡，非空证据流程保留 | codex/feat/shared-pipeline / interactive-video-worktrees/shared-pipeline | src/novel_manga/interactive/delivery.py、tests/test_interactive_delivery.py；无材料/视频/全局QC改动 | 2026-10-14 | 已完成：空[]/{}／surfaces=[]修复，15项目标回归及全量3269通过；fa2fc29已本地提交并快进main、回合悬疑b5ee0d8。悬疑现有影片重导出实际4字卡恢复，25fps/4837帧/音轨封装复制/解码验证完成，无新增H3次数。恋综与荒野存在其他会话未提交WIP，按branch-workflow暂不合并；所属会话可在WIP安顿后merge main或采用fa2fc29。未推送/部署。 |
+
+| codex /root/backrooms_audio | 用户批准闭环一：Agent候选校验拒绝后最多3份候选有界反馈重提 | codex/feat/shared-pipeline / interactive-video-worktrees/shared-pipeline | application/repair/{agent,managed}.py、对应tests、skills/video-repair/SKILL.md；不碰reviewed/execution/final_cut | 2026-10-14 | 已完成：带候选的精确校验拒绝回传、最多3份候选/逐份审计；stop/源或终审证据变化/服务失败/额度耗尽停止。终审global帧/邻界图复制进sandbox并先核对，缺必需帧不盲调；既有输入策略自然失效旧blocked。新增17项有意义回归及相关128项通过，diff检查通过；原3次视频/每次600秒/全部历史保留，无模型/生成/部署/提交合并。root统一集成/全量/小说同步及实拍验证待做 |
