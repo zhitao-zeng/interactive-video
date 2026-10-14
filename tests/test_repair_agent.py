@@ -85,7 +85,7 @@ def test_rejected_agent_candidate_does_not_write_or_charge_and_other_clip_procee
         'action':'edit','reason':'fix','evidence':['input/prompt.txt'],
         'prompt':clip['prompt_h3'].replace('stands by','stands calmly by')})
     monkeypatch.setattr(request_check,'request_consistency',lambda c,*a,**k:{
-        'consistent':c['clip_id']=='b','problems':['still wrong']})
+        'consistent':c['clip_id']=='b','problems':[] if c['clip_id']=='b' else ['still wrong']})
     result=managed.prepare(d)
     after=json.loads((d/'clip_plan.json').read_text())['clips']
     assert result['changed']==['b'] and 'a' in result['blocked']
@@ -111,6 +111,11 @@ def test_sandbox_exports_copies_and_requires_current_output(tmp_path,monkeypatch
         (work/'output/decision.json').write_text(json.dumps({'action':'retake','reason':'input correct','evidence':['input/take-1']}))
         return SimpleNamespace(ok=True,produced=['decision.json'],directory=work/'attempts/1')
     monkeypatch.setattr(agent,'run_agent',run)
+    def frames(directory,cid,video,target):
+        target.mkdir(parents=True)
+        frame=target/'frame_1.jpg';frame.write_bytes(b'fixture frame')
+        return [frame],'fixture'
+    monkeypatch.setattr(agent,'provided_frames',frames)
     decision=agent.propose(d,clips[0],review['a'],config=config)
     assert decision['action']=='retake'
 

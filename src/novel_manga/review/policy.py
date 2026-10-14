@@ -18,6 +18,9 @@ MISSING = re.compile(r"(?<!特征)(?<!道具)缺失|(?<!设定中)(?<!设定里)
                      r"|(?<!设定中)(?<!设定里)没有出现|未出场")
 
 
+PRESENTATION_KINDS = {"proportion", "split_view", "body_motion", "spatial"}
+
+
 LEAD_ROLES = {"主角", "女主角", "男主角"}
 
 
@@ -32,6 +35,10 @@ def fix_tier(verdict: dict, bible: review_models_StoryBible, rules: ReviewRules 
     broken body, a lead with the wrong face, or a speaking character who is not
     there; a side character's shirt colour or a garbled phone screen they do not."""
     rules = rules or ReviewRules()
+    if verdict.get("visual_defects") and verdict.get("visual_defect_kind") in PRESENTATION_KINDS:
+        return "must_fix"  # faulty authored/request layout cannot excuse an obvious picture defect
+    if verdict.get("reasonable_deviation") and not verdict.get("visual_defects") and verdict.get("identity_ok") is not False:
+        return "ignore"  # a harmless alternative shot is not a retake request
     if count_mismatches(verdict.get('verify') or {}):
         return 'must_fix'  # ranges already account for the scripted empty suit/cropping
     if verdict.get("story_ok") is False and verdict.get("story_kind") in STORY_FATAL:
@@ -74,6 +81,8 @@ def compose_feedback(verdict: dict, clip: dict | None = None, manifest: dict | N
 
     clip and manifest are accepted so a caller can pass them; they are unused on purpose.
     """
+    if verdict.get("visual_defects") and verdict.get("visual_defect_kind") in PRESENTATION_KINDS and verdict.get("feedback"):
+        return str(verdict["feedback"]).strip()
     parts = []
     if verdict.get("story_ok") is False and verdict.get("story_kind") in STORY_FATAL and verdict.get("story_issue"):
         # What to draw, not what was wrong: the judge's feedback is written as an instruction (who must be in frame,
@@ -127,6 +136,7 @@ def verify_to_verdict(answer: dict) -> dict:
         "location_ok": None, "time_of_day_ok": None, "location_issue": "",
         "text_or_watermark": bool(answer.get("ghost_text")),
         "chat_text_ok": None, "chat_text_issue": "",
+        **({key:answer[key] for key in ("visual_defect_kind", "reasonable_deviation", "deviation_note") if key in answer}),
         "visual_defects": True if flags.get("body_artifact") else None, "defect_issue": ("身体结构异常待复核：" + evidence) if flags.get("body_artifact") else evidence if obvious and not any(flags.values()) else "",
         "story_ok": False if story_error else None,
         "story_kind": story_kind,

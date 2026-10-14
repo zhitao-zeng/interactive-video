@@ -74,6 +74,7 @@ def test_provider_auto_publishes_before_the_probe(tmp_path, monkeypatch):
             return R()
 
         def post(self, url, **kw):
+            assert kw['headers'] == {'i': '1'}  # the existing asset group belongs to the image account
             class R:
                 status_code = 200
                 text = ""

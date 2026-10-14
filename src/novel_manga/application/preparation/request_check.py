@@ -7,8 +7,12 @@ from novel_manga.application.configuration import h3_request_check_endpoint
 from novel_manga.llm.client import ask_json, image_part, obj
 from novel_manga.util import read_json, atomic_write_json
 
-POLICY = 'request-reference-v8-scene-roles'
+POLICY = 'request-reference-v10-grounded-conflict-recheck'
 STABLE_ASPECTS = {'identity', 'appearance', 'wearing', 'object'}
+
+
+def reference_scope(path):
+    return read_json(Path(path).with_suffix(Path(path).suffix + '.origin.json'), {}).get('reference_scope', '')
 SCHEMA = obj({'observations': {'type': 'array', 'items': {'type': 'string', 'maxLength': 240}},
               'findings': {'type': 'array', 'items': obj({
                   'basis': {'type': 'string', 'enum': ['reference', 'request']},
@@ -49,15 +53,23 @@ def interpret(answer, lines, picture_count, *, references=()):
             'problems': problems, 'findings': answer['findings'], 'out_of_scope': ignored}
 
 
-def recheck_scope(answer, lines, legend):
-    """Verify what a reported conflict compares before treating its labels as authoritative."""
+def recheck_scope(answer, lines, legend, *, images=()):
+    """Recheck reported conflicts against the submitted evidence, not inferred picture details."""
     candidates = [(i, row) for i, row in enumerate(answer.get('findings', []))
                   if row.get('relation') == 'contradiction']
     if not candidates:
         return answer
-    prompt = ('复核输入检查器报告的冲突范围，不重新判断图片内容，也不审查尚未生成的视频。'
+    prompt = ('复核输入检查器报告的冲突范围和事实依据。使用本次附带的同一批实际参考图，'
+              '不要把第一轮reason中的图片描述当成已证实事实，也不审查尚未生成的视频。'
+              '只复核列出的findings，不增加新的检查项。图号与图例一一对应。'
+              '每项同时返回scope及relation；只有两项可见或明确给出的当前事实不能同时成立才是contradiction。'
+              '图中部位未展示、细节看不清、描述未指定该部件属性是underspecified；可同时成立是compatible。'
+              '无法确定则uncertain，不能把不确定当成已证实不冲突。'
+              '例如裁到胸口的肖像不能证明袖口长度或手表颜色；银色表壳与深色表带可以同时成立。'
               '报告的aspect/basis标签可能标错，必须依据reason描述的两项事实和原始请求行重新判断。'
               '角色参考只提供稳定身份、身体结构和服装设计；站坐、手部姿势、手中临时道具、背景、'
+              '图例reference_scope=identity_portrait表示来源提供的是身份肖像，不是全身服饰清单；'
+              '只约束身份及实际可见部位的设计，未展示的身体部位/背部装备由当前固定角色设定补充，不能从未展示推断不存在。'
               '没有正在抽烟或喝酒，都不能限制导演安排的新动作。角色图站着而分镜坐着是out_of_scope，'
               '不是appearance冲突；图里没有临时手持道具不等于导演不能让角色拿起它。'
               '普通场景参考图提供地形、建筑和固定结构，不是成片的全量物体清单或带人物的起始帧。'
@@ -72,12 +84,14 @@ def recheck_scope(answer, lines, legend):
                             'findings': [{'id': i, **row} for i, row in candidates]}, ensure_ascii=False))
     schema = obj({'checks': {'type': 'array', 'items': obj({
         'id': {'type': 'integer'}, 'scope': {'type': 'string', 'enum': ['in_scope', 'out_of_scope', 'uncertain']},
+        'relation': {'type': 'string', 'enum': ['contradiction', 'underspecified', 'compatible', 'uncertain']},
         'reason': {'type': 'string', 'maxLength': 240}})}})
     try:
-        checked = ask_json([{'type': 'text', 'text': prompt}], schema,
+        checked = ask_json([*images, {'type': 'text', 'text': prompt}], schema,
             name='request_conflict_scope', max_tokens=1200, timeout=180, settings=h3_request_check_endpoint())
         rows = checked.get('checks') or []
-        if len(rows) != len(candidates) or {r.get('id') for r in rows} != {i for i, _ in candidates}:
+        if (len(rows) != len(candidates) or {r.get('id') for r in rows} != {i for i, _ in candidates}
+                or any(r.get('relation') not in {'contradiction', 'underspecified', 'compatible', 'uncertain'} for r in rows)):
             return {**answer, 'scope_check': {'error': 'incomplete scope recheck'}}
     except Exception as error:
         return {**answer, 'scope_check': {'error': type(error).__name__}}
@@ -86,6 +100,8 @@ def recheck_scope(answer, lines, legend):
     for row in rows:
         if row['scope'] == 'out_of_scope':
             revised['findings'][row['id']]['scope_recheck'] = 'out_of_scope'
+        if row['scope'] == 'in_scope' and row['relation'] != 'uncertain':
+            revised['findings'][row['id']]['relation'] = row['relation']
     revised['scope_check'] = checked
     return revised
 
@@ -100,7 +116,8 @@ def request_consistency(clip: dict, novel_dir: Path, *, request=None) -> dict:
         ref = metadata[i - 1] if i <= len(metadata) else {}
         parts.append(image_part(path, 1024))
         legend.append({'picture': i, 'name': ref.get('name'), 'role': ref.get('role'),
-                       'view': ref.get('view'), 'wearers': ref.get('wearers', [])})
+                       'view': ref.get('view'), 'wearers': ref.get('wearers', []),
+                       'reference_scope': reference_scope(path)})
     english = str(request['prompt'] if request is not None else clip.get('prompt_h3', ''))
     # These are explicit compiler-owned style/metadata fields, not character instructions. The
     # actual generation request stays untouched. A generic "fabric surfaces" style sentence
@@ -112,6 +129,10 @@ def request_consistency(clip: dict, novel_dir: Path, *, request=None) -> dict:
     prompt = ('核对实际即将发给视频模型的请求与参考图，不评价尚未生成的视频，不改台词。'
               '最终英文是实际执行的画面和声音要求，中文仅提供剧情和身份背景；不要用过期的中文机位/状态否定已确认的英文修正。'
               '先在observations逐图记录可见的衣物款式、主色、配饰、物件类型，再比较本镜文字。'
+              '图例reference_scope=identity_portrait是来源指定的身份肖像，不是全身服饰清单；'
+              '它约束脸、头发、年龄和实际可见部位的设计，未展示的身体部位和装备依照请求中的固定角色设定。'
+              '不能因为局部肖像未展示背部或下身装备就认定该装备不存在，也不要求先增加穿戴动作；'
+              '实际可见衣物的颜色、款式明确冲突仍须报告。'
               '角色的稳定外观以实际角色参考为准；本镜具体衣物、主色、配饰要求与图中事实明确不兼容且没有换装情节时，才是输入冲突。'
               '有明确穿戴关系和对应装备参考时可覆盖基础衣物；明确的穿脱、面罩开合按本镜事件执行，'
               '不能把参考卡上的坐站、机位、面罩默认状态强加给视频；头部被裁切不算缺脸。'
@@ -149,7 +170,7 @@ def request_consistency(clip: dict, novel_dir: Path, *, request=None) -> dict:
     schema['properties']['findings']['items']['properties']['picture']['maximum'] = len(paths)
     answer = ask_json(parts, schema, name='repair_request_consistency', max_tokens=1600,
                       settings=h3_request_check_endpoint())
-    answer = recheck_scope(answer, lines, legend)
+    answer = recheck_scope(answer, lines, legend, images=parts[:-1])
     result = interpret(answer, lines, len(paths), references=legend)
     if 'scope_check' in answer:
         result['scope_check'] = answer['scope_check']
@@ -162,6 +183,9 @@ def cached_consistency(novel_dir, work, clip, request, *, require_cached=False):
               'references': request['references'], 'reference_sha256': request.get('reference_sha256'),
               'roles': [{k: r.get(k) for k in ('name', 'role', 'view', 'wearers')}
                         for r in clip.get('references', []) if r.get('role') != 'voice']}
+    scopes=[reference_scope(p) for p in request['references']]
+    if any(scopes):
+        inputs['reference_scopes']=scopes
     path = work / 'request_checks' / (clip['clip_id'] + '.json')
     saved = read_json(path, {})
     answer = saved.get('answer') if saved.get('inputs') == inputs else None
@@ -171,7 +195,8 @@ def cached_consistency(novel_dir, work, clip, request, *, require_cached=False):
     if (answer is None and old_inputs.get('policy') in {'request-reference-v1', 'request-reference-v2-scoped-evidence',
                                                      'request-reference-v3-scoped-evidence',
                                                      'request-reference-v4-current-input-only', 'request-reference-v5-explicit-contradictions',
-                                                     'request-reference-v7-scope-recheck'}
+                                                     'request-reference-v7-scope-recheck', 'request-reference-v8-scene-roles',
+                                                     'request-reference-v9-imported-portrait-scope'}
             and {**old_inputs, 'policy': POLICY} == inputs
             and old_answer.get('consistent') is True and not old_answer.get('problems')
             and not any(f.get('basis') == 'reference' and f.get('aspect') == 'space'

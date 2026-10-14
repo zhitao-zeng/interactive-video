@@ -21,3 +21,11 @@ inputs/
 *.bak-*
 
 .superpowers/
+
+models/
+assets/
+
+.venv
+
+# Reused source package directory (including a worktree symlink).
+/inputs

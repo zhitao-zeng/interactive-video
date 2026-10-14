@@ -1,0 +1,717 @@
+{
+  "title": "地图上不存在的村庄",
+  "source": "试播集/EP01-地图上不存在的村庄.md",
+  "target_seconds": 180,
+  "hook": "青溪村路牌仍在，新地图却没有这个名字；林野马上沿旧路核验入口。",
+  "summary": "旧入口受阻，返回岔路；脚印转向上坡推动核对地面站房，两个位置与旧图提醒形成下一次调查条件；两项选择均未采用。",
+  "interaction": {
+    "id": "E01-END",
+    "question": "明天先查哪边？",
+    "seconds": 3,
+    "options": [
+      {
+        "id": "A",
+        "label": "沿脚印找新路",
+        "reason": "查现场脚印去向与可通性",
+        "next": "第二集A线"
+      },
+      {
+        "id": "B",
+        "label": "在地面查站房",
+        "reason": "查旧入口的位置资料与记录",
+        "next": "第二集B线"
+      }
+    ],
+    "selected": null
+  },
+  "shots": [
+    {
+      "id": "T01",
+      "source_shots": [
+        "A01",
+        "A02"
+      ],
+      "location": "村口",
+      "scene_id": "SC01",
+      "visible": false,
+      "on_camera": false,
+      "visual": "从来路靠近木牌；木牌近景；阴天午后，真人写实，沿用既有参考",
+      "action": "沿林野来路直接看清“青溪村”木牌和指向山里的路；准确牌文由后期呈现",
+      "end": "村名与路径可辨",
+      "camera": "固定短近景，牌与路径同框",
+      "scale": "木牌近景",
+      "sfx": "远近两步后停，草叶风声",
+      "dialogue": "青溪村，路牌还在。",
+      "voice_delivery": "靠近后轻声辨认，不铺背景",
+      "duration_seconds": 3
+    },
+    {
+      "id": "T02",
+      "source_shots": [
+        "A02"
+      ],
+      "location": "村口",
+      "scene_id": "SC01",
+      "visible": false,
+      "on_camera": false,
+      "visual": "手机在手，牌在背景；手机与牌特写；阴天午后，真人写实，沿用既有参考",
+      "action": "手机新图与木牌边缘同框，当前区域无青溪村标注，手停止滑动",
+      "end": "新图与牌文形成矛盾",
+      "camera": "稳定手部观察，地图后期图层与现场牌同框",
+      "scale": "手机与牌特写",
+      "sfx": "风声承接，短袖口摩擦",
+      "dialogue": "新地图上，却没有这个名字。",
+      "voice_delivery": "对照后带疑问，短句",
+      "duration_seconds": 4
+    },
+    {
+      "id": "T03",
+      "source_shots": [
+        "A03",
+        "A04"
+      ],
+      "location": "村口",
+      "scene_id": "SC01",
+      "visible": true,
+      "on_camera": false,
+      "visual": "核对手机结束；人物中景；阴天午后，真人写实，沿用既有参考",
+      "action": "林野收手机，循路前行；只给短身份条，不独立介绍经历",
+      "end": "手机入袋，沿旧路开始找",
+      "camera": "侧前中景随行，人物视线朝路",
+      "scale": "人物中景",
+      "sfx": "手机入袋，脚步和肩带声起",
+      "dialogue": "先沿它指的路，找入口。",
+      "voice_delivery": "作出决定，边收手机边走；短句有落点",
+      "duration_seconds": 5,
+      "overlay": {
+        "text": "林野｜探险记录者"
+      }
+    },
+    {
+      "id": "T04",
+      "source_shots": [
+        "A04"
+      ],
+      "location": "断路",
+      "scene_id": "SC01",
+      "visible": true,
+      "on_camera": false,
+      "visual": "正在完整路面前行；人物随行全景；阴天午后，真人写实，沿用既有参考",
+      "action": "随他走到弯道，来路与道路边缘可辨，障碍进入前方",
+      "end": "阻碍进入视线",
+      "camera": "在完整路面侧后随行，前进方向连续",
+      "scale": "人物随行全景",
+      "sfx": "湿路脚步、装备摩擦",
+      "dialogue": "",
+      "voice_delivery": "无对白，行动利落",
+      "duration_seconds": 5
+    },
+    {
+      "id": "T05",
+      "source_shots": [
+        "A04"
+      ],
+      "location": "断路",
+      "scene_id": "SC02",
+      "visible": true,
+      "on_camera": false,
+      "visual": "迈步中；靴子特写；阴天午后，真人写实，沿用既有参考",
+      "action": "脚停在落石外的完整路面，身体不越进石堆",
+      "end": "停在落石外",
+      "camera": "低于膝观察完整落脚位置",
+      "scale": "靴子特写",
+      "sfx": "最后一步后脚步停止，风声继续",
+      "dialogue": "",
+      "voice_delivery": "无对白，停住",
+      "duration_seconds": 2
+    },
+    {
+      "id": "T06",
+      "source_shots": [
+        "A04"
+      ],
+      "location": "断路",
+      "scene_id": "SC02",
+      "visible": false,
+      "on_camera": false,
+      "visual": "人已停住；视线近景；阴天午后，真人写实，沿用既有参考",
+      "action": "从停步位置看落石覆盖道路，路的后半段被遮住；不给新增塌落或洪水",
+      "end": "道路和后方被遮住",
+      "camera": "眼高视线，近处完整路面与遮挡同框",
+      "scale": "视线近景",
+      "sfx": "自然林风，无突发轰响",
+      "dialogue": "",
+      "voice_delivery": "无对白，短暂辨认",
+      "duration_seconds": 5
+    },
+    {
+      "id": "T07",
+      "source_shots": [
+        "A04"
+      ],
+      "location": "断路",
+      "scene_id": "SC02",
+      "visible": true,
+      "on_camera": false,
+      "visual": "站在完整路面；人物侧中景；阴天午后，真人写实，沿用既有参考",
+      "action": "沿石堆遮挡边缘看一眼，收回重心，留在完整路面",
+      "end": "决定停止旧入口推进",
+      "camera": "固定侧位，人物与来路位置可读",
+      "scale": "人物侧中景",
+      "sfx": "转头的衣料轻响，低风",
+      "dialogue": "牌子还在，路却断了。后面也看不见。",
+      "voice_delivery": "看清后落定判断，收回重心；不渲染危险",
+      "duration_seconds": 6
+    },
+    {
+      "id": "T08",
+      "source_shots": [
+        "A05",
+        "A06"
+      ],
+      "location": "断路",
+      "scene_id": "SC02",
+      "visible": true,
+      "on_camera": false,
+      "visual": "手机在袋，双手可用；旧图核对近景；阴天午后，真人写实，沿用既有参考",
+      "action": "展开同一泛黄旧图，指青溪村点位，再抬眼到被阻断的路；同一张七点旧图保持连续，不补坐标",
+      "end": "旧图与现场核对结束",
+      "camera": "肩侧连贯看纸和现场，精确信息后期完成",
+      "scale": "旧图核对近景",
+      "sfx": "展开纸、指尖触纸、袖口声",
+      "dialogue": "旧图标的青溪村，就在这一带。",
+      "voice_delivery": "核对点位后说一句，不解释七个地点的背景",
+      "duration_seconds": 7
+    },
+    {
+      "id": "T09",
+      "source_shots": [
+        "A04",
+        "A07"
+      ],
+      "location": "断路",
+      "scene_id": "SC02",
+      "visible": true,
+      "on_camera": false,
+      "visual": "旧图在手，来路已看过；人物返回全景；阴天午后，真人写实，沿用既有参考",
+      "action": "折图入袋，转身沿完整来路返回；石堆在后方退去，岔路进入前方",
+      "end": "旧图入袋，返回岔路",
+      "camera": "侧后随行，实际来路朝前，禁止画成继续走向石堆",
+      "scale": "人物返回全景",
+      "sfx": "折图、入袋、转身、连续脚步；接近河岸才出现水声",
+      "dialogue": "回岔路，找别的依据。",
+      "voice_delivery": "行动中的短决定",
+      "duration_seconds": 8,
+      "authored_location": "断路到岔路"
+    },
+    {
+      "id": "T10",
+      "source_shots": [
+        "A07"
+      ],
+      "location": "河岸岔路",
+      "scene_id": "SC03",
+      "visible": true,
+      "on_camera": false,
+      "visual": "站在岔路外侧；带人物宽景；阴天午后，真人写实，沿用既有参考",
+      "action": "林野在外侧岔路站定，看沿河步道，再看地面站房；保留人物尺度",
+      "end": "两处可观察对象分开可辨",
+      "camera": "岔路外侧眼高宽景，两处对象分开可指",
+      "scale": "带人物宽景",
+      "sfx": "河水、低风，脚步停止",
+      "dialogue": "",
+      "voice_delivery": "无对白，找可观察对象",
+      "duration_seconds": 5
+    },
+    {
+      "id": "T11",
+      "source_shots": [
+        "A08"
+      ],
+      "location": "河岸岔路",
+      "scene_id": "SC03",
+      "visible": true,
+      "on_camera": false,
+      "visual": "靠近泥边；人物到痕迹近景；阴天午后，真人写实，沿用既有参考",
+      "action": "脚停在泥地旁的完整石面，目光落到鞋印，不踩痕迹",
+      "end": "脚在痕迹外，注意力落到印迹",
+      "camera": "膝下与视线引导相接，自身靴子不混成线索",
+      "scale": "人物到痕迹近景",
+      "sfx": "一步后停止，衣料轻响",
+      "dialogue": "",
+      "voice_delivery": "无对白，注意力收窄",
+      "duration_seconds": 3
+    },
+    {
+      "id": "T12",
+      "source_shots": [
+        "A08"
+      ],
+      "location": "河岸岔路",
+      "scene_id": "SC03",
+      "visible": false,
+      "on_camera": false,
+      "visual": "鞋印未被林野踩踏；脚印特写；阴天午后，真人写实，沿用既有参考",
+      "action": "先看同一鞋印压旧叶，再带出相邻印迹；保持鞋底形状连续",
+      "end": "鞋印与压叶关系可辨",
+      "camera": "泥地旁俯看，压叶关系清楚",
+      "scale": "脚印特写",
+      "sfx": "低河水；短句在看清后进入",
+      "dialogue": "这串鞋印，压在旧叶上。",
+      "voice_delivery": "先看清压叶关系，再指认一项细节",
+      "duration_seconds": 6
+    },
+    {
+      "id": "T13",
+      "source_shots": [
+        "A08"
+      ],
+      "location": "河岸岔路",
+      "scene_id": "SC03",
+      "visible": true,
+      "on_camera": false,
+      "visual": "站在石面边；人物侧近景；阴天午后，真人写实，沿用既有参考",
+      "action": "蹲到完整石边，手在膝上，核验鞋印边缘，不触泥",
+      "end": "蹲下核验，留下时间未知",
+      "camera": "人物与同一脚印同框，视线落到痕迹",
+      "scale": "人物侧近景",
+      "sfx": "蹲下的背包衣料声，河水持续",
+      "dialogue": "有人来过。多久以前，还看不出。",
+      "voice_delivery": "确认痕迹存在，时间只保留一次未知",
+      "duration_seconds": 5
+    },
+    {
+      "id": "T14",
+      "source_shots": [
+        "A08",
+        "A09",
+        "A16"
+      ],
+      "location": "河岸岔路",
+      "scene_id": "SC03",
+      "visible": false,
+      "on_camera": false,
+      "visual": "在分支入口外观察；方向视线镜头；阴天午后，真人写实，沿用既有参考",
+      "action": "视线沿现有印迹到河岸边的路径，先给观众看方向",
+      "end": "先见沿河方向",
+      "camera": "从入口外看路径，不预先越过转弯",
+      "scale": "方向视线镜头",
+      "sfx": "河水和草叶风",
+      "dialogue": "先看它往哪边走。",
+      "voice_delivery": "当下任务的短句，视线沿印迹移动",
+      "duration_seconds": 6
+    },
+    {
+      "id": "T15",
+      "source_shots": [
+        "A08",
+        "A09"
+      ],
+      "location": "河岸岔路",
+      "scene_id": "SC03",
+      "visible": true,
+      "on_camera": false,
+      "visual": "起身，相机挂身，双手空出；相机记录近景；阴天午后，真人写实，沿用既有参考",
+      "action": "起身取相机，把脚印与路径方向拍在一张记录里，按一次快门后放回挂带",
+      "end": "痕迹方向已拍，相机回挂带",
+      "camera": "肩侧能看见相机朝痕迹，不朝远处河景",
+      "scale": "相机记录近景",
+      "sfx": "装备拿取、一次快门、挂带声",
+      "dialogue": "",
+      "voice_delivery": "无对白，完成即切",
+      "duration_seconds": 4
+    },
+    {
+      "id": "T16",
+      "source_shots": [
+        "A09",
+        "A16"
+      ],
+      "location": "河岸岔路",
+      "scene_id": "SC03",
+      "visible": false,
+      "on_camera": false,
+      "visual": "仍停在入口外；转折视线镜头；阴天午后，真人写实，沿用既有参考",
+      "action": "沿同一鞋印追到河边转向上坡的位置，让坡度和河岸有共同参照",
+      "end": "上坡转折显出来",
+      "camera": "由入口外抬视线，停在可见转折",
+      "scale": "转折视线镜头",
+      "sfx": "河水渐远，风和草叶声接住",
+      "dialogue": "",
+      "voice_delivery": "无对白，发现有重量",
+      "duration_seconds": 4
+    },
+    {
+      "id": "T17",
+      "source_shots": [
+        "A16"
+      ],
+      "location": "河岸岔路",
+      "scene_id": "SC03",
+      "visible": true,
+      "on_camera": false,
+      "visual": "看见转折；人物反应近景；阴天午后，真人写实，沿用既有参考",
+      "action": "林野目光在转向处停住，再抬到山坡，不夸张瞪眼",
+      "end": "目光与问题转向坡",
+      "camera": "侧脸近景，视线与上一镜同向",
+      "scale": "人物反应近景",
+      "sfx": "衣料轻响，底声连续",
+      "dialogue": "等等。它没有一直沿河，拐上去了。",
+      "voice_delivery": "看到转折后短停，再修正注意方向",
+      "duration_seconds": 5
+    },
+    {
+      "id": "T18",
+      "source_shots": [
+        "A09",
+        "A16"
+      ],
+      "location": "河岸岔路",
+      "scene_id": "SC03",
+      "visible": false,
+      "on_camera": false,
+      "visual": "没有进入分支；上坡视线镜头；阴天午后，真人写实，沿用既有参考",
+      "action": "坡路在草木后拐弯，镜头和人物都停在入口外，不进入未见区域",
+      "end": "弯后是否接村未知",
+      "camera": "眼高视线，坡与低处河岸关系可辨",
+      "scale": "上坡视线镜头",
+      "sfx": "风、草叶与较远河水，无坡后神秘声",
+      "dialogue": "上面能接回村子吗？",
+      "voice_delivery": "短问句，保持未知",
+      "duration_seconds": 5
+    },
+    {
+      "id": "T19",
+      "source_shots": [
+        "A07",
+        "A10",
+        "A11"
+      ],
+      "location": "河岸岔路",
+      "scene_id": "SC04",
+      "visible": true,
+      "on_camera": false,
+      "visual": "相机回挂，双手空出；人物转向中景；阴天午后，真人写实，沿用既有参考",
+      "action": "收回视线，注意力转到站房外墙牌；相机在挂带，未采用上坡路线",
+      "end": "转向站房外墙牌",
+      "camera": "人物和远处站房同框，转向目标可见",
+      "scale": "人物转向中景",
+      "sfx": "转身衣料、脚步起",
+      "dialogue": "那边是旧站房，先去对一下。",
+      "voice_delivery": "清楚说明下一步",
+      "duration_seconds": 5
+    },
+    {
+      "id": "T20",
+      "source_shots": [
+        "A10"
+      ],
+      "location": "地面站房",
+      "scene_id": "SC04",
+      "visible": true,
+      "on_camera": false,
+      "visual": "从岔路出发；人物随行全景；阴天午后，真人写实，沿用既有参考",
+      "action": "沿完整支路走到站房外墙，脚下始终地面，不进屋、不乘索道",
+      "end": "抵达外墙，不进入室内",
+      "camera": "侧后随行到外墙即止",
+      "scale": "人物随行全景",
+      "sfx": "脚步装备声；水声渐弱，外墙风承接",
+      "dialogue": "",
+      "voice_delivery": "无对白，走近利落",
+      "duration_seconds": 6
+    },
+    {
+      "id": "T21",
+      "source_shots": [
+        "A10"
+      ],
+      "location": "地面站房",
+      "scene_id": "SC04",
+      "visible": true,
+      "on_camera": false,
+      "visual": "站在地面；带人物中景；阴天午后，真人写实，沿用既有参考",
+      "action": "人物抬眼确认空置滑轮架和外墙，在地面站稳，注意力落向牌子",
+      "end": "注意力落到牌",
+      "camera": "人脚下地面、架体与外墙同框",
+      "scale": "带人物中景",
+      "sfx": "外墙风、短衣料声，无运转机械",
+      "dialogue": "",
+      "voice_delivery": "无对白，观察建筑用途",
+      "duration_seconds": 4
+    },
+    {
+      "id": "T22",
+      "source_shots": [
+        "A10"
+      ],
+      "location": "地面站房",
+      "scene_id": "SC04",
+      "visible": false,
+      "on_camera": false,
+      "visual": "停用标志在视线内；停用牌特写；阴天午后，真人写实，沿用既有参考",
+      "action": "准确呈现“已停用”，不添加日期或关闭原因",
+      "end": "停用事实读清",
+      "camera": "眼高固定短镜，字层后期完成",
+      "scale": "停用牌特写",
+      "sfx": "屋檐低风",
+      "dialogue": "",
+      "voice_delivery": "无对白，读清即切",
+      "duration_seconds": 3
+    },
+    {
+      "id": "T23",
+      "source_shots": [
+        "A11"
+      ],
+      "location": "地面站房",
+      "scene_id": "SC04",
+      "visible": false,
+      "on_camera": false,
+      "visual": "示意牌在眼前；示意牌近景；阴天午后，真人写实，沿用既有参考",
+      "action": "先让观众看两个不同节点“谷底站”“山腰入口”；只显示必要空间关系",
+      "end": "两个不同节点可辨",
+      "camera": "正向稳定牌面，节点与字形同一后期层",
+      "scale": "示意牌近景",
+      "sfx": "低风，不加悬疑低鸣",
+      "dialogue": "",
+      "voice_delivery": "无对白，给辨认时间",
+      "duration_seconds": 6
+    },
+    {
+      "id": "T24",
+      "source_shots": [
+        "A11"
+      ],
+      "location": "地面站房",
+      "scene_id": "SC04",
+      "visible": true,
+      "on_camera": false,
+      "visual": "节点可辨，手未遮字；手与牌特写；阴天午后，真人写实，沿用既有参考",
+      "action": "指尖先落谷底站，再落山腰入口，不遮字、不复制手",
+      "end": "两个位置被指认",
+      "camera": "手与两节点同框，按视线顺序切",
+      "scale": "手与牌特写",
+      "sfx": "袖口轻响，底声不遮语音",
+      "dialogue": "谷底站……山腰入口。图上是两个位置。",
+      "voice_delivery": "读第一个位置、稍停、再指第二个；不抢先解释",
+      "duration_seconds": 5
+    },
+    {
+      "id": "T25",
+      "source_shots": [
+        "A06",
+        "A09",
+        "A11",
+        "A16"
+      ],
+      "location": "地面站房",
+      "scene_id": "SC04",
+      "visible": true,
+      "on_camera": false,
+      "visual": "旧图收在口袋，相机挂身；人物与旧图中景；阴天午后，真人写实，沿用既有参考",
+      "action": "取出同一旧图与墙牌对照，从纸上点位抬眼到可见山坡；不宣布位置已匹配",
+      "end": "旧图仍展开在手，相机挂回胸前；牌面与坡向已经对照",
+      "camera": "侧前同框保留纸、牌和坡向，图始终原纸色",
+      "scale": "人物与旧图中景",
+      "sfx": "纸展开、衣料、低风",
+      "dialogue": "牌子又标了山腰入口。脚印，会不会通到那里？",
+      "voice_delivery": "两份观察形成一个具体疑问，保留不确定性",
+      "duration_seconds": 8
+    },
+    {
+      "id": "T26",
+      "source_shots": [
+        "A12"
+      ],
+      "location": "地面站房",
+      "scene_id": "SC04",
+      "visible": false,
+      "on_camera": false,
+      "visual": "旧图仍展开在手，相机在挂带；旧图下缘特写；阴天午后，真人写实，沿用既有参考",
+      "action": "旧图保持展开，手只移到同一张纸的下缘，准确读到“雨后勿走谷底”；不收图再展开，不添加日期、坐标或其他文字",
+      "end": "旧图下缘提醒读清，仍在手中",
+      "camera": "从同一持图姿势切手部近景，纸色与折痕承接，必要字层后期完成",
+      "scale": "旧图下缘特写",
+      "sfx": "手指轻触纸、短纸摩擦、屋檐低风",
+      "dialogue": "",
+      "voice_delivery": "先让观众读取，不复述整句",
+      "duration_seconds": 5
+    },
+    {
+      "id": "T27",
+      "source_shots": [
+        "A07",
+        "A12"
+      ],
+      "location": "地面站房",
+      "scene_id": "SC05",
+      "visible": true,
+      "on_camera": false,
+      "visual": "旧图仍在手，刚读完下缘提醒；河岸与步道中景；阴天午后，真人写实，沿用既有参考",
+      "action": "从站房已到达的地面位置，看低处河岸与较高步道；不给洪水、新落石、即时雨情或未知弯后的画面",
+      "end": "低处河岸与较高步道已看过，图仍展开",
+      "camera": "人物当前视线，地面观察位与河岸高低关系可辨",
+      "scale": "河岸与步道中景",
+      "sfx": "较远河水，屋檐风逐渐接到草叶风",
+      "dialogue": "",
+      "voice_delivery": "辨认低处与步道，不制造惊吓",
+      "duration_seconds": 4
+    },
+    {
+      "id": "T28",
+      "source_shots": [
+        "A12",
+        "A15"
+      ],
+      "location": "地面站房",
+      "scene_id": "SC05",
+      "visible": true,
+      "on_camera": false,
+      "visual": "看过河岸地形，旧图仍展开在手；林野侧面中景；阴天午后，真人写实，沿用既有参考",
+      "action": "收回视线，轻点地图下缘提醒，明确次日先查路况；图仍在手，不替观众选择调查路线",
+      "end": "明确先核实路况，仍未选A/B",
+      "camera": "固定侧面，指提醒后抬眼，双手与展开纸保持连续",
+      "scale": "林野侧面中景",
+      "sfx": "指尖触纸、衣料轻响、低风与远水",
+      "dialogue": "明天先核实路况，再走。",
+      "voice_delivery": "决定明确的一句，轻点提醒后说",
+      "duration_seconds": 5
+    },
+    {
+      "id": "T29",
+      "source_shots": [
+        "A10",
+        "A11",
+        "A12"
+      ],
+      "location": "地面站房",
+      "scene_id": "SC05",
+      "visible": true,
+      "on_camera": false,
+      "visual": "旧图展开在手，相机在挂带；林野与示意牌中景；阴天午后，真人写实，沿用既有参考",
+      "action": "沿原折痕折图入袋，双手空出后取相机，对准已看过的示意牌与外墙位置，按一次快门，再放回挂带",
+      "end": "旧图入袋，相机在挂带，外墙牌已记录",
+      "camera": "肩侧完整动作，取景方向与示意牌同框；不是查看回放",
+      "scale": "林野与示意牌中景",
+      "sfx": "折图入袋、相机拿取、一次快门、挂带和衣料声",
+      "dialogue": "",
+      "voice_delivery": "完成即切，身体行动有目的",
+      "duration_seconds": 7
+    },
+    {
+      "id": "T30",
+      "source_shots": [
+        "A07",
+        "A15"
+      ],
+      "location": "河岸岔路",
+      "scene_id": "SC05",
+      "visible": true,
+      "on_camera": false,
+      "visual": "旧图入袋，相机挂身；人物返回全景；阴天午后，真人写实，沿用既有参考",
+      "action": "沿来路由站房外返回岔路站定，站房退在后方，未深入任何调查分支",
+      "end": "返回岔路站定",
+      "camera": "侧后随行，站房来路可辨",
+      "scale": "人物返回全景",
+      "sfx": "脚步、河水渐强",
+      "dialogue": "",
+      "voice_delivery": "无对白，位置连续",
+      "duration_seconds": 6
+    },
+    {
+      "id": "T31",
+      "source_shots": [
+        "A11",
+        "A15",
+        "A16"
+      ],
+      "location": "河岸岔路",
+      "scene_id": "SC05",
+      "visible": false,
+      "on_camera": false,
+      "visual": "笔记取出，相机挂身；自己的笔记近景；阴天午后，真人写实，沿用既有参考",
+      "action": "本子只记录“旧路受阻”“脚印上坡”“图示山腰入口”“关系待查”，合本；不冒充站房档案",
+      "end": "短记今日所得后合本",
+      "camera": "俯看自己的本子，字层准确后期呈现",
+      "scale": "自己的笔记近景",
+      "sfx": "一次翻页、短记、合本；河水低声",
+      "dialogue": "路没走通。明天，有得查了。",
+      "voice_delivery": "有一点收获感，承认本集目标未完成",
+      "duration_seconds": 5
+    },
+    {
+      "id": "T32",
+      "source_shots": [
+        "A13",
+        "A16"
+      ],
+      "location": "河岸岔路",
+      "scene_id": "SC06",
+      "visible": false,
+      "on_camera": false,
+      "visual": "这是已记录证据回看；A证据近景；阴天午后，真人写实，沿用既有参考",
+      "action": "回看已记录的脚印转向及上坡弯道，同时显示完整A选项和依据",
+      "end": "A依据可辨，尚未采用",
+      "camera": "只回看原可见转折，不预演上山结果",
+      "scale": "A证据近景",
+      "sfx": "同一河岸底声，无新增脚步",
+      "dialogue": "跟脚印，查现在的人往哪儿走。",
+      "voice_delivery": "直接讲调查价值，不承诺脚印就是进村路线",
+      "duration_seconds": 6,
+      "overlay": {
+        "text": "A 沿脚印找新路\n查现场脚印去向与可通性"
+      }
+    },
+    {
+      "id": "T33",
+      "source_shots": [
+        "A14",
+        "A11"
+      ],
+      "location": "地面站房",
+      "scene_id": "SC06",
+      "visible": false,
+      "on_camera": false,
+      "visual": "这是已到过外部材料回看；B证据近景；阴天午后，真人写实，沿用既有参考",
+      "action": "回看已看过的外墙与两节点，同时显示完整B选项和依据",
+      "end": "B依据可辨，尚未采用",
+      "camera": "短证据回看，不进入新空间",
+      "scale": "B证据近景",
+      "sfx": "同一外墙风声，无室内怪声",
+      "dialogue": "查站房，找旧入口的位置依据。",
+      "voice_delivery": "直接讲与A不同的调查价值",
+      "duration_seconds": 6,
+      "overlay": {
+        "text": "B 在地面查站房\n查旧入口的位置资料与记录"
+      }
+    },
+    {
+      "id": "T34",
+      "source_shots": [
+        "A15"
+      ],
+      "location": "河岸岔路",
+      "scene_id": "SC06",
+      "visible": true,
+      "on_camera": true,
+      "visual": "人仍站岔路，合本在手；人物收尾中景；阴天午后，真人写实，沿用既有参考",
+      "action": "回看结束人仍在岔路，合本入袋后面对观众，两选项小标签同时保留，不向分支出发",
+      "end": "本子入袋，选择交给观众",
+      "camera": "眼高短正面口播，背包仍在双肩",
+      "scale": "人物收尾中景",
+      "sfx": "入袋衣料、低河水和风；结尾人声清楚",
+      "dialogue": "明天先追脚印，还是先查站房？你们选，我去核对。",
+      "voice_delivery": "直接邀请远程搭档，短句有落点",
+      "duration_seconds": 8,
+      "overlay": {
+        "text": "A 沿脚印找新路　／　B 在地面查站房"
+      }
+    }
+  ],
+  "version": "story-v4",
+  "status": "approved_for_full_production_2026-10-13",
+  "profile": {
+    "resolution": "480p",
+    "camera_policy": "authored"
+  }
+}
