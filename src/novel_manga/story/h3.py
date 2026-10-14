@@ -203,6 +203,8 @@ def voice_lines(clip: dict, subject_of: dict, speaker_ids: dict) -> list[str]:
         voice += 1
         name = ref.get("name")
         if name not in subject_of:
+            if name in speaker_ids:
+                lines.append(f"<Audio {voice}> is the voice-timbre reference for the off-screen speaker {speaker_ids[name]}.")
             continue
         # A voice bound to someone who never opens their mouth in this clip has no speaker id, and
         # the guide forbids inventing one; the timbre still belongs to that subject.

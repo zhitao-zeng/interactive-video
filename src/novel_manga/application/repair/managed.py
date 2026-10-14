@@ -37,7 +37,10 @@ def source_state(directory: Path, clip: dict, *, inputs: RepairInputs | None = N
     source_identity = {k: [{field:value for field,value in row.items() if field!='source_quote'}
                           for row in identity_context.get(k, [])] for k in ['mentions','relations','appearances']}
     from novel_manga.application.identity.dialogue import POLICY as BINDING_POLICY
-    return {'binding_policy': BINDING_POLICY, 'identity_reading': source_identity, 'stages':[s for i,s in enumerate(script.get('shots',[]),1)
+    from novel_manga.application.repair.authored_request import POLICY as AUTHORED_POLICY
+    return {'binding_policy': BINDING_POLICY,
+            **({'authored_request_policy': AUTHORED_POLICY} if clip.get('authored_english_source') else {}),
+            'identity_reading': source_identity, 'stages':[s for i,s in enumerate(script.get('shots',[]),1)
                       if s.get('index',i) in clip.get('shot_indexes',[])],
             'segments':inputs.identity.segments, 'segment_ids': clip.get('segment_ids') or [],
             'cast':clip.get('cast',[]),'references':clip.get('references',[]),'crowd_roles':clip.get('crowd_roles',{}),
@@ -84,6 +87,10 @@ def candidates(directory: Path, review: dict | None = None) -> tuple[list[str],d
 
 def reframe_candidate(directory: Path, cid: str, issue: str):
     """One bounded rewrite/check path shared by video repair and first-take input repair."""
+    from novel_manga.application.repair.authored_request import propose as authored_proposal
+    authored = authored_proposal(directory, cid, issue)
+    if authored is not None:
+        return authored
     from novel_manga.application.repair.flow import repair_episode
     from novel_manga.application.rendering.h3 import convert
     from novel_manga.application.profiles import h3_prompt_outdated

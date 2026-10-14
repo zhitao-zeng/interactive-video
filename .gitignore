@@ -21,3 +21,8 @@ inputs/
 *.bak-*
 
 .superpowers/
+
+models/
+assets/
+
+.venv

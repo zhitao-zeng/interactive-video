@@ -1,0 +1,13 @@
+{
+  "name": "心动未剪辑·真人恋综",
+  "render_family": "photo",
+  "visual_style": "现代真人恋爱综艺摄影，自然皮肤与现代休闲衣装，克制表演",
+  "render_direction": "真实皮肤与织物，柔和自然窗光或采访布光，现代休闲服装，暖白、木棕、深青、鼠尾草绿与低饱和铜",
+  "scene_style": "海边小屋真实室内摄影，木纹、棉麻和哑光石材，空间固定",
+  "scene_direction": "暖白、木棕、深青、鼠尾草绿，傍晚自然窗光，告白间中性受控布光；保留原场景布局",
+  "h3_style_line": "Contemporary photorealistic live-action relationship reality show. Natural skin texture, modern casual clothing, restrained acting, warm white, oak brown, deep teal and sage colors. Soft late-afternoon window light or controlled neutral interview lighting; maintain the supplied room geography. Reference sheets are design references only: generate a coherent full-frame scene, never a collage or multiple panels.",
+  "card_suffix": "",
+  "prompt_fingerprint": false,
+  "tidy_prompts": true,
+  "location_empty_suffix": "空场参考，画面内无人，没有人影或剪影；牌面不生成文字，由后期添加"
+}

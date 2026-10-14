@@ -2,6 +2,7 @@ from __future__ import annotations
 import os
 import re
 import wave
+import tempfile
 from pathlib import Path
 from ..util import read_json, run
 from .common import log, reference_digests
@@ -24,9 +25,14 @@ def trimmed_voice(path: Path, seconds: float) -> Path:
     out = path.parent / ".trim" / f"{path.stem}.{seconds:g}s.wav"
     if not out.is_file() or out.stat().st_mtime < path.stat().st_mtime:
         out.parent.mkdir(parents=True, exist_ok=True)
-        partial = out.with_suffix(".partial.wav")
-        run(["ffmpeg", "-y", "-v", "error", "-i", str(path), "-t", f"{seconds:.2f}", "-c:a", "pcm_s16le", str(partial)])
-        os.replace(partial, out)
+        # Different clips can prepare the same speaker concurrently.
+        with tempfile.NamedTemporaryFile(dir=out.parent, suffix=".wav", delete=False) as handle:
+            partial = Path(handle.name)
+        try:
+            run(["ffmpeg", "-y", "-v", "error", "-i", str(path), "-t", f"{seconds:.2f}", "-c:a", "pcm_s16le", str(partial)])
+            os.replace(partial, out)
+        finally:
+            partial.unlink(missing_ok=True)
     return out
 
 def renumber_audio(prompt: str, sent: list[int]) -> str:
