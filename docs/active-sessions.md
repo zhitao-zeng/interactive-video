@@ -40,4 +40,4 @@
 
 |Codex|恋综现版Agent审片→失败自动H3重拍→验收后Mac|codex/romance-sd25-continuity|现有19镜/原take历史；共用viewer-first审核、既有sandbox_agent；.runtime/romance-agent-review-20261014|已完成审片修复与合成：Agent发现6镜失败，共9次新H3生成，总take61→70；6镜新take均独立复审通过，07局部ASR疑点已核实。189.8秒新片已发Mac（sender_exit_code=0）；主会话未看图。保留静音原始失败值，按批准无BGM/自然停顿稿用本edition非阻塞诊断；speech与其他媒体门保留。未commit/push。|
 
-|Codex integration|共用链路已合入main并同步本分支|romance|保留本分支内容、运行配置与后续增量|main=0f49c49；共用3263测试和独立复核通过；无生成/推送。|
+|Codex integration|共用链路已合入main并同步本分支|romance|保留本分支内容、运行配置与后续增量|main=018e392；共用3263测试和独立复核通过，本分支3268完整测试通过；保留内容增量，无生成/推送。|

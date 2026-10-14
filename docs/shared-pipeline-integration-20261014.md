@@ -39,3 +39,14 @@ Keep multi-turn guidance over the older single-utterance skill wording; retain b
 viewer-first checks. Merge panel placement with observed shot spans, retaining both source branches'
 regression coverage. Fix the generic compiler target rather than letting a repair reintroduce a cartoon
 instruction. These decisions do not change authored episode facts or existing output histories.
+
+## Completed synchronization
+
+All three content branches merge the validated main release. Shared source is identical on romance and suspense; adventure retains its separately captured sound/native-text/reference-asset additions on top.
+
+- main: **3263 tests passed**, exit 0.
+- romance: **3268 tests passed**, exit 0.
+- adventure: **3287 tests passed**, exit 0.
+- suspense: **3276 tests passed**, exit 0.
+
+Original content runtime configurations and local input/media symlinks remain intact. Original studio worktree remains on its snapshot branch; use the dedicated main worktree for the stable implementation. All commits and merges are local; no push or model/service operation was performed.
