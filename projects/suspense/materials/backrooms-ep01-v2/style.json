@@ -1,0 +1,14 @@
+{
+  "name": "后室池室真人探险Vlog",
+  "video_kind": "现代真人第一人称探索片段",
+  "render_family": "photo",
+  "visual_style": "真人手机探索Vlog，真实皮肤和户外布料，巨大白砖池室、蓝绿色清水、温润天光，克制自然反应",
+  "render_direction": "真实皮肤与发丝，单手机前置/后置，人物比例自然，石墨灰外套和黑背心，空间美丽干净但陌生",
+  "scene_style": "明亮超现实白砖池室，实际材质与可信空间相对位置",
+  "scene_direction": "巨大的白色方柱、白砖墙与池底，蓝绿清水，柔和高处天光；浅深水、两组相反方向的台阶和同一干平台清晰",
+  "h3_style_line": "Photorealistic contemporary smartphone exploration vlog. Natural skin and outdoor fabric, immense white ceramic poolrooms, clear turquoise water and soft warm skylight. One phone front or rear camera, restrained reactions, physically legible geometry and no supernatural camera viewpoints.",
+  "card_suffix": "",
+  "prompt_fingerprint": false,
+  "tidy_prompts": true,
+  "location_empty_suffix": "空场参考，无人、不含人影，不生成文字，精确层级与选项文字由后期添加"
+}

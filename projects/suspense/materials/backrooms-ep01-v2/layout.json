@@ -1,0 +1,201 @@
+{
+  "owner": "/root/backrooms_package_review — approved Backrooms EP01 adaptation and director handoff; root session owns production",
+  "edition": "suspense-backrooms-h3-ep01-v2",
+  "space": "Level 37 本集局部池室；一处连续探索区域的四个视角状态，不是四个传送层级",
+  "coordinates": "米，仅制作俯视关系；x 向东、y 向北；镜头沿当下观看方向决定左右，A/B 最终机位朝北。水面 z=0",
+  "features": {
+    "start": [
+      10,
+      0
+    ],
+    "main_column": {
+      "center": [
+        8,
+        12
+      ],
+      "square_width": 4,
+      "height": 12,
+      "landmark": "东侧靠水线有一块深青色窄砖带，四面主体仍为白色方砖"
+    },
+    "bright_arch": {
+      "center": [
+        10,
+        20
+      ],
+      "width": 3,
+      "destination": "仍然积水的更大池厅，未出层"
+    },
+    "descending_stair": {
+      "top": [
+        10,
+        24
+      ],
+      "direction": "向西下行进入深水",
+      "visible_steps": 3,
+      "bottom": "不可见；不表现无底洞、怪物或水下目的地"
+    },
+    "ascending_stair": {
+      "bottom": [
+        5.5,
+        15
+      ],
+      "top": [
+        5.5,
+        17
+      ],
+      "direction": "向北上行到水面以上的干平台",
+      "visibility": "位于主柱北面略偏西；初始南侧视角被柱体遮住，返回时从柱北浅水带才能发现",
+      "steps": 4
+    },
+    "dry_platform": {
+      "bounds": [
+        3,
+        7,
+        17,
+        20
+      ],
+      "floor_height": 0.55,
+      "sit_position": [
+        5.5,
+        18
+      ],
+      "backpack_position": [
+        5.9,
+        18
+      ]
+    },
+    "A_dark_corridor": {
+      "mouth": [
+        4,
+        20
+      ],
+      "direction": "北",
+      "structure": "顶和两侧均封闭的暗通道，前段实地，尽头不可见",
+      "possible_connection": "43 水族馆主题公园，可能，非保证"
+    },
+    "B_bright_corridor": {
+      "mouth": [
+        6,
+        20
+      ],
+      "direction": "北",
+      "structure": "明亮白砖走廊，下一个转角遮住尽头，与先前浅水池厅材质一致",
+      "possible_connection": "233 暖水酒店，小概率，也可能仍在池室"
+    }
+  },
+  "walkable_shallow_routes": [
+    {
+      "path": [
+        [
+          10,
+          0
+        ],
+        [
+          10,
+          9
+        ],
+        [
+          10.5,
+          12
+        ],
+        [
+          10.5,
+          16
+        ],
+        [
+          10,
+          20
+        ],
+        [
+          10,
+          24
+        ]
+      ],
+      "ankle_depth_m": 0.12
+    },
+    {
+      "path": [
+        [
+          10.5,
+          16
+        ],
+        [
+          8,
+          16
+        ],
+        [
+          5.5,
+          15
+        ]
+      ],
+      "ankle_depth_m": 0.12,
+      "purpose": "退回主柱后再绕其北面，连接此前被遮挡的向上台阶"
+    }
+  ],
+  "route": "起点浅深交界→沿主柱东侧浅水带→明亮拱口→更大池厅的下行水阶→原路退回同一主柱→柱北面的上行台阶→干平台→原位看A/B",
+  "assets": [
+    {
+      "id": "location_001",
+      "name": "池室浅深交界",
+      "path": "series_assets/locations/location_001/establishing.jpeg",
+      "state": "起点朝北，右侧可见脚踝水深的白砖浅带、左側蓝绿深区，远处主柱"
+    },
+    {
+      "id": "location_002",
+      "name": "池室大柱与亮口",
+      "path": "series_assets/locations/location_002/establishing.jpeg",
+      "state": "同一主柱东侧浅水带、北侧亮拱口；白色主柱东侧深青窄砖带为返程地标，上行台阶在柱北后方"
+    },
+    {
+      "id": "location_003",
+      "name": "池室下行水阶",
+      "path": "series_assets/locations/location_003/establishing.jpeg",
+      "state": "通过亮口之后的浅水台面，从台面朝西下望，前三阶清楚，后方深区不见底"
+    },
+    {
+      "id": "location_004",
+      "name": "池室干平台双通道",
+      "path": "series_assets/locations/location_004/establishing.jpeg",
+      "state": "上行后同一干平台，从南向北看，A左暗口、B右亮廊，进入台阶在机位后方"
+    },
+    {
+      "id": "location_005",
+      "name": "池室柱后上行阶",
+      "path": "series_assets/locations/location_005/establishing.jpeg",
+      "state": "同一主柱北面反向观察，沿原浅水带绕到北面才可见四级向上短阶，抵达水面上55厘米同一干平台，不新增地点"
+    }
+  ],
+  "inventory": [
+    {
+      "item": "唯一深色手机",
+      "state": "自拍杆固定→S12解除卡扣仍在左手并录像→S17重新固定自拍杆；腕绳始终连接同一手腕；不放到水里"
+    },
+    {
+      "item": "伸缩自拍杆",
+      "state": "S01—S11持机；S12取下手机→S13—S16只有空杆用于探水/浅路→S17接回手机；不要新增第二杆"
+    },
+    {
+      "item": "深灰背包",
+      "state": "S01—S16背在身上且未泡水；S17坐平台内侧后放右边并取补给，之后留在身边"
+    },
+    {
+      "item": "头灯",
+      "state": "S01—S19在背包，未戴；S20取出戴在额头打开，S21—S23始终戴好，暗口只照前段"
+    },
+    {
+      "item": "半瓶饮用水与一根能量棒",
+      "state": "S17从原背包取出展示，未饮用、未拆包装；结束时存量相同，下一集不得凭空增加"
+    },
+    {
+      "item": "灰色徒步鞋",
+      "state": "全片同一双鞋，浅水只湿至脚踝；上平台时湿鞋踩白砖，不改成靴子，不脱鞋"
+    }
+  ],
+  "capture_rules": [
+    "一部手机前置或后置连续记录，可停录剪接，不存在替主角拍摄的第三人机位",
+    "后置口播不露弥夏的脸或全身，可按需要出现她自己的手、袖口或灰色徒步鞋",
+    "自拍时脸真实可见并由弥夏开口；环境口播仍是现场发声，不是心声",
+    "所有可读层级/选项/资料字样由后期精确排版，场景和道具不生成字",
+    "空间明亮蓝绿，危险来自深水与无可攀处，不以变黑、随机墙体变化或实体替代"
+  ]
+}

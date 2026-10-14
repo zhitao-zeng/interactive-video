@@ -1,0 +1,168 @@
+{
+  "owner": "/root/backrooms_assets — API-generated assets and image artistic review",
+  "model": "gpt-image-2",
+  "provider": "PhanRouterMediaProvider",
+  "no_local_image_backend": true,
+  "layout": "layout.json",
+  "all_assets_accepted": true,
+  "assets": [
+    {
+      "id": "character_001",
+      "kind": "character",
+      "name": "弥夏",
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/characters/character_001/turnaround.jpeg",
+      "path": "series_assets/characters/character_001/turnaround.jpeg",
+      "scope": "identity_portrait",
+      "state": "accepted",
+      "origin": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/.runtime/backrooms-reference-20261014/package/角色资产/弥夏-身份基准-v1.0.png",
+      "review": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/characters/character_001/turnaround.origin.json"
+    },
+    {
+      "id": "location_001",
+      "kind": "location",
+      "name": "池室浅深交界",
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_001/establishing.jpeg",
+      "path": "series_assets/locations/location_001/establishing.jpeg",
+      "scope": "generated-scene-from-approved-layout",
+      "state": "accepted",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "versions": [
+        "assets/generated/location_001/v1.jpeg",
+        "assets/generated/location_001/v2.jpeg"
+      ],
+      "selected_version": "v2",
+      "receipt": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_001/establishing.receipt.json",
+      "art_review": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_001/establishing.art-review.json",
+      "task": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_001/establishing.jpeg.task.json"
+    },
+    {
+      "id": "location_002",
+      "kind": "location",
+      "name": "池室大柱与亮口",
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_002/establishing.jpeg",
+      "path": "series_assets/locations/location_002/establishing.jpeg",
+      "scope": "generated-scene-from-approved-layout",
+      "state": "accepted",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "versions": [
+        "assets/generated/location_002/v1.jpeg"
+      ],
+      "selected_version": "v1",
+      "receipt": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_002/establishing.receipt.json",
+      "art_review": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_002/establishing.art-review.json",
+      "task": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_002/establishing.jpeg.task.json"
+    },
+    {
+      "id": "location_003",
+      "kind": "location",
+      "name": "池室下行水阶",
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_003/establishing.jpeg",
+      "path": "series_assets/locations/location_003/establishing.jpeg",
+      "scope": "generated-scene-from-approved-layout",
+      "state": "accepted",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "versions": [
+        "assets/generated/location_003/v1.jpeg"
+      ],
+      "selected_version": "v1",
+      "receipt": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_003/establishing.receipt.json",
+      "art_review": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_003/establishing.art-review.json",
+      "task": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_003/establishing.jpeg.task.json"
+    },
+    {
+      "id": "location_004",
+      "kind": "location",
+      "name": "池室干平台双通道",
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_004/establishing.jpeg",
+      "path": "series_assets/locations/location_004/establishing.jpeg",
+      "scope": "generated-scene-from-approved-layout",
+      "state": "accepted",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "versions": [
+        "assets/generated/location_004/v1.jpeg",
+        "assets/generated/location_004/v2.jpeg"
+      ],
+      "selected_version": "v2",
+      "receipt": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_004/establishing.receipt.json",
+      "art_review": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_004/establishing.art-review.json",
+      "task": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_004/establishing.jpeg.task.json"
+    },
+    {
+      "id": "prop_001",
+      "kind": "prop",
+      "name": "空伸缩自拍杆",
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/props/prop_001/turnaround.jpeg",
+      "path": "series_assets/props/prop_001/turnaround.jpeg",
+      "scope": "generated-prop-state",
+      "state": "accepted",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "versions": [
+        "assets/generated/prop_001/v1.jpeg"
+      ],
+      "selected_version": "v1",
+      "receipt": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/props/prop_001/turnaround.receipt.json",
+      "art_review": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/props/prop_001/turnaround.art-review.json",
+      "task": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/props/prop_001/turnaround.jpeg.task.json"
+    },
+    {
+      "id": "prop_002",
+      "kind": "prop",
+      "name": "小型头灯",
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/props/prop_002/turnaround.jpeg",
+      "path": "series_assets/props/prop_002/turnaround.jpeg",
+      "scope": "generated-prop-state",
+      "state": "accepted",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "versions": [
+        "assets/generated/prop_002/v1.jpeg"
+      ],
+      "selected_version": "v1",
+      "receipt": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/props/prop_002/turnaround.receipt.json",
+      "art_review": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/props/prop_002/turnaround.art-review.json",
+      "task": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/props/prop_002/turnaround.jpeg.task.json"
+    },
+    {
+      "id": "prop_003",
+      "kind": "prop",
+      "name": "随身补给",
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/props/prop_003/turnaround.jpeg",
+      "path": "series_assets/props/prop_003/turnaround.jpeg",
+      "scope": "generated-prop-state",
+      "state": "accepted",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "versions": [
+        "assets/generated/prop_003/v1.jpeg"
+      ],
+      "selected_version": "v1",
+      "receipt": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/props/prop_003/turnaround.receipt.json",
+      "art_review": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/props/prop_003/turnaround.art-review.json",
+      "task": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/props/prop_003/turnaround.jpeg.task.json"
+    },
+    {
+      "id": "location_005",
+      "kind": "location",
+      "name": "池室柱后上行阶",
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_005/establishing.jpeg",
+      "path": "series_assets/locations/location_005/establishing.jpeg",
+      "scope": "generated-scene-from-approved-layout",
+      "state": "accepted",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "versions": [
+        "assets/generated/location_005/v1.jpeg",
+        "assets/generated/location_005/v2.jpeg"
+      ],
+      "selected_version": "v2",
+      "receipt": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_005/establishing.receipt.json",
+      "art_review": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_005/establishing.art-review.json",
+      "task": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/projects/suspense/materials/backrooms-ep01-v2/series_assets/locations/location_005/establishing.jpeg.task.json"
+    }
+  ]
+}
