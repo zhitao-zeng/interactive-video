@@ -31,3 +31,5 @@ Spec: user approved the shared-pipeline/main/content-branch split on 2026-10-14.
 
 - Workspace and three sources inspected; all initially point to 440bfdf with uncommitted work. Shared worktree created from main.
 - Decision: the existing user-approved chat design is the execution spec; no repeated approval is needed.
+
+- Source snapshots committed; 16 conflicting shared paths reconciled. Full regression 3263 passed; independent code review passed. Main merge and content synchronization next.
