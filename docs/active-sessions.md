@@ -111,4 +111,4 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 
 最终v28四章完整自动验证收口（2026-10-11）：107/115/244流程准备完成414.210/333.931/543.393秒，108场景复核上游502在296.889秒失败。无历史模型回复复用/作者hook/人工问题或补跑；运行中代码未改。独立源文/归档下游核对107聚焦通过，115核心ID/数量通过但seg8包在mentions有而主体资料缺项，244医生UNKNOWN/extra被误放行（原16/21/22同事件可证e005），所以四章自动验收未过。165实体/卡、57claims、25输入裁决全保留；本轮只实验/文档，无提交/推送/合并/切生产/媒体。证据目录.runtime/identity-unification-20261009/four-chapter-source-acceptance-20261010/four-chapter-fresh-final-v28-20261011/final-report.json；通用检索/复核与片段范围仍待修。
 
-|Codex shared integration|用户授权共用链路整合及同步三内容分支|codex/feat/shared-pipeline|本worktree src/tests/config/CLI；内容快照已保存|共用冲突已处理，针对性64项通过，完整回归进行中；未生成或改服务。|
+|Codex shared integration|用户授权共用链路整合及同步三内容分支|codex/feat/shared-pipeline|本worktree src/tests/config/CLI；内容快照已保存|已完成：main共用3263项回归及独立复核通过，修复已同步三个内容分支，三边完整回归通过；荒野后续增量保留，无生成/改服务/推送。|
