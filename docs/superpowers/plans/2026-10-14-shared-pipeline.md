@@ -33,3 +33,5 @@ Spec: user approved the shared-pipeline/main/content-branch split on 2026-10-14.
 - Decision: the existing user-approved chat design is the execution spec; no repeated approval is needed.
 
 - Source snapshots committed; 16 conflicting shared paths reconciled. Full regression 3263 passed; independent code review passed. Main merge and content synchronization next.
+
+- Complete: validated main merged back into all three content branches; their full suites passed. Adventure in-flight changes preserved in local snapshots and merged on top, not included in stable main. No push or production calls.
