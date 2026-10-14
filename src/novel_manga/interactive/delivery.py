@@ -145,8 +145,10 @@ def deliver(runner, report: dict, destination: Path) -> dict:
     if extra_overlays and (ctx.episode_dir/'evidence_surfaces.json').is_file():
         from novel_manga.interactive.evidence import prepare_evidence
         try:
-            postproduction=prepare_evidence(ctx,report,destination)
-            source=Path(postproduction['body'])
+            manifest=json.loads((ctx.episode_dir/'evidence_surfaces.json').read_text())
+            if manifest and manifest['surfaces']:
+                postproduction=prepare_evidence(ctx,report,destination)
+                source=Path(postproduction['body'])
         except Exception as error:
             postproduction={'passed':False, 'shot_spans':[],
                             'errors':{'composite':f'{type(error).__name__}: {str(error)[:250]}'}}
