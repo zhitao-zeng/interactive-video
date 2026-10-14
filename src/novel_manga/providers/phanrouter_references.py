@@ -78,7 +78,10 @@ class ReferenceMaterials:
             hosted_url = self._hosted_image_url(image)
         # Names are unique per user: novel, card, view and a piece of the content hash; a clash gets a suffix.
         novel = path.parents[3].name if len(path.parents) > 3 else "novel"
-        stem = f"{novel}-{path.parent.name}-{path.stem}-{digest[:10]}"
+        # Long edition names otherwise fail the library's original_name column.
+        # Keep the existing content suffix and leave room for the clash suffix.
+        prefix = f"{novel}-{path.parent.name}-{path.stem}"
+        stem = f"{prefix[:49]}-{digest[:10]}"
         asset_id = None
         for attempt in range(3):
             name = stem if attempt == 0 else f"{stem}-{attempt + 1}"

@@ -74,6 +74,21 @@ def test_name_clash_gets_a_suffix(tmp_path):
     assert [c["json"]["Name"][-2:] for c in p.client.calls][1] == "-2"
 
 
+def test_long_edition_name_can_register_without_losing_the_content_suffix(tmp_path):
+    import hashlib
+    p, _, _ = provider(tmp_path)
+    p.client = Client(conflicts=1)
+    card = tmp_path/'outputs'/'adventure-laughing-country-sd25-480-sound-v2'/'series_assets'/'characters'/'character_001'
+    card.mkdir(parents=True)
+    image = card/'turnaround.jpeg'; image.write_bytes(b'long-edition-photo')
+    result = p._restore_image_url(ImageResult(path=image, public_url='https://cdn.example/card.jpg'))
+    names = [c['json']['Name'] for c in p.client.calls]
+    assert result == 'asset://asset-1'
+    assert all(len(n) <= 62 for n in names)
+    assert names[1] == names[0]+'-2'
+    assert names[0].endswith(hashlib.sha256(image.read_bytes()).hexdigest()[:10])
+
+
 def test_off_by_default_and_inline_stays_inline(tmp_path):
     p, client, card = provider(tmp_path, reference_images_via_assets=False)
     assert p._restore_image_url(ImageResult(path=card, public_url="https://cdn.example/card.jpg")) == "https://cdn.example/card.jpg"
