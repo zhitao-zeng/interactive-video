@@ -216,13 +216,14 @@ def test_task_repair_options_preserve_the_callers_config_and_full_evidence(tmp_p
     mock_host_frames(agent, monkeypatch)
     def execute(name, **kwargs):
         assert kwargs['config']['extra_body'] == {
-            'request_option': 'preserved', 'thinking': {'type': 'disabled'}}
+            'request_option': 'preserved', 'thinking': {'type': 'disabled'},
+            'tool_choice':{'type':'auto','disable_parallel_tool_use':True}}
         assert kwargs['timeout'] == 600
         work = Path(config['runs_root'])/name
         evidence = json.loads((work/'input/evidence.json').read_text())
         assert len(evidence['takes']) == 2
         prompt = (work/'prompt.txt').read_text()
-        assert 'input/primary.json' in prompt and 'complete prompt.txt together in one tool turn' in prompt
+        assert 'input/primary.json' in prompt and 'sequential Write calls are allowed' in prompt
         write(work/'output/decision.json', {'action': 'stop', 'reason': 'fixture',
                                           'evidence': ['input/evidence.json']})
         return SimpleNamespace(ok=True, produced=['decision.json'], attempt='test')
