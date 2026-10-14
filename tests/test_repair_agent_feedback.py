@@ -83,6 +83,18 @@ def test_keep_cannot_clear_final_movie_issue_and_returns_to_agent(tmp_path,monke
     assert [r['status'] for r in audit(directory)['candidates']]==['rejected','adopted']
 
 
+def test_changed_runtime_reopens_blocked_input_without_resetting_take(tmp_path,monkeypatch):
+    directory,clips,_=configured(tmp_path);runtime={'model':'deepseek-v4.1-flash','effort':'medium'}
+    monkeypatch.setattr(agent,'load_config',lambda:copy.deepcopy(runtime))
+    review=read_json(directory/'episode_review.json');takes=managed.current_takes(directory,{'clips':clips},review)
+    state=managed.input_state(directory,clips[0],review['clips']['a'],takes)
+    atomic_write_json(directory/'repair_routing.json',{'a':{'status':'blocked','reason':'prior timeout','inputs':state}})
+    assert managed.candidates(directory,review)[1]['a']=='prior timeout'
+    runtime['repair_extra_body']={'thinking':{'type':'disabled'},'output_config':{'effort':'low'}}
+    assert 'a' in managed.candidates(directory,review)[0]
+    assert managed.current_takes(directory,{'clips':clips},review)==takes
+
+
 def test_sandbox_validation_rejection_exports_candidate_file_and_feedback_before_second_run(tmp_path,monkeypatch):
     directory,clips,_=configured(tmp_path);config={'runs_root':str(tmp_path/'runs')};calls=[]
     wrong=candidate(clips[0])['prompt'].replace('[Shot 1]','[Shot 2]')
