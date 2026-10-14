@@ -53,9 +53,11 @@
 
 **Files:** novel isolated worktree matching common modules, `agents/episode/media_operations.py`, completion/publication acceptance paths and focused tests.
 
-- [ ] Add final review after actual assembly and expose current feedback in render/review/finish; preserve novel request_scope/dialogue protections.
-- [ ] Run novel focused and full regression, then apply only tested task-owned source/test hunks to actual main; preserve all unrelated WIP.
-- [ ] Snapshot the existing backrooms delivery/episode metadata, confirm baseline count 28 and unchanged limits, then run the single complete automatic H3 workflow using current assets.
-- [ ] Await the terminal review outcome, retain every rejected candidate/take, and send the resulting version plus truthful review/count receipts to the existing Mac target.
+- [x] Add final review after actual assembly and expose current feedback in render/review/finish; preserve novel request_scope/dialogue protections.
+- [x] Run novel focused and full regression, then apply only tested task-owned source/test hunks to actual main; preserve all unrelated WIP.
+- [x] Snapshot the existing backrooms delivery/episode metadata, confirm baseline count 28 and unchanged limits, then run the single complete automatic H3 workflow using current assets.
+- [x] Await the terminal review outcome, retain every rejected candidate/take, and send the resulting version plus truthful review/count receipts to the existing Mac target.
 
 All real model/generation outcomes and any remaining content/budget blocker belong to the task runtime, not simulated test claims.
+
+Actual terminal outcome: candidate, 28→36 takes, 8 Mac files sent with exit0. Automatic review retained one audio failure; the independent post-terminal art supplement confirmed seven additional visual categories. This is completion of the bounded production/delivery run, not content acceptance. Original three-take limits are unchanged; there was no manual shot repair.
