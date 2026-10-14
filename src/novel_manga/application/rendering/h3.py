@@ -68,6 +68,13 @@ INPUT_RULES = REQUEST_CONTENT_RULES + (
     "Do not discuss translation, the task or missing information in shots or soundscape.\n"
 )
 
+POST_OVERLAY_RULES = (
+    "Text listed in postproduction_overlays is added by the delivery compositor, even if a source action "
+    "mentions that subtitle. It is not generated text in the photographed scene. Preserve the underlying "
+    "action and native dialogue, but omit these overlay captions from shot paragraphs rather than copying "
+    "their Chinese strings or asking the video model to draw subtitles. "
+)
+
 
 TRIES = 3  # translations per clip before it is left without an English prompt
 
@@ -96,10 +103,13 @@ def request_context(clip: dict, episode_dir: Path | None, *, source_script=None)
               for i, s in enumerate(script.get('shots', []), 1) if s.get('index', i) in indexes]
     refs = [r for r in clip.get('references', []) if r.get('role') != 'voice']
     images = [image_part(directory.parent / r['path'], 1024) for r in refs]
-    return {'source_excerpt': source, 'source_stage_bindings': stages,
+    context={'source_excerpt': source, 'source_stage_bindings': stages,
             'current_stage_parts': clip.get('shot_parts', []),
             'pictures': [{k: r[k] for k in ('name', 'role', 'view', 'wearers', 'aliases') if k in r}
-                         for r in refs]}, images
+                         for r in refs]}
+    overlays=[row for row in read_json(directory/'overlays.json',[]) if row.get('index') in indexes]
+    if overlays:context['postproduction_overlays']=overlays
+    return context,images
 
 
 def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path | None = None,
@@ -137,6 +147,13 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
     if clip.get("prompt_h3_of") == stamp and clip.get("prompt_h3") and not request_issues(clip):
         return False
     stages = stages_of(prompt)
+    if not stages and clip.get('prompt_compiler') == 'romance_conversation_v1':
+        bindings = clip.get('dialogue_bindings', [])
+        if any(row.get('stage') != 1 for row in bindings):
+            return reject('FAILED: conversation dialogue must belong to its single authored take')
+        stages = [(prompt, [(row['speaker_name'], row['text'],
+                             row.get('delivery_mode') == 'offscreen_dialogue', row.get('emotion', ''))
+                            for row in bindings])]
     if not stages:
         return reject("FAILED: the Chinese prompt has no 【阶段】 block to translate")
     _, subject_of = subject_lines(clip)
@@ -216,7 +233,8 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
         answer = None
         try:
             feedback = ('\nPrevious response was rejected: ' + problem + '\n') if problem else ''
-            text = (ASK + INPUT_RULES + feedback + naming + '\nInput context:\n'
+            overlay_rules=POST_OVERLAY_RULES if context.get('postproduction_overlays') else ''
+            text = (ASK + INPUT_RULES + overlay_rules + feedback + naming + '\nInput context:\n'
                     + json.dumps(context, ensure_ascii=False) + '\nShots:\n'
                     + '\n'.join(f'{i}. {visual}' for i, visual in enumerate(visuals, 1)))
             print(f"{clip.get('clip_id', 'clip')}: h3prompt model={endpoint.model}", file=sys.stderr, flush=True)

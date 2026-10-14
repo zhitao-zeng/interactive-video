@@ -233,7 +233,9 @@ def build_references(cast: list[str], location_short: str | None, bible: StoryBi
     # by itself; it ignores both @音频N text bindings and the order of the audio
     # items (docs/seedance-reference-audio.md), so nothing about voices goes
     # into the prompt.  Cast order here is just for a stable plan file.
-    for voice_index, name in enumerate((n for n in cast if n in speakers and n in settings.voices), start=1):
+    # A narrator still needs the same voice in an environment-only shot.
+    voice_order = dict.fromkeys([*cast, *speakers])
+    for voice_index, name in enumerate((n for n in voice_order if n in speakers and n in settings.voices), start=1):
         references.append({"tag": f"@音频{voice_index}", "role": "voice", "name": name, "path": settings.voices[name]})
     if prop_bindings:
         location_binding += ("。" if location_binding else '') + "。".join(prop_bindings)

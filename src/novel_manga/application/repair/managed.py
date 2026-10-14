@@ -37,7 +37,10 @@ def source_state(directory: Path, clip: dict, *, inputs: RepairInputs | None = N
     source_identity = {k: [{field:value for field,value in row.items() if field!='source_quote'}
                           for row in identity_context.get(k, [])] for k in ['mentions','relations','appearances']}
     from novel_manga.application.identity.dialogue import POLICY as BINDING_POLICY
-    return {'binding_policy': BINDING_POLICY, 'identity_reading': source_identity, 'stages':[s for i,s in enumerate(script.get('shots',[]),1)
+    from novel_manga.application.repair.authored_request import POLICY as AUTHORED_POLICY
+    return {'binding_policy': BINDING_POLICY,
+            **({'authored_request_policy': AUTHORED_POLICY} if clip.get('authored_english_source') or clip.get('source_authored_segment') else {}),
+            'identity_reading': source_identity, 'stages':[s for i,s in enumerate(script.get('shots',[]),1)
                       if s.get('index',i) in clip.get('shot_indexes',[])],
             'segments':inputs.identity.segments, 'segment_ids': clip.get('segment_ids') or [],
             'cast':clip.get('cast',[]),'references':clip.get('references',[]),'crowd_roles':clip.get('crowd_roles',{}),
@@ -48,7 +51,9 @@ def source_state(directory: Path, clip: dict, *, inputs: RepairInputs | None = N
 def input_state(directory: Path, clip: dict, verdict: dict, takes: dict, *, inputs: RepairInputs | None = None) -> dict:
     inputs = inputs if inputs is not None else RepairInputs.load(directory)
     from novel_manga.application.preparation.request_check import POLICY as INPUT_POLICY
-    return {'reframe_policy': REFRAME_POLICY, 'input_check_policy': INPUT_POLICY, 'clip':history.accepted_clip_material(clip),
+    from novel_manga.application.repair.agent import enabled, FRAME_HANDOFF_POLICY
+    return {**({'repair_evidence_policy':FRAME_HANDOFF_POLICY} if enabled(directory) else {}),
+            'reframe_policy': REFRAME_POLICY, 'input_check_policy': INPUT_POLICY, 'clip':history.accepted_clip_material(clip),
             'note':inputs.notes.get(clip['clip_id'],''),
             'source':source_state(directory,clip,inputs=inputs),'take':takes.get(clip['clip_id']),
             'error_kinds': (verdict.get('verify') or {}).get('error_kinds', []),
@@ -84,6 +89,10 @@ def candidates(directory: Path, review: dict | None = None) -> tuple[list[str],d
 
 def reframe_candidate(directory: Path, cid: str, issue: str):
     """One bounded rewrite/check path shared by video repair and first-take input repair."""
+    from novel_manga.application.repair.authored_request import propose as authored_proposal
+    authored = authored_proposal(directory, cid, issue)
+    if authored is not None:
+        return authored
     from novel_manga.application.repair.flow import repair_episode
     from novel_manga.application.rendering.h3 import convert
     from novel_manga.application.profiles import h3_prompt_outdated
@@ -150,9 +159,30 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
         review = read(directory/'episode_review.json', {})
         verdict = review.get('clips', {}).get(cid, {})
         before = input_state(directory, clip, verdict, current_takes(directory, plan, review))
+        previous=decisions.get(cid,{})
+        if previous.get('status')=='blocked' and previous.get('inputs')==before:
+            blocked[cid]=previous.get('reason','unchanged rejected repair')
+            continue
         source_before = read(directory/'chapter_script.json', {})
         notes_before = read(directory/'review_feedback.json', {})
         try:
+            # A repeated canvas layout can come from the actual reference sheet.
+            # Fix that input before spending another seed under the same limit.
+            from novel_manga.application.repair.reference_views import propose as reference_views_proposal
+            reference_proposal=reference_views_proposal(directory,clip,verdict)
+            if reference_proposal is not None:
+                updated=next(c for c in reference_proposal.plan['clips'] if c['clip_id']==cid)
+                check=agent.check_request(updated,directory.parent)
+                if not check.get('consistent') or check.get('problems'):
+                    raise ValueError('single-view reference input did not pass consistency check')
+                if read(directory/'clip_plan.json',{})!=plan or read(directory/'chapter_script.json',{})!=source_before:
+                    raise ValueError('episode inputs changed while selecting reference views')
+                publish_candidate(directory,reference_proposal,'reference_single_view',{cid})
+                changed.append(cid)
+                decisions[cid]={'at':time.strftime('%F %T'),'action':'reference_single_view','status':'prepared',
+                    'diagnosis':reference_proposal.changes,'inputs':before}
+                atomic_write_json(directory/'repair_routing.json',decisions)
+                continue
             decision = agent.propose(directory, clip, verdict)
             # Do not accept a proposal against a source changed while the sandbox was running.
             if (read(directory/'clip_plan.json', {}) != plan
@@ -167,14 +197,14 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
             elif action == 'edit':
                 proposal = agent.final_proposal(directory, plan, clip, decision)
                 updated = next(c for c in proposal.plan['clips'] if c['clip_id'] == cid)
-                check = request_consistency(updated, directory.parent)
-                if not check.get('consistent'):
+                check = agent.check_request(updated, directory.parent)
+                if not check.get('consistent') or check.get('problems'):
                     raise ValueError('agent candidate input conflict: '+ '; '.join(check.get('problems', [])))
                 publish_candidate(directory, proposal, 'agent_prompt', {cid})
                 changed.append(cid)
             else:
-                check = request_consistency(clip, directory.parent)
-                if not check.get('consistent'):
+                check = agent.check_request(clip, directory.parent)
+                if not check.get('consistent') or check.get('problems'):
                     raise ValueError('agent retake input conflict: '+ '; '.join(check.get('problems', [])))
                 publish_retake(directory, retake_proposal(plan, cid, decision))
                 changed.append(cid)

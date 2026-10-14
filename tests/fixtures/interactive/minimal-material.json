@@ -1,0 +1,201 @@
+{
+  "profile": {
+    "style": "suspense-live",
+    "frame": "9:16",
+    "tier": "quality",
+    "genre": "generic",
+    "resolution": "480p",
+    "expressions": false,
+    "two_views": "off",
+    "episode_shape": "fixed",
+    "speech_gate": "enforce",
+    "props": false
+  },
+  "bible": {
+    "novel_title": "凌晨两点，谁进过空房？",
+    "genre": "当代悬疑调查互动短剧",
+    "visual_style": "现代真人电影摄影，自然皮肤、普通公寓、克制表演",
+    "palette": "钢灰、炭黑、米白、旧木棕；低饱和自然调色",
+    "style_fingerprint": "suspense-live-v1",
+    "characters": [
+      {
+        "name": "沈序",
+        "role": "主角",
+        "gender": "男",
+        "age": "28",
+        "appearance": "中国成年男性，清瘦、短黑侧分发、无眼镜无胡须，以原包身份基准为准。",
+        "wardrobe": "炭灰哑光及大腿中部羊毛外套，黑色圆领内搭，深色长裤、黑靴，无警徽无武器。",
+        "voice_profile_id": "shenxu-v1"
+      },
+      {
+        "name": "徐程",
+        "role": "租客",
+        "gender": "男",
+        "age": "31",
+        "appearance": "中国成年男性，柔和偏圆椭圆脸，微乱短黑发，自然刘海，无胡须，略疲惫；普通租客。",
+        "wardrobe": "无字米灰圆领卫衣、深灰休闲裤、深色室内拖鞋；手持普通深色壳手机。",
+        "voice_profile_id": "xucheng-v1"
+      }
+    ],
+    "locations": [
+      "公寓走廊：正对同一面墙时801左、802右，相邻两户之间共墙；棕色木门、米灰墙、灰砖地、小型白色摄像头。",
+      "801室内：空置普通公寓，右侧共墙小检查标记；木桌左侧玻璃杯与不锈钢保温杯，中间黑手机连白充电线，右侧维修纸页，桌下工具包。",
+      "802室内：徐程居住的普通公寓，米灰墙、木柜、灰布椅；朝室内看左侧与801共墙，调查时徐程始终站在自家门内。"
+    ],
+    "props": [
+      {
+        "name": "门锁打印记录",
+        "appearance": "一张白色A4打印纸，记录01:52，徐程（临时），密码被使用；不显示实际密码。",
+        "category": "其他"
+      },
+      {
+        "name": "维修清点单",
+        "appearance": "普通米白A4维修资料，标题维修清点单，不增加日期、签名或新调查结论。",
+        "category": "其他"
+      },
+      {
+        "name": "黑本笔记页",
+        "appearance": "黑色笔记本中同一页的事实、证词、假设三栏；假设徐程进入带问号。",
+        "category": "其他"
+      },
+      {
+        "name": "松脱装订条",
+        "appearance": "一张独立米色窄纸条，017／附件04；不是沈序的旧卡。",
+        "category": "其他"
+      },
+      {
+        "name": "沈序旧案卡",
+        "appearance": "沈序黑本中的旧米色纸卡，只有编号017；无案情照片和人物姓名。",
+        "category": "其他"
+      },
+      {
+        "name": "017对照材料",
+        "appearance": "两张分开的纸：旧卡017与窄装订条017／附件04，形状不同。",
+        "category": "其他"
+      }
+    ],
+    "continuity_rules": [
+      "801和802在走廊同侧相邻，共墙；不能变成走廊两侧对门。",
+      "徐程调查时留在802门内，沈序在走廊与801移动。",
+      "只有801充电手机与徐程手持手机两部；沈序拿门锁打印纸。",
+      "S24以前装订条朝下不露017，S26取旧卡对照，S29收回旧卡，装订条留在801。",
+      "三下敲击只在开场陈述画面发生，不把它解释成超自然或确定的维修行为。",
+      "门锁记录仅证明密码被使用，不证明徐程进入；相同017编号不等于已确认同案。"
+    ]
+  },
+  "groups": [
+    {
+      "shot_indexes": [
+        1
+      ],
+      "source_segment": "原镜头1"
+    }
+  ],
+  "segments": [
+    {
+      "segment_id": "seg_1",
+      "text": "闭着的801房门与相邻802门框建立位置；共墙侧传来三下敲击。"
+    }
+  ],
+  "overlays": [],
+  "interaction": {
+    "id": "suspense-ep01-end",
+    "series_title": "凌晨两点，谁进过空房？",
+    "question": "先查哪一处？",
+    "seconds": 3,
+    "ambience_shot_index": 18,
+    "options": [
+      {
+        "id": "A",
+        "label": "查监控",
+        "next": "第二集A入口"
+      },
+      {
+        "id": "B",
+        "label": "查租客",
+        "next": "第二集B入口"
+      },
+      {
+        "id": "C",
+        "label": "查门锁",
+        "next": "第二集C入口"
+      }
+    ],
+    "selected": null,
+    "theme": {
+      "background": "#24282B",
+      "foreground": "#EEE8DC",
+      "secondary": "#A9B2B5"
+    }
+  },
+  "voice_specs": {
+    "沈序": {
+      "sample_text": "先核对记录。",
+      "prompt": "成年男性",
+      "picture": "series_assets/characters/character_001/turnaround.jpeg"
+    }
+  },
+  "script": {
+    "video_title": "凌晨两点，谁进过空房？",
+    "source_title": "凌晨两点谁进过空房 第一集",
+    "episode_index": 1,
+    "profile": {
+      "style": "suspense-live",
+      "frame": "9:16",
+      "tier": "quality",
+      "genre": "generic",
+      "resolution": "480p",
+      "expressions": false,
+      "two_views": "off",
+      "episode_shape": "fixed",
+      "speech_gate": "enforce",
+      "props": false
+    },
+    "shots": [
+      {
+        "index": 1,
+        "origin_index": 1,
+        "shot_id": "S01",
+        "label": "S01",
+        "segment_id": "seg_1",
+        "source_quote": "闭着的801房门与相邻802门框建立位置；共墙侧传来三下敲击。",
+        "source_shots": [
+          "B01",
+          "B02"
+        ],
+        "location": "公寓走廊",
+        "scene_id": "公寓走廊",
+        "scene_time": "徐程陈述的凌晨两点",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [],
+        "visual_prompt": "两户房门位置固定。近景；闭着的801房门与相邻802门框建立位置；共墙侧传来三下敲击。",
+        "motion_prompt": "闭着的801房门与相邻802门框建立位置；共墙侧传来三下敲击。",
+        "start_state": "两户房门位置固定",
+        "end_state": "三下敲击结束",
+        "camera": "固定机位，门牌与两户关系可辨认",
+        "light": "普通公寓实景光，真实肤色；凌晨仅普通室内灯，调查时柔和日光和楼道顶灯。",
+        "shot_scale": "近景",
+        "duration_seconds": 4,
+        "authored_duration_seconds": 4,
+        "sfx": "三下敲墙声，仅此一次；楼道底声；自然连续的公寓底声，无配乐。",
+        "avoid": "多余人物、重复人物、凶手式阴笑、夸张蒸汽、鬼影、字幕、水印",
+        "turns": [
+          {
+            "speaker_name": "",
+            "delivery_mode": "silent_action",
+            "text": "闭着的801房门与相邻802门框建立位置；共墙侧传来三下敲击。",
+            "emotion": ""
+          }
+        ]
+      }
+    ],
+    "skipped_segments": [],
+    "hook": "空房的门锁记录上出现相邻租客的名字。",
+    "summary": "核对记录的证据边界，发现017编号对应，提出三条未获选的调查入口。"
+  },
+  "source_seconds": 4
+}

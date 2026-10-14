@@ -86,6 +86,9 @@ def repair_rejected_reference(ctx, clip: dict, index: int) -> list[str]:
     ref = references[index]
     if ref.get("role") == "voice":
         return []  # a refused reference voice has no card to repair
+    if ref.get('role') == 'character' and getattr(getattr(ctx, 'asset_style', None), 'render_family', '') == 'photo':
+        log('privacy repair: live-action identity must remain photographic; no animation redraw')
+        return []
     path = ctx.novel_dir / ref["path"]
     label = f"{ref['asset_id']}/{path.name}"
     if ref["path"] in (set(ctx.state.ok_assets) | load_privacy_ok(ctx.novel_dir)):
@@ -146,6 +149,9 @@ def repair_privacy_cards(ctx, clip: dict) -> list[str]:
     redrawn at most once: one already stylized (by this run, a parallel
     thread or another process) just earns the clip its retry.
     """
+    if getattr(getattr(ctx, 'asset_style', None), 'render_family', '') == 'photo':
+        log('privacy repair: live-action profile keeps the supplied identity; rejection is reported')
+        return []
     exempt = set(ctx.state.ok_assets) | load_privacy_ok(ctx.novel_dir)
     cards = [ref for ref in clip.get("references", []) if ref["role"] == "character"]
     candidates = [ref for ref in cards if ref["path"] not in exempt]

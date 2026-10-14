@@ -10,17 +10,18 @@ import tempfile
 from novel_manga.episodes import chapter_of
 from novel_manga.util import atomic_write_json, read_json
 from .context import EpisodeContext
+from novel_manga.application.preparation.imported import EPISODE_FILES, BOOK_FILES as IMPORTED_BOOK_FILES
 from .session import SKILL_SOURCE
 
 
 BOOK_FILES = ('novel.json', 'story_bible.json', 'bible_aliases.json', 'bible_growth.json', 'entity_index.json',
               'reading_cast.json', 'cast_index.json', 'style.json', 'profile.json',
               'visual_grammar.json', 'chat_screen.json', 'asr_aliases.json', 'entity/entities.json',
-              'entity/claims.json', 'entity/types.json')
+              'entity/claims.json', 'entity/types.json', *IMPORTED_BOOK_FILES)
 READING_FILES = ('identity_source_reading.json', 'identity_context.json', 'source_reading.json',
                  'source_speaker_contract.json', 'identity_binding_review.json')
 SCRIPT_FILES = ('chapter_script.json', 'clip_plan.json', 'episode_plan.json', 'scene_outline.json',
-                'scene_script.json', 'clip_overrides.json', 'visor_states.json', 'posture_states.json')
+                'scene_script.json', 'clip_overrides.json', 'visor_states.json', 'posture_states.json', *EPISODE_FILES)
 SKILL_REFERENCES = {
     'output_contract': 'references/output-contract.md',
     'authoring': 'references/authoring.md',
@@ -97,6 +98,10 @@ def _replace_file(source, target):
 
 
 def _source(ctx, segments):
+    # A local original is stronger evidence than condensed segment excerpts.
+    authored = ctx.source_episode_dir/'authored_source.md'
+    if authored.is_file():
+        return authored.read_text(encoding='utf-8'), ctx.source_episode_dir.name, 'authored_document', None
     metadata = read_json(ctx.source_novel_dir / 'novel.json', {})
     chapter = chapter_of(ctx.source_episode_dir.name)
     reason = None
@@ -509,12 +514,26 @@ def prepare_inputs(ctx: EpisodeContext):
         else:
             _copy(ctx.episode_dir / 'chapter_script.json', ctx.work_dir / 'input/chapter_script.json')
         authoritative = ['input/chapter_script.json', 'input/clip_plan.json']
+    imported = []
+    for name in EPISODE_FILES:
+        _copy(ctx.source_episode_dir/name, ctx.episode_dir/name)
+        if _copy(ctx.episode_dir/name, ctx.work_dir/'input'/name):
+            imported.append('input/'+name)
+    for row in read_json(ctx.episode_dir/'intake.json', {}).get('documents', []):
+        name = row['path']
+        _copy(ctx.source_episode_dir/name, ctx.episode_dir/name)
+        if _copy(ctx.episode_dir/name, ctx.work_dir/'input'/name):
+            imported.append('input/'+name)
+    for name in IMPORTED_BOOK_FILES:
+        if _copy(ctx.novel_dir/name, ctx.work_dir/'input'/name):
+            imported.append('input/'+name)
+    authoritative.extend(imported)
     target = ctx.target_seconds
     if ctx.input_mode == 'script' and target is None:
         total = sum(float(c.get('request_seconds') or 0) for c in plan.get('clips', []))
         target = (total, total) if total else None
     manifest = {'input_mode': ctx.input_mode, 'source': 'input/source.txt', 'source_kind': source_kind,
-        'source_complete': source_kind == 'registered_source', 'source_error': source_error,
+        'source_complete': source_kind in {'registered_source', 'authored_document'}, 'source_error': source_error,
         'segments': 'input/segments.json', 'catalog': 'input/catalog.json', 'reading': reading,
         'chapter': chapter_of(ctx.source_episode_dir.name), 'title': title,
         'profile': 'input/profile.json', 'target_seconds': list(target) if target else None,

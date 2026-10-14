@@ -77,6 +77,9 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
         self.pool = H3Pool(target[5:] or None) if target == "pool" or target.startswith("pool:") else None
         self.base_url = "" if self.pool else target.rstrip("/")
         self.ratio = ratio
+        self.short_edge = int(os.environ.get('NOVEL_H3_SHORT_EDGE', str(SHORT_EDGE)))
+        if self.short_edge not in (544, 768):
+            raise ValueError('NOVEL_H3_SHORT_EDGE must be 544 or 768')
         # Internal generation and artifact traffic must not use the session's
         # public-network proxy. The inherited image provider keeps its client.
         self.h3_client = httpx.Client(timeout=settings.request_timeout, trust_env=False)
@@ -98,7 +101,7 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
 
     def sampling_parameters(self) -> dict:
         """The sampling configuration actually sent by this local H3 lane."""
-        return {"short_edge": SHORT_EDGE, "aspect_ratio": self.ratio,
+        return {"short_edge": getattr(self, 'short_edge', SHORT_EDGE), "aspect_ratio": self.ratio,
                 "num_inference_steps": 9, "flow_shift": 12.0, "audio_flow_shift": 3.0}
 
     def _payload(self, prompt: str, images: list[Path], audios: tuple[Path, ...], duration: float) -> dict:
@@ -173,6 +176,7 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
         additional_images: tuple[Path, ...] = (),
         reference_audios: tuple[Path, ...] = (),
         seed_variant: int = 0,
+        seed: int | None = None,
     ) -> Path:
         call_started = time.monotonic()
         timing = {'call_started_at': time.time(), 'pool_wait_s': 0.0, 'submission_s': 0.0}
@@ -181,6 +185,10 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
             if not Path(path).is_file():
                 raise FileNotFoundError(path)
         payload = self._payload(prompt, images, tuple(reference_audios), duration)
+        if seed is not None:
+            if not isinstance(seed, int) or not 0 <= seed < 2 ** 31:
+                raise ValueError('H3 seed must be an integer in [0, 2**31)')
+            payload['seed'] = seed
         sampling = self.sampling_parameters()
         request_sha256 = self._request_digest(payload, seed_variant)
 
@@ -225,7 +233,7 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
             atomic_write_json(task_path, {**cached, "h3_sampling": resumed_sampling})
         # This remains the NEW-request seed. An old task is polled using its
         # existing id; if it is unavailable, ordinary recovery submits 544.
-        payload["seed"] = int(request_sha256[:8], 16) % (2 ** 31)
+        payload["seed"] = seed if seed is not None else int(request_sha256[:8], 16) % (2 ** 31)
 
         slot, instance, status = None, None, "pending"
         submitted = time.monotonic()

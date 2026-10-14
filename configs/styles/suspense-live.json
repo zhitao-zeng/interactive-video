@@ -1,0 +1,13 @@
+{
+  "name": "现代公寓悬疑写实",
+  "render_family": "photo",
+  "visual_style": "现代真人悬疑电影摄影，真实皮肤、普通公寓实景、自然服装、克制表演",
+  "render_direction": "自然皮肤纹理、真实布料，钢灰米白旧木棕，柔和日光与普通室内灯，真实人物比例",
+  "scene_style": "现代中国出租公寓实景摄影",
+  "scene_direction": "米灰墙面、灰砖地、棕色木门，清楚可信的房间方位与自然曝光",
+  "h3_style_line": "Contemporary live-action suspense film footage. Natural skin, ordinary Chinese rental apartments, beige plaster, gray tiles, brown wooden doors, restrained performances and realistic practical light.",
+  "card_suffix": "",
+  "prompt_fingerprint": false,
+  "tidy_prompts": true,
+  "location_empty_suffix": "空场参考，无人；不生成文字，由后期精确排版"
+}
