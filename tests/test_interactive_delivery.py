@@ -35,6 +35,23 @@ def test_resume_only_when_no_generation_has_been_submitted(tmp_path):
     assert not can_resume_unsubmitted(tmp_path,report)
 
 
+def test_branding_is_encoded_before_final_movie_review(labelled_delivery):
+    import json
+    from novel_manga.interactive import delivery
+    from types import SimpleNamespace
+    case=labelled_delivery
+    runner=SimpleNamespace(context=case.ctx)
+    report,destination,commands=case.report,case.destination,case.commands
+    wm={'text':'series EP01','fontfile':'/font.ttf','fontsize':28,'fontcolor':'white',
+        'borderw':2,'bordercolor':'black','x':'w-text_w-48','y':48}
+    (runner.context.episode_dir/'delivery_policy.json').write_text(json.dumps({'packaging':{'watermark':wm}}))
+    receipt=delivery.deliver(runner,report,destination)
+    graph=next(c[c.index('-filter_complex')+1] for c in commands if '-filter_complex' in c)
+    assert 'concat=n=2:v=1:a=1[plain][a];[plain]drawtext=' in graph
+    assert (destination/'watermark.txt').read_text()=='series EP01'
+    assert receipt['packaging']['watermark']==wm
+
+
 def test_user_can_cancel_scene_overlays_without_removing_dialogue_or_choices(tmp_path,monkeypatch):
     import json
     from types import SimpleNamespace

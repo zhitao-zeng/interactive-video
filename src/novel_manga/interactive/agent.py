@@ -19,7 +19,7 @@ def repair_lane(lane):
             os.environ[key] = previous
 
 
-def run(runner, lane, *, resume=False):
+def run(runner, lane, *, resume=False, destination=None):
     from novel_manga.application.rendering.reviewed import run as reviewed_run
     from novel_manga.application.review.execution import media_matches
     from novel_manga.util import read_json
@@ -27,8 +27,13 @@ def run(runner, lane, *, resume=False):
         read_json(runner.context.episode_dir/'thin_media_report.json',{}), notes=runner.context.feedback)
     previous = runner.context.profile
     runner.context.profile = {**previous, 'repair_backend': 'sandbox_agent'}
+    final_review=None
+    if destination is not None:
+        from novel_manga.interactive.delivery import reviewed_delivery
+        final_review=lambda report: reviewed_delivery(runner,report,destination)
     try:
         with repair_lane(lane):
-            return reviewed_run(runner,repair_existing=True) if reuse else reviewed_run(runner)
+            options={'final_review':final_review} if final_review is not None else {}
+            return reviewed_run(runner,repair_existing=True,**options) if reuse else reviewed_run(runner,**options)
     finally:
         runner.context.profile = previous
