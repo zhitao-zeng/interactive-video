@@ -52,3 +52,8 @@ def test_shared_sandbox_arguments_are_provider_specific():
 def test_sandbox_declares_the_configured_custom_model_context_window():
     args = sandbox.provider_container_args({'context_window': 1000000})
     assert args == ['-e', 'CLAUDE_CODE_MAX_CONTEXT_TOKENS=1000000']
+
+
+def test_oneoff_sandbox_honors_native_thinking_control():
+    args=sandbox.provider_container_args({'max_thinking_tokens':0})
+    assert args==['-e','MAX_THINKING_TOKENS=0','-e','CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1']
