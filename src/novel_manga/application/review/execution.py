@@ -158,6 +158,8 @@ def save_result(directory, media, review, *, plan=None, rounds=(), corrections=(
         rounds=rounds, corrections=corrections, blocked=blocked,
         generated_counts=managed.generated_counts(history.load(directory)),
     )
+    native=final_cut.apply_feedback(directory,review,None)
+    result['native_content_passed']=evaluate_acceptance(planned,media,native,stale=stale).content_passed
     if final is not None:
         final_passed=final_current and final.get('complete') is True and final.get('passed') is True and not final.get('issues') and not final.get('errors')
         result.update(final_cut_passed=bool(final_passed),
