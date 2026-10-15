@@ -26,4 +26,4 @@
 
 实际 export010 尾窗 190.480–193.480 秒重新跑本地 SenseVoice，结果为空；RMS −34.54930dBFS、峰值 −19.98623dBFS，无削波且非静音。与 007 PCM 不全等，未冒用旧 ASR；绑定最终文件身份的核验位于专属 runtime 的 audio/audit/export-010。尚未主观试听自然度，不声称主观效果已通过。
 
-Mac 目标为原有 4paradigm 的 MacBook Pro。回执、终审 JSON 和封面已收到 HTTP 200；视频链路约 30KB/s，直传视频超时后恢复既有 Taildrop 视频传送，预览与完整片仍在途。实际发送完成情况以 .runtime/backrooms-upstream-fix-20261015/mac-transfer.json 为准，不把启动命令当作送达。所有修复均本地提交，无 push、PR 或全局服务/网络改动。
+Mac 交付已完成：5 个文件为 480P 完整预览、1080P 完整片、回执、终审 JSON 和封面。文字/证据/封面获 Taildrop HTTP 200，两个视频 CLI 均 exit 0；完整片 OutgoingFiles 明确 Finished/Succeeded，119,599,903 字节与源文件一致。原电影身份、实际 63 次及旧版保留再次核对。实际凭据为专属 runtime 的 mac-transfer.json 与 final-handoff.json，不声称读取了 Mac 文件系统。慢链路中断曾留下较小同名预览，最终完整预览为 11,146,669 字节，已提醒使用最后收到的完整副本；中断记录也保留。所有本任务生产、发送及进度订阅进程已结束。本地提交，无 push、PR 或全局服务/网络改动。
