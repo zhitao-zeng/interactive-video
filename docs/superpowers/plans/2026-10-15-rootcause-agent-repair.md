@@ -54,9 +54,9 @@ User authorized the concrete prior root-cause plan and automatic continuation; n
 
 **Files:** tests for cross-route regressions, docs record; novel synchronized minimal files; production runtime catalogs and existing episode only through host actions.
 
-- [ ] Run applicable/full suites and one independent branch review; fix actual important findings with regression tests.
-- [ ] Commit/merge shared main and compatible content branches; sync same implementation to isolated novel tree, test and apply only nonconflicting files to actual novel main.
-- [ ] Agents prepare actual asset/story/audio candidates and corrected review from current movie evidence; host exports them to repair sandbox.
-- [ ] Register corrected review; run fixed full automatic flow. Input-only repairs are legal at zero video budget. Any new video allowance must be explicit, conditional on verified changed input, logged without resetting original counts; one new take per qualifying source range maximum in this run.
+- [x] Run applicable/full suites and one independent branch review; fix actual important findings with regression tests.
+- [x] Commit/merge shared main and compatible content branches; sync same implementation to isolated novel tree, test and apply only nonconflicting files to actual novel main.
+- [x] Agents prepare actual asset/story/audio candidates and corrected review from current movie evidence; host exports them to repair sandbox.
+- [x] Register corrected review; run fixed full automatic flow. Input-only repairs are legal at zero video budget. Any new video allowance must be explicit, conditional on verified changed input, logged without resetting original counts; at most one conditional extra for each qualifying exhausted source range; previously unspent video balances remain available without a new grant.
 - [ ] Wait for full native/final/independent review; retain honest result and every old take/version. Send movie, preview, review and receipt to existing Mac destination; verify transfer receipts.
-- [ ] Record changed behavior/tests/commits/counts/review result/delivery limitations. Do not claim media passed unless gates passed.
+- [x] Record changed behavior/tests/commits/counts/review result/delivery limitations. Do not claim media passed unless gates passed.
