@@ -118,4 +118,4 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 
 | codex /root/backrooms_audio | 用户批准闭环一：Agent候选校验拒绝后最多3份候选有界反馈重提 | codex/feat/shared-pipeline / interactive-video-worktrees/shared-pipeline | application/repair/{agent,managed}.py、对应tests、skills/video-repair/SKILL.md；不碰reviewed/execution/final_cut | 2026-10-14 | 已完成：带候选的精确校验拒绝回传、最多3份候选/逐份审计；stop/源或终审证据变化/服务失败/额度耗尽停止。终审global帧/邻界图复制进sandbox并先核对，缺必需帧不盲调；既有输入策略自然失效旧blocked。新增17项有意义回归及相关128项通过，diff检查通过；原3次视频/每次600秒/全部历史保留，无模型/生成/部署/提交合并。root统一集成/全量/小说同步及实拍验证待做 |
 
-| Codex 悬疑会话01a133e5 | 独立审片进入自动修复闭环，小说同步 | codex/feat/shared-pipeline | review/independent.py、final_cut.py、互动入口及对应测试；小说独立worktree | 2026-10-15 | 在途：独立结果必须进入现有反馈/Agent/重拍/重新审片；原36条和3次上限保留，不人工补段。 |
+| Codex 悬疑会话01a133e5 | 独立审片进入自动修复闭环，小说同步 | codex/feat/shared-pipeline | review/independent.py、final_cut.py、互动入口及对应测试；小说独立worktree | 2026-10-15 | 在途：独立结果必须进入现有反馈/Agent/重拍/重新审片；原36条和3次上限保留，不人工补段。 ；2026-10-15进展：共享 f8f1669/3323全量、小说实际main af70848/3547全量；独立七项已注册为8个镜头反馈。原Phanthy8次HTTP402零新拍；用户明确临时Codex登录Luna，17秒实际读图/输出已过；Luna完整自动续跑进行中，原36次/3次上限和旧版保留，无人工补段、无push。 |
