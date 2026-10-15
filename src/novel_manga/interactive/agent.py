@@ -19,10 +19,14 @@ def repair_lane(lane):
             os.environ[key] = previous
 
 
-def run(runner, lane, *, resume=False, destination=None):
+def run(runner, lane, *, resume=False, destination=None, independent_report=None):
     from novel_manga.application.rendering.reviewed import run as reviewed_run
     from novel_manga.application.review.execution import media_matches
     from novel_manga.util import read_json
+    if independent_report is not None:
+        from novel_manga.application.review.independent import register
+        register(runner.context.episode_dir,
+                 read_json(runner.context.episode_dir/'thin_media_report.json',{}),independent_report)
     reuse = resume and media_matches(runner.context.clip_plan,
         read_json(runner.context.episode_dir/'thin_media_report.json',{}), notes=runner.context.feedback)
     previous = runner.context.profile
