@@ -179,7 +179,18 @@ def deliver(runner, report: dict, destination: Path) -> dict:
     tail=destination/'interaction.mp4'
     tail_audio=['-f','lavfi','-i','anullsrc=r=48000:cl=stereo']
     ambience_source=None
-    if interaction.get('ambience_shot_index'):
+    if policy.get('interaction_ambience'):
+        from novel_manga.application.repair.ambience import validate
+        asset=policy['interaction_ambience']
+        independent_audio=validate(asset)
+        ambient=destination/'interaction-ambience.wav'
+        run(['ffmpeg','-y','-v','error','-i',str(independent_audio),'-t','3',
+             '-ar','48000','-ac','2','-c:a','pcm_s16le',str(ambient)])
+        ambience_source={**asset,'kind':'independent_asset','exported_audio':str(ambient),
+                         'clip_id':next((c['clip_id'] for c in ctx.clip_plan['clips']
+                            if interaction.get('ambience_shot_index') in c.get('shot_indexes',[])),None)}
+        tail_audio=['-i',str(ambient)]
+    elif interaction.get('ambience_shot_index'):
         start,length=ambience_window(interaction['ambience_shot_index'],ctx.script,ctx.clip_plan,assembly.get('timeline',[]))
         ambience_source={'start':start,'end':start+length,
                          'clip_id':next(c['clip_id'] for c in ctx.clip_plan['clips']

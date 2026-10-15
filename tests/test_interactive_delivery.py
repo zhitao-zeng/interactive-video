@@ -188,3 +188,21 @@ def test_nonempty_evidence_composite_error_cannot_be_accepted(labelled_delivery,
     assert receipt['postproduction']['errors']['composite']=='RuntimeError: Unable to observe prop surface'
     assert receipt['final_evidence_review_pending'] is True
     assert json.loads((case.destination/'evidence-review.json').read_text())['passed'] is False
+
+
+def test_independent_ambience_uses_asset_instead_of_spoken_body_window(labelled_delivery,monkeypatch):
+    import json,wave
+    from types import SimpleNamespace
+    from novel_manga.interactive import delivery
+    case=labelled_delivery
+    audio=case.ctx.episode_dir/'room.wav'
+    with wave.open(str(audio),'wb') as f:
+        f.setparams((1,2,48000,0,'NONE','not compressed'));f.writeframes(b'\0\0'*144000)
+    (case.ctx.episode_dir/'interaction.json').write_text(json.dumps({'seconds':3,'question':'choose','options':[],'ambience_shot_index':19}))
+    (case.ctx.episode_dir/'delivery_policy.json').write_text(json.dumps({'interaction_ambience':{
+        'path':str(audio),'review':{'speech_free':True,'method':'local_asr'}}}))
+    monkeypatch.setattr(delivery,'ambience_window',lambda *a:pytest.fail('mixed audio window must not be used'))
+    receipt=delivery.deliver(SimpleNamespace(context=case.ctx),case.report,case.destination)
+    assert receipt['ambience_source']['kind']=='independent_asset'
+    extraction=[c for c in case.commands if str(audio) in c]
+    assert len(extraction)==1 and '-ss' not in extraction[0]
