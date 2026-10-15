@@ -14,6 +14,20 @@ All three use the same versioned implementation. Topic adapters are common code,
 of the whole pipeline. Explicit `--project` and `--material` choose the content. Outputs and generation
 histories stay in the original owning worktrees.
 
+The common repair principles in `skills/episode-production/SKILL.md`, the shared
+`references/case-lessons.md`, and the common principles/stability examples in
+`skills/video-repair/SKILL.md` are shared guidance. Publish their changes through
+`shared-pipeline` and `main`, then synchronize the same guidance into all three
+content branches and the independent novel repository. Preserve local tool
+contracts and in-progress planning/camera guidance; they follow the code that
+actually implements them. Genre creation skills remain separate.
+
+Check the installed Skill as well as the repository source when resuming an
+Agent. A code checkout, an installed workspace copy and an earlier conversation
+are different states. Preserve old attempt snapshots and running jobs; refreshed
+guidance must be read on the next authorized invocation before claiming it was
+used. Synchronizing a Skill does not authorize generation or renew a budget.
+
 ## Routine work
 
 1. Work in the existing topic worktree and keep its branch. Commit topic material independently.
