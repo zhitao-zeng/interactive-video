@@ -16,7 +16,7 @@ and supported decisions, not universal prompt templates or quality guarantees.
 | Final publication named a bad clip while the ordinary repair list was empty. | A host routing gap hid an unresolved publication target. | Current publication blockers are repair targets too; use the actual per-clip permissions. |
 | A source actor needed a card; another already had a card but needed a new appearance. | Missing identity and a different phase are distinct operations. | Request characters for missing actors (including speaking animals); use phases/reuse_asset_id for an existing identity. |
 | A local scene correction touched a shot shared by adjacent clips. | Repair scope must include the dependency; repeated identical resumes did not change it. | Use the returned dependent clip/shot scope and repair their source-supported states together. |
-| A DS repair turn explicitly refused a fictional chapter and submitted no operation. | The model misclassified the task; more identical DS turns made no progress. | The host may switch once to configured Qwen within the same operation/take budget. Never reset history. |
+| A DS repair turn explicitly refused a fictional chapter and submitted no operation. | The model misclassified the task; more identical DS turns made no progress. | The host may use the configured fallback after an actual refusal; idle summaries refresh primary context. The original operation/take budget remains authoritative. |
 | A batch of400 chapters had all source text imported and jobs queued, but no new chapter reading, cross-chapter merge or story ledger. | Per-chapter source drafting was being mistaken for complete book preparation. | Check actual reading/roster/story coverage before batch scripting. Continue the established book preparation stages first; source files and queued jobs are not proof of completed reading. |
 
 Do not end an unfinished operation with another conversation-history summary.
@@ -69,3 +69,22 @@ historical run logs or their old operational instructions into the sandbox.
 `input/reading/locations.json`保留本章读书发现的场景；素材库没有图片，不表示故事发生在另一个有图的地点。海底、海滩、山崖不能因为图库只剩大学城就改成大学城。需要图片时先把真实角色/地点写进草稿，再用现有`apply action=input`的characters/locations提交原文依据、设计与补图请求。实际检查图片并绑定后继续check/render，不以文字声称素材已完成。
 
 公共故障经验：H3的Subject不是人类分类，动物不能被模板默认写成人。一次局部修复若报告其他片段改变，先区分真实姿态继承与编译器重算造成的漂移；宿主会保留未改前缀、自动处理有证据且未越预算的依赖，不需要通过扩大全部章节范围反复碰运气。若真实依赖涉及已拍片段或用完预算，保留准确原因，不改次数。共享素材复核结果可以复用，但needs_review不是已通过；未成功的旧修法是失败证据，不是成功案例。
+
+Later delivery evidence (2026-10-11–13):
+
+| Observed case | What was established | Decision it informs |
+| --- | --- | --- |
+|391 had incomplete cached verification;456 encountered non-numeric counts;560 had a stored speech failure absent from remaining problems. |391 later completed review/finish without H3 regeneration.456's new live response was numeric: malformed branches were verified with labelled fixtures.560's failure establishes propagation, not independently checked audio accuracy. | Obtain complete current judgments and retain independent failures; do not rewrite content for parser faults or mark unknown results passed. |
+|473 retained an old idle-recovery marker after an explicit context restart. | The current restart preference was overwritten before session selection. | Use the explicit restart with the existing candidate; a fresh context must not reset budgets or replay obsolete fallback history. |
+|754 had raw/final instability and a princess shown as two bodies. | The adopted repair corrected a street-to-rooftop reference and replaced the conflicting over-shoulder/frontal composition with one same-camera body. One new take had steadier native-frame motion and passed the recorded postchecks. | Compare raw/final temporal evidence and physical instances. This composite repair is not proof that one phrase or fixed framing cures every shake. |
+|The last17 episodes were generated/assembled and uploaded with review deferred. | Missing video was filled; content acceptance was not demonstrated. | Record delivery separately; it does not prove that every attempted content repair succeeded. |
+|722 and752 had sustained whole-frame jitter. | Fixed-background shots with localized subject action yielded steadier takes;722 then needed another repair for a duplicated companion.752 targeted model review stayed incomplete;722 retained a missing siege-prop finding. | Check the new take for newly introduced defects and retain incomplete/unresolved checks. Motion screening is diagnostic, not whole-episode acceptance. |
+
+The754,722 and752 records are bounded historical results. Small still grids can
+hide rapid oscillation: use chronological native/final motion evidence for a
+temporal complaint, and adjacent room landmarks for a cross-cut position complaint.
+A screen alarm is a lead to verify, not a new acceptance gate or automatic retake.
+
+Additional provenance: `docs/guangming-repair-memory-20261008.md` and
+`docs/agent-repair-integration-20261013.md`. Historical model names, hosts and
+temporary grants describe those cases; they are not instructions for a new run.
