@@ -20,6 +20,11 @@ def _load_current(runner):
 
 def run(runner, *, repair_existing=False, final_review=None):
     ctx = runner.context; directory = ctx.episode_dir
+    from novel_manga.application.repair.pending_inputs import recover_unrenderable
+    if recover_unrenderable(directory):
+        from novel_manga.application.review.execution import media_matches
+        _load_current(runner)
+        repair_existing=media_matches(ctx.clip_plan,read_json(directory/'thin_media_report.json',{}),notes=ctx.feedback)
     if repair_existing:
         report = read_json(directory / 'thin_media_report.json', {})
         if not report.get('clips'):
@@ -105,7 +110,7 @@ def run(runner, *, repair_existing=False, final_review=None):
             _load_current(runner)
             review = read_json(directory / 'episode_review.json', review)
             report = read_json(directory / 'thin_media_report.json', report)
-            if prepared.get('assembly_changed'):
+            if prepared.get('assembly_changed') or prepared.get('review_changed'):
                 # Re-export the card/audio and run both movie reviewers. No video job.
                 continue
             if prepared.get('accepted'):
