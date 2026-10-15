@@ -117,3 +117,5 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | codex /root/backrooms_audio | 用户授权后室成片后期故障：空证据面回落普通字卡，非空证据流程保留 | codex/feat/shared-pipeline / interactive-video-worktrees/shared-pipeline | src/novel_manga/interactive/delivery.py、tests/test_interactive_delivery.py；无材料/视频/全局QC改动 | 2026-10-14 | 已完成：空[]/{}／surfaces=[]修复，15项目标回归及全量3269通过；fa2fc29已本地提交并快进main、回合悬疑b5ee0d8。悬疑现有影片重导出实际4字卡恢复，25fps/4837帧/音轨封装复制/解码验证完成，无新增H3次数。恋综与荒野存在其他会话未提交WIP，按branch-workflow暂不合并；所属会话可在WIP安顿后merge main或采用fa2fc29。未推送/部署。 |
 
 | codex /root/backrooms_audio | 用户批准闭环一：Agent候选校验拒绝后最多3份候选有界反馈重提 | codex/feat/shared-pipeline / interactive-video-worktrees/shared-pipeline | application/repair/{agent,managed}.py、对应tests、skills/video-repair/SKILL.md；不碰reviewed/execution/final_cut | 2026-10-14 | 已完成：带候选的精确校验拒绝回传、最多3份候选/逐份审计；stop/源或终审证据变化/服务失败/额度耗尽停止。终审global帧/邻界图复制进sandbox并先核对，缺必需帧不盲调；既有输入策略自然失效旧blocked。新增17项有意义回归及相关128项通过，diff检查通过；原3次视频/每次600秒/全部历史保留，无模型/生成/部署/提交合并。root统一集成/全量/小说同步及实拍验证待做 |
+
+| Codex 悬疑会话01a133e5 | 独立审片进入自动修复闭环，小说同步 | codex/feat/shared-pipeline | review/independent.py、final_cut.py、互动入口及对应测试；小说独立worktree | 2026-10-15 | 在途：独立结果必须进入现有反馈/Agent/重拍/重新审片；原36条和3次上限保留，不人工补段。 |
