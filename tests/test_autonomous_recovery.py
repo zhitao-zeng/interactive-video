@@ -160,6 +160,47 @@ def test_summary_followed_by_unexecuted_json_also_switches_once(tmp_path):
     assert recovery.switch_for_refusal(ctx,replacement,result,attempt,{}, {}) is None
 
 
+def test_two_timeout_slices_without_outputs_or_handoffs_use_existing_fallback(tmp_path):
+    ctx=context(tmp_path)
+    atomic_write_json(ctx.work_dir/'episode-session.json',{'session_id':'old'})
+    atomic_write_json(ctx.episode_dir/'repair_history/history.json',{'takes':43})
+    config={'model':'DS','refusal_fallback':{'model':'Qwen','base_url':'http://qwen','key_var':'KEY'}}
+    result={'deadline':1234,'agent_seconds':1200}
+    attempt=SimpleNamespace(record={'exit':124,'produced':[]},directory=tmp_path/'attempt')
+    assert recovery.switch_for_refusal(ctx,config,result,attempt,{}, {}) is None
+    replacement=recovery.switch_for_refusal(ctx,config,result,attempt,{}, {})
+    assert replacement['model']=='Qwen'
+    assert result['deadline']==1234 and result['agent_seconds']==1200
+    assert read_json(ctx.episode_dir/'repair_history/history.json')=={'takes':43}
+    assert recovery.switch_for_refusal(ctx,replacement,result,attempt,{}, {}) is None
+
+
+def test_timeout_with_output_or_host_handoff_is_not_idle(tmp_path):
+    ctx=context(tmp_path)
+    config={'refusal_fallback':{'model':'Qwen','base_url':'http://qwen','key_var':'KEY'}}
+    attempt=SimpleNamespace(record={'exit':124,'produced':['repair.json']},directory=tmp_path/'attempt')
+    result={'idle_turns':1}
+    assert recovery.switch_for_refusal(ctx,config,result,attempt,{}, {}) is None
+    assert result['idle_turns']==0
+    attempt.record['produced']=[]
+    result['idle_turns']=1
+    assert recovery.switch_for_refusal(ctx,config,result,attempt,{}, {'job':{'id':'new'}}) is None
+    assert result['idle_turns']==0
+
+
+def test_stopped_timeout_loop_recovers_with_original_time_and_no_new_takes(tmp_path):
+    ctx=context(tmp_path);attempts=[]
+    for n in range(2):
+        folder=tmp_path/f'timed-{n}';attempts.append(str(folder))
+        atomic_write_json(folder/'attempt.json',{'exit':124,'produced':[]})
+        (folder/'session.jsonl').write_text('')
+    saved={'status':'blocked','remaining_seconds':321,'attempts':attempts,
+        'reason':'episode agent ended twice without operation or output progress'}
+    recovered=recovery.resume_protocol(ctx.run_dir,ctx.episode_dir,saved)
+    assert recovered['protocol_recovery']['kind']=='idle_turns'
+    assert recovered['remaining_seconds']==321 and recovered['attempts']==attempts
+
+
 def test_first_task_diagnosis_excludes_errors_for_already_filmed_clips(tmp_path):
     ctx=context(tmp_path)
     result=recovery.diagnose(ctx,{'adopted':True,'first_pass_remaining':['clip_07'],

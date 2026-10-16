@@ -138,3 +138,109 @@ def test_false_review_premise_stays_unaccepted_and_routes_to_input_evidence():
         'observations':['卡面与原文矛盾'], 'checks':[{'scope':'visual','met':False,'evidence':'三人'}]})
     assert result['result'] == 'uncertain'
     assert result['error_kind'] == 'review_premise_conflict'
+
+
+def test_positive_take_evidence_does_not_become_a_failure_claim(tmp_path, monkeypatch):
+    d, clips, rows = fixture_episode(tmp_path)
+    previous = json.loads((d/'episode_review.json').read_text())
+    previous['clips']['a']['confirmed'] = {'check': {
+        **{k: rows['a'][k] for k in ['video', 'take']},
+        'result': 'resolved', 'checked_scope': 'visual', 'observations': ['一个人正常站立']}}
+    fresh = copy.deepcopy(previous)
+    fresh['clips']['a'].update(severity='fail', defect_issue='当前评审发现穿模')
+    fresh['feedback'] = {'a': '修正当前穿模'}
+    monkeypatch.setattr(confirmed, 'judge_finding', lambda *a, **kw:
+        (_ for _ in ()).throw(AssertionError('positive evidence is not a failure target')))
+    result = confirmed.enforce(d, fresh, previous, verify=True)
+    assert result['clips']['a']['severity'] == 'fail'
+    assert result['feedback']['a'] == '修正当前穿模'
+
+
+def test_resolved_old_finding_does_not_replace_new_failure_instructions(tmp_path):
+    d, clips, rows = fixture_episode(tmp_path)
+    previous = json.loads((d/'episode_review.json').read_text())
+    current = {k: rows['a'][k] for k in ['video', 'take']}
+    previous['clips']['a']['confirmed'] = {
+        'video': current['video'], 'take': [0, 0, 0],
+        'issue': '旧镜头复制人物', 'instruction': '只保留一个人',
+        'check': {**current, 'result': 'resolved'}}
+    fresh = copy.deepcopy(previous)
+    fresh['clips']['a'].update(severity='fail', defect_issue='当前镜头穿模')
+    fresh['clips']['a'].pop('feedback', None)
+    fresh['feedback'] = {'a': '修正当前穿模'}
+    result = confirmed.enforce(d, fresh, previous)
+    assert result['feedback']['a'] == '修正当前穿模'
+
+
+def test_current_speech_instructions_survive_enforcing_a_picture_finding(tmp_path):
+    d, clips, rows = fixture_episode(tmp_path)
+    previous = json.loads((d/'episode_review.json').read_text())
+    current = {k: rows['a'][k] for k in ['video', 'take']}
+    claim = {'video': current['video'], 'take': [0, 0, 0],
+        'issue': '旧镜头复制人物', 'instruction': '只保留一个人',
+        'check': {**current, 'result': 'resolved'}}
+    previous['clips']['a']['confirmed'] = claim
+    fresh = copy.deepcopy(previous)
+    fresh['clips']['a'].update(severity='fail', feedback='修正当前穿模', speech_gate={'passed':False})
+    fresh['feedback'] = {'a':'修正当前穿模\n删除多说的台词'}
+    assert confirmed.enforce(d, fresh, previous)['feedback']['a'] == fresh['feedback']['a']
+    previous['clips']['a']['confirmed']['check']['result'] = 'unresolved'
+    result = confirmed.enforce(d, fresh, previous)
+    for instruction in ['修正当前穿模', '删除多说的台词', '只保留一个人']:
+        assert instruction in result['feedback']['a']
+
+
+def test_scoped_criteria_recheck_only_matching_clip_and_cache_resolved_result(tmp_path, monkeypatch):
+    from novel_manga.util import atomic_write_json
+    d, clips, rows = fixture_episode(tmp_path)
+    criteria = ['换机位本身可接受；核对人物、座位、行李和花的空间关系。']
+    atomic_write_json(d / 'review_criteria.json', {'clips': {'a': criteria}})
+    old_criteria = ['旧标准：不允许换机位。']
+    previous = json.loads((d / 'episode_review.json').read_text())
+    for cid in ('a', 'b'):
+        current = {k: rows[cid][k] for k in ('video', 'take')}
+        previous['clips'][cid]['confirmed'] = {
+            'video': current['video'] if cid == 'a' else 'older.mp4',
+            'take': current['take'] if cid == 'a' else [0, 0, 0],
+            'issue': '旧判词', 'instruction': '核实空间关系',
+            'check': {**current, 'result': 'resolved' if cid == 'a' else 'unresolved',
+                      'review_criteria': old_criteria}}
+    fresh = copy.deepcopy(previous)
+    for row in fresh['clips'].values():
+        row.update(severity='pass', tier='optional')
+    calls = []
+
+    def judge(clip, video, claim, work, novel_dir=None, review_criteria=()):
+        calls.append((clip.get('clip_id'), list(review_criteria)))
+        return {'result': 'resolved' if review_criteria else 'unresolved', 'observations': ['当前take'],
+                'evidence': '当前帧已核对'}
+
+    monkeypatch.setattr(confirmed, 'judge_finding', judge)
+    checked = confirmed.enforce(d, fresh, previous, verify=True)
+    assert calls == [('a', criteria)]
+    assert checked['clips']['a']['severity'] in {'pass', 'minor'}
+    assert checked['clips']['a']['confirmed']['check']['review_criteria'] == criteria
+    assert checked['clips']['b']['severity'] == 'fail'
+
+    calls.clear()
+    again = confirmed.enforce(d, checked, checked, verify=True)
+    assert calls == []
+    assert again['clips']['a']['severity'] in {'pass', 'minor'}
+
+
+def test_scoped_criteria_do_not_clear_a_real_spatial_defect(tmp_path, monkeypatch):
+    from novel_manga.util import atomic_write_json
+    d, clips, rows = fixture_episode(tmp_path)
+    criteria = ['允许镜头切换和轻微碰花。']
+    atomic_write_json(d / 'review_criteria.json', {'clips': {'a': criteria}})
+    previous = json.loads((d / 'episode_review.json').read_text())
+    current = {k: rows['a'][k] for k in ('video', 'take')}
+    previous['clips']['a']['confirmed'] = {
+        'video': 'older.mp4', 'take': [0, 0, 0], 'issue': '座位与行李空间关系混乱',
+        'instruction': '核对座位和行李', 'check': {**current, 'result': 'unresolved'}}
+    fresh = copy.deepcopy(previous)
+    monkeypatch.setattr(confirmed, 'judge_finding', lambda *a, **kw: {
+        'result': 'unresolved', 'observations': ['行李挡住错误座位'], 'evidence': '行李与座位位置仍混乱'})
+    result = confirmed.enforce(d, fresh, previous, verify=True)
+    assert result['clips']['a']['severity'] == 'fail'
+    assert 'a' in result['feedback']

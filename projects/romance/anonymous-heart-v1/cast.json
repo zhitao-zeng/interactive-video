@@ -1,0 +1,74 @@
+{
+  "characters": [
+    {
+      "name": "阮夏",
+      "role": "主角",
+      "gender": "女",
+      "age": "27岁",
+      "appearance": "暖棕齐肩发、柔和椭圆脸与杏眼；杏色衬衫、海军蓝长裙、米白低跟鞋。",
+      "wardrobe": "杏色衬衫＋海军蓝长裙＋米白鞋",
+      "face_anchors": [
+        "暖棕齐肩发、柔和椭圆脸与杏眼；杏色衬衫、海军蓝长裙、米白低跟鞋。"
+      ],
+      "voice_profile_id": "flowers-C01-v1",
+      "occupation": "展陈设计师",
+      "speech_habit": "主动接梗，真正在意时先开玩笑，回话围绕眼前事情。",
+      "anonymous_handle": "晚点下班"
+    },
+    {
+      "name": "闻屿",
+      "role": "主角",
+      "gender": "男",
+      "age": "29岁",
+      "appearance": "黑短发、长窄椭圆脸、较窄眼型与清楚下颌；灰蓝卷袖衬衫、炭灰裤、棕鞋。",
+      "wardrobe": "灰蓝衬衫＋炭灰长裤＋棕鞋",
+      "face_anchors": [
+        "黑短发、长窄椭圆脸、较窄眼型与清楚下颌；灰蓝卷袖衬衫、炭灰裤、棕鞋。"
+      ],
+      "voice_profile_id": "flowers-C02-v1",
+      "occupation": "建筑声学工程师",
+      "speech_habit": "回答具体，愿意澄清；安静但不故作冷酷。",
+      "anonymous_handle": "路灯下"
+    },
+    {
+      "name": "程越",
+      "role": "主角",
+      "gender": "男",
+      "age": "28岁",
+      "appearance": "棕色微卷短发、较宽柔方脸、较圆眼睛与笑窝；米白针织短袖、棕裤、白鞋。",
+      "wardrobe": "米白针织短袖＋棕裤＋白鞋",
+      "face_anchors": [
+        "棕色微卷短发、较宽柔方脸、较圆眼睛与笑窝；米白针织短袖、棕裤、白鞋。"
+      ],
+      "voice_profile_id": "flowers-C03-v1",
+      "occupation": "咖啡店主",
+      "speech_habit": "先照顾眼前的小事，轻巧接话；不冒领匿名亲密。",
+      "anonymous_handle": "明天再改"
+    },
+    {
+      "name": "许棠",
+      "role": "主角",
+      "gender": "女",
+      "age": "26岁",
+      "appearance": "黑色利落短波波头、较长脸与清楚下巴；鼠尾草绿短袖、米白长裤、棕鞋。",
+      "wardrobe": "鼠尾草绿短袖＋米白长裤＋棕鞋",
+      "face_anchors": [
+        "黑色利落短波波头、较长脸与清楚下巴；鼠尾草绿短袖、米白长裤、棕鞋。"
+      ],
+      "voice_profile_id": "flowers-C04-v1",
+      "occupation": "活动策划",
+      "speech_habit": "直接追问，不替别人解释，也能承认自己的在意。",
+      "anonymous_handle": "不要熬夜"
+    }
+  ],
+  "anonymous_pairs": [
+    [
+      "阮夏",
+      "闻屿"
+    ],
+    [
+      "许棠",
+      "程越"
+    ]
+  ]
+}

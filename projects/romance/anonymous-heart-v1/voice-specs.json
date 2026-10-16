@@ -1,0 +1,30 @@
+{
+  "阮夏": {
+    "sample_text": "这朵花，是你送的？哦，那我猜错了。你怎么知道？所以，花是你送的？刚才那段，能剪掉吗？你刚才还点头。阮夏。别再叫我晚点下班",
+    "prompt": "Adult female Mandarin, warm and lively, natural conversational pace.",
+    "picture": "series_assets/characters/character_001/turnaround.jpeg",
+    "origin": "reuse_existing_generated_timbre",
+    "old_voice_name": "许知意"
+  },
+  "闻屿": {
+    "sample_text": "昨晚那幅画，挂好了？你发给我那张照片，右边钉子都掉了。嗯。闻屿。那是你自己起的。你发消息也不慢。现在等你喝完水。你的花先",
+    "prompt": "Adult male Mandarin, calm lower register, concise and attentive.",
+    "picture": "series_assets/characters/character_002/turnaround.jpeg",
+    "origin": "reuse_existing_generated_timbre",
+    "old_voice_name": "周叙"
+  },
+  "程越": {
+    "sample_text": "我送的不是这个。没事，先喝口水。先喝口水，刚才都没顾上。没有，这杯就是给你的。程越，开咖啡店的。那你千万别说是哪场。好，",
+    "prompt": "Adult male Mandarin, relaxed brighter register, easy conversational warmth.",
+    "picture": "series_assets/characters/character_003/turnaround.jpeg",
+    "origin": "reuse_existing_generated_timbre",
+    "old_voice_name": "陆屿"
+  },
+  "许棠": {
+    "sample_text": "你问得太认真了，我都差点信了。我点的是水，不是他。许棠，做活动的。那我可能催过你。我的那封，还在箱子里。我拿一下。别带工",
+    "prompt": "Adult female Mandarin, clear direct delivery, lightly playful when replying.",
+    "picture": "series_assets/characters/character_004/turnaround.jpeg",
+    "origin": "reuse_existing_generated_timbre",
+    "old_voice_name": "宋乔"
+  }
+}

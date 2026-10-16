@@ -1,0 +1,608 @@
+{
+  "title": "地图上不存在的村庄",
+  "source": "试播集/EP01-地图上不存在的村庄.md",
+  "target_seconds": 180,
+  "hook": "地图没标村名，旧路又被堵住；鞋印与停用站房指向两条调查路径。",
+  "summary": "林野核对旧入口、记录鞋印和站房示意，明确尚未验证的事实，返回村口请观众选择次日调查方向。回看发现脚印转向上坡，不提前揭示村庄真相。",
+  "interaction": {
+    "id": "E01-END",
+    "question": "明天先查哪边？",
+    "seconds": 3,
+    "options": [
+      {
+        "id": "A",
+        "label": "沿脚印找新路",
+        "next": "次日沿步道核对上坡新路"
+      },
+      {
+        "id": "B",
+        "label": "在地面查站房",
+        "next": "次日在地面站房核对入口记录"
+      }
+    ],
+    "selected": null
+  },
+  "shots": [
+    {
+      "id": "E01-S01",
+      "source_shots": [
+        "A01",
+        "A02"
+      ],
+      "location": "村口",
+      "visible": false,
+      "on_camera": false,
+      "visual": "湿润山路边，一块旧木牌倾斜立在苔石旁，牌面留空。",
+      "action": "镜头沿苔石缓慢移到旧木牌，山风轻动草叶。",
+      "end": "旧木牌停在画面中央。",
+      "camera": "缓慢推近旧木牌",
+      "scale": "近景",
+      "sfx": "风声与草叶摩擦",
+      "dialogue": "地图上没有这个村，山里却有它的路牌。",
+      "duration_seconds": 6,
+      "overlay": {
+        "text": "青溪村｜旧入口",
+        "position": "top",
+        "kind": "evidence"
+      }
+    },
+    {
+      "id": "E01-S02",
+      "source_shots": [
+        "A02"
+      ],
+      "location": "村口",
+      "visible": false,
+      "on_camera": false,
+      "visual": "手机被橄榄绿袖口的双手稳定握住，屏幕为不含文字的简洁地图。",
+      "action": "手指在屏幕上轻滑，停在山谷区域。",
+      "end": "手机屏幕保持稳定。",
+      "camera": "俯拍手机与木牌边缘",
+      "scale": "特写",
+      "sfx": "轻微衣料声",
+      "dialogue": "新地图上，这里只剩下一片山地。",
+      "duration_seconds": 6,
+      "overlay": {
+        "text": "新地图：未标注村名",
+        "position": "top",
+        "kind": "evidence"
+      }
+    },
+    {
+      "id": "E01-S03",
+      "source_shots": [
+        "A03"
+      ],
+      "location": "村口",
+      "visible": true,
+      "on_camera": true,
+      "visual": "林野站在木牌旁，身穿深橄榄绿户外夹克，背炭灰背包。",
+      "action": "林野抬眼看向镜头，平静介绍自己。",
+      "end": "林野站在原地，将视线转向山路。",
+      "camera": "平视胸像，背景为模糊山路",
+      "scale": "中近景",
+      "sfx": "轻柔山风",
+      "dialogue": "我叫林野，专门寻找地图上消失的地方。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S04",
+      "source_shots": [
+        "A03",
+        "A04"
+      ],
+      "location": "村口",
+      "visible": true,
+      "on_camera": false,
+      "visual": "林野站在通往山谷的湿润窄路上，右侧是低矮苔石。",
+      "action": "林野沿路缓步向前，目光留意脚下。",
+      "end": "林野停在山路转弯前。",
+      "camera": "侧后方跟随，保持人物全身尺度",
+      "scale": "全景",
+      "sfx": "登山靴踩湿土",
+      "dialogue": "今天先确认一件事：旧入口，还能不能走。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S05",
+      "source_shots": [
+        "A04"
+      ],
+      "location": "断路",
+      "visible": false,
+      "on_camera": false,
+      "visual": "山路前方被灰色落石堵住，路边灌木自然垂落。",
+      "action": "镜头缓慢推向路面被落石盖住的位置。",
+      "end": "落石与残存路面交界清晰可见。",
+      "camera": "低机位缓推，保留落石全貌",
+      "scale": "全景",
+      "sfx": "远处水声和风声",
+      "dialogue": "牌子还在，路却断了。",
+      "duration_seconds": 6,
+      "overlay": {
+        "text": "旧路：落石阻断",
+        "position": "top",
+        "kind": "evidence"
+      }
+    },
+    {
+      "id": "E01-S06",
+      "source_shots": [
+        "A04"
+      ],
+      "location": "断路",
+      "visible": true,
+      "on_camera": false,
+      "visual": "林野站在落石前方的完整路面上，距离落石两米。",
+      "action": "林野停步，沿落石边缘观察，双脚不越过原位置。",
+      "end": "林野仍站在完整路面。",
+      "camera": "侧面中景，人物和障碍同框",
+      "scale": "中景",
+      "sfx": "山风",
+      "dialogue": "从这边看不到后面的路，先不过去。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S07",
+      "source_shots": [
+        "A05"
+      ],
+      "location": "断路",
+      "visible": false,
+      "on_camera": false,
+      "visual": "橄榄绿袖口的双手拿着折好的泛黄旧地图。",
+      "action": "双手缓慢展开地图，露出折痕和无字路线示意。",
+      "end": "旧地图完全展开，边缘被双手固定。",
+      "camera": "俯拍纸张，背景为灰色岩石",
+      "scale": "特写",
+      "sfx": "纸张展开声",
+      "dialogue": "这张旧地图，留下了七个地点。",
+      "duration_seconds": 6,
+      "overlay": {
+        "text": "旧地图｜七处待核地点",
+        "position": "top",
+        "kind": "evidence"
+      }
+    },
+    {
+      "id": "E01-S08",
+      "source_shots": [
+        "A06"
+      ],
+      "location": "断路",
+      "visible": true,
+      "on_camera": false,
+      "visual": "林野站在路边，双手持展开的旧地图，山谷在他前方。",
+      "action": "林野低头看地图，再抬头对照山谷。",
+      "end": "林野抬头注视山谷，地图保持展开。",
+      "camera": "侧前方拍摄，地图与山谷分层",
+      "scale": "中景",
+      "sfx": "风和轻微纸张声",
+      "dialogue": "青溪村就在这，但入口已经变了。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S09",
+      "source_shots": [
+        "A06"
+      ],
+      "location": "断路",
+      "visible": false,
+      "on_camera": false,
+      "visual": "远处山谷被树木覆盖，近处路面在落石下消失。",
+      "action": "镜头从落石边缘缓慢抬向山谷。",
+      "end": "视线停在树木覆盖的山坡上。",
+      "camera": "缓慢仰移，不越过断路",
+      "scale": "远景",
+      "sfx": "山谷风声",
+      "dialogue": "旧图能告诉我们方向，不能证明路还在。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S10",
+      "source_shots": [
+        "A04",
+        "A07"
+      ],
+      "location": "断路",
+      "visible": true,
+      "on_camera": false,
+      "visual": "林野站在落石前，旧地图已折起握在左手。",
+      "action": "林野转身沿完整路面返回，右手扶住背包肩带。",
+      "end": "林野朝来路稳步离开。",
+      "camera": "固定侧面全景，保持来路可见",
+      "scale": "全景",
+      "sfx": "脚步声",
+      "dialogue": "先退回刚才的岔路，再找能核对的线索。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S11",
+      "source_shots": [
+        "A07"
+      ],
+      "location": "河岸岔路",
+      "visible": false,
+      "on_camera": false,
+      "visual": "岔路旁有低缓河岸，沿河步道伸向山坡，另一支路通往灰色站房。",
+      "action": "镜头缓慢横移，依次交代沿河步道和地面站房。",
+      "end": "两条方向和站房位置都可辨认。",
+      "camera": "高处固定机位轻微横移",
+      "scale": "远景",
+      "sfx": "流水与鸟声",
+      "dialogue": "岔路一边沿着河，另一边通向旧站房。",
+      "duration_seconds": 6,
+      "overlay": {
+        "text": "左：沿河步道　右：地面站房",
+        "position": "top",
+        "kind": "evidence"
+      }
+    },
+    {
+      "id": "E01-S12",
+      "source_shots": [
+        "A08"
+      ],
+      "location": "河岸岔路",
+      "visible": false,
+      "on_camera": false,
+      "visual": "湿泥上的一串鞋印压住深褐色旧落叶，河岸草丛在旁。",
+      "action": "镜头沿鞋印缓慢前移，显出鞋底纹路与压住的叶片。",
+      "end": "一枚完整鞋印停在画面中间。",
+      "camera": "低机位近摄鞋印",
+      "scale": "特写",
+      "sfx": "近处流水",
+      "dialogue": "这里有脚印，压在旧落叶上。",
+      "duration_seconds": 6,
+      "overlay": {
+        "text": "现场线索①｜鞋印",
+        "position": "top",
+        "kind": "evidence"
+      }
+    },
+    {
+      "id": "E01-S13",
+      "source_shots": [
+        "A08"
+      ],
+      "location": "河岸岔路",
+      "visible": true,
+      "on_camera": false,
+      "visual": "林野蹲在泥地旁的干燥石块边，双手放在膝上。",
+      "action": "林野俯身观察鞋印，不触碰泥面。",
+      "end": "林野仍蹲在石块边，视线沿鞋印方向延伸。",
+      "camera": "侧面低机位，人物与鞋印同框",
+      "scale": "中景",
+      "sfx": "流水与衣料声",
+      "dialogue": "看起来有人最近来过，但具体时间还不确定。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S14",
+      "source_shots": [
+        "A08",
+        "A09"
+      ],
+      "location": "河岸岔路",
+      "visible": false,
+      "on_camera": false,
+      "visual": "连续鞋印从河岸湿泥延伸到步道边，近处叶片被轻轻压住。",
+      "action": "镜头沿鞋印方向缓慢平移，停在步道入口。",
+      "end": "鞋印延伸方向与步道入口在同一画面。",
+      "camera": "沿泥面轻缓平移",
+      "scale": "近景",
+      "sfx": "流水",
+      "dialogue": "先记住方向，别急着把它当成进村的路。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S15",
+      "source_shots": [
+        "A09"
+      ],
+      "location": "河岸岔路",
+      "visible": true,
+      "on_camera": false,
+      "visual": "林野站在步道入口外，背包保持在双肩。",
+      "action": "林野拿起紧凑黑色相机，对准鞋印方向记录一张照片。",
+      "end": "林野放低相机，仍站在入口外。",
+      "camera": "侧后方中景，步道占画面上方",
+      "scale": "中景",
+      "sfx": "相机快门一声",
+      "dialogue": "把位置拍下来，明天才能对照。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S16",
+      "source_shots": [
+        "A09"
+      ],
+      "location": "河岸岔路",
+      "visible": false,
+      "on_camera": false,
+      "visual": "沿河步道从近处延伸到树木遮挡的上坡处。",
+      "action": "镜头缓缓推向步道转弯，保持入口外视角。",
+      "end": "上坡转弯处停在视线尽头。",
+      "camera": "固定方向缓推",
+      "scale": "全景",
+      "sfx": "河水与鸟鸣",
+      "dialogue": "路在前面拐弯，后面是什么，现在看不见。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S17",
+      "source_shots": [
+        "A10"
+      ],
+      "location": "地面站房",
+      "visible": true,
+      "on_camera": false,
+      "visual": "林野站在灰色低矮索道站房外，门旁一块旧牌面无字。",
+      "action": "林野看向门旁的牌，再抬头观察屋檐和空置滑轮架。",
+      "end": "林野停在站房外侧。",
+      "camera": "侧面广角，完整交代地面建筑",
+      "scale": "全景",
+      "sfx": "山风",
+      "dialogue": "另一边，是停用的索道站。",
+      "duration_seconds": 6,
+      "overlay": {
+        "text": "索道站｜已停用",
+        "position": "top",
+        "kind": "evidence"
+      }
+    },
+    {
+      "id": "E01-S18",
+      "source_shots": [
+        "A10"
+      ],
+      "location": "地面站房",
+      "visible": false,
+      "on_camera": false,
+      "visual": "站房外空置的金属滑轮架与斑驳墙面同框，结构静止。",
+      "action": "镜头从滑轮架缓慢移向站房外墙。",
+      "end": "外墙旧示意牌进入画面。",
+      "camera": "缓慢平移",
+      "scale": "近景",
+      "sfx": "风掠过屋檐",
+      "dialogue": "设备停了，不代表这里没有留下记录。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S19",
+      "source_shots": [
+        "A11"
+      ],
+      "location": "地面站房",
+      "visible": false,
+      "on_camera": false,
+      "visual": "站房外墙上固定着褪色无字示意牌，两个节点用线连接。",
+      "action": "镜头对准示意牌，轻轻推近。",
+      "end": "示意牌完整居中，节点轮廓可辨认。",
+      "camera": "正面平视示意牌",
+      "scale": "特写",
+      "sfx": "轻风",
+      "dialogue": "这张示意里，谷底站和山腰入口不在一处。",
+      "duration_seconds": 6,
+      "overlay": {
+        "text": "示意｜谷底站 → 山腰入口",
+        "position": "top",
+        "kind": "evidence"
+      }
+    },
+    {
+      "id": "E01-S20",
+      "source_shots": [
+        "A11"
+      ],
+      "location": "地面站房",
+      "visible": true,
+      "on_camera": false,
+      "visual": "林野站在示意牌旁，左手持折起的旧地图。",
+      "action": "林野看完示意牌，将视线转向山腰方向。",
+      "end": "林野站在原地注视山腰。",
+      "camera": "侧面中景，牌和人物同时入画",
+      "scale": "中景",
+      "sfx": "山风",
+      "dialogue": "它也许能解释，旧路为什么变了。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S21",
+      "source_shots": [
+        "A11"
+      ],
+      "location": "地面站房",
+      "visible": true,
+      "on_camera": false,
+      "visual": "林野站在站房外墙边，手中拿着旧棕色小笔记本。",
+      "action": "林野低头在无字页上作简短记录，随后合上笔记本。",
+      "end": "林野手握合上的笔记本。",
+      "camera": "斜侧面中近景，手部动作清楚",
+      "scale": "中近景",
+      "sfx": "笔触与纸页声",
+      "dialogue": "先记下这个问题，答案还要找材料核对。",
+      "duration_seconds": 6,
+      "overlay": {
+        "text": "待核实：旧入口为何变化",
+        "position": "top",
+        "kind": "evidence"
+      }
+    },
+    {
+      "id": "E01-S22",
+      "source_shots": [
+        "A12"
+      ],
+      "location": "河岸岔路",
+      "visible": false,
+      "on_camera": false,
+      "visual": "双手持展开的旧地图，泛黄纸张下缘有一块留白区域。",
+      "action": "手指停在地图下缘，纸张被轻轻压平。",
+      "end": "地图下缘保持稳定。",
+      "camera": "俯拍地图下缘",
+      "scale": "特写",
+      "sfx": "纸张摩擦",
+      "dialogue": "地图下面，还有一句提醒。",
+      "duration_seconds": 6,
+      "overlay": {
+        "text": "雨后勿走谷底",
+        "position": "top",
+        "kind": "evidence"
+      }
+    },
+    {
+      "id": "E01-S23",
+      "source_shots": [
+        "A12"
+      ],
+      "location": "河岸岔路",
+      "visible": true,
+      "on_camera": false,
+      "visual": "林野站在河岸岔路旁，手持旧地图，身后是湿润河岸。",
+      "action": "林野看向河岸，再把旧地图折起。",
+      "end": "林野握着折好的地图，留在岔路外侧。",
+      "camera": "平视侧面，河岸在背景",
+      "scale": "中景",
+      "sfx": "流水与纸张声",
+      "dialogue": "雨后勿走谷底。这条提醒，我先记下来。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S24",
+      "source_shots": [
+        "A07",
+        "A12"
+      ],
+      "location": "河岸岔路",
+      "visible": false,
+      "on_camera": false,
+      "visual": "河水沿低缓河床流过，湿润石块和步道边缘清楚可见。",
+      "action": "镜头从水面缓慢移向高一些的步道。",
+      "end": "步道与河床的高度差保持可见。",
+      "camera": "平缓横移，环境观察镜头",
+      "scale": "全景",
+      "sfx": "连续流水",
+      "dialogue": "今天先把两条调查方向弄清楚。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S25",
+      "source_shots": [
+        "A13"
+      ],
+      "location": "河岸岔路",
+      "visible": false,
+      "on_camera": false,
+      "visual": "河岸的鞋印与通往上坡的步道入口同时可见。",
+      "action": "镜头沿脚印方向缓慢移动，最后停在步道入口。",
+      "end": "步道入口居中，远处转弯被树木遮挡。",
+      "camera": "低机位推移至平视",
+      "scale": "全景",
+      "sfx": "流水与风",
+      "dialogue": "第一条，沿脚印，核对现在能走的路。",
+      "duration_seconds": 6,
+      "overlay": {
+        "text": "A｜沿脚印找新路",
+        "position": "top",
+        "kind": "evidence"
+      }
+    },
+    {
+      "id": "E01-S26",
+      "source_shots": [
+        "A14"
+      ],
+      "location": "地面站房",
+      "visible": false,
+      "on_camera": false,
+      "visual": "地面站房、外墙示意牌与旁边山坡同框。",
+      "action": "镜头缓慢推近站房外墙，保持建筑立于地面的关系。",
+      "end": "示意牌与站房入口清晰可见。",
+      "camera": "平视缓推",
+      "scale": "全景",
+      "sfx": "山风",
+      "dialogue": "第二条，在地面查站房，弄清旧入口。",
+      "duration_seconds": 6,
+      "overlay": {
+        "text": "B｜在地面调查站房",
+        "position": "top",
+        "kind": "evidence"
+      }
+    },
+    {
+      "id": "E01-S27",
+      "source_shots": [
+        "A15"
+      ],
+      "location": "村口",
+      "visible": true,
+      "on_camera": true,
+      "visual": "林野站在村口木牌旁，手里拿着合上的旧棕色笔记本。",
+      "action": "林野将笔记本放进夹克口袋，面对镜头。",
+      "end": "林野站稳，双手自然放下。",
+      "camera": "平视半身，木牌留在背景",
+      "scale": "中景",
+      "sfx": "轻柔山风",
+      "dialogue": "明天先查哪边，你们选，我去核对。",
+      "duration_seconds": 6
+    },
+    {
+      "id": "E01-S28",
+      "source_shots": [
+        "A15",
+        "A16"
+      ],
+      "location": "村口",
+      "visible": true,
+      "on_camera": false,
+      "visual": "林野站在原处，手持相机看刚才记录的照片，屏幕不显示可读文字。",
+      "action": "林野视线停住，轻轻抬起眉眼。",
+      "end": "林野注视相机屏幕，神情专注。",
+      "camera": "从侧面推近人物反应",
+      "scale": "近景",
+      "sfx": "衣料声",
+      "dialogue": "等等，再看一眼脚印的方向。",
+      "duration_seconds": 5
+    },
+    {
+      "id": "E01-S29",
+      "source_shots": [
+        "A16"
+      ],
+      "location": "河岸岔路",
+      "visible": false,
+      "on_camera": false,
+      "visual": "现场记录回看：河岸泥地鞋印在岔路边改变方向，朝上坡延伸。",
+      "action": "镜头沿鞋印转向上坡，停在被草木遮挡的位置。",
+      "end": "鞋印离开河边，朝上坡延伸。",
+      "camera": "俯拍缓慢移向上坡，作为照片细节的回看",
+      "scale": "近景",
+      "sfx": "轻柔风声",
+      "dialogue": "脚印不是往谷底，是往山上走的。",
+      "duration_seconds": 5,
+      "overlay": {
+        "text": "现场记录回看｜转向上坡",
+        "position": "top",
+        "kind": "evidence"
+      }
+    },
+    {
+      "id": "E01-S30",
+      "source_shots": [
+        "A16"
+      ],
+      "location": "村口",
+      "visible": true,
+      "on_camera": false,
+      "visual": "林野站在木牌旁，放低相机，目光转向远处山坡。",
+      "action": "林野看向山坡，短暂停顿后轻轻点头。",
+      "end": "林野目光停在远处山坡。",
+      "camera": "侧面近景，远山虚化",
+      "scale": "近景",
+      "sfx": "山风",
+      "dialogue": "那里，会不会有另一个入口？",
+      "duration_seconds": 5
+    }
+  ]
+}

@@ -242,7 +242,7 @@ def conversation_deferred(saved):
 def completed_idle(directory):
     """Observed output/handoff facts, not the wording of the final answer."""
     folder=Path(directory);record=read_json(folder/'attempt.json',{})
-    if record.get('exit')!=0 or record.get('produced')!=[]:return False
+    if record.get('exit')not in {0,124} or record.get('produced')!=[]:return False
     path=folder/'session.jsonl'
     if not path.is_file():return False
     for line in path.open():
@@ -403,12 +403,12 @@ def switch_for_refusal(ctx, config, result, attempt, before, after):
     handed_off = (after.get('job') or {}).get('id') != (before.get('job') or {}).get('id')
     result['summary_only_turns'] = (result.get('summary_only_turns', 0)+1
                                   if attempt.record.get('summary_only') and not handed_off else 0)
-    idle=(attempt.record.get('exit')==0 and attempt.record.get('produced')==[] and not handed_off)
+    idle=(attempt.record.get('exit')in {0,124} and attempt.record.get('produced')==[] and not handed_off)
     result['idle_turns']=result.get('idle_turns',0)+1 if idle else 0
     reason = attempt.record.get('refusal') or (
         'Repeated summary-only completions without a host operation'
         if result['summary_only_turns'] >= 2 else
-        'Two completed turns without changed output or a host operation' if result['idle_turns']>=2 else '')
+        'Two turns without changed output or a host operation' if result['idle_turns']>=2 else '')
     fallback = config.get('refusal_fallback')
     if not fallback or result.get('model_switch') or not reason or handed_off:
         return None

@@ -193,13 +193,27 @@ class RepairOperations:
             verdict = (review.get('clips') or {}).get(cid, {})
             take = selected.get(cid, {})
             video = Path(take['video']) if take.get('video') else None
-            if (row.get('action') == 'keep' and current_review
+            review_artifact = None
+            author_session = None
+            if row.get('review_file') is not None:
+                try:
+                    if row.get('action') != 'keep':
+                        raise ValueError('review_file is supported only for a current-take keep decision')
+                    review_artifact = input_file(self.ctx, {'file': row['review_file']}, row['review_file'])
+                    author_session = read_json(self.ctx.work_dir / 'episode-session.json', {}).get('session_id')
+                    from novel_manga.application.review.execution import validate_scoped_agent_review
+                    validate_scoped_agent_review(directory, cid, review_artifact,
+                                                  work_dir=self.ctx.work_dir, author_session=author_session)
+                except (ValueError, KeyError, OSError, TypeError) as error:
+                    blocked[cid] = str(error)
+                    continue
+            if (review_artifact is None and row.get('action') == 'keep' and current_review
                     and verdict.get('severity') in {'pass', 'minor'} and cid not in (review.get('feedback') or {})
                     and take.get('passed') is True and video and video.is_file()
                     and verdict.get('take') == take_identity(video)):
                 kept.append(cid)
                 continue
-            if cid not in allowed:
+            if cid not in allowed and review_artifact is None:
                 blocked[cid] = 'clip has no eligible failure or current verified take to keep'
                 continue
             clip = copy.deepcopy(next(c for c in candidate['clips'] if c['clip_id'] == cid))
@@ -215,7 +229,12 @@ class RepairOperations:
                     if limit is not None and sum(cid in r.get('keep_checks', []) for r in prior) >= int(limit):
                         raise ValueError('independent recheck allowance used; stop unresolved clip')
                     keep_checks.append(cid)
-                    checked = recheck_current_clip(directory, cid)
+                    if review_artifact is not None:
+                        checked = recheck_current_clip(directory, cid, review_artifact=review_artifact,
+                                                       work_dir=self.ctx.work_dir,
+                                                       author_session=author_session)
+                    else:
+                        checked = recheck_current_clip(directory, cid)
                     kept.extend(checked['accepted'])
                     if not checked['accepted']:
                         blocked[cid] = 'current video independent recheck still failed'

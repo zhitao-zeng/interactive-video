@@ -1,0 +1,2282 @@
+{
+  "source": "心动未剪辑（原创互动恋综提案）",
+  "style": "photographic",
+  "promptLang": "zh",
+  "version": "2.0",
+  "route": "shared",
+  "params": {
+    "maxSegmentSeconds": 15,
+    "minCutSeconds": 2,
+    "maxCutSeconds": 5,
+    "maxOnScreen": 3,
+    "tolerance": 0.15
+  },
+  "episodes": [
+    {
+      "ep": 1,
+      "segments": [
+        {
+          "id": "E01-01",
+          "sceneIndex": 1,
+          "cuts": [
+            {
+              "beats": [
+                1,
+                1
+              ],
+              "seconds": 2.5,
+              "size": "wide",
+              "camera": "Tracking Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. wide shot. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The woman steps through the rear-left wooden door pulling her cream suitcase toward the seating area. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi occupies NE after she sits in beat 6. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "小屋的门被推开，许知意拖着行李箱走进客厅。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "辅助道具 A01",
+                  "path": "../../images/四人行李箱-sheet.png"
+                }
+              ],
+              "originalBeat": 1,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "脚步、衣料或箱轮声随实际动作出现。"
+            },
+            {
+              "beats": [
+                2,
+                2
+              ],
+              "seconds": 4.9,
+              "size": "wide",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. wide shot. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The woman pauses inside the coastal living room, still beside her suitcase, taking in four empty chairs. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi occupies NE after she sits in beat 6. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "画外音：欢迎来到《心动未剪辑》。四位嘉宾，七天同住。",
+              "delivery": "节目解说，轻快有期待；只向观众播放",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 2,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                3,
+                3
+              ],
+              "seconds": 3.2,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The woman glances toward the empty chairs, unaware of the audience-only narration. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi occupies NE after she sits in beat 6. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "画外音：其中两位，是分手两年的前任。",
+              "delivery": "节目解说，留悬念，不提前点名",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 3,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                4,
+                4
+              ],
+              "seconds": 2.5,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium shot. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs Her cream suitcase is now parked by the north wall; she walks toward the northeast window chair. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi occupies NE after she sits in beat 6. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "许知意停好箱子，走到靠窗的椅子旁。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "辅助道具 A01",
+                  "path": "../../images/四人行李箱-sheet.png"
+                }
+              ],
+              "originalBeat": 4,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "脚步、衣料或箱轮声随实际动作出现。"
+            }
+          ],
+          "h3Prompt": "参考图与目标视频的对齐——图 1（来自镜头 1）对齐目标视频 0.00 秒处；图 2（来自镜头 2）对齐目标视频 2.50 秒处；图 3（来自镜头 3）对齐目标视频 7.40 秒处；图 4（来自镜头 4）对齐目标视频 10.60 秒处。\n\n整体视听描述：\n[镜头 1] 参照图1构图，真人影视写实，全景，跟拍。小屋的门被推开，许知意拖着行李箱走进客厅。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 2] 于 00:02.500，参照图2构图，真人影视写实，全景，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 以画外音说（画内人物唇形完全闭合），节目解说，轻快有期待；只向观众播放：<d>[Chinese] 欢迎来到《心动未剪辑》。四位嘉宾，七天同住。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 3] 于 00:07.400，参照图3构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 以画外音说（画内人物唇形完全闭合），节目解说，留悬念，不提前点名：<d>[Chinese] 其中两位，是分手两年的前任。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 4] 于 00:10.600，参照图4构图，真人影视写实，中景，固定。许知意停好箱子，走到靠窗的椅子旁。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n\n整体音景：脚步、衣料或箱轮声随实际动作出现。 低室内底噪，保留对白间停顿。\n\n非叙事配乐：无；使用自然停顿维持情绪，片尾互动另加极轻音乐。",
+          "note": "分镜图尚未生成；先用references中的母图生成每切关键帧，再按图序投视频。"
+        },
+        {
+          "id": "E01-02",
+          "sceneIndex": 1,
+          "cuts": [
+            {
+              "beats": [
+                5,
+                5
+              ],
+              "seconds": 2,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium shot. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi occupies NE after she sits in beat 6. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "许知意：没人？那我先挑了。",
+              "delivery": "对着屋里的固定摄像机笑，落落大方",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 5,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                6,
+                6
+              ],
+              "seconds": 2.5,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium shot. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The woman lowers herself into the northeast chair in the last sunlight. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi occupies NE after she sits in beat 6. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "许知意在阳光照到的位置坐下。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 6,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "脚步、衣料或箱轮声随实际动作出现。"
+            },
+            {
+              "beats": [
+                7,
+                7
+              ],
+              "seconds": 3.2,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The woman rests one forearm on the oak chair arm, lips closed beneath a pre-recorded female voiceover. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi occupies NE after she sits in beat 6. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "画外音：我来之前，列了十条择偶标准。",
+              "delivery": "许知意的前采原声，叠在入场画面上",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 7,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                8,
+                8
+              ],
+              "seconds": 4,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs She looks toward the sea window, lips closed beneath the pre-recorded interview voice. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi occupies NE after she sits in beat 6. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "画外音：现在只记得一条：有话直说，别让我猜。",
+              "delivery": "许知意的前采原声，笑着说，后半句认真",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 8,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            }
+          ],
+          "h3Prompt": "参考图与目标视频的对齐——图 1（来自镜头 1）对齐目标视频 0.00 秒处；图 2（来自镜头 2）对齐目标视频 2.00 秒处；图 3（来自镜头 3）对齐目标视频 4.50 秒处；图 4（来自镜头 4）对齐目标视频 7.70 秒处。\n\n整体视听描述：\n[镜头 1] 参照图1构图，真人影视写实，中景，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 许知意以对着屋里的固定摄像机笑，落落大方的语气说：<d>[Chinese] 没人？那我先挑了。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 2] 于 00:02.000，参照图2构图，真人影视写实，中景，固定。许知意在阳光照到的位置坐下。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 3] 于 00:04.500，参照图3构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 以画外音说（画内人物唇形完全闭合），许知意的前采原声，叠在入场画面上：<d>[Chinese] 我来之前，列了十条择偶标准。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 4] 于 00:07.700，参照图4构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 以画外音说（画内人物唇形完全闭合），许知意的前采原声，笑着说，后半句认真：<d>[Chinese] 现在只记得一条：有话直说，别让我猜。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n\n整体音景：低室内底噪，保留对白间停顿。 脚步、衣料或箱轮声随实际动作出现。\n\n非叙事配乐：无；使用自然停顿维持情绪，片尾互动另加极轻音乐。",
+          "note": "分镜图尚未生成；先用references中的母图生成每切关键帧，再按图序投视频。"
+        },
+        {
+          "id": "E01-03",
+          "sceneIndex": 2,
+          "cuts": [
+            {
+              "beats": [
+                1,
+                1
+              ],
+              "seconds": 2.5,
+              "size": "wide",
+              "camera": "Tracking Shot",
+              "characters": [
+                "C03"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. wide shot. the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The wavy-haired man enters pulling a gray-olive suitcase, greeting the seated woman. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu is standing until beat 16; his NW chair remains empty. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "陆屿推着行李箱进门，向许知意打招呼。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                },
+                {
+                  "role": "辅助道具 A01",
+                  "path": "../../images/四人行李箱-sheet.png"
+                }
+              ],
+              "originalBeat": 1,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "脚步、衣料或箱轮声随实际动作出现。"
+            },
+            {
+              "beats": [
+                2,
+                2
+              ],
+              "seconds": 2,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C03"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium shot. the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu is standing until beat 16; his NW chair remains empty. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。此交流段以许知意坐、陆屿站的双人关系为主，不要求每句重切正脸。",
+              "action": "陆屿：陆屿，开书店的。",
+              "delivery": "略紧张，不背熟练的自我介绍",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                }
+              ],
+              "originalBeat": 2,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                3,
+                3
+              ],
+              "seconds": 2.5,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C01",
+                "C03"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium two-shot. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The subject is at the current position established by the preceding action, looking toward the partner visible in the same two-shot. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu is standing until beat 16; his NW chair remains empty. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame. Include both referenced participants in a shared medium composition; preserve their distinct supplied identities and existing posture. No extra dialogue from the listener.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。此交流段以许知意坐、陆屿站的双人关系为主，不要求每句重切正脸。",
+              "action": "你店里忙吗？",
+              "delivery": "好奇地顺着书店的话题问，不像采访提问",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                }
+              ],
+              "originalBeat": 3,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                4,
+                4
+              ],
+              "seconds": 3.6,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C01",
+                "C03"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium two-shot. the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The subject is at the current position established by the preceding action, looking toward the partner visible in the same two-shot. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu is standing until beat 16; his NW chair remains empty. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame. Include both referenced participants in a shared medium composition; preserve their distinct supplied identities and existing posture. No extra dialogue from the listener.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。此交流段以许知意坐、陆屿站的双人关系为主，不要求每句重切正脸。",
+              "action": "还行。不过今天有点紧张。",
+              "delivery": "先回答店里，再看一眼她；正常说话，不自嘲表演",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 4,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                5,
+                5
+              ],
+              "seconds": 3.2,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C01",
+                "C03"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium two-shot. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The subject is at the current position established by the preceding action, looking toward the partner visible in the same two-shot. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu is standing until beat 16; his NW chair remains empty. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame. Include both referenced participants in a shared medium composition; preserve their distinct supplied identities and existing posture. No extra dialogue from the listener.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。此交流段以许知意坐、陆屿站的双人关系为主，不要求每句重切正脸。",
+              "action": "我也是。你来了就好点了。",
+              "delivery": "接住他的坦白，后半句轻一点，不演成表白",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                }
+              ],
+              "originalBeat": 5,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            }
+          ],
+          "h3Prompt": "参考图与目标视频的对齐——图 1（来自镜头 1）对齐目标视频 0.00 秒处；图 2（来自镜头 2）对齐目标视频 2.50 秒处；图 3（来自镜头 3）对齐目标视频 4.50 秒处；图 4（来自镜头 4）对齐目标视频 7.00 秒处；图 5（来自镜头 5）对齐目标视频 10.60 秒处。\n\n整体视听描述：\n[镜头 1] 参照图1构图，真人影视写实，全景，跟拍。陆屿推着行李箱进门，向许知意打招呼。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 2] 于 00:02.500，参照图2构图，真人影视写实，中景，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 陆屿以略紧张，不背熟练的自我介绍的语气说：<d>[Chinese] 陆屿，开书店的。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 3] 于 00:04.500，参照图3构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 许知意以好奇，主动接话的语气说：<d>[Chinese] 那你是不是特别会聊天？</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 4] 于 00:07.000，参照图4构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 陆屿以认真说完，再露出一点笑的语气说：<d>[Chinese] 我平时对着书说，它们不太搭理我。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 5] 于 00:10.600，参照图5构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 许知意以接住他的玩笑的语气说：<d>[Chinese] 怪不得你来了。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n\n整体音景：脚步、衣料或箱轮声随实际动作出现。 低室内底噪，保留对白间停顿。\n\n非叙事配乐：无；使用自然停顿维持情绪，片尾互动另加极轻音乐。",
+          "note": "分镜图尚未生成；先用references中的母图生成每切关键帧，再按图序投视频。"
+        },
+        {
+          "id": "E01-04",
+          "sceneIndex": 2,
+          "cuts": [
+            {
+              "beats": [
+                6,
+                6
+              ],
+              "seconds": 2.5,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C03"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium shot. the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The man parks his suitcase by the rear wall and points toward the northwest empty chair. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu is standing until beat 16; his NW chair remains empty. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "陆屿笑着停好箱子，指了指她旁边的空位。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                },
+                {
+                  "role": "辅助道具 A01",
+                  "path": "../../images/四人行李箱-sheet.png"
+                }
+              ],
+              "originalBeat": 6,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "脚步、衣料或箱轮声随实际动作出现。"
+            },
+            {
+              "beats": [
+                7,
+                7
+              ],
+              "seconds": 2,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C03"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium shot. the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu is standing until beat 16; his NW chair remains empty. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "陆屿：我能坐这儿吗？",
+              "delivery": "得到回应再坐，不直接占住她旁边",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                }
+              ],
+              "originalBeat": 7,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                8,
+                8
+              ],
+              "seconds": 2.5,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C01",
+                "C03"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium shot. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs; the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The woman nods and the man takes the northwest chair beside her. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props.  Parked luggage belonging to Xu Zhiyi, Lu Yu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "许知意点头，陆屿坐下。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                }
+              ],
+              "originalBeat": 8,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "脚步、衣料或箱轮声随实际动作出现。"
+            },
+            {
+              "beats": [
+                9,
+                9
+              ],
+              "seconds": 3.4,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "许知意：许知意，画画的。随心所欲的意。",
+              "delivery": "轻松地介绍自己，对自己的说法有点得意",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 9,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                10,
+                10
+              ],
+              "seconds": 2,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C03"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "知意。记住了。",
+              "delivery": "重复她的名字确认，语气平常",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                }
+              ],
+              "originalBeat": 10,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            }
+          ],
+          "h3Prompt": "参考图与目标视频的对齐——图 1（来自镜头 1）对齐目标视频 0.00 秒处；图 2（来自镜头 2）对齐目标视频 2.50 秒处；图 3（来自镜头 3）对齐目标视频 4.50 秒处；图 4（来自镜头 4）对齐目标视频 7.00 秒处；图 5（来自镜头 5）对齐目标视频 10.40 秒处。\n\n整体视听描述：\n[镜头 1] 参照图1构图，真人影视写实，中景，固定。陆屿笑着停好箱子，指了指她旁边的空位。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 2] 于 00:02.500，参照图2构图，真人影视写实，中景，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 陆屿以得到回应再坐，不直接占住她旁边的语气说：<d>[Chinese] 我能坐这儿吗？</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 3] 于 00:04.500，参照图3构图，真人影视写实，中景，固定。许知意点头，陆屿坐下。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 4] 于 00:07.000，参照图4构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 许知意以轻松地介绍自己，对自己的说法有点得意的语气说：<d>[Chinese] 许知意，画画的。随心所欲的意。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 5] 于 00:10.400，参照图5构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 陆屿以看着她说，记住的是她想怎么被认识的语气说：<d>[Chinese] 记住了，随心所欲。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n\n整体音景：脚步、衣料或箱轮声随实际动作出现。 低室内底噪，保留对白间停顿。\n\n非叙事配乐：无；使用自然停顿维持情绪，片尾互动另加极轻音乐。",
+          "note": "分镜图尚未生成；先用references中的母图生成每切关键帧，再按图序投视频。"
+        },
+        {
+          "id": "E01-05",
+          "sceneIndex": 3,
+          "cuts": [
+            {
+              "beats": [
+                1,
+                1
+              ],
+              "seconds": 2.5,
+              "size": "wide",
+              "camera": "Tracking Shot",
+              "characters": [
+                "C04"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. wide shot. the 29-year-old woman with a center-parted blunt black bob, caramel sleeveless knit top, ivory wide-leg trousers and small gold hoops The bob-haired woman enters and parks her caramel suitcase against the north wall. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains standing until beat 21; SW is empty. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "宋乔走进客厅，把箱子停在墙边。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C04",
+                  "path": "../../images/宋乔-sheet.png"
+                },
+                {
+                  "role": "辅助道具 A01",
+                  "path": "../../images/四人行李箱-sheet.png"
+                }
+              ],
+              "originalBeat": 1,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "脚步、衣料或箱轮声随实际动作出现。"
+            },
+            {
+              "beats": [
+                2,
+                2
+              ],
+              "seconds": 2.9,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C04"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium shot. the 29-year-old woman with a center-parted blunt black bob, caramel sleeveless knit top, ivory wide-leg trousers and small gold hoops The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains standing until beat 21; SW is empty. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "宋乔：宋乔，做陶的。我能加入吗？",
+              "delivery": "先看向两人，坦率地加入谈话",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C04",
+                  "path": "../../images/宋乔-sheet.png"
+                }
+              ],
+              "originalBeat": 2,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                3,
+                3
+              ],
+              "seconds": 2.5,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C01",
+                "C04"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium shot. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs; the 29-year-old woman with a center-parted blunt black bob, caramel sleeveless knit top, ivory wide-leg trousers and small gold hoops The seated woman welcomes the newcomer, who sits in the southwest chair opposite the wavy-haired man. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props.  Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "许知意招呼她坐下，宋乔坐在陆屿对面。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "角色母图 C04",
+                  "path": "../../images/宋乔-sheet.png"
+                }
+              ],
+              "originalBeat": 3,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "脚步、衣料或箱轮声随实际动作出现。"
+            },
+            {
+              "beats": [
+                4,
+                4
+              ],
+              "seconds": 3.4,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C03"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。保留三人在场感；重点是宋乔把杯子话题转成次日咖啡邀约，八点由陆屿提出。",
+              "action": "陆屿：陶艺？我店里正想换一批咖啡杯。",
+              "delivery": "职业习惯先于约会反应，脱口而出",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                }
+              ],
+              "originalBeat": 4,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                5,
+                5
+              ],
+              "seconds": 2.9,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C03",
+                "C04"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium two-shot. the 29-year-old woman with a center-parted blunt black bob, caramel sleeveless knit top, ivory wide-leg trousers and small gold hoops The subject is at the current position established by the preceding action, looking toward the partner visible in the same two-shot. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame. Include both referenced participants in a shared medium composition; preserve their distinct supplied identities and existing posture. No extra dialogue from the listener.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。保留三人在场感；重点是宋乔把杯子话题转成次日咖啡邀约，八点由陆屿提出。",
+              "action": "刚坐下，你就跟我谈生意啊？",
+              "delivery": "带笑问陆屿，是真在接他的话，不对镜头抖包袱",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C04",
+                  "path": "../../images/宋乔-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                }
+              ],
+              "originalBeat": 5,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            }
+          ],
+          "h3Prompt": "参考图与目标视频的对齐——图 1（来自镜头 1）对齐目标视频 0.00 秒处；图 2（来自镜头 2）对齐目标视频 2.50 秒处；图 3（来自镜头 3）对齐目标视频 5.40 秒处；图 4（来自镜头 4）对齐目标视频 7.90 秒处；图 5（来自镜头 5）对齐目标视频 11.30 秒处。\n\n整体视听描述：\n[镜头 1] 参照图1构图，真人影视写实，全景，跟拍。宋乔走进客厅，把箱子停在墙边。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 2] 于 00:02.500，参照图2构图，真人影视写实，中景，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 宋乔以先看向两人，坦率地加入谈话的语气说：<d>[Chinese] 宋乔，做陶的。我能加入吗？</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 3] 于 00:05.400，参照图3构图，真人影视写实，中景，固定。许知意招呼她坐下，宋乔坐在陆屿对面。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 4] 于 00:07.900，参照图4构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 陆屿以职业习惯先于约会反应，脱口而出的语气说：<d>[Chinese] 陶艺？我店里正想换一批咖啡杯。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 5] 于 00:11.300，参照图5构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 宋乔以带笑提醒，既不攻击，也不让话题滑走的语气说：<d>[Chinese] 先别谈生意。我是来约会的。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n\n整体音景：脚步、衣料或箱轮声随实际动作出现。 低室内底噪，保留对白间停顿。\n\n非叙事配乐：无；使用自然停顿维持情绪，片尾互动另加极轻音乐。",
+          "note": "分镜图尚未生成；先用references中的母图生成每切关键帧，再按图序投视频。"
+        },
+        {
+          "id": "E01-06",
+          "sceneIndex": 3,
+          "cuts": [
+            {
+              "beats": [
+                6,
+                6
+              ],
+              "seconds": 2.5,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C03",
+                "C04"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium two-shot. the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The seated man briefly smiles and raises his empty hands, then lowers them. He remains silent; no apology or extra dialogue. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame. Include both referenced participants in a shared medium composition; preserve their distinct supplied identities and existing posture. No extra dialogue from the listener.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。保留三人在场感；重点是宋乔把杯子话题转成次日咖啡邀约，八点由陆屿提出。",
+              "action": "陆屿笑了一下，抬起双手示意收回话题，随即放下。全程不说话。",
+              "delivery": "自然静默动作，不追加对白",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                },
+                {
+                  "role": "角色母图 C04",
+                  "path": "../../images/宋乔-sheet.png"
+                }
+              ],
+              "originalBeat": 6,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                7,
+                7
+              ],
+              "seconds": 3.8,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C04"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 29-year-old woman with a center-parted blunt black bob, caramel sleeveless knit top, ivory wide-leg trousers and small gold hoops The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。保留三人在场感；重点是宋乔把杯子话题转成次日咖啡邀约，八点由陆屿提出。",
+              "action": "宋乔：明早去喝咖啡？杯子的事，回来再说。",
+              "delivery": "直接对陆屿发出邀请",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C04",
+                  "path": "../../images/宋乔-sheet.png"
+                }
+              ],
+              "originalBeat": 7,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                8,
+                8
+              ],
+              "seconds": 2,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C03"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。保留三人在场感；重点是宋乔把杯子话题转成次日咖啡邀约，八点由陆屿提出。",
+              "action": "陆屿：好，八点？",
+              "delivery": "认真接受；此处是初步了解，不是排他承诺",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                }
+              ],
+              "originalBeat": 8,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                9,
+                9
+              ],
+              "seconds": 2,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C04"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 29-year-old woman with a center-parted blunt black bob, caramel sleeveless knit top, ivory wide-leg trousers and small gold hoops The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。保留三人在场感；重点是宋乔把杯子话题转成次日咖啡邀约，八点由陆屿提出。",
+              "action": "宋乔：八点见。",
+              "delivery": "爽快确认，随后自然转回三人谈话",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C04",
+                  "path": "../../images/宋乔-sheet.png"
+                }
+              ],
+              "originalBeat": 9,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            }
+          ],
+          "h3Prompt": "参考图与目标视频的对齐——图 1（来自镜头 1）对齐目标视频 0.00 秒处；图 2（来自镜头 2）对齐目标视频 2.50 秒处；图 3（来自镜头 3）对齐目标视频 6.30 秒处；图 4（来自镜头 4）对齐目标视频 8.30 秒处。\n\n整体视听描述：\n[镜头 1] 参照图1构图，真人影视写实，中景，固定。陆屿笑着抬起双手，承认自己跑题。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 2] 于 00:02.500，参照图2构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 宋乔以直接对陆屿发出邀请的语气说：<d>[Chinese] 明早去喝咖啡？杯子的事，回来再说。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 3] 于 00:06.300，参照图3构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 陆屿以认真接受；此处是初步了解，不是排他承诺的语气说：<d>[Chinese] 好，八点？</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 4] 于 00:08.300，参照图4构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 宋乔以爽快确认，随后自然转回三人谈话的语气说：<d>[Chinese] 八点见。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n\n整体音景：低室内底噪，保留对白间停顿。\n\n非叙事配乐：无；使用自然停顿维持情绪，片尾互动另加极轻音乐。",
+          "note": "分镜图尚未生成；先用references中的母图生成每切关键帧，再按图序投视频。"
+        },
+        {
+          "id": "E01-07",
+          "sceneIndex": 4,
+          "cuts": [
+            {
+              "beats": [
+                1,
+                1
+              ],
+              "seconds": 2.5,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C02"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium shot. the 31-year-old clean-shaven man with short side-parted black hair, gray crewneck with the overshirt removed off-screen, taupe trousers and silver watch on his LEFT wrist The tall man takes off his charcoal overshirt, places it outside the frame and sits in the ivory interview chair, wearing only the stone-gray crewneck. The single interview room: ivory armless chair in center, taupe curtain left, empty walnut side table right unless the action places a prop there. Soft neutral controlled key from upper left. Controlled interview lighting, no daylight window. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Isolate this single face; other participants stay off-camera.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。访谈视线在镜头旁；不擅自加入采访者反打。",
+              "action": "周叙在前采室坐下，把外套放在一旁。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/单人告白间-sheet.png"
+                },
+                {
+                  "role": "角色母图 C02",
+                  "path": "../../images/周叙-sheet.png"
+                }
+              ],
+              "originalBeat": 1,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "安静室内底噪，轻呼吸；不添加敲门声。"
+            },
+            {
+              "beats": [
+                2,
+                2
+              ],
+              "seconds": 2,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C02"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium shot. the 31-year-old clean-shaven man with short side-parted black hair, gray crewneck with the overshirt removed off-screen, taupe trousers and silver watch on his LEFT wrist The seated subject addresses an unseen interviewer just beside the lens, maintaining a steady natural posture. The single interview room: ivory armless chair in center, taupe curtain left, empty walnut side table right unless the action places a prop there. Soft neutral controlled key from upper left. Controlled interview lighting, no daylight window. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Isolate this single face; other participants stay off-camera.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。访谈视线在镜头旁；不擅自加入采访者反打。",
+              "action": "周叙：周叙，建筑师。",
+              "delivery": "稳，简短",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/单人告白间-sheet.png"
+                },
+                {
+                  "role": "角色母图 C02",
+                  "path": "../../images/周叙-sheet.png"
+                }
+              ],
+              "originalBeat": 2,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "安静室内底噪，轻呼吸；不添加敲门声。"
+            },
+            {
+              "beats": [
+                3,
+                3
+              ],
+              "seconds": 4,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C02"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 31-year-old clean-shaven man with short side-parted black hair, gray crewneck with the overshirt removed off-screen, taupe trousers and silver watch on his LEFT wrist The seated subject addresses an unseen interviewer just beside the lens, maintaining a steady natural posture. The single interview room: ivory armless chair in center, taupe curtain left, empty walnut side table right unless the action places a prop there. Soft neutral controlled key from upper left. Controlled interview lighting, no daylight window. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Isolate this single face; other participants stay off-camera.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。访谈视线在镜头旁；不擅自加入采访者反打。",
+              "action": "以前一忙，就想着晚点再跟她说。",
+              "delivery": "回忆具体的旧习惯，不念反省总结",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/单人告白间-sheet.png"
+                },
+                {
+                  "role": "角色母图 C02",
+                  "path": "../../images/周叙-sheet.png"
+                }
+              ],
+              "originalBeat": 3,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "安静室内底噪，轻呼吸；不添加敲门声。"
+            },
+            {
+              "beats": [
+                4,
+                4
+              ],
+              "seconds": 2.5,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C02"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 31-year-old clean-shaven man with short side-parted black hair, gray crewneck with the overshirt removed off-screen, taupe trousers and silver watch on his LEFT wrist The man looks toward the unseen interviewer; his polite smile fades. The single interview room: ivory armless chair in center, taupe curtain left, empty walnut side table right unless the action places a prop there. Soft neutral controlled key from upper left. Controlled interview lighting, no daylight window. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Isolate this single face; other participants stay off-camera.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。访谈视线在镜头旁；不擅自加入采访者反打。",
+              "action": "周叙看向采访者，没有再维持礼貌的笑。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/单人告白间-sheet.png"
+                },
+                {
+                  "role": "角色母图 C02",
+                  "path": "../../images/周叙-sheet.png"
+                }
+              ],
+              "originalBeat": 4,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "安静室内底噪，轻呼吸；不添加敲门声。"
+            },
+            {
+              "beats": [
+                5,
+                5
+              ],
+              "seconds": 2.5,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C02"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 31-year-old clean-shaven man with short side-parted black hair, gray crewneck with the overshirt removed off-screen, taupe trousers and silver watch on his LEFT wrist The seated subject addresses an unseen interviewer just beside the lens, maintaining a steady natural posture. The single interview room: ivory armless chair in center, taupe curtain left, empty walnut side table right unless the action places a prop there. Soft neutral controlled key from upper left. Controlled interview lighting, no daylight window. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Isolate this single face; other participants stay off-camera.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。访谈视线在镜头旁；不擅自加入采访者反打。",
+              "action": "后来她就不等了。",
+              "delivery": "平静说完，不强调最后一个字",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/单人告白间-sheet.png"
+                },
+                {
+                  "role": "角色母图 C02",
+                  "path": "../../images/周叙-sheet.png"
+                }
+              ],
+              "originalBeat": 5,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "安静室内底噪，轻呼吸；不添加敲门声。"
+            }
+          ],
+          "h3Prompt": "参考图与目标视频的对齐——图 1（来自镜头 1）对齐目标视频 0.00 秒处；图 2（来自镜头 2）对齐目标视频 2.50 秒处；图 3（来自镜头 3）对齐目标视频 4.50 秒处；图 4（来自镜头 4）对齐目标视频 8.50 秒处；图 5（来自镜头 5）对齐目标视频 11.00 秒处。\n\n整体视听描述：\n[镜头 1] 参照图1构图，真人影视写实，中景，固定。周叙在前采室坐下，把外套放在一旁。  访谈视线在镜头旁；不擅自加入采访者反打。\n[镜头 2] 于 00:02.500，参照图2构图，真人影视写实，中景，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 周叙以稳，简短的语气说：<d>[Chinese] 周叙，建筑师。</d> 访谈视线在镜头旁；不擅自加入采访者反打。\n[镜头 3] 于 00:04.500，参照图3构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 周叙以说到后半句停一下，承认是自己的旧习惯的语气说：<d>[Chinese] 以前觉得，事情做完再解释，也来得及。</d> 访谈视线在镜头旁；不擅自加入采访者反打。\n[镜头 4] 于 00:08.500，参照图4构图，真人影视写实，特写，固定。周叙看向采访者，没有再维持礼貌的笑。  访谈视线在镜头旁；不擅自加入采访者反打。\n[镜头 5] 于 00:11.000，参照图5构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 周叙以平静，不把反省演成已经完成的改变的语气说：<d>[Chinese] 现在不这么想了。</d> 访谈视线在镜头旁；不擅自加入采访者反打。\n\n整体音景：安静室内底噪，轻呼吸；不添加敲门声。\n\n非叙事配乐：无；使用自然停顿维持情绪，片尾互动另加极轻音乐。",
+          "note": "分镜图尚未生成；先用references中的母图生成每切关键帧，再按图序投视频。"
+        },
+        {
+          "id": "E01-08",
+          "sceneIndex": 5,
+          "cuts": [
+            {
+              "beats": [
+                1,
+                1
+              ],
+              "seconds": 2.5,
+              "size": "wide",
+              "camera": "Tracking Shot",
+              "characters": [
+                "C02"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. wide shot. the 31-year-old clean-shaven man with short side-parted black hair, charcoal overshirt, gray crewneck, taupe trousers and silver watch on his LEFT wrist Back in his charcoal overshirt, the tall man enters the living room with his graphite suitcase and stops on seeing the woman. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu stays standing with his suitcase until permission in beat 45; SE remains empty until beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "周叙推门走进客厅，看到许知意后停住。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C02",
+                  "path": "../../images/周叙-sheet.png"
+                }
+              ],
+              "originalBeat": 1,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "脚步、衣料或箱轮声随实际动作出现。"
+            },
+            {
+              "beats": [
+                2,
+                2
+              ],
+              "seconds": 2,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C02"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 31-year-old clean-shaven man with short side-parted black hair, charcoal overshirt, gray crewneck, taupe trousers and silver watch on his LEFT wrist The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu stays standing with his suitcase until permission in beat 45; SE remains empty until beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "周叙：好久不见，知意。",
+              "delivery": "熟悉的称呼脱口而出，不急着靠近",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C02",
+                  "path": "../../images/周叙-sheet.png"
+                }
+              ],
+              "originalBeat": 2,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                3,
+                3
+              ],
+              "seconds": 2.5,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The woman places her plain clear glass down on her side of the table and looks up. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu stays standing with his suitcase until permission in beat 45; SE remains empty until beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "许知意放下水杯，抬头看他。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "辅助道具 A02",
+                  "path": "../../images/玻璃水杯-sheet.png"
+                }
+              ],
+              "originalBeat": 3,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                4,
+                4
+              ],
+              "seconds": 2,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu stays standing with his suitcase until permission in beat 45; SE remains empty until beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "许知意：你好，周叙。",
+              "delivery": "仍然礼貌，却不再像刚才一样接玩笑",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 4,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                5,
+                5
+              ],
+              "seconds": 2,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C04"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 29-year-old woman with a center-parted blunt black bob, caramel sleeveless knit top, ivory wide-leg trousers and small gold hoops The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu stays standing with his suitcase until permission in beat 45; SE remains empty until beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "宋乔：你们……认识？",
+              "delivery": "顺着现场信息发问，不起哄",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C04",
+                  "path": "../../images/宋乔-sheet.png"
+                }
+              ],
+              "originalBeat": 5,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                6,
+                6
+              ],
+              "seconds": 2,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu stays standing with his suitcase until permission in beat 45; SE remains empty until beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "许知意：前任。两年前分的。",
+              "delivery": "自己公开关系，不等他定义",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 6,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            }
+          ],
+          "h3Prompt": "参考图与目标视频的对齐——图 1（来自镜头 1）对齐目标视频 0.00 秒处；图 2（来自镜头 2）对齐目标视频 2.50 秒处；图 3（来自镜头 3）对齐目标视频 4.50 秒处；图 4（来自镜头 4）对齐目标视频 7.00 秒处；图 5（来自镜头 5）对齐目标视频 9.00 秒处；图 6（来自镜头 6）对齐目标视频 11.00 秒处。\n\n整体视听描述：\n[镜头 1] 参照图1构图，真人影视写实，全景，跟拍。周叙推门走进客厅，看到许知意后停住。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 2] 于 00:02.500，参照图2构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 周叙以熟悉的称呼脱口而出，不急着靠近的语气说：<d>[Chinese] 好久不见，知意。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 3] 于 00:04.500，参照图3构图，真人影视写实，特写，固定。许知意放下水杯，抬头看他。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 4] 于 00:07.000，参照图4构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 许知意以仍然礼貌，却不再像刚才一样接玩笑的语气说：<d>[Chinese] 你好，周叙。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 5] 于 00:09.000，参照图5构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 宋乔以顺着现场信息发问，不起哄的语气说：<d>[Chinese] 你们……认识？</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 6] 于 00:11.000，参照图6构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 许知意以自己公开关系，不等他定义的语气说：<d>[Chinese] 前任。两年前分的。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n\n整体音景：脚步、衣料或箱轮声随实际动作出现。 低室内底噪，保留对白间停顿。\n\n非叙事配乐：无；使用自然停顿维持情绪，片尾互动另加极轻音乐。",
+          "note": "分镜图尚未生成；先用references中的母图生成每切关键帧，再按图序投视频。"
+        },
+        {
+          "id": "E01-09",
+          "sceneIndex": 5,
+          "cuts": [
+            {
+              "beats": [
+                7,
+                7
+              ],
+              "seconds": 3.2,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium shot. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu stays standing with his suitcase until permission in beat 45; SE remains empty until beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "许知意：知道你会来，还是有点不习惯。",
+              "delivery": "转回周叙，承认准备过与亲眼见到仍有差别",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 7,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                8,
+                8
+              ],
+              "seconds": 2,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C02"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 31-year-old clean-shaven man with short side-parted black hair, charcoal overshirt, gray crewneck, taupe trousers and silver watch on his LEFT wrist The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu stays standing with his suitcase until permission in beat 45; SE remains empty until beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "周叙：我也是。",
+              "delivery": "没有借她的坦诚进一步靠近",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C02",
+                  "path": "../../images/周叙-sheet.png"
+                }
+              ],
+              "originalBeat": 8,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                9,
+                9
+              ],
+              "seconds": 2.5,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C03"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The wavy-haired man remains in his northwest seat, stops smiling and listens. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu stays standing with his suitcase until permission in beat 45; SE remains empty until beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。保留陆屿已有的安静反应；周叙问座位时仍站立；不要把反打的左右变化当作换座。这不是新增反应：原A成片已有陆屿的对应反应，应保留。",
+              "action": "陆屿收起笑意，安静地听，没有离开座位。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                }
+              ],
+              "originalBeat": 9,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                10,
+                10
+              ],
+              "seconds": 2,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C02"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium shot. the 31-year-old clean-shaven man with short side-parted black hair, charcoal overshirt, gray crewneck, taupe trousers and silver watch on his LEFT wrist The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu stays standing with his suitcase until permission in beat 45; SE remains empty until beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。保留陆屿已有的安静反应；周叙问座位时仍站立；不要把反打的左右变化当作换座。",
+              "action": "周叙：你还是喜欢坐窗边。",
+              "delivery": "想从熟悉的事情开始谈话",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C02",
+                  "path": "../../images/周叙-sheet.png"
+                }
+              ],
+              "originalBeat": 10,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                11,
+                11
+              ],
+              "seconds": 2,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu stays standing with his suitcase until permission in beat 45; SE remains empty until beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。保留陆屿已有的安静反应；周叙问座位时仍站立；不要把反打的左右变化当作换座。",
+              "action": "许知意：今天这儿有太阳。",
+              "delivery": "看一眼窗外，再看他；没有顺势回忆过去",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 11,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                12,
+                12
+              ],
+              "seconds": 2,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C01",
+                "C02"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium two-shot. the 31-year-old clean-shaven man with short side-parted black hair, charcoal overshirt, gray crewneck, taupe trousers and silver watch on his LEFT wrist The tall man is standing beside the empty SE chair, with his suitcase still beside him. He asks the seated woman for permission and remains standing through the end of this beat. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu stays standing with his suitcase until permission in beat 45; SE remains empty until beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame. Include both referenced participants in a shared medium composition; preserve their distinct supplied identities and existing posture. No extra dialogue from the listener.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。保留陆屿已有的安静反应；周叙问座位时仍站立；不要把反打的左右变化当作换座。",
+              "action": "周叙：我能坐这儿吗？",
+              "delivery": "指向剩下的空位，等她回应",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C02",
+                  "path": "../../images/周叙-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 12,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            }
+          ],
+          "h3Prompt": "参考图与目标视频的对齐——图 1（来自镜头 1）对齐目标视频 0.00 秒处；图 2（来自镜头 2）对齐目标视频 3.20 秒处；图 3（来自镜头 3）对齐目标视频 5.20 秒处；图 4（来自镜头 4）对齐目标视频 7.70 秒处；图 5（来自镜头 5）对齐目标视频 9.70 秒处；图 6（来自镜头 6）对齐目标视频 11.70 秒处。\n\n整体视听描述：\n[镜头 1] 参照图1构图，真人影视写实，中景，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 许知意以转回周叙，承认准备过与亲眼见到仍有差别的语气说：<d>[Chinese] 知道你会来，还是有点不习惯。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 2] 于 00:03.200，参照图2构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 周叙以没有借她的坦诚进一步靠近的语气说：<d>[Chinese] 我也是。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 3] 于 00:05.200，参照图3构图，真人影视写实，特写，固定。陆屿收起笑意，安静地听，没有离开座位。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 4] 于 00:07.700，参照图4构图，真人影视写实，中景，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 周叙以想从熟悉的事情开始谈话的语气说：<d>[Chinese] 你还是喜欢坐窗边。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 5] 于 00:09.700，参照图5构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 许知意以看一眼窗外，再看他；没有顺势回忆过去的语气说：<d>[Chinese] 今天这儿有太阳。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 6] 于 00:11.700，参照图6构图，真人影视写实，中景，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 周叙以指向剩下的空位，等她回应的语气说：<d>[Chinese] 我能坐这儿吗？</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n\n整体音景：低室内底噪，保留对白间停顿。\n\n非叙事配乐：无；使用自然停顿维持情绪，片尾互动另加极轻音乐。",
+          "note": "分镜图尚未生成；先用references中的母图生成每切关键帧，再按图序投视频。"
+        },
+        {
+          "id": "E01-10",
+          "sceneIndex": 5,
+          "cuts": [
+            {
+              "beats": [
+                13,
+                13
+              ],
+              "seconds": 2,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu stays standing with his suitcase until permission in beat 45; SE remains empty until beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame. Zhou Xu remains standing outside the close framing until her answer finishes.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。保留陆屿已有的安静反应；周叙问座位时仍站立；不要把反打的左右变化当作换座。",
+              "action": "许知意：坐吧。",
+              "delivery": "允许同处一室，不代表接受追求",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 13,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                14,
+                14
+              ],
+              "seconds": 2.5,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C01",
+                "C02"
+              ],
+              "props": [],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium two-shot. the 31-year-old clean-shaven man with short side-parted black hair, charcoal overshirt, gray crewneck, taupe trousers and silver watch on his LEFT wrist The tall man parks his suitcase against the north wall and takes the remaining southeast chair. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame. Begin with the tall man standing. After her permission, he parks his suitcase without moving the existing three, then sits on SE. End seated; no other person moves seats. Include both referenced participants in a shared medium composition; preserve their distinct supplied identities and existing posture. No extra dialogue from the listener.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。保留陆屿已有的安静反应；周叙问座位时仍站立；不要把反打的左右变化当作换座。",
+              "action": "周叙把箱子放到墙边，坐进剩下的空位。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C02",
+                  "path": "../../images/周叙-sheet.png"
+                },
+                {
+                  "role": "辅助道具 A01",
+                  "path": "../../images/四人行李箱-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 14,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "脚步、衣料或箱轮声随实际动作出现。"
+            }
+          ],
+          "h3Prompt": "参考图与目标视频的对齐——图 1（来自镜头 1）对齐目标视频 0.00 秒处；图 2（来自镜头 2）对齐目标视频 2.00 秒处。\n\n整体视听描述：\n[镜头 1] 参照图1构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 许知意以允许同处一室，不代表接受追求的语气说：<d>[Chinese] 坐吧。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 2] 于 00:02.000，参照图2构图，真人影视写实，中景，固定。周叙把箱子放到墙边，坐进剩下的空位。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n\n整体音景：低室内底噪，保留对白间停顿。 脚步、衣料或箱轮声随实际动作出现。\n\n非叙事配乐：无；使用自然停顿维持情绪，片尾互动另加极轻音乐。",
+          "note": "分镜图尚未生成；先用references中的母图生成每切关键帧，再按图序投视频。"
+        },
+        {
+          "id": "E01-11",
+          "sceneIndex": 6,
+          "cuts": [
+            {
+              "beats": [
+                1,
+                1
+              ],
+              "seconds": 2.5,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01",
+                "C03"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs; the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry Two guests reach for their own blank ivory invitation cards; the other two cards remain on the table outside this crop. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props.  Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "嘉宾们拿起桌上放好的空白邀请卡。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                },
+                {
+                  "role": "辅助道具 A03",
+                  "path": "../../images/黑色中性笔-sheet.png"
+                }
+              ],
+              "originalBeat": 1,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "纸卡轻摩擦，低室内底噪。"
+            },
+            {
+              "beats": [
+                2,
+                2
+              ],
+              "seconds": 4.7,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. Object insert with no faces. An insert shows exactly four blank ivory invitation cards with copper borders and four matte black pens arranged one per guest on the walnut table. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props.  Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "画外音：今晚十点，每人可邀一位嘉宾，单独聊十分钟。",
+              "delivery": "节目广播，现场所有嘉宾都能听到",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                }
+              ],
+              "originalBeat": 2,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                3,
+                3
+              ],
+              "seconds": 3.4,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The woman listens to the room broadcast, lips closed, her own blank card still in front of her. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "画外音：每人最多赴一场约，也可以不去。",
+              "delivery": "节目广播，给出互斥选择的依据",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                }
+              ],
+              "originalBeat": 3,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                4,
+                4
+              ],
+              "seconds": 2.5,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C02",
+                "C01"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 31-year-old clean-shaven man with short side-parted black hair, charcoal overshirt, gray crewneck, taupe trousers and silver watch on his LEFT wrist; the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The tall man writes on his card and hands it to the woman; all legible writing will be composited in post. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props.  Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "周叙写好邀请卡，递到许知意面前。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C02",
+                  "path": "../../images/周叙-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                },
+                {
+                  "role": "辅助道具 A03",
+                  "path": "../../images/黑色中性笔-sheet.png"
+                }
+              ],
+              "originalBeat": 4,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "纸卡轻摩擦，低室内底噪。"
+            }
+          ],
+          "h3Prompt": "参考图与目标视频的对齐——图 1（来自镜头 1）对齐目标视频 0.00 秒处；图 2（来自镜头 2）对齐目标视频 2.50 秒处；图 3（来自镜头 3）对齐目标视频 7.20 秒处；图 4（来自镜头 4）对齐目标视频 10.60 秒处。\n\n整体视听描述：\n[镜头 1] 参照图1构图，真人影视写实，特写，固定。嘉宾们拿起桌上放好的空白邀请卡。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 2] 于 00:02.500，参照图2构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 以画外音说（画内人物唇形完全闭合），节目广播，现场所有嘉宾都能听到：<d>[Chinese] 今晚十点，每人可邀一位嘉宾，单独聊十分钟。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 3] 于 00:07.200，参照图3构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 以画外音说（画内人物唇形完全闭合），节目广播，给出互斥选择的依据：<d>[Chinese] 每人最多赴一场约，也可以不去。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 4] 于 00:10.600，参照图4构图，真人影视写实，特写，固定。周叙写好邀请卡，递到许知意面前。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n\n整体音景：纸卡轻摩擦，低室内底噪。 低室内底噪，保留对白间停顿。\n\n非叙事配乐：无；使用自然停顿维持情绪，片尾互动另加极轻音乐。",
+          "note": "分镜图尚未生成；先用references中的母图生成每切关键帧，再按图序投视频。"
+        },
+        {
+          "id": "E01-12",
+          "sceneIndex": 6,
+          "cuts": [
+            {
+              "beats": [
+                5,
+                5
+              ],
+              "seconds": 4.6,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C02"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 31-year-old clean-shaven man with short side-parted black hair, charcoal overshirt, gray crewneck, taupe trousers and silver watch on his LEFT wrist The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "露台。两年前那顿饭，我还欠你个解释。",
+              "delivery": "先说地点，再直接承认欠她解释，不背告白稿",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C02",
+                  "path": "../../images/周叙-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                }
+              ],
+              "originalBeat": 5,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                6,
+                6
+              ],
+              "seconds": 2.3,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "许知意：是道歉，还是想复合？",
+              "delivery": "先问清楚邀请的目的",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                }
+              ],
+              "originalBeat": 6,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                7,
+                7
+              ],
+              "seconds": 2.7,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C02"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 31-year-old clean-shaven man with short side-parted black hair, charcoal overshirt, gray crewneck, taupe trousers and silver watch on his LEFT wrist The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "周叙：先道歉。也想再争取一次。",
+              "delivery": "承认两种动机，不用措辞躲开问题",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C02",
+                  "path": "../../images/周叙-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                }
+              ],
+              "originalBeat": 7,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                8,
+                8
+              ],
+              "seconds": 2.5,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The woman lays the received card on her own left on the table without nodding. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "许知意把卡片放在桌上，没有点头。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                }
+              ],
+              "originalBeat": 8,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "纸卡轻摩擦，低室内底噪。"
+            },
+            {
+              "beats": [
+                9,
+                9
+              ],
+              "seconds": 2.4,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C03"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The wavy-haired man lays his card on the woman's own right beside the first invitation. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。邀请先到知意面前，再接她的回答与宋乔收回卡片；不要用无关表情强造嫉妒。",
+              "action": "陆屿将自己的邀请卡放到她面前。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                }
+              ],
+              "originalBeat": 9,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "纸卡轻摩擦，低室内底噪。"
+            }
+          ],
+          "h3Prompt": "参考图与目标视频的对齐——图 1（来自镜头 1）对齐目标视频 0.00 秒处；图 2（来自镜头 2）对齐目标视频 3.80 秒处；图 3（来自镜头 3）对齐目标视频 6.10 秒处；图 4（来自镜头 4）对齐目标视频 8.80 秒处；图 5（来自镜头 5）对齐目标视频 11.30 秒处。\n\n整体视听描述：\n[镜头 1] 参照图1构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 周叙以具体说出旧事的缺口，不能用深情盖过失约的语气说：<d>[Chinese] 露台。我想补上两年前没来的那顿饭。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 2] 于 00:03.800，参照图2构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 许知意以先问清楚邀请的目的的语气说：<d>[Chinese] 是道歉，还是想复合？</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 3] 于 00:06.100，参照图3构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 周叙以承认两种动机，不用措辞躲开问题的语气说：<d>[Chinese] 先道歉。也想再争取一次。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 4] 于 00:08.800，参照图4构图，真人影视写实，特写，固定。许知意把卡片放在桌上，没有点头。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 5] 于 00:11.300，参照图5构图，真人影视写实，特写，固定。陆屿将自己的邀请卡放到她面前。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n\n整体音景：低室内底噪，保留对白间停顿。 纸卡轻摩擦，低室内底噪。\n\n非叙事配乐：无；使用自然停顿维持情绪，片尾互动另加极轻音乐。",
+          "note": "分镜图尚未生成；先用references中的母图生成每切关键帧，再按图序投视频。"
+        },
+        {
+          "id": "E01-13",
+          "sceneIndex": 6,
+          "cuts": [
+            {
+              "beats": [
+                10,
+                10
+              ],
+              "seconds": 3.2,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C01",
+                "C03"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium two-shot. the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The subject is at the current position established by the preceding action, looking toward the partner visible in the same two-shot. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame. Include both referenced participants in a shared medium composition; preserve their distinct supplied identities and existing posture. No extra dialogue from the listener.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。邀请先到知意面前，再接她的回答与宋乔收回卡片；不要用无关表情强造嫉妒。",
+              "action": "厨房见？刚才还没聊完呢。",
+              "delivery": "看向知意，留给她回答，不抢着压过周叙",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 10,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                11,
+                11
+              ],
+              "seconds": 2.9,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。邀请先到知意面前，再接她的回答与宋乔收回卡片；不要用无关表情强造嫉妒。",
+              "action": "许知意：你不先问问，我们以前的事？",
+              "delivery": "试探他是否也只对这段过去感兴趣",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                }
+              ],
+              "originalBeat": 11,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                12,
+                12
+              ],
+              "seconds": 2,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C03"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。邀请先到知意面前，再接她的回答与宋乔收回卡片；不要用无关表情强造嫉妒。",
+              "action": "陆屿：你想说，我就听。",
+              "delivery": "认真回应，不替她封住这个话题",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                }
+              ],
+              "originalBeat": 12,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                13,
+                13
+              ],
+              "seconds": 3.4,
+              "size": "medium",
+              "camera": "Static Shot",
+              "characters": [
+                "C01",
+                "C03"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. medium two-shot. the 27-year-old man with wavy brown fringe, olive short-sleeve shirt over a white tee and off-white trousers, no jewelry The subject is at the current position established by the preceding action, looking toward the partner visible in the same two-shot. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame. Include both referenced participants in a shared medium composition; preserve their distinct supplied identities and existing posture. No extra dialogue from the listener.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。邀请先到知意面前，再接她的回答与宋乔收回卡片；不要用无关表情强造嫉妒。",
+              "action": "刚才不是聊得挺好的吗？",
+              "delivery": "轻轻接着上一句说，不等待观众为金句鼓掌",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C03",
+                  "path": "../../images/陆屿-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                }
+              ],
+              "originalBeat": 13,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                14,
+                14
+              ],
+              "seconds": 3.0,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C04"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 29-year-old woman with a center-parted blunt black bob, caramel sleeveless knit top, ivory wide-leg trousers and small gold hoops The bob-haired woman glances toward the wavy-haired man, looks down, lays her own blank invitation card flat on her side of the table, and releases it. Keep her hand and the card visible until they separate. She remains silent and does not offer the card to anyone. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。邀请先到知意面前，再接她的回答与宋乔收回卡片；不要用无关表情强造嫉妒。",
+              "action": "宋乔看向陆屿，再低头把自己的空白邀请卡平放回自己面前的桌面，松开手。没有说话，也没有把卡递给任何人。",
+              "delivery": "自然静默动作，不追加对白",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C04",
+                  "path": "../../images/宋乔-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                }
+              ],
+              "originalBeat": 14,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "纸卡轻摩擦，低室内底噪。"
+            }
+          ],
+          "h3Prompt": "参考图与目标视频的对齐——图 1（来自镜头 1）对齐目标视频 0.00 秒处；图 2（来自镜头 2）对齐目标视频 3.20 秒处；图 3（来自镜头 3）对齐目标视频 6.10 秒处；图 4（来自镜头 4）对齐目标视频 8.10 秒处；图 5（来自镜头 5）对齐目标视频 11.50 秒处。\n\n整体视听描述：\n[镜头 1] 参照图1构图，真人影视写实，中景，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 陆屿以语气自然，不和周叙较劲的语气说：<d>[Chinese] 我约你在厨房。我还想接着聊。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 2] 于 00:03.200，参照图2构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 许知意以试探他是否也只对这段过去感兴趣的语气说：<d>[Chinese] 你不先问问，我们以前的事？</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 3] 于 00:06.100，参照图3构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 陆屿以认真回应，不替她封住这个话题的语气说：<d>[Chinese] 你想说，我就听。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 4] 于 00:08.100，参照图4构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 陆屿以直接承认好感，仍保留刚认识的分寸的语气说：<d>[Chinese] 但刚才让我想坐你旁边的，是你。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 5] 于 00:11.500，参照图5构图，真人影视写实，特写，固定。宋乔看了看陆屿，将自己手里的空白邀请卡放回桌上。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n\n整体音景：低室内底噪，保留对白间停顿。 纸卡轻摩擦，低室内底噪。\n\n非叙事配乐：无；使用自然停顿维持情绪，片尾互动另加极轻音乐。",
+          "note": "分镜图尚未生成；先用references中的母图生成每切关键帧，再按图序投视频。"
+        },
+        {
+          "id": "E01-14",
+          "sceneIndex": 6,
+          "cuts": [
+            {
+              "beats": [
+                15,
+                15
+              ],
+              "seconds": 2.4,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The woman looks toward the wavy-haired man and gives a short smile. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "许知意看向陆屿，短暂地笑了一下。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                }
+              ],
+              "originalBeat": 15,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                16,
+                16
+              ],
+              "seconds": 4.5,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The subject is at the current position established by the preceding action, looking toward the conversation partner off-camera, with room for the eyeline. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "我再想想。去了也只是聊聊。",
+              "delivery": "看一眼两张卡，再看两人；说明边界，不像结尾宣言",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                }
+              ],
+              "originalBeat": 16,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "低室内底噪，保留对白间停顿。"
+            },
+            {
+              "beats": [
+                17,
+                17
+              ],
+              "seconds": 2.4,
+              "size": "close",
+              "camera": "Static Shot",
+              "characters": [
+                "C01"
+              ],
+              "props": [
+                "P01"
+              ],
+              "frame": "Photorealistic live-action film still, natural adult skin texture, restrained warm-neutral editorial grading. close-up. the 28-year-old woman with shoulder-length espresso hair, ivory cardigan, white tee, dark teal mid-calf skirt and tiny gold studs The woman aligns the two received invitation cards side by side, then looks up; her own blank card remains separate. The fixed four-chair living room: sea window east, entrance northwest; Xu Zhiyi remains seated NE. Lu Yu remains seated NW. Song Qiao remains seated SW. Zhou Xu occupies SE after the sitting action in beat 46. These are fixed room positions, not screen-left or screen-right. A close framing does not remove off-camera occupants. Exactly four chairs stay in place. Late-afternoon window daylight. Preserve exact identity from the supplied character references. No rendered captions or text, no extra people or props. Keep the specified framing; off-camera occupants retain their world positions. Parked luggage belonging to Xu Zhiyi, Lu Yu, Song Qiao, Zhou Xu remains along the north wall after its parking action; it does not disappear between cuts. Show it only when this area is in frame.",
+              "note": "保持A版真人画风、原身份衣装和四椅房间；前后状态连续。沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。",
+              "action": "许知意把两张邀请卡并排放好，抬头看向两人。",
+              "delivery": "自然动作；保持上下拍衔接",
+              "references": [
+                {
+                  "role": "场景母图（不是当前分镜图）",
+                  "path": "../../images/海边小屋客厅-sheet.png"
+                },
+                {
+                  "role": "角色母图 C01",
+                  "path": "../../images/许知意-sheet.png"
+                },
+                {
+                  "role": "道具母图 P01",
+                  "path": "../../images/纸质邀请卡-sheet.png"
+                }
+              ],
+              "originalBeat": 17,
+              "frameStatus": "未生成逐镜关键帧；此处为完整分镜脚本与提示词",
+              "sound": "纸卡轻摩擦，低室内底噪。"
+            }
+          ],
+          "h3Prompt": "参考图与目标视频的对齐——图 1（来自镜头 1）对齐目标视频 0.00 秒处；图 2（来自镜头 2）对齐目标视频 2.40 秒处；图 3（来自镜头 3）对齐目标视频 6.40 秒处。\n\n整体视听描述：\n[镜头 1] 参照图1构图，真人影视写实，特写，固定。许知意看向陆屿，短暂地笑了一下。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 2] 于 00:02.400，参照图2构图，真人影视写实，特写，固定。人物延续前拍位置与手部状态，视线朝向谈话对象；单人访谈看镜头旁。 许知意以对两人说明，不在所有人的注视下立刻决定的语气说：<d>[Chinese] 我想一会儿。见面，也不代表答应什么。</d> 沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n[镜头 3] 于 00:06.400，参照图3构图，真人影视写实，特写，固定。许知意把两张邀请卡并排放好，抬头看向两人。  沿既定人物轴线正反打，反应镜头不新增台词；保持道具状态。\n\n整体音景：低室内底噪，保留对白间停顿。 纸卡轻摩擦，低室内底噪。\n\n非叙事配乐：无；使用自然停顿维持情绪，片尾互动另加极轻音乐。",
+          "note": "分镜图尚未生成；先用references中的母图生成每切关键帧，再按图序投视频。"
+        }
+      ]
+    }
+  ],
+  "presentation": {
+    "title": "第一集：初次见面，有人例外",
+    "format": "第三人称恋综正片；顺序入场穿插前采；首夜互动决定第二集开场",
+    "identityCards": [
+      {
+        "scene": 1,
+        "text": "许知意｜28岁｜自由插画师",
+        "timing": "她选座时叠加；此时不标前任身份"
+      },
+      {
+        "scene": 2,
+        "text": "陆屿｜27岁｜独立书店合伙人",
+        "timing": "入场自我介绍时叠加"
+      },
+      {
+        "scene": 3,
+        "text": "宋乔｜29岁｜陶艺工作室主理人",
+        "timing": "入场自我介绍时叠加"
+      },
+      {
+        "scene": 4,
+        "text": "周叙｜31岁｜建筑师",
+        "timing": "前采开头叠加"
+      },
+      {
+        "scene": 5,
+        "text": "许知意 × 周叙｜两年前分手",
+        "timing": "知意说出关系之后再显示"
+      }
+    ],
+    "consentNote": "知意与周叙在录制前已知悉彼此参加并同意同场；揭晓针对观众与另外两位嘉宾。知意的停顿是见到本人的情绪，不是被节目组骗来。",
+    "endCard": {
+      "seconds": 12,
+      "question": "今晚十点，知意先做什么？",
+      "choices": [
+        {
+          "key": "A",
+          "label": "去露台，把过去问清楚"
+        },
+        {
+          "key": "B",
+          "label": "去厨房，认识新的心动"
+        },
+        {
+          "key": "C",
+          "label": "今晚独处，两张都退回"
+        }
+      ],
+      "footer": "评论 A / B / C，获选行动将在第二集开头兑现。截止时间与计票规则见置顶评论。"
+    },
+    "discussionPrompts": [
+      "前任来争取第二次机会，对你来说是诚意，还是压力？",
+      "陆屿答应了宋乔的早餐，又邀请知意夜聊，你觉得坦率还是不够专一？"
+    ],
+    "discussionContext": "首日尚无排他关系，早餐与首夜在不同时段。讨论不能将陆屿接受初识邀约直接定性成欺骗；角色应在意愿变化后明确沟通。",
+    "disclosure": "AI虚构互动恋综",
+    "timingNote": "本包正文目标168秒，片尾互动12秒；第一集原剧本对白和动作原文保留，目标预算按成片分开列示。",
+    "bodySeconds": 168,
+    "totalSeconds": 180,
+    "endCardSeconds": 12
+  },
+  "note": "完整分镜文本。逐镜关键帧与视频未生成。中文视频提示词；分镜图提示词英文。未挂载shot-recipes，配方门跳过。"
+}

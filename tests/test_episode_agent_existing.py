@@ -152,6 +152,21 @@ def test_adopt_cannot_reset_existing_physical_history(tmp_path, monkeypatch):
     assert history.generation_counts(ctx.episode_dir) == {'clip_01': 1}
 
 
+def test_render_without_file_reuses_started_plan_when_run_lacks_prepared_marker(tmp_path, monkeypatch):
+    ctx, _, _ = prepared(tmp_path, monkeypatch)
+    history.save(ctx.episode_dir, {'trials': [], 'prior_generation_counts': {'clips': {'clip_01': 1}}})
+    assert not (ctx.run_dir/'prepared.json').exists()
+    protected = {p: p.read_bytes() for p in (ctx.episode_dir/'clip_plan.json',
+        ctx.episode_dir/'chapter_script.json', ctx.work_dir/'output/requests.json')}
+    counts = history.generation_counts(ctx.episode_dir)
+    tools = EpisodeTools(ctx)
+    monkeypatch.setattr(tools.drafts, 'adopt', lambda payload: pytest.fail('started render must not adopt a draft'))
+    result = tools.dispatch('render', {})
+    assert result['ok'] is True
+    assert history.generation_counts(ctx.episode_dir) == counts
+    assert all(path.read_bytes() == content for path, content in protected.items())
+
+
 def test_host_supplied_prior_counts_are_imported_after_valid_adoption_with_one_pending_take(tmp_path, monkeypatch):
     ctx, _, _ = prepared(tmp_path, monkeypatch)
     atomic_write_json(ctx.run_dir/'prior-generation-counts.json', {

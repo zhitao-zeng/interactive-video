@@ -1,0 +1,56 @@
+{
+  "source": "Original project-composed synthesized keyboard, no external melody/sample",
+  "loop_seconds": 24,
+  "tempo_bpm": 80,
+  "ownership": "Created for this project on 2026-10-14",
+  "cues": [
+    {
+      "shots": [
+        "F01"
+      ],
+      "mood": "轻巧误认",
+      "mix": "对白下方轻量铺底，不加夸张喜剧音效"
+    },
+    {
+      "shots": [
+        "F02"
+      ],
+      "mood": "认出时让回答清楚",
+      "mix": "音乐再收低约6dB，保留确认回答"
+    },
+    {
+      "shots": [
+        "F03",
+        "F04",
+        "F05",
+        "F06"
+      ],
+      "mood": "放松初见",
+      "mix": "短循环轻铺，人物对白优先"
+    },
+    {
+      "shots": [
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14"
+      ],
+      "mood": "接近与试探",
+      "mix": "可按回应收低，不用音乐宣告心动"
+    },
+    {
+      "shots": [
+        "F15",
+        "F16",
+        "END"
+      ],
+      "mood": "选择前留白",
+      "mix": "结束处轻柔延续，不提前给出选项结果"
+    }
+  ],
+  "pilot_mix": "Original keyboard loop mean -33dB; low bed at 0.45 gain with brief recognition-section reduction and end fade. Native dialogue remains unchanged. Actual mix is numerically checked; subjective listening not claimed."
+}

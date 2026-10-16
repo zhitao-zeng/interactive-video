@@ -70,6 +70,48 @@ def test_prompt_formatting_is_repeatable_and_does_not_mutate_evidence(tmp_path, 
     assert (clip, facts) == before
 
 
+def test_scoped_criteria_reach_broad_and_presentation_visual_judges(tmp_path, monkeypatch):
+    criteria = ['换机位本身可接受；核对人物、座位、行李和花的空间关系。']
+    seen = {}
+    monkeypatch.setattr(judges.review_evidence, 'review_mode', lambda *a: 'classic')
+    monkeypatch.setattr(judges.review_evidence, 'collect_clip_evidence', lambda *a, **k: ([], object()))
+    monkeypatch.setattr(judges.review_prompts, 'classic_prompt', lambda *a: 'base broad prompt')
+    monkeypatch.setattr('novel_manga.application.packing.visor.recorded_clip_states', lambda *a, **k: {})
+    monkeypatch.setattr(judges.cast_video, 'enabled', lambda: False)
+    def presentation(work, review_criteria=()):
+        seen['presentation'] = list(review_criteria)
+        return None
+
+    monkeypatch.setattr(judges, 'presentation_check', presentation)
+
+    def ask(parts, *args, **kwargs):
+        seen['broad'] = '\n'.join(part.get('text', '') for part in parts)
+        return {'severity': 'pass'}
+
+    monkeypatch.setattr(judges.model_client, 'ask_json', ask)
+    result = judges.judge_clip({'clip_id': 'clip_07'}, tmp_path / 'v.mp4', None, {}, '',
+                               tmp_path / 'book_1/work/review/clip_07', review_criteria=criteria)
+    assert result['severity'] == 'pass'
+    assert criteria[0] in seen['broad']
+    assert seen['presentation'] == criteria
+
+
+def test_presentation_prompt_includes_scoped_criteria(tmp_path, monkeypatch):
+    work = tmp_path / 'work'; work.mkdir()
+    (work / 'frame-evidence.json').write_text(json.dumps({'frames': [{'seconds': 1, 'path': str(tmp_path / 'frame.jpg')}]}))
+    monkeypatch.setattr(judges.model_client, 'image_part', lambda *a, **k: {'type': 'image'})
+    seen = {}
+
+    def ask(parts, *args, **kwargs):
+        seen['prompt'] = parts[-1]['text']
+        return {'layout': 'single', 'body_scale': 'natural', 'space_motion': 'natural', 'evidence': '无异常'}
+
+    monkeypatch.setattr(judges.model_client, 'ask_json', ask)
+    criteria = ['允许切换镜头，花朵轻微接触不单独判错。']
+    judges.presentation_check(work, criteria)
+    assert criteria[0] in seen['prompt']
+
+
 def test_failed_clip_does_not_discard_completed_verdicts(tmp_path, monkeypatch):
     novel = tmp_path / 'n'; directory = novel / 'n_1'; directory.mkdir(parents=True)
     bible = StoryBible(novel_title='n', genre='g', visual_style='v', palette='p', style_fingerprint='f', characters=[], locations=[])

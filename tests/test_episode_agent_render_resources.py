@@ -62,3 +62,23 @@ def test_managed_missing_or_zero_inflight_refuses_before_runner(runner_arguments
     with pytest.raises(ValueError, match='NOVEL_RENDER_INFLIGHT'):
         tools.media.runner()
     assert not calls
+
+
+def test_profile_background_music_reaches_the_existing_renderer_mix(runner_arguments, monkeypatch):
+    tools, calls = runner_arguments
+    music = tools.ctx.novel_dir/'music/approved.wav'
+    music.parent.mkdir(); music.write_bytes(b'existing approved music')
+    atomic_write_json(tools.ctx.novel_dir/'profile.json', {'bgm_path':'music/approved.wav'})
+    settings_calls = []
+    monkeypatch.setattr(Settings, 'from_env', classmethod(lambda cls, **kw: settings_calls.append(kw) or object()))
+    tools.media.runner()
+    assert settings_calls[0]['bgm_path'] == music
+    assert calls[0]['max_attempts'] == 1
+
+
+def test_missing_configured_music_fails_before_constructing_media_clients(runner_arguments):
+    tools, calls = runner_arguments
+    atomic_write_json(tools.ctx.novel_dir/'profile.json', {'bgm_path':'missing-approved.wav'})
+    with pytest.raises(ValueError, match='background music is missing'):
+        tools.media.runner()
+    assert not calls
