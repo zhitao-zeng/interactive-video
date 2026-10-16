@@ -1,0 +1,34 @@
+{
+  "status": "review_draft",
+  "question": "明天先查哪边？",
+  "choices": [
+    {
+      "id": "A",
+      "text": "沿脚印找新路",
+      "reason": "查现场脚印去向与可通性",
+      "first_investigation": "先核实天气与河岸路况，再在可通位置核对同一脚印的后续方向；未知弯后保持未揭晓"
+    },
+    {
+      "id": "B",
+      "text": "在地面查站房",
+      "reason": "查旧入口的位置资料与记录",
+      "first_investigation": "在地面核对站房可获得的位置资料与记录；是否进入、取得何种材料在后续来源补齐后确定"
+    }
+  ],
+  "planned_start_seconds": 177,
+  "seconds": 3,
+  "frames": 75,
+  "route_selected": null,
+  "truth_revealed": false,
+  "version": "story-v4",
+  "shared_knowledge": [
+    "新地图没有青溪村标注",
+    "旧路牌仍在",
+    "旧入口被落石阻断",
+    "现场鞋印压住旧叶并转向上坡",
+    "外墙牌示意谷底站与山腰入口两个位置",
+    "旧图下缘提醒雨后勿走谷底",
+    "尚未看到村庄或确认两处入口相通"
+  ],
+  "branch_knowledge_rule": "未选路线的独有材料不能自动出现在另一条路线；首集未确认幕后真相。"
+}

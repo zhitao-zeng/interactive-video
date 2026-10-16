@@ -77,6 +77,24 @@ def test_an_updated_template_is_also_a_different_skill_set(tmp_path):
 
 # --- the attempt ----------------------------------------------------------------------------------
 
+def test_repair_disabled_thinking_reaches_the_actual_regular_runner(tmp_path,monkeypatch):
+    _,run_dir=sandbox(tmp_path)
+    config=json.loads((tmp_path/'config.json').read_text())
+    config['extra_body']={'thinking':{'type':'disabled'},'max_tokens':16384}
+    monkeypatch.setenv('SANDBOX_KEY','k')
+    calls=[]
+    def fake(command,stdout,stderr,env):
+        calls.append(command)
+        (run_dir/'output/decision.json').write_text('{}')
+        return 0
+    monkeypatch.setattr(runner.subprocess,'call',fake)
+    result=runner.run_agent('book-merge',config=config,timeout=600,log=lambda *a:None)
+    assert result.ok and result.produced==['decision.json']
+    assert 'MAX_THINKING_TOKENS=0' in calls[0]
+    assert 'CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1' in calls[0]
+    assert calls[0][calls[0].index('timeout')+1]=='600'
+
+
 def run_once(tmp_path, monkeypatch, *, exit_code, writes=None):
     runs, run_dir = sandbox(tmp_path)
     monkeypatch.setenv("SANDBOX_KEY", "k")

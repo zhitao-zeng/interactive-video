@@ -57,3 +57,10 @@ def test_sandbox_declares_the_configured_custom_model_context_window():
 def test_oneoff_sandbox_honors_native_thinking_control():
     args=sandbox.provider_container_args({'max_thinking_tokens':0})
     assert args==['-e','MAX_THINKING_TOKENS=0','-e','CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1']
+def test_disabled_thinking_also_disables_cli_adaptive_thinking():
+    for config in [{'max_thinking_tokens': 0}, {'extra_body': {'thinking': {'type': 'disabled'}}}]:
+        args = sandbox.provider_container_args(config)
+        assert args.count('MAX_THINKING_TOKENS=0') == 1
+        assert args.count('CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1') == 1
+    assert sandbox.thinking_budget({}) is None
+    assert sandbox.thinking_budget({'max_thinking_tokens': 2048}) == 2048

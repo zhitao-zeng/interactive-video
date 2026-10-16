@@ -70,6 +70,9 @@ def run_session(work_dir, prompt_text, *, resume=False, timeout=1200, config,
         raise SandboxRefused('This workspace contains other skills; use a dedicated episode workspace.')
     output = work/'output'
     output.mkdir(parents=True, exist_ok=True)
+    manifest = read_json(work/'input/manifest.json', {})
+    creation_only = manifest.get('phase') == 'creation_only'
+    script_preparation = manifest.get('phase') == 'script_preparation'
     attempt = unique_attempt(work/'attempts', f'{time.strftime("%Y%m%d-%H%M%S")}-episode')
     if skill.exists():
         shutil.copytree(skill, attempt/'skill-before')
@@ -82,6 +85,31 @@ def run_session(work_dir, prompt_text, *, resume=False, timeout=1200, config,
         'candidates; input/ contains host evidence. Source code under /opt/novel-code is read-only. '
         'The host owns generation limits and independent acceptance. Do not edit host verdicts '
         'or history, install software, or modify the saved Codex login.\n\n')
+    if creation_only:
+        role = ('You are the single creative author in an isolated text-only workspace. '
+            'Read /work/.claude/skills/episode-production/SKILL.md, the creation-only contract '
+            'and required original sources on the first turn. On resume, retain that context, '
+            'read current feedback and refreshed guidance, and verify relevant source passages. '
+            'Use file, image and local shell operations only '
+            'for reading supplied material and writing the complete creative draft under output/. '
+            'No host workflow or media-generation tools are installed. Do not invoke models, '
+            'media services, rendering, production adoption, or modify inputs/history/authentication. '
+            'Use explicit literal file paths in read commands so the host can trace resource use. '
+            'Prefer available Python3 for structured JSON edits; use simple shell file writers '
+            'if a runtime or apply_patch is absent, without relying on optional Perl/Node modules. '
+            'Save substantial edit scripts under output before running them so a syntax repair '
+            'can continue the saved work instead of retyping the complete draft. '
+            'the host validates JSON after the turn, so installing tools is unnecessary. '
+            'Original reference images are attached on the first turn.\n\n')
+    elif script_preparation:
+        role = ('You are the same author compiling an approved screenplay into final H3 requests. '
+            'Read /work/.claude/skills/episode-production/SKILL.md and the script-mode output contract. '
+            'Keep the approved shots, dialogue, ownership, camera, groups, timing and supplied references. '
+            'Read supplied files and inspect the actual reference images using local file/image tools. '
+            'Write output/requests.json only, plus an asset-binding explanation when requested. '
+            'No host workflow or media-generation tools are installed. Do not invoke models, media '
+            'services, production adoption, or modify inputs, history or authentication. '
+            'The host composes and checks the final syntax and executes the complete pipeline.\n\n')
     (attempt/'prompt.txt').write_text(role+prompt_text, encoding='utf-8')
     before = {p.relative_to(output): (p.stat().st_mtime_ns, p.stat().st_size)
               for p in output.rglob('*') if p.is_file()}
@@ -99,9 +127,15 @@ def run_session(work_dir, prompt_text, *, resume=False, timeout=1200, config,
         command.extend(['-v', f'{SKILL_SOURCE.parents[1]/"src"}:/opt/novel-code:ro'])
     command.extend([config['image'], 'timeout', str(timeout), 'codex', 'exec',
         '--ignore-user-config', '--skip-git-repo-check', '--json',
-        '--sandbox', 'danger-full-access' if enable_tools else 'workspace-write',
+        '--sandbox', 'danger-full-access' if enable_tools or creation_only or script_preparation else 'workspace-write',
         '-c', 'approval_policy="never"', '-c', f'model_reasoning_effort={json.dumps(config.get("effort", "medium"))}',
         '--model', config['model']])
+    attached = []
+    if creation_only and not resume:
+        for row in manifest.get('asset_catalog', []):
+            command.extend(['--image', '/work/'+row['path']])
+            attached.append({'path':row['path'], 'bytes':(work/row['path']).stat().st_size})
+    atomic_write_json(attempt/'attached-images.json', attached)
     if resume:
         command.extend(['resume', state['session_id']])
     command.append('-')
@@ -137,11 +171,15 @@ def run_session(work_dir, prompt_text, *, resume=False, timeout=1200, config,
         or (attempt/'output-before'/p.relative_to(output)).read_bytes() != p.read_bytes())
     shutil.copytree(output, attempt/'output-after')
     completion = next((e for e in reversed(normalized) if e.get('type') == 'result'), {})
+    native_completion = next((e for e in reversed(events) if e.get('type') == 'turn.completed'), {})
     if completion.get('is_error') and code == 0:
         code = 1
     record = {'run': work.name, 'attempt': attempt.name, 'session_id': thread or state.get('session_id'),
         'backend': 'codex', 'auth': 'saved_codex_login', 'model': config['model'], 'image': config['image'],
         'resume': resume, 'enable_tools': enable_tools, 'skills': 'episode-production',
+        'creation_only': creation_only, 'host_media_tools_installed': bool(enable_tools),
+        'phase': manifest.get('phase', 'production'),
+        'usage': native_completion.get('usage', {}),
         'timeout_seconds': timeout, 'seconds': round(time.monotonic()-started), 'exit': code,
         'produced': produced, 'kept_from_earlier_attempts': len(files)-len(produced),
         'expected_output': expected_output, 'expected_output_produced': expected_output in produced,

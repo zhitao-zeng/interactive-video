@@ -60,6 +60,8 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
         # A keep/source recheck may have verified individual clips in the new
         # mode while the rest of the episode still awaits that method.
         earlier = {cid:row for cid,row in earlier.items() if review_contracts.current_review(row,mode)}
+    earlier = {cid:row for cid,row in earlier.items()
+               if not row.get('policy') or review_contracts.current_review(row,mode)}
     resume = not fresh if fresh is not None else os.environ.get("NOVEL_REVIEW_FRESH", "").strip() != "1"
     def checkpoint():
         # A long review may outlive its terminal. Save each completed take so a restart reuses it;
@@ -114,6 +116,10 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
                          or old.get('review_criteria', []) == criteria)
                     and (not cast_video.enabled() or
                          ((old.get('verify') or {}).get('cast_video') or {}).get('policy') == cast_video.POLICY))
+            if old and old.get('confirmed') and not old.get('confirmed_base'):
+                # Legacy confirmed failures did not retain the unmodified broad
+                # verdict. Recheck only that take before restoring a resolved claim.
+                same_take=False
             source_changed = bool(old and (clip.get('source_trace_repaired') or 'source_segment_ids' in old)
                                   and old.get('source_segment_ids') != (clip.get('segment_ids') or []))
             speech_recovered = bool(old and (old.get('speech_gate') or {}).get('passed') is False

@@ -18,7 +18,7 @@ from novel_manga.application.review.evidence import clip_frames
 from novel_manga.review.storage import take_identity
 from novel_manga.util import read_json, atomic_write_json
 
-FRAME_HANDOFF_POLICY = 'same-take-frames-v9-upstream-budget-candidate-feedback'
+FRAME_HANDOFF_POLICY = 'same-take-frames-v10-unified-input-bindings-and-feedback'
 MAX_CANDIDATES = 3
 
 
@@ -87,8 +87,24 @@ def validate_prompt(clip, prompt):
                 for i,row in enumerate(rows)]
     # The agent may clarify the actual clothes/visible state. Lock the reference
     # associations and retention mode, not every word of their descriptions.
-    if retention_bindings(old['retention_analysis']) != retention_bindings(new['retention_analysis']):
+    before_retention = retention_bindings(old['retention_analysis'])
+    after_retention = retention_bindings(new['retention_analysis'])
+    if [(row[0],row[1]) for row in before_retention] != [(row[0],row[1]) for row in after_retention]:
         raise ValueError('agent changed protected reference binding: retention_analysis')
+    from novel_manga.story.dialogue import subject_map
+    people={f'<Subject {number}>' for number in subject_map(clip).values()}
+    defined_pictures={label:{token for token in tokens if token.startswith('<Picture ')}
+                      for label,tokens in definition_bindings(old['subject_definitions'])}
+    props={f'<Picture {number}>' for number,ref in enumerate(
+        (r for r in clip.get('references',[]) if r.get('role')!='voice'),1) if ref.get('role')=='prop'}
+    for before,after in zip(before_retention,after_retention):
+        previous,current=set(before[2]),set(after[2])
+        # A character can name an already-selected prop while clarifying its
+        # wearing state. Identity definitions and all original associations
+        # remain locked; the source consistency check still verifies that state.
+        allowed=(props|defined_pictures.get(before[0],set())) if before[0] in people else set()
+        if previous-current or current-previous-allowed:
+            raise ValueError('agent changed protected reference binding: retention_analysis')
     old_dialogue = [dialogue_punctuation(text) for text in re.findall(r'<d>(.*?)</d>', clip['prompt_h3'], re.S)]
     new_dialogue = [dialogue_punctuation(text) for text in re.findall(r'<d>(.*?)</d>', prompt, re.S)]
     if old_dialogue != new_dialogue:
@@ -193,6 +209,19 @@ def export_final_cut(directory, inputs, clip, verdict):
 def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejections=None):
     """No production writes. Container sees evidence copies, never the production directory."""
     config = config or load_config()
+    profile = read_json(directory.parent/'profile.json', {})
+    if endpoint := profile.get('repair_agent_endpoint'):
+        from novel_manga.llm.config import ENDPOINTS
+        selected = ENDPOINTS[endpoint]
+        base = selected['QWEN38_LOCAL_BASE_URL']
+        if ',' in base:
+            raise ValueError('Repair SDK endpoint requires one configured API base')
+        config = {**config, 'base_url':base.removesuffix('/v1'),
+                  'model':selected['QWEN38_LOCAL_MODEL'],
+                  'key_var':selected['QWEN38_LOCAL_API_KEY_VAR']}
+    model = profile.get('repair_agent_model')
+    if model:
+        config = {**config, 'model': str(model)}
     if config.get('repair_extra_body'):
         config = {**config, 'extra_body': {**(config.get('extra_body') or {}),
                                          **config['repair_extra_body']}}
@@ -320,17 +349,29 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
         'reference_images': [r['path'] for r in evidence['references'] if r.get('role') != 'voice'],
         'source': 'Use inline shots_and_neighbours and corresponding segments first; read extra source documents only for a specific unresolved fact.'}
     evidence['reading_scope'] = 'One failed request; history and full-episode documents are optional evidence, not a mandatory reading list.'
+    reference_choices=[]
+    for i,choice in enumerate((verdict.get('confirmed') or {}).get('reference_candidates',[]),1):
+        source=Path(choice['source']);target=inputs/f'reference-choice-{i}{source.suffix}'
+        shutil.copy2(source,target)
+        reference_choices.append({**{k:v for k,v in choice.items() if k!='source'},
+                                  'path':str(target.relative_to(work))})
+    evidence['reference_choices']=reference_choices
     atomic_write_json(inputs/'evidence.json',evidence)
     related_segments = {str(value) for value in clip.get('segment_ids', [])}
     related_segments.update(str(shot['segment_id']) for shot in shots if shot.get('segment_id'))
     atomic_write_json(inputs/'primary.json', {
         'current_frames': current.get('frames', []),
+        'provider': lane,
+        'request_field': field,
+        'request_rules': evidence['request_rules'],
+        'actual_request': clip[field],
         'current_request': current.get('request'),
         'request': 'input/prompt.txt',
         'shots_and_neighbours': shots,
         'source_passages': [row for row in evidence['segments']
                             if str(row.get('segment_id')) in related_segments],
         'references': evidence['references'],
+        'reference_choices': reference_choices,
         'verdict': evidence['verdict'], 'rejections':feedback,
         'upstream':'input/upstream.json',
         **({'final_cut':final_cut} if final_cut is not None else {}),
@@ -386,12 +427,17 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
         produced.update(attempt.produced)
         recovery.update(continued_attempt=attempt.directory.name,ok=attempt.ok,produced=sorted(produced))
         atomic_write_json(work/'protocol-recovery.json',recovery)
-    if not attempt.ok or 'decision.json' not in produced:
+    timed_out = not attempt.ok and getattr(attempt, 'exit_code', None) == 124
+    if (not attempt.ok and not timed_out) or 'decision.json' not in produced:
         raise AgentUnavailable('repair agent did not produce a current decision')
     answer=read_json(work/'output/decision.json',{})
     if answer.get('action') not in {'edit','retake','keep','stop','input','asset','audio'} or not answer.get('reason') or not answer.get('evidence'):
         raise ValueError('repair agent decision requires action, reason and evidence')
     answer.update(run=run,attempt=attempt.attempt if hasattr(attempt,'attempt') else attempt.directory.name)
+    if timed_out:
+        # The stopped process may have written a complete candidate before
+        # timing out. Keep that status; all normal artifact/source checks apply.
+        answer['execution'] = {'exit_code': 124, 'recovered_candidate': True}
     if answer['action']=='edit':
         if 'prompt.txt' not in produced:raise AgentUnavailable('repair agent did not produce a current prompt')
         answer['prompt']=(work/'output/prompt.txt').read_text(encoding='utf-8').strip()
@@ -400,6 +446,8 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
             if answer['prompt']==clip[field].strip():raise ValueError('agent edit made no effective change')
         except ValueError as error:
             raise CandidateRejected(str(error),answer,stage='validate_request') from error
+    if answer['action']=='input' and 'source_patch.json' in produced:
+        answer['source_patch']=read_json(work/'output/source_patch.json',{})
     return answer
 
 
@@ -415,7 +463,86 @@ def final_proposal(directory, plan, clip, decision):
     target[field]=decision['prompt']
     if lane=='h3':target['prompt_h3_of']=h3_stamp(target,notes.get(clip['clip_id'],''))
     target['repair_take']=int(clip.get('repair_take',0))+1
-    target['prompt_h3_agent' if lane=='h3' else 'prompt_sd25_agent']={k:decision[k] for k in ('run','attempt','reason','evidence') if k in decision}
+    target['prompt_h3_agent' if lane=='h3' else 'prompt_sd25_agent']={k:decision[k] for k in ('run','attempt','reason','evidence','execution') if k in decision}
     return RepairProposal(result={'changed':[clip['clip_id']],'why':decision['reason']},
                           script=read_json(directory/'chapter_script.json',{}),plan=candidate,notes=notes,
+                          changes={clip['clip_id']:decision})
+
+
+def source_proposal(directory, plan, clip, decision):
+    """Compile SDK-proposed prop/wearing fields through the existing source compiler."""
+    from novel_manga.application.agents.episode.input_contracts import normalize_arguments
+    from novel_manga.application.repair.flow import rebuild_clips
+    from novel_manga.application.rendering.h3 import convert
+    from novel_manga.models.bible import StoryBible
+    from novel_manga.application.preparation.readiness import plan_issues
+    if request_lane(clip)!='h3':
+        raise ValueError('Source binding repair requires the existing H3 source compiler')
+    row=normalize_arguments({'clip_id':clip['clip_id'],'action':'input','reason':decision['reason'],
+                             **decision['source_patch']})
+    if set(row)-{'clip_id','action','reason','shots','locations'}:
+        raise ValueError('Source binding repair supports only scoped shot patches')
+    patches=row.get('shots') or []
+    locations=row.get('locations') or {}
+    if not patches and not locations:raise ValueError('Source binding repair needs changed shot fields or a supplied view')
+    script=read_json(directory/'chapter_script.json',{})
+    candidate=copy.deepcopy(script)
+    by_index={s.get('index',i):s for i,s in enumerate(candidate['shots'],1)}
+    bible=StoryBible.model_validate_json((directory.parent/'story_bible.json').read_text())
+    known={name for p in bible.props for name in [p.name,*p.aliases]}
+    seen=set()
+    for patch in patches:
+        index=patch['index']
+        if index not in clip['shot_indexes'] or index in seen:
+            raise ValueError('Agent source patch is outside its failed clip or repeats a stage')
+        seen.add(index)
+        if set(patch)-{'index','props','wears'}:
+            raise ValueError('Source binding repair preserves action, cast, dialogue, timing and scene')
+        if any(name not in known for name in patch.get('props',[])):
+            raise ValueError('Source binding repair must select registered prop names or aliases')
+        if any(value and value not in known for value in (patch.get('wears') or {}).values()):
+            raise ValueError('Source wearing repair must select registered prop names or aliases')
+        by_index[index].update({k:copy.deepcopy(v) for k,v in patch.items() if k!='index'})
+    if candidate==script:
+        if not locations:raise ValueError('Agent source patch made no effective change')
+        rebuilt=copy.deepcopy(plan)
+    else:
+        rebuilt,changed=rebuild_clips(directory,directory.parent/'story_bible.json',candidate,plan,
+                                       {clip['clip_id']},preserve_timing=True)
+        if changed!=[clip['clip_id']]:raise ValueError('Source binding repair changed unrelated clips')
+    target=next(c for c in rebuilt['clips'] if c['clip_id']==clip['clip_id'])
+    choices=(read_json(directory/'episode_review.json',{}).get('clips',{}).get(clip['clip_id'],{})
+             .get('confirmed',{}).get('reference_candidates',[]))
+    for name,selection in locations.items():
+        if not isinstance(selection,dict):raise ValueError('Source view selection requires an offered reuse_asset_id')
+        choice=next((c for c in choices if c['name']==name and c['asset_id']==selection.get('reuse_asset_id')),None)
+        if choice is None:raise ValueError('Source view must select a supplied reference candidate')
+        ref=next((r for r in target['references'] if r['role']=='location' and r['name']==name),None)
+        if ref is None:raise ValueError('Source view changed the selected location identity')
+        path=Path(choice['source']);relative=path.relative_to(directory.parent)
+        if not path.is_file():raise ValueError('Supplied source view is missing')
+        ref.update(path=str(relative),view=choice.get('scope','existing-source-detail'),
+                   supplied_source_view=copy.deepcopy(choice))
+    if target.get('lines')!=clip.get('lines') or target.get('shot_timing')!=clip.get('shot_timing'):
+        raise ValueError('Source binding repair changed protected speech or timing')
+    if problems:=plan_issues(rebuilt,candidate):
+        raise ValueError('Source binding candidate compilation failed: '+str(problems))
+    errors=[]
+    note=''
+    if locations:
+        note=('A supplied existing-source detail view replaces the same location reference. '
+              'Use its actually visible native lettering and the stated detail scope; keep the original '
+              'dialogue, events, single-view framing and timing. The source description retains the wider '
+              'setting; this picture is a physical detail reference rather than an extra scene. '
+              + ' '.join(c.get('scope','') for c in choices if c['name'] in locations))
+    convert(target,note=note,episode_dir=directory,source_script=candidate,problems=errors)
+    if note:
+        for key in ('prompt_before_correction','prompt_correction_merged'):target.pop(key,None)
+        target['prompt']=clip['prompt'];target['prompt_h3_of']=h3_stamp(target,read_json(directory/'review_feedback.json',{}).get(clip['clip_id'],''))
+    if errors or not target.get('prompt_h3') or request_issues(target):
+        raise ValueError('Source binding candidate H3 translation failed: '+str(errors))
+    target['repair_take']=int(clip.get('repair_take',0))+1
+    target['agent_source_repair']={k:decision[k] for k in ('run','attempt','reason','evidence','source_patch') if k in decision}
+    return RepairProposal({'changed':[clip['clip_id']],'why':decision['reason']},script=candidate,
+                          plan=rebuilt,notes=read_json(directory/'review_feedback.json',{}),
                           changes={clip['clip_id']:decision})

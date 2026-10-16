@@ -24,7 +24,7 @@ from novel_manga.application.repair import upstream
 from novel_manga.application.review import final_dispute
 
 from novel_manga.application.repair.history import MAX_GENERATED_TAKES, generated_counts, generation_limit
-REFRAME_POLICY = 'reframe-v3-reference-state-and-candidate-feedback'
+REFRAME_POLICY = 'reframe-v5-validated-timeout-candidates'
 
 
 def agent_enabled(directory):
@@ -90,6 +90,8 @@ def candidates(directory: Path, review: dict | None = None) -> tuple[list[str],d
     counts = generated_counts(history.load(directory))
     wanted,blocked = [],{}
     grants = read(directory/'repair_budget_grants.json',{})
+    from novel_manga.application.repair.agent import enabled
+    budget_limit = history.preparation_limit if enabled(directory) else generation_limit
     inputs = None
     for clip in plan.get('clips',[]):
         cid = clip['clip_id'];verdict = review.get('clips',{}).get(cid,{})
@@ -264,7 +266,8 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
                             assembly_changed=assembly_changed or result['assembly_changed']
                         else:
                             try:
-                                proposal=(upstream.input_proposal(directory,plan,clip,decision) if action=='input'
+                                proposal=((agent.source_proposal(directory,plan,clip,decision) if decision.get('source_patch')
+                                           else upstream.input_proposal(directory,plan,clip,decision)) if action=='input'
                                           else upstream.create_asset(directory,clip,decision))
                             except ValueError as error:
                                 raise agent.CandidateRejected(str(error),decision,stage='upstream_input') from error

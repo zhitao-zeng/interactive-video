@@ -1,0 +1,127 @@
+{
+  "version": "adventure-v4",
+  "surfaces": [
+    {
+      "id": "village_sign",
+      "kind": "sign",
+      "shot_ids": [
+        "T01"
+      ],
+      "required_shots": [
+        "T01"
+      ],
+      "text": "青溪村",
+      "target": "the wooden road sign surface, leave wood and its border visible",
+      "source_shots": [
+        "A01",
+        "A02"
+      ]
+    },
+    {
+      "id": "new_map",
+      "kind": "new_map",
+      "shot_ids": [
+        "T02"
+      ],
+      "required_shots": [
+        "T02"
+      ],
+      "text": "",
+      "target": "the smartphone screen interior, leave the phone frame and hands intact; unlabelled terrain",
+      "source_shots": [
+        "A02"
+      ]
+    },
+    {
+      "id": "old_map",
+      "kind": "old_map",
+      "shot_ids": [
+        "T08",
+        "T25"
+      ],
+      "required_shots": [
+        "T08"
+      ],
+      "text": "青溪村",
+      "target": "the opened yellow paper map body, seven markers, no new named places or routes",
+      "source_shots": [
+        "A05",
+        "A06"
+      ],
+      "anchor_labels": [
+        "青溪村"
+      ]
+    },
+    {
+      "id": "inactive",
+      "kind": "sign",
+      "shot_ids": [
+        "T22"
+      ],
+      "required_shots": [
+        "T22"
+      ],
+      "text": "已停用",
+      "target": "the inactive sign surface on the station wall, not the large schematic panel",
+      "source_shots": [
+        "A10"
+      ]
+    },
+    {
+      "id": "station_nodes",
+      "kind": "nodes",
+      "shot_ids": [
+        "T23",
+        "T24",
+        "T25",
+        "T33"
+      ],
+      "required_shots": [
+        "T23"
+      ],
+      "text": "谷底站\n山腰入口",
+      "target": "the station schematic panel plane; two different positions, no connecting route; preserve pointing fingers",
+      "source_shots": [
+        "A11"
+      ],
+      "anchor_labels": [
+        "谷底站",
+        "山腰入口"
+      ]
+    },
+    {
+      "id": "map_note",
+      "kind": "map_note",
+      "shot_ids": [
+        "T26"
+      ],
+      "required_shots": [
+        "T26"
+      ],
+      "text": "雨后勿走谷底",
+      "target": "the visible lower margin of the same old yellow map, not the whole paper or hands",
+      "source_shots": [
+        "A12"
+      ]
+    },
+    {
+      "id": "field_notes",
+      "kind": "notebook",
+      "shot_ids": [
+        "T31"
+      ],
+      "required_shots": [
+        "T31"
+      ],
+      "text": "旧路受阻\n脚印上坡\n图示山腰入口\n关系待查",
+      "target": "the page of his own field notebook, keep paper border and hands visible",
+      "source_shots": [
+        "A11",
+        "A15",
+        "A16"
+      ]
+    }
+  ],
+  "fact_boundary": "准确字形、七个无坐标点和两个独立节点仅作为道具信息呈现；不新增村名、坐标、连接路线或幕后事实。",
+  "timing": "按实际物件与镜头观察合成，不用作者时长比例替代实际切点。"
+}

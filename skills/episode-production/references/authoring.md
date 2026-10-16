@@ -73,3 +73,50 @@ Retain the current result through the cut rather than replaying the event as an
 ending. Source-mode cuts fit the planned speech and physical acting together;
 they need not count simultaneous action and dialogue twice or fill time with
 unmotivated pauses. Existing split ranges in script mode remain authoritative.
+
+## Native H3 speech performance
+
+Describe the person's response to the current event. Establish the starting state
+and let a discovered fact or another
+person's words trigger the next change. Bind useful pitch, pace, volume, breath,
+emphasis and facial changes to the relevant clause; ordinary lines need only the
+detail that matters. Preserve each character's manner and the genre. A travel
+update can move from easy sharing to restrained doubt without adopting an argument's
+crying or shouting. Later reactions begin after their trigger.
+
+Prefer this local order: English delivery and acting → the exact bound utterance
+or `<DIALOGUE_N>` → the authored result. Put the delivery immediately before the
+utterance, outside `<d>`. Where a pause or speech ending matters, describe closed
+lips and the actual observation, listening or continuing action. Fit speech and
+reaction into the supplied duration; add neither filler words nor generic waiting.
+Move existing delivery into one coherent direction instead of appending a competing
+second performance description.
+For example, a supplied rule-reading shot can use:
+
+```text
+Her voice starts level and conversational. At the obligation she briefly hesitates,
+gives the key word slightly more weight, and ends with a quieter questioning rise.
+<DIALOGUE_1>
+She closes her mouth and continues reading the sign.
+```
+
+The marker stands for the complete approved line, not permission to rewrite it.
+Keep an authored POV or offscreen voice; this method does not require a new facial
+close-up, a fixed shot length, or a dramatic change on every sentence. Use affirmative
+actions instead of stacking prohibitions or putting performance tags inside dialogue.
+
+Choose audio conditioning from the task, not from the mere existence of a voice
+file. For native H3 conversation with no required locked voice, a sample without
+audio reference is a useful option. When selected, the actual reference-audio list
+and submitted audio conditions must both be empty: omit Audio definitions, retention
+and the audio-reference summary label while keeping dialogue, pictures and speaker
+IDs. Describe a consistent voice within the clip; timbre across clips can drift.
+Retain a required locked voice or audio-first/postmix workflow unless a change is
+authorized. If the host still fixes audio selection, use its supported correction
+path; changing prose alone does not remove an actual audio input.
+
+The 2026-10-15 nine-second H3 pilot combined front-loaded performance with removal
+of audio conditioning, and the user preferred the result. This supports trying that
+combination, not a universal ban on voice references or proof of either factor alone.
+ASR measures spoken content; naturalness needs listening feedback. Preserve the
+existing music/physical-sound plan and trial history when comparing performances.

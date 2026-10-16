@@ -235,6 +235,8 @@ def h3_compile_inputs(clip: dict) -> dict:
         inputs['h3_style_line'] = str(clip['h3_style_line'])
     if 'shot_sound' in clip:
         inputs['shot_sound'] = clip['shot_sound']
+    if clip.get('music_cues'):
+        inputs['music_cues'] = clip['music_cues']
     if clip.get('shot_timing'):
         inputs['shot_timing'] = clip['shot_timing']
     if any(r.get('wearers') for r in clip.get('references', [])):

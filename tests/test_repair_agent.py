@@ -41,6 +41,46 @@ def test_repair_cannot_add_duration_different_from_saved_shot_timing():
         agent.validate_prompt(c, replacement)
 
 
+def test_existing_prop_can_clarify_character_wearing_without_changing_identity_binding():
+    c=example();c['references'].append({'role':'prop','name':'monitor','path':'monitor.jpg'})
+    c['prompt_h3']=compose(c,['<Subject 1> stands by the door.'],[('',[('甲','你好。',False,'平静')])])
+    parts=agent.sections(c['prompt_h3'])
+    rows=parts['retention_analysis'].splitlines();rows[0]+=' The existing monitor from <Picture 2> clips to one cheek.'
+    parts['retention_analysis']='\n'.join(rows)
+    candidate='\n\n'.join(f'{name}:\n{parts[name]}' for name in agent.SECTIONS)
+    agent.validate_prompt(c,candidate)
+
+
+def test_retention_clarification_cannot_borrow_another_characters_picture():
+    c=example();c['references'].append({'role':'character','name':'乙','path':'b.jpg'})
+    c['prompt_h3']=compose(c,['<Subject 1> stands by the door.'],[('',[('甲','你好。',False,'平静')])])
+    parts=agent.sections(c['prompt_h3']);rows=parts['retention_analysis'].splitlines()
+    rows[0]+=' Appearance follows <Picture 2>.';parts['retention_analysis']='\n'.join(rows)
+    candidate='\n\n'.join(f'{name}:\n{parts[name]}' for name in agent.SECTIONS)
+    with pytest.raises(ValueError,match='retention_analysis'):agent.validate_prompt(c,candidate)
+
+
+def test_retention_can_name_its_already_defined_identity_picture():
+    c=example();parts=agent.sections(c['prompt_h3'])
+    rows=parts['retention_analysis'].splitlines();rows[0]='<Subject 1>: fully_preserved - the same supplied identity and outfit.'
+    parts['retention_analysis']='\n'.join(rows)
+    c['prompt_h3']='\n\n'.join(f'{name}:\n{parts[name]}' for name in agent.SECTIONS)
+    rows[0]+=' Identity remains from <Picture 1>.';parts['retention_analysis']='\n'.join(rows)
+    candidate='\n\n'.join(f'{name}:\n{parts[name]}' for name in agent.SECTIONS)
+    agent.validate_prompt(c,candidate)
+
+
+def test_a_prop_retention_cannot_take_another_props_picture():
+    c=example();c['references'] += [{'role':'prop','name':'box','path':'box.jpg'},
+                                  {'role':'prop','name':'key','path':'key.jpg'}]
+    c['prompt_h3']=compose(c,['<Subject 1> stands by the door.'],[('',[('甲','你好。',False,'平静')])])
+    parts=agent.sections(c['prompt_h3']);rows=parts['retention_analysis'].splitlines()
+    rows=[row.replace('<Picture 2>','<Picture 3>') if row.startswith('<Subject 2>:') else row for row in rows]
+    parts['retention_analysis']='\n'.join(rows)
+    candidate='\n\n'.join(f'{name}:\n{parts[name]}' for name in agent.SECTIONS)
+    with pytest.raises(ValueError,match='retention_analysis'):agent.validate_prompt(c,candidate)
+
+
 def configured(tmp_path):
     d,clips,review=fixture_episode(tmp_path)
     for c in clips:
@@ -79,6 +119,28 @@ def test_budget_exhaustion_rejects_retake_without_debit(tmp_path,monkeypatch):
     assert not result['changed'] and 'budget' in result['blocked']['a']
 
 
+@pytest.mark.parametrize('consistent',[False,True])
+def test_authorized_extra_uses_agent_preparation_and_waits_for_validated_inputs(tmp_path,monkeypatch,consistent):
+    d,clips,_=configured(tmp_path)
+    record=history.load(d);record['prior_generation_counts']={'clips':{'a':3,'b':3}};history.save(d,record)
+    history.grant_conditional_extra(d,'a',authorization='explicit reviewed extra',reason='existing reference candidate')
+    assert managed.candidates(d)[0]==['a']
+    before=copy.deepcopy(clips)
+    monkeypatch.setattr(agent,'propose',lambda directory,clip,verdict:{
+        'action':'edit','reason':'fix','evidence':['input/prompt.txt'],
+        'prompt':clip['prompt_h3'].replace('stands by','stands calmly by')})
+    monkeypatch.setattr(request_check,'request_consistency',lambda *a,**kw:{
+        'consistent':consistent,'problems':[] if consistent else ['reference still wrong']})
+    result=managed.prepare(d,['a'])
+    assert bool(result['changed']) is consistent
+    assert history.extra_take_ready(d,'a') is consistent
+    assert not history.extra_take_ready(d,'b')
+    assert history.generation_limit(d,'a')==3
+    assert history.generation_counts(d)=={'a':3,'b':3}
+    if not consistent:
+        assert json.loads((d/'clip_plan.json').read_text())['clips']==before
+
+
 def test_rejected_agent_candidate_does_not_write_or_charge_and_other_clip_proceeds(tmp_path,monkeypatch):
     d,clips,_=configured(tmp_path);before=copy.deepcopy(clips)
     monkeypatch.setattr(agent,'propose',lambda directory,clip,verdict,**kwargs:{
@@ -100,11 +162,30 @@ def test_agent_stop_does_not_fall_back_to_blind_retake(tmp_path,monkeypatch):
     assert json.loads((d/'clip_plan.json').read_text())['clips']==clips
 
 
-def test_sandbox_exports_copies_and_requires_current_output(tmp_path,monkeypatch):
-    d,clips,review=configured(tmp_path);config={'runs_root':str(tmp_path/'runs')}
+@pytest.mark.parametrize('endpoint',[None,'flashnext'])
+def test_sandbox_exports_copies_and_requires_current_output(tmp_path,monkeypatch,endpoint):
+    d,clips,review=configured(tmp_path);config={'runs_root':str(tmp_path/'runs'),'model':'default-model'}
+    selected_model='book-repair-model' if endpoint is None else 'Qwen3.8-Flash-Next'
+    profile={'repair_backend':'sandbox_agent','repair_agent_model':selected_model}
+    if endpoint:profile['repair_agent_endpoint']=endpoint
+    (d.parent/'profile.json').write_text(json.dumps(profile))
     def run(name,**kw):
+        assert kw['config']['model']==selected_model
+        if endpoint:
+            assert kw['config']['base_url']=='http://172.28.4.81:8038'
+            assert kw['config']['key_var']=='GPU81_QWEN_API_KEY'
+        assert kw['timeout']==600
         work=Path(config['runs_root'])/name
         evidence=json.loads((work/'input/evidence.json').read_text())
+        primary=json.loads((work/'input/primary.json').read_text())
+        assert primary['provider']=='h3'
+        assert primary['request_field']=='prompt_h3'
+        assert primary['actual_request']==clips[0]['prompt_h3']
+        assert primary['request_rules']==evidence['request_rules']
+        prompt=(work/'prompt.txt').read_text()
+        assert 'first parallel Read tool batch' in prompt
+        assert '/work/input/take-1/frames/frame_1.jpg' in prompt
+        assert 'name: video-repair' in prompt
         assert evidence['takes'] and (work/evidence['takes'][0]['path']/'clip.mp4').is_file()
         assert (work/'.claude/skills/video-repair/SKILL.md').is_file()
         (work/'output').mkdir()
@@ -118,6 +199,102 @@ def test_sandbox_exports_copies_and_requires_current_output(tmp_path,monkeypatch
     monkeypatch.setattr(agent,'provided_frames',frames)
     decision=agent.propose(d,clips[0],review['a'],config=config)
     assert decision['action']=='retake'
+    assert config['model']=='default-model'
+
+
+@pytest.mark.parametrize('exit_code,produced,invalid,accepted', [
+    (124,['decision.json','prompt.txt'],False,True),
+    (124,['decision.json'],False,False),
+    (124,['decision.json','prompt.txt'],True,False),
+    (1,['decision.json','prompt.txt'],False,False),
+])
+def test_timed_out_outputs_are_candidates_only_after_existing_validation(tmp_path,monkeypatch,exit_code,produced,invalid,accepted):
+    d,clips,review=configured(tmp_path);config={'runs_root':str(tmp_path/'runs'),'model':'configured'}
+    original=copy.deepcopy(clips)
+    def run(name,**kw):
+        assert kw['timeout']==600
+        work=Path(config['runs_root'])/name;(work/'output').mkdir()
+        (work/'output/decision.json').write_text(json.dumps({'action':'edit','reason':'clarify current picture',
+            'evidence':['input/take-1/frames/frame_1.jpg']}))
+        prompt=clips[0]['prompt_h3'].replace('stands by','stands calmly by')
+        if invalid:
+            assert '[Shot 1]' in prompt
+            prompt=prompt.replace('[Shot 1]','[Shot 2]')
+        (work/'output/prompt.txt').write_text(prompt)
+        return SimpleNamespace(ok=False,exit_code=exit_code,produced=produced,directory=work/'attempts/timeout')
+    monkeypatch.setattr(agent,'run_agent',run)
+    def frames(directory,cid,video,target):
+        target.mkdir(parents=True);p=target/'frame.jpg';p.write_bytes(b'frame');return [p],'fixture'
+    monkeypatch.setattr(agent,'provided_frames',frames)
+    counts=history.generation_counts(d)
+    if accepted:
+        decision=agent.propose(d,clips[0],review['a'],config=config)
+        assert decision['execution']=={'exit_code':124,'recovered_candidate':True}
+        proposal=agent.final_proposal(d,{'clips':clips},clips[0],decision)
+        assert proposal.plan['clips'][0]['prompt_h3_agent']['execution']['exit_code']==124
+    else:
+        with pytest.raises(ValueError):agent.propose(d,clips[0],review['a'],config=config)
+    assert history.generation_counts(d)==counts
+    assert json.loads((d/'clip_plan.json').read_text())['clips']==original
+
+
+def test_endpoint_change_reopens_failed_preparation_without_resetting_generation_history(tmp_path):
+    d,clips,review=configured(tmp_path)
+    before=managed.input_state(d,clips[0],review['a'],{})
+    saved=history.load(d)
+    (d.parent/'profile.json').write_text(json.dumps({'repair_agent_endpoint':'flashnext'}))
+    after=managed.input_state(d,clips[0],review['a'],{})
+    assert before!=after and after['repair_agent_endpoint']=='flashnext'
+    assert history.load(d)==saved
+
+
+def test_a_different_repair_model_changes_failed_input_state_without_clearing_history(tmp_path):
+    d,clips,review=configured(tmp_path)
+    before=managed.input_state(d,clips[0],review['a'],{})
+    saved=history.load(d)
+    (d.parent/'profile.json').write_text(json.dumps({'repair_backend':'sandbox_agent','repair_agent_model':'book-repair-model'}))
+    after=managed.input_state(d,clips[0],review['a'],{})
+    assert before!=after and after['repair_agent_model']=='book-repair-model'
+    assert history.load(d)==saved
+
+
+def test_corrected_output_allowance_reopens_failed_agent_without_resetting_takes(tmp_path,monkeypatch):
+    d,clips,_=configured(tmp_path)
+    config={'repair_extra_body':{'max_tokens':4096}}
+    monkeypatch.setattr(agent,'load_config',lambda:config)
+    calls=[]
+    def failed(directory,clip,verdict):
+        calls.append(clip['clip_id'])
+        raise ValueError('repair agent did not produce a current decision')
+    monkeypatch.setattr(agent,'propose',failed)
+    managed.prepare(d,['a'])
+    before=history.generation_counts(d)
+    managed.prepare(d,['a'])
+    assert calls==['a']
+    config['repair_extra_body']['max_tokens']=16384
+    managed.prepare(d,['a'])
+    assert calls==['a','a']
+    assert history.generation_counts(d)==before
+    assert json.loads((d/'clip_plan.json').read_text())['clips']==clips
+
+
+def test_effective_thinking_control_reopens_failed_preparation_without_new_takes(tmp_path,monkeypatch):
+    d,clips,_=configured(tmp_path)
+    config={'repair_extra_body':{'thinking':{'type':'enabled'}}}
+    monkeypatch.setattr(agent,'load_config',lambda:config)
+    calls=[]
+    def failed(directory,clip,verdict):
+        calls.append(clip['clip_id'])
+        raise ValueError('repair agent did not produce a current decision')
+    monkeypatch.setattr(agent,'propose',failed)
+    managed.prepare(d,['a']);before=history.generation_counts(d)
+    managed.prepare(d,['a']);assert calls==['a']
+    config['repair_extra_body']['thinking']={'type':'disabled'}
+    managed.prepare(d,['a']);assert calls==['a','a']
+    route=json.loads((d/'repair_routing.json').read_text())
+    assert route['a']['inputs']['repair_agent_max_thinking_tokens']==0
+    assert history.generation_counts(d)==before
+    assert json.loads((d/'clip_plan.json').read_text())['clips']==clips
 
 
 def test_unchanged_repack_preserves_agent_request_but_new_inputs_invalidate_it():

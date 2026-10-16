@@ -1,5 +1,9 @@
 # Episode output contract
 
+For `phase: creation_only`, use [the creator contract](creative-authoring.md).
+Its `episode.json` is a complete creative candidate, not a render/adopt request.
+The source/script media contracts below apply when media production is authorized.
+
 Read the manifest's `input_mode`. For **script** input, read the authoritative
 `input/chapter_script.json` and `input/clip_plan.json` and write:
 
@@ -75,10 +79,17 @@ For source input, replace `prompt_h3` with `h3` (supply exactly one):
 
 For prepared script input, a `prompts` value may be the same shots/soundscape
 object. Existing complete strings remain valid and should be reused.
+The structured object also accepts `music`, an English string for the final
+`non_diegetic_music` section. Use the approved shot music cues and their timing;
+keep speech and dialogue markers out of music, as for soundscape.
 Provide one English body per covered shot. Use `<DIALOGUE_1>`, `<DIALOGUE_2>`, etc.
 exactly once in playback order within each shot, restarting numbering at one for
 the next shot. Place each marker where that utterance belongs relative to actions.
-Keep vocal delivery, physical sound and acting instructions beside its marker.
+Put relevant English vocal delivery and its triggering action immediately before
+the dialogue marker; place the resulting reaction after it. When the authored
+pause or end needs it, describe closed lips and a concrete observation or action.
+Keep physical sound with its authored source. Preserve the approved words and
+timing; the performance convention does not authorize changing either.
 Silent shots and postmix visual shots have zero native dialogue markers.
 
 The host supplies six sections, reference definitions, retention, exact authored
@@ -95,7 +106,11 @@ subjects first in image-reference order, then noncharacter image assets.
 Quote native speech as `<Subject N> (Sx) says <d>[Chinese] chosen text</d>`;
 offscreen speech uses `says in an off-screen voiceover`, or `An off-screen voice (Sx)`
 when its owner has no visual subject. Bind audio reference, owner and the same `(Sx)`
-in the audio definition and first spoken voice-timbre instruction.
+in the audio definition and first spoken voice-timbre instruction when audio is
+actually selected. A native-voice request with explicitly empty audio selection
+keeps its dialogue and speaker IDs, and omits Audio definitions/retention and the
+audio-reference summary prefix. The host's submitted audio list must also be empty;
+script mode cannot silently change protected reference selection.
 When the supplied mode is postmix, a pure inner-voice clip has one thinker and its
 H3 request stages the visual action and scene sounds, with zero native dialogue
 and zero Audio tags/definitions. Select the supplied thinker card and voice for

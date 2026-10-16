@@ -3,6 +3,7 @@ from pathlib import Path
 import json
 import shutil
 import subprocess
+from novel_manga.media.quality import inspect_media
 from fractions import Fraction
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from novel_manga.util import atomic_write_json, media_duration, run
@@ -174,6 +175,17 @@ def deliver(runner, report: dict, destination: Path) -> dict:
     subprocess.run(['ffmpeg','-y','-v','error','-threads','4','-i',str(source),'-vf',filters,
                     '-c:v','libx264','-preset','fast','-crf','19','-r','25','-pix_fmt','yuv420p',
                     '-c:a','aac','-ar','48000','-ac','2','-b:a','192k',str(body)],cwd=destination,check=True)
+    publication_path=ctx.episode_dir/'publication.json'
+    publication=None
+    if publication_path.is_file():
+        from novel_manga.interactive.packaging import package_body
+        publication_config=json.loads(publication_path.read_text())
+        boundary=next(c for c in ctx.clip_plan['clips'] if c['clip_id']==publication_config['world_card']['after_clip_id'])
+        boundary_has_speech=any(t.get('text') for s in ctx.script['shots'] if s['index'] in boundary['shot_indexes']
+                                for t in s.get('turns',[]))
+        body,publication=package_body(body,publication_config,assembly.get('timeline',[]),
+                                    destination,ctx.settings.font_path,ctx.settings.width,ctx.settings.height,
+                                    boundary_has_speech=boundary_has_speech)
     card=destination/'interaction.jpeg'
     _card(card,interaction,ctx.settings.font_path,ctx.settings.width,ctx.settings.height)
     tail=destination/'interaction.mp4'
@@ -192,6 +204,8 @@ def deliver(runner, report: dict, destination: Path) -> dict:
         tail_audio=['-i',str(ambient)]
     elif interaction.get('ambience_shot_index'):
         start,length=ambience_window(interaction['ambience_shot_index'],ctx.script,ctx.clip_plan,assembly.get('timeline',[]))
+        if publication and start>=publication['world_card']['start']:
+            start+=publication['world_card']['seconds']
         ambience_source={'start':start,'end':start+length,
                          'clip_id':next(c['clip_id'] for c in ctx.clip_plan['clips']
                                         if interaction['ambience_shot_index'] in c.get('shot_indexes',[]))}
@@ -223,11 +237,17 @@ def deliver(runner, report: dict, destination: Path) -> dict:
     run(['ffmpeg','-y','-v','error','-i',str(final),'-vn','-c:a','pcm_s16le',str(destination/'episode_audio.wav')])
     ass=Path(assembly.get('ass',''))
     if ass.is_file():
-        shutil.copy2(ass,destination/'subtitles.ass')
+        if publication:
+            from novel_manga.interactive.packaging import shift_subtitles
+            shift_subtitles(ass,destination/'subtitles.ass',publication['world_card']['start'],publication['world_card']['seconds'])
+        else:
+            shutil.copy2(ass,destination/'subtitles.ass')
+        ass=destination/'subtitles.ass'
         run(['ffmpeg','-y','-v','error','-i',str(ass),str(destination/'subtitles.srt')])
     cover=Path(assembly.get('cover',''))
     if cover.is_file():shutil.copy2(cover,destination/'cover.jpeg')
     if packaging.get('cover'):shutil.copy2(packaging['cover'],destination/'cover.jpeg')
+    elif publication:shutil.copy2(destination/'world-introduction.jpeg',destination/'cover.jpeg')
     decode=subprocess.run(['ffmpeg','-v','error','-i',str(final),'-f','null','-'],capture_output=True,text=True)
     info=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(final)],text=True))
     video=next(s for s in info['streams'] if s['codec_type']=='video')
@@ -236,11 +256,24 @@ def deliver(runner, report: dict, destination: Path) -> dict:
     technical=(decode.returncode==0 and not decode.stderr.strip() and video['width']==ctx.settings.width and video['height']==ctx.settings.height
                and video['codec_name']=='h264' and video['r_frame_rate']=='25/1' and audio['codec_name']=='aac'
                and 180<=duration<=300 and int(video['nb_frames'])-int(body_info['nb_frames'])==75)
+    # Clean delivery uses the native join, and publication inserts its own cards.
+    # The assembly's normalized audio is a different track, not this film's QC.
+    media_report=destination/'media-quality.json'
+    delivered_media=inspect_media(final,destination/'cover.jpeg',card,destination/'subtitles.ass',
+                                  ctx.settings,media_report,silent_outro_seconds=3,
+                                  subtitles_required=any(t.get('text') for s in ctx.script['shots']
+                                                         for t in s.get('turns',[])))
+    delivered_report={**report,'assembly':{**assembly,'thin_passed':delivered_media['passed']},
+                      'quality_review':{**report.get('quality_review',{}),
+                          'passed':report.get('quality_review',{}).get('content_passed') is True
+                                   and delivered_media['passed'] is True}}
     planned_body=sum(float(c['request_seconds']) for c in ctx.clip_plan['clips'])
-    receipt={'status':delivery_status(report,technical),'final_video':str(final),'duration':duration,
+    receipt={'status':delivery_status(delivered_report,technical),'final_video':str(final),'duration':duration,
              'technical_passed':technical,'content_passed':report.get('quality_review',{}).get('content_passed',False),
-             'production_media_passed':assembly.get('thin_passed',False),
-             'production_media_issues':[k for k,v in (assembly.get('media_qc') or {}).get('checks',{}).items()
+             'production_media_passed':delivered_media['passed'],
+             'production_media_report':str(media_report),
+             'source_assembly_media_passed':assembly.get('thin_passed',False),
+             'production_media_issues':[k for k,v in delivered_media.get('checks',{}).items()
                                         if isinstance(v,dict) and v.get('passed') is False],
              'interaction':{**interaction,**interaction_window(body_seconds)},'ambience_source':ambience_source,'evidence_events':events,
              'planned_body_seconds':planned_body,'actual_body_seconds':body_seconds,
@@ -250,6 +283,10 @@ def deliver(runner, report: dict, destination: Path) -> dict:
              'audio':'native mixed episode audio, not isolated vocals',
              'delivery_policy':{'extra_visual_overlays':extra_overlays,'dialogue_subtitles':True,'interaction_card':True},
              'source_report':str(ctx.episode_dir/'thin_media_report.json'),'packaging':packaging}
+    if publication:
+        receipt['publication']=publication
+        receipt['planned_body_seconds']+=publication['world_card']['seconds']
+        receipt['body_duration_delta']=round(body_seconds-receipt['planned_body_seconds'],3)
     if not extra_overlays:
         receipt['overlay_timing']='disabled by user; dialogue subtitles and interaction card retained'
         receipt['audio_level_processing']=False

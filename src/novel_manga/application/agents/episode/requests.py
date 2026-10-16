@@ -34,6 +34,11 @@ def compose_request(clip, directions):
         raise RepairArgumentError('H3 soundscape requires an English string')
     if re.search(r'</?d>|<DIALOGUE_|\(S\d+\)|<Audio \d+>', sound):
         raise RepairArgumentError('H3 soundscape cannot contain native speech or dialogue slots')
+    music = directions.get('music', '')
+    if not isinstance(music, str):
+        raise RepairArgumentError('H3 music requires an English string')
+    if re.search(r'</?d>|<DIALOGUE_|\(S\d+\)|<Audio \d+>', music):
+        raise RepairArgumentError('H3 music cannot contain native speech or dialogue slots')
     expected=dialogue_slots(clip)
     actual=[re.findall(r'<DIALOGUE_\d+>',text)for text in shots]
     global_slots=[f'<DIALOGUE_{i}>'for i in range(1,1+sum(map(len,expected)))]
@@ -52,7 +57,7 @@ def compose_request(clip, directions):
             raise RepairArgumentError(f'Shot {stage}: dialogue slots must occur once in order: {wanted}')
         if re.search(r'<d>|\(S\d+\)|\[Shot \d+\]|Planned duration:|At \d\d:\d\d', text):
             raise RepairArgumentError(f'Shot {stage}: host supplies speech bindings, shot headers and timing; write body and dialogue slots only')
-    return compose(clip, shots, [('', []) for _ in shots], soundscape=sound, authored=True)
+    return compose(clip, shots, [('', []) for _ in shots], soundscape=sound, music=music, authored=True)
 
 
 def compose_repair(clip, decision):

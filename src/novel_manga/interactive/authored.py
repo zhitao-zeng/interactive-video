@@ -34,6 +34,9 @@ def prepare_authored(project: Path, output: Path, *, family: str = 'adventure') 
                        ('interaction',material['interaction']),('overlays',material['overlays']),
                        ('evidence_surfaces',material.get('evidence_surfaces',[]))]:
         atomic_write_json(episode/(name+'.json'),value)
+    for name in ('publication', 'delivery_policy'):
+        if name in material:
+            atomic_write_json(episode/(name+'.json'), material[name])
     atomic_write_json(episode/'source_trace.json',{'original':str(project/'source.md'),
         'archive':material.get('source_archive'),'shots':[{'index':s['index'],'shot_id':s['shot_id'],
         'original_shot':s.get('source_shot'),'source_kind':s.get('source_kind'),

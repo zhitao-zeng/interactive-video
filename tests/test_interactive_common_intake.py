@@ -156,3 +156,16 @@ def test_runner_honors_episode_native_h3_sampling_only_on_h3_lane(tmp_path,monke
     runner=runtime.runner_for(root,novel,lane,project='romance')
     assert runner.settings.native==expected
     assert runner.profile is profile
+@pytest.mark.parametrize('lane',['h3','sd25'])
+def test_resume_returns_missing_clips_to_renderer_even_when_inputs_match(monkeypatch,tmp_path,lane):
+    from types import SimpleNamespace
+    from novel_manga.interactive import agent
+    atomic_write_json(tmp_path/'thin_media_report.json',{'clips':[{'clip_id':'a','selected':None}],
+                                                       'failed_clips':['a']})
+    runner=SimpleNamespace(context=SimpleNamespace(profile={},clip_plan={'clips':[{'clip_id':'a'}]},
+                                                   episode_dir=tmp_path,feedback={}))
+    monkeypatch.setattr('novel_manga.application.review.execution.media_matches',lambda *a,**k:True)
+    seen=[]
+    monkeypatch.setattr('novel_manga.application.rendering.reviewed.run',lambda *a,**k:seen.append(k) or {})
+    agent.run(runner,lane,resume=True)
+    assert seen==[{}]

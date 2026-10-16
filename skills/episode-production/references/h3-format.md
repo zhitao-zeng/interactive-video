@@ -51,11 +51,21 @@ same speaker ID through the clip, independently of Subject or Audio number:
 
 ```text
 <Audio 1> is the voice-timbre reference for <Subject 2> (S1).
-<Subject 2> (S1) says <d>[Chinese] 原样台词。</d>
 The speaking voice follows the timbre referenced from <Audio 1>.
+Her voice starts level, briefly hesitates at the new information, then ends quietly.
+<Subject 2> (S1) says <d>[Chinese] 原样台词。</d>
+She closes her mouth and listens to the other person.
 ```
 
-Place English vocal delivery beside the bound utterance. For an offscreen owner,
+Prefer English vocal delivery immediately before the bound utterance, with an
+authored reaction or mouth closure after it where appropriate. This is a local
+performance convention; upstream requires delivery outside `<d>`, not this exact
+ordering. Use only details supported by the current scene.
+When audio conditioning is explicitly absent, omit both Audio lines in the example,
+all audio-retention entries and the audio-reference summary label; retain `(Sx)`
+and the supplied dialogue. Confirm the host sends zero audio references rather
+than assuming an omitted tag removes a selected file.
+For an offscreen owner,
 use `<Subject N> (Sx) says in an off-screen voiceover <d>[Chinese] ...</d>`;
 an owner without a visual Subject uses `An off-screen voice (Sx)` with the same
 delivery syntax. Keep words, ownership and stage consistent with structured turns.

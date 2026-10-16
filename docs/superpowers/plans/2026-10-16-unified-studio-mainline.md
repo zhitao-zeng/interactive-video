@@ -39,10 +39,11 @@
 
 **Files:** configs/interactive.json, interactive/runtime.py, interactive/production.py, scripts/interactive_video.py, tests/test_studio_mainline.py.
 
-**Interfaces:** `project_config(root, project)` returns common defaults overlaid with that project's production/services; `run_episode` and CLI use resolved historical edition paths. Status can select `--edition` without generating.
+**Interfaces:** `project_config(root, project)` returns common defaults overlaid with that project's production/services; `run_episode` and CLI use resolved historical edition paths. Status can select `--edition` without generating. `create --task --output-dir` calls the single creator directly, without invoking novel reading/planning.
 
 - [ ] Add tests with a temporary config proving project overrides retain unrelated defaults and episode workers/native resolution still win. Run them before implementation; expected: missing project_config or wrong override behavior.
 - [ ] Add a linked historical edition test asserting the original directory is passed to the runner, its count is retained, and status never invokes rendering. Run before implementing; expected: alias path/default-only status failure.
+- [ ] Add a CLI dispatch test that records a direct creator call, rejects unexpected novel workflow/media calls, and retains resume/feedback/config arguments. Expected: create is absent before implementation.
 - [ ] Implement the smallest changes in existing entrypoints, retain argument behavior for current callers, run all affected tests and commit.
 
 ### Task 3: Cut over the local entry and verify the real retained data

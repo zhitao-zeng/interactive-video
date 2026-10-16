@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import novel_manga.llm.client as model_client
-REVIEW_POLICY = "thin-review-v1.25-picture-observation-and-reasonable-deviation"
+REVIEW_POLICY = "thin-review-v1.26-native-captions-and-clue-text"
 
 
 POLICY = REVIEW_POLICY  # shared with scheduling and delivery: the judge reads the source passage
@@ -32,10 +32,10 @@ CARD_SIDE = 1024
 MAX_IMAGES = 8  # vLLM --limit-mm-per-prompt
 
 
-STORY_KINDS = ("无问题", "原文中有动作的人物缺席", "动作落在错误的人物身上", "画面事件与原文不符", "无法判断")
+STORY_KINDS = ("无问题", "原文中有动作的人物缺席", "动作落在错误的人物身上", "关键线索内容被改写", "画面事件与原文不符", "无法判断")
 
 
-STORY_FATAL = {"原文中有动作的人物缺席", "动作落在错误的人物身上"}
+STORY_FATAL = {"原文中有动作的人物缺席", "动作落在错误的人物身上", "关键线索内容被改写"}
 
 
 NAME_SCHEMA = model_client.obj({
@@ -115,6 +115,8 @@ CLIP_SCHEMA = model_client.obj({
     "time_of_day_ok": {"type": "boolean"},
     "location_issue": {"type": "string"},
     "text_or_watermark": {"type": "boolean"},
+    "unplanned_subtitles": {"type": "boolean"},
+    "subtitle_issue": {"type": "string"},
     "chat_text_ok": {"type": "boolean"},
     "chat_text_issue": {"type": "string"},
     "visual_defects": {"type": "boolean"},
@@ -158,7 +160,7 @@ SCRIPT_CHECK_RULES = (
 
 
 VERIFY_FLAGS = ('same_person_twice', 'species_or_gender_wrong', 'action_by_wrong_person',
-                'actor_missing', 'lead_face_swapped', 'body_artifact')
+                'actor_missing', 'lead_face_swapped', 'body_artifact', 'unplanned_subtitles', 'clue_text_changed')
 
 BODY_QUESTION = (
     "body_artifact：先看实际画面是否有明显不自然的人物/头身/肢体比例、没有剧情理由的分屏或双视图、人物与环境尺度不协调、明显穿模或不自然连接；再沿肩—肘—腕—手检查多余独立手臂、腿或机械附肢，"
@@ -167,7 +169,7 @@ BODY_QUESTION = (
 )
 
 VERIFY_SCHEMA = {"type": "object", "additionalProperties": False,
-                 "required": ["people", *VERIFY_FLAGS, "ghost_text", "count_checks", "verdict", "evidence", "instruction"],
+                 "required": ["people", *VERIFY_FLAGS, "subtitle_issue", "ghost_text", "count_checks", "verdict", "evidence", "instruction"],
                  "properties": {
                      "people": {"type": "array", "items": {"type": "object", "additionalProperties": False, "required": ["who", "entity_kind", "gender", "is_animal", "doing", "frames"],
                                                            "properties": {"who": {"type": "string"}, "entity_kind": {"type": "string", "enum": ["character", "object"]}, "gender": {"type": "string", "enum": ["男", "女", "不明"]},
@@ -175,6 +177,8 @@ VERIFY_SCHEMA = {"type": "object", "additionalProperties": False,
                      "body_artifact": {"type": "boolean"},
                      "same_person_twice": {"type": "boolean"}, "species_or_gender_wrong": {"type": "boolean"}, "action_by_wrong_person": {"type": "boolean"},
                      "actor_missing": {"type": "boolean"}, "lead_face_swapped": {"type": "boolean"}, "ghost_text": {"type": "boolean"},
+                     "unplanned_subtitles": {"type": "boolean"}, "subtitle_issue": {"type": "string"},
+                     "clue_text_changed": {"type": "boolean"},
                      "count_checks": {"type": "array", "minItems": 1, "maxItems": 24, "items": {
                          "type": "object", "additionalProperties": False,
                          "required": ["count_kind", "entity", "frames", "expected_min", "expected_max", "observed", "reason"],

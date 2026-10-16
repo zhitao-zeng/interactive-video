@@ -47,7 +47,8 @@ OCR is optional additional evidence. It does not replace exact source reconstruc
 
 Record lightweight face/identity consistency against the locked character asset. Use it to find likely character drift, but do not treat it as biometric identification and do not block admission or automatically regenerate media from this score.
 
-For visible dialogue generation, use these prompt-time constraints only:
+For visible dialogue in a selected **locked-audio close-up workflow**, use these
+prompt-time constraints only:
 
 - one visible speaking role per clip;
 - speaker-specific close-up asset;
@@ -55,9 +56,15 @@ For visible dialogue generation, use these prompt-time constraints only:
 - exact locked TTS file supplied as reference audio;
 - no LatentSync, screenshot mouth inspection, SyncNet-like gate, or lip-sync remediation pass.
 
+For native H3, retain the authored visible/offscreen camera and the selected audio
+conditioning. Check subtitle timing against the generated audio. Inspect for native
+dialogue captions before adding the project's own captions so two layers do not
+appear. Voice naturalness, useful pauses and music balance need listening feedback;
+ASR, speaker similarity and static frames cannot establish those outcomes.
+
 ## Remediation routing
 
-- Wrong or unclear words: regenerate Qwen TTS, adjust pronunciation instructions, then rerun ASR.
+- Wrong or unclear words: use the selected mode's existing bounded repair. A locked-TTS workflow can correct pronunciation and regenerate that audio; native H3 repairs its supported input/request and checks the resulting speech. Preserve actual attempts and authorization.
 - Subtitle timing drift: generate forced alignment or synthesize shorter subtitle pages independently; do not hand-shift the whole episode.
 - Speaker too small, obscured, or wrong: regenerate a speaker-specific keyframe and video turn.
 - Burn-in absent: rerender from the retained ASS and verify delivered pixels.
