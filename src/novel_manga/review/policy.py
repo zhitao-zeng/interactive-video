@@ -35,6 +35,10 @@ def fix_tier(verdict: dict, bible: review_models_StoryBible, rules: ReviewRules 
     broken body, a lead with the wrong face, or a speaking character who is not
     there; a side character's shirt colour or a garbled phone screen they do not."""
     rules = rules or ReviewRules()
+    if verdict.get('unplanned_subtitles') is True:
+        return 'must_fix'  # native captions would duplicate the host's dialogue subtitles
+    if verdict.get('story_ok') is False and verdict.get('story_kind') == '关键线索内容被改写':
+        return 'must_fix'
     if verdict.get("visual_defects") and verdict.get("visual_defect_kind") in PRESENTATION_KINDS:
         return "must_fix"  # faulty authored/request layout cannot excuse an obvious picture defect
     if verdict.get("reasonable_deviation") and not verdict.get("visual_defects") and verdict.get("identity_ok") is not False:
@@ -84,14 +88,16 @@ def compose_feedback(verdict: dict, clip: dict | None = None, manifest: dict | N
     if verdict.get("visual_defects") and verdict.get("visual_defect_kind") in PRESENTATION_KINDS and verdict.get("feedback"):
         return str(verdict["feedback"]).strip()
     parts = []
+    if verdict.get('unplanned_subtitles') is True:
+        parts.append('取消原生生成的漂浮对白字幕，台词只以声音出现；对白字幕由宿主统一添加，保留经批准的剧情内牌面、纸条、档案和手机消息文字')
     if verdict.get("story_ok") is False and verdict.get("story_kind") in STORY_FATAL and verdict.get("story_issue"):
         # What to draw, not what was wrong: the judge's feedback is written as an instruction (who must be in frame,
         # who does what to whom); story_issue describes the mistake, and H3 rendered that description back as the
         # scene (雾月 2026-09-14: "two identical white-haired women seated left and right" came back as such).
         note = str(verdict.get("feedback") or "").strip()
         parts.append(note if note and not re.search(r"字幕|文字", note) else "按原文修正剧情：" + str(verdict["story_issue"]).strip())
-    if verdict.get("text_or_watermark"):
-        parts.append("除手机屏幕上指定的聊天消息外，画面中不得出现任何文字、字幕、弹幕或水印，台词只以语音出现")
+    if verdict.get("text_or_watermark") and not verdict.get('unplanned_subtitles'):
+        parts.append("取消未经批准的漂浮字幕、水印和Logo；台词只以声音出现，保留经批准的剧情内实体文字和手机消息")
     if verdict.get("chat_text_ok") is False:
         parts.append("手机屏幕上的消息文字必须是清晰端正的简体中文，内容与指定的消息逐字一致，不得乱码或出现无关文字；屏幕要正对镜头、占画面主体")
     if not verdict.get("identity_ok", True):
@@ -127,14 +133,17 @@ def verify_to_verdict(answer: dict) -> dict:
     people = [p for p in entities if not isinstance(p, dict) or p.get("entity_kind") != "object"] if isinstance(entities, list) else entities
     objects = [p for p in entities if isinstance(p, dict) and p.get("entity_kind") == "object"] if isinstance(entities, list) else []
     story_kind = ('动作落在错误的人物身上' if flags['action_by_wrong_person'] else
-                  '原文中有动作的人物缺席' if flags['actor_missing'] else '无法判断')
-    story_error = flags['action_by_wrong_person'] or flags['actor_missing']
+                  '原文中有动作的人物缺席' if flags['actor_missing'] else
+                  '关键线索内容被改写' if flags['clue_text_changed'] else '无法判断')
+    story_error = flags['action_by_wrong_person'] or flags['actor_missing'] or flags['clue_text_changed']
     return {
         "visible_people": len(people) if isinstance(people, list) else 0,
         "identity_ok": not (flags["same_person_twice"] or flags["species_or_gender_wrong"] or flags["lead_face_swapped"] or subtle),
         "identity_issue": evidence if (flags["same_person_twice"] or flags["species_or_gender_wrong"] or flags["lead_face_swapped"] or subtle) else "",
         "location_ok": None, "time_of_day_ok": None, "location_issue": "",
         "text_or_watermark": bool(answer.get("ghost_text")),
+        "unplanned_subtitles": flags['unplanned_subtitles'],
+        "subtitle_issue": str(answer.get('subtitle_issue') or '') if flags['unplanned_subtitles'] else '',
         "chat_text_ok": None, "chat_text_issue": "",
         **({key:answer[key] for key in ("visual_defect_kind", "reasonable_deviation", "deviation_note") if key in answer}),
         "visual_defects": True if flags.get("body_artifact") else None, "defect_issue": ("身体结构异常待复核：" + evidence) if flags.get("body_artifact") else evidence if obvious and not any(flags.values()) else "",

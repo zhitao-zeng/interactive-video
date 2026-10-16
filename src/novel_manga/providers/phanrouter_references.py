@@ -59,6 +59,7 @@ class ReferenceMaterials:
         except (OSError, ValueError):
             record = {}
         if record.get("asset_id") and record.get("sha256") == digest and record.get("group_id") == group:
+            self._await_active(sidecar, record)
             return f"asset://{record['asset_id']}"
         if getattr(self.settings, "phanrouter_asset_public_base", None):
             hosted_url = self.public_card_url(path, digest)
@@ -66,7 +67,7 @@ class ReferenceMaterials:
             # then probe: the probe is what tells you the tunnel actually serves the publish dir.
             try:
                 from ..media.publish import publish_file, publish_root
-                published = publish_file(path, publish_root(getattr(self.settings, "output_root", None)))
+                published = publish_file(path, publish_root(getattr(self.settings, "output_root", None)), reference=True)
             except OSError:
                 published = None
             probe = self.client.head(hosted_url, timeout=min(self.settings.request_timeout, SUBMIT_TIMEOUT_SECONDS),
@@ -78,7 +79,10 @@ class ReferenceMaterials:
             hosted_url = self._hosted_image_url(image)
         # Names are unique per user: novel, card, view and a piece of the content hash; a clash gets a suffix.
         novel = path.parents[3].name if len(path.parents) > 3 else "novel"
-        stem = f"{novel}-{path.parent.name}-{path.stem}-{digest[:10]}"
+        # Long edition names otherwise fail the library's original_name column.
+        # Keep the existing content suffix and leave room for the clash suffix.
+        prefix = f"{novel}-{path.parent.name}-{path.stem}"
+        stem = f"{prefix[:49]}-{digest[:10]}"
         asset_id = None
         for attempt in range(3):
             name = stem if attempt == 0 else f"{stem}-{attempt + 1}"
@@ -87,7 +91,7 @@ class ReferenceMaterials:
                 json={"GroupId": group, "Name": name, "URL": hosted_url, "AssetType": "Image"},
                 timeout=min(self.settings.request_timeout, SUBMIT_TIMEOUT_SECONDS),
             )
-            if response.status_code == 400 and "already exists" in response.text:
+            if response.status_code in {400, 409} and "already exists" in response.text:
                 continue
             try:
                 response.raise_for_status()
@@ -98,9 +102,34 @@ class ReferenceMaterials:
             break
         if not asset_id:
             raise RuntimeError(f"asset library returned no asset id for {path.parent.name}/{path.name}")
-        atomic_write_json(sidecar, {"asset_id": asset_id, "sha256": digest, "group_id": group, "name": name,
-                                    "source_url": hosted_url, "created_at": time.time()})
+        record = {"asset_id": asset_id, "sha256": digest, "group_id": group, "name": name,
+                  "source_url": hosted_url, "created_at": time.time()}
+        atomic_write_json(sidecar, record)
+        self._await_active(sidecar, record)
         return f"asset://{asset_id}"
+
+    def _await_active(self, sidecar: Path, record: dict) -> None:
+        """A registered ID cannot enter a video request before processing ends."""
+        if record.get('status') == 'Active':
+            return
+        deadline = time.monotonic() + self.settings.poll_timeout
+        while time.monotonic() < deadline:
+            response = self.client.post(f'{self._asset_base_url()}/open/GetAsset',
+                headers=self.image_headers, json={'Id': record['asset_id']},
+                timeout=min(self.settings.request_timeout, SUBMIT_TIMEOUT_SECONDS))
+            response.raise_for_status()
+            data = task_data(response.json())
+            status = str(data.get('Status') or '')
+            if not status:
+                raise RuntimeError(f'asset library returned no processing status for {sidecar.parent.name}')
+            record.update(status=status, status_checked_at=time.time())
+            atomic_write_json(sidecar, record)
+            if status == 'Active':
+                return
+            if status.lower() in {'failed', 'rejected', 'deleted', 'disabled', 'error'}:
+                raise RuntimeError(f'asset library processing {status} for {sidecar.parent.name}')
+            time.sleep(5)
+        raise TimeoutError(f'asset library is still processing {sidecar.parent.name}; resume its existing ID')
 
 
     def _hosted_image_url(self, image: ImageResult) -> str:

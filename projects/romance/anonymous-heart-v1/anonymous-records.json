@@ -1,0 +1,68 @@
+{
+  "authority": "Original authored facts, not reconstructed from generated footage",
+  "messages": [
+    {
+      "pair": [
+        "阮夏",
+        "闻屿"
+      ],
+      "night": 7,
+      "from": "阮夏",
+      "text": "右边那颗钉子又掉了。我先把画扶住。",
+      "attachment": "只拍画框，不露人脸；本轮不生成附件画面"
+    },
+    {
+      "pair": [
+        "阮夏",
+        "闻屿"
+      ],
+      "night": 7,
+      "from": "闻屿",
+      "text": "先放地上。别一边扶一边回我。"
+    },
+    {
+      "pair": [
+        "阮夏",
+        "闻屿"
+      ],
+      "night": 6,
+      "from": "阮夏",
+      "text": "今天拍到一张晚霞，回头发你。"
+    },
+    {
+      "pair": [
+        "许棠",
+        "程越"
+      ],
+      "night": 7,
+      "from": "程越",
+      "text": "明天别带工作来。店里的事我也先不管了。"
+    }
+  ],
+  "received_letters": [
+    {
+      "from": "闻屿",
+      "to": "阮夏",
+      "flower": "栀子",
+      "text": "画先放稳。明天见面，再听你讲。"
+    },
+    {
+      "from": "程越",
+      "to": "许棠",
+      "flower": "玫瑰",
+      "text": "别带工作来。"
+    },
+    {
+      "from": "阮夏",
+      "to": "闻屿",
+      "flower": "向日葵",
+      "text": "谢谢你昨晚没先睡。明天我应该不会迟到。"
+    },
+    {
+      "from": "许棠",
+      "to": "程越",
+      "flower": "鸢尾",
+      "text": "你说不管店里，明天我可要检查。"
+    }
+  ]
+}

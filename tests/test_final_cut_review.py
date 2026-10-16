@@ -188,3 +188,33 @@ def test_persistent_failed_final_review_blocks_native_only_publication(publicati
     atomic_write_json(directory/'final_cut_review.json',final)
     assert publisher.publish_if_ready(directory,review,takes) is False
     assert (directory/'nov_1.mp4').read_bytes()==b'incumbent movie'
+
+
+def test_publication_card_is_reviewed_and_later_frames_use_movie_time(tmp_path,monkeypatch):
+    runner,media,movie=episode(tmp_path)
+    second={'clip_id':'b','kind':'video','shot_indexes':[2],'references':[]}
+    runner.context.clip_plan['clips'].append(second)
+    media['assembly']['timeline'].append({'unit_id':'b','start':9,'end':18})
+    media['clips'].append({'clip_id':'b','selected':{'video':str(movie),'chunks':[]}})
+    atomic_write_json(runner.context.episode_dir/'clip_plan.json',runner.context.clip_plan)
+    card={'after_clip_id':'a','start':9,'end':12,'seconds':3,'title':'approved world title'}
+    atomic_write_json(runner.context.episode_dir/'publication.json',{'world_card':card})
+    monkeypatch.setattr(final_cut.subprocess,'check_output',lambda *a,**k:json.dumps({'format':{'duration':21}}))
+    monkeypatch.setattr(final_cut.subprocess,'run',lambda c,**k:Path(c[-1]).write_bytes(b'frame'))
+    monkeypatch.setattr(final_cut.model,'image_part',lambda *a:{'type':'text','text':'fixture'})
+    monkeypatch.setattr(final_cut.model,'ask_json',lambda *a,**k:{'passed':True,'observations':['actual supplied frames'],'issues':[]})
+    result=final_cut.review_assembly(runner,media,receipt={'final_video':str(movie),'publication':{'world_card':card}})
+    assert result['complete']
+    assert [r['seconds'] for r in result['frames'] if r['clip_id']=='b']==[12.15,16.5,20.8]
+    world=next(r for r in result['frames'] if 'world introduction card' in r['label'])
+    assert world['seconds']==10.5 and 'approved world title' in world['approved_labels']
+    assert media['assembly']['timeline'][1]['start']==9
+
+
+def test_ambience_asr_uses_publication_shifted_movie_time():
+    media={'assembly':{'timeline':[{'unit_id':'a','start':0,'end':9},{'unit_id':'b','start':9,'end':18}]},
+           'clips':[{'clip_id':'b','selected':{'chunks':[{'start':3,'end':4,'hypothesis':'spoken words'}]}}]}
+    receipt={'publication':{'world_card':{'start':9,'seconds':3}},
+             'ambience_source':{'clip_id':'b','start':15,'end':18}}
+    issues=final_cut.ambience_speech_issues(media,receipt,[{'clip_id':'b','path':'frame.jpg'}])
+    assert len(issues)==1 and 'spoken words' in issues[0]['evidence']

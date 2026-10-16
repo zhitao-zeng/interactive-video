@@ -1,0 +1,1579 @@
+{
+  "status": "mapping_only_no_video_submitted",
+  "new_video_calls": 0,
+  "old_totals": {
+    "h3": 23,
+    "sd25": 17
+  },
+  "policy": "用户已授权实质改稿后的完整新版比较。新版初拍逐次记录，旧原请求续修仍继承旧次数和上限；原记录不清空，不因编号重用错配历史。",
+  "clips": [
+    {
+      "candidate_clip": "clip_01",
+      "authored_shots": [
+        "T01",
+        "T02",
+        "T03"
+      ],
+      "original_source_shots": [
+        "A01",
+        "A02",
+        "A03",
+        "A04"
+      ],
+      "requested_seconds": 12,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_01",
+            "shared_source_shots": [
+              "A01",
+              "A02"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_02",
+            "shared_source_shots": [
+              "A03",
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_03",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_01",
+            "shared_source_shots": [
+              "A01",
+              "A02"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": true
+          },
+          {
+            "old_clip": "clip_02",
+            "shared_source_shots": [
+              "A03",
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": true
+          },
+          {
+            "old_clip": "clip_03",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_02",
+      "authored_shots": [
+        "T04",
+        "T05",
+        "T06"
+      ],
+      "original_source_shots": [
+        "A04"
+      ],
+      "requested_seconds": 12,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_02",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_03",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_02",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": true
+          },
+          {
+            "old_clip": "clip_03",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_03",
+      "authored_shots": [
+        "T07",
+        "T08"
+      ],
+      "original_source_shots": [
+        "A04",
+        "A05",
+        "A06"
+      ],
+      "requested_seconds": 13,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_02",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_03",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_04",
+            "shared_source_shots": [
+              "A05",
+              "A06"
+            ],
+            "old_generated_count": 3,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A04",
+              "A06"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_02",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": true
+          },
+          {
+            "old_clip": "clip_03",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_04",
+            "shared_source_shots": [
+              "A05",
+              "A06"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": true
+          },
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A04",
+              "A06"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_04",
+      "authored_shots": [
+        "T09"
+      ],
+      "original_source_shots": [
+        "A04",
+        "A07"
+      ],
+      "requested_seconds": 8,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_02",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_03",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A04",
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_06",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_02",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": true
+          },
+          {
+            "old_clip": "clip_03",
+            "shared_source_shots": [
+              "A04"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A04",
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_06",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_05",
+      "authored_shots": [
+        "T10",
+        "T11",
+        "T12"
+      ],
+      "original_source_shots": [
+        "A07",
+        "A08"
+      ],
+      "requested_seconds": 14,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_06",
+            "shared_source_shots": [
+              "A07",
+              "A08"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_07",
+            "shared_source_shots": [
+              "A08"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_06",
+            "shared_source_shots": [
+              "A07",
+              "A08"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_07",
+            "shared_source_shots": [
+              "A08"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_06",
+      "authored_shots": [
+        "T13",
+        "T14",
+        "T15"
+      ],
+      "original_source_shots": [
+        "A08",
+        "A09",
+        "A16"
+      ],
+      "requested_seconds": 15,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_06",
+            "shared_source_shots": [
+              "A08"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_07",
+            "shared_source_shots": [
+              "A08",
+              "A09"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_08",
+            "shared_source_shots": [
+              "A09"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_15",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 2,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_16",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_17",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_06",
+            "shared_source_shots": [
+              "A08"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_07",
+            "shared_source_shots": [
+              "A08",
+              "A09"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_08",
+            "shared_source_shots": [
+              "A09"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_15",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_16",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_17",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_07",
+      "authored_shots": [
+        "T16",
+        "T17",
+        "T18"
+      ],
+      "original_source_shots": [
+        "A09",
+        "A16"
+      ],
+      "requested_seconds": 14,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_07",
+            "shared_source_shots": [
+              "A09"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_08",
+            "shared_source_shots": [
+              "A09"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_15",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 2,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_16",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_17",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_07",
+            "shared_source_shots": [
+              "A09"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_08",
+            "shared_source_shots": [
+              "A09"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_15",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_16",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_17",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_08",
+      "authored_shots": [
+        "T19"
+      ],
+      "original_source_shots": [
+        "A07",
+        "A10",
+        "A11"
+      ],
+      "requested_seconds": 5,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_06",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_09",
+            "shared_source_shots": [
+              "A10"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_10",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_11",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 2,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_06",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_09",
+            "shared_source_shots": [
+              "A10"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_10",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_11",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_09",
+      "authored_shots": [
+        "T20",
+        "T21",
+        "T22"
+      ],
+      "original_source_shots": [
+        "A10"
+      ],
+      "requested_seconds": 13,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_09",
+            "shared_source_shots": [
+              "A10"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_09",
+            "shared_source_shots": [
+              "A10"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_10",
+      "authored_shots": [
+        "T23",
+        "T24"
+      ],
+      "original_source_shots": [
+        "A11"
+      ],
+      "requested_seconds": 11,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_10",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_11",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 2,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_10",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_11",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_11",
+      "authored_shots": [
+        "T25",
+        "T26"
+      ],
+      "original_source_shots": [
+        "A06",
+        "A09",
+        "A11",
+        "A12",
+        "A16"
+      ],
+      "requested_seconds": 13,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_04",
+            "shared_source_shots": [
+              "A06"
+            ],
+            "old_generated_count": 3,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A06"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_07",
+            "shared_source_shots": [
+              "A09"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_08",
+            "shared_source_shots": [
+              "A09"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_10",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_11",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 2,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_12",
+            "shared_source_shots": [
+              "A12"
+            ],
+            "old_generated_count": 3,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A12"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_15",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 2,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_16",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_17",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_04",
+            "shared_source_shots": [
+              "A06"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": true
+          },
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A06"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_07",
+            "shared_source_shots": [
+              "A09"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_08",
+            "shared_source_shots": [
+              "A09"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_10",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_11",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_12",
+            "shared_source_shots": [
+              "A12"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A12"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_15",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_16",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_17",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_12",
+      "authored_shots": [
+        "T27",
+        "T28"
+      ],
+      "original_source_shots": [
+        "A07",
+        "A12",
+        "A15"
+      ],
+      "requested_seconds": 9,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_06",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_12",
+            "shared_source_shots": [
+              "A12"
+            ],
+            "old_generated_count": 3,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A07",
+              "A12"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_15",
+            "shared_source_shots": [
+              "A15"
+            ],
+            "old_generated_count": 2,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_06",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_12",
+            "shared_source_shots": [
+              "A12"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A07",
+              "A12"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_15",
+            "shared_source_shots": [
+              "A15"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_13",
+      "authored_shots": [
+        "T29"
+      ],
+      "original_source_shots": [
+        "A10",
+        "A11",
+        "A12"
+      ],
+      "requested_seconds": 7,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_09",
+            "shared_source_shots": [
+              "A10"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_10",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_11",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 2,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_12",
+            "shared_source_shots": [
+              "A12"
+            ],
+            "old_generated_count": 3,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A12"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_09",
+            "shared_source_shots": [
+              "A10"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_10",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_11",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_12",
+            "shared_source_shots": [
+              "A12"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A12"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_14",
+      "authored_shots": [
+        "T30",
+        "T31"
+      ],
+      "original_source_shots": [
+        "A07",
+        "A11",
+        "A15",
+        "A16"
+      ],
+      "requested_seconds": 11,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_06",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_10",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_11",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 2,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_15",
+            "shared_source_shots": [
+              "A15",
+              "A16"
+            ],
+            "old_generated_count": 2,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_16",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_17",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_05",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_06",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_10",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_11",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A07"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_15",
+            "shared_source_shots": [
+              "A15",
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_16",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_17",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_15",
+      "authored_shots": [
+        "T32"
+      ],
+      "original_source_shots": [
+        "A13",
+        "A16"
+      ],
+      "requested_seconds": 6,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A13"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_15",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 2,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_16",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_17",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_13",
+            "shared_source_shots": [
+              "A13"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_15",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_16",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_17",
+            "shared_source_shots": [
+              "A16"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_16",
+      "authored_shots": [
+        "T33"
+      ],
+      "original_source_shots": [
+        "A11",
+        "A14"
+      ],
+      "requested_seconds": 6,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_10",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_11",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 2,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_14",
+            "shared_source_shots": [
+              "A14"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_10",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_11",
+            "shared_source_shots": [
+              "A11"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          },
+          {
+            "old_clip": "clip_14",
+            "shared_source_shots": [
+              "A14"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    },
+    {
+      "candidate_clip": "clip_17",
+      "authored_shots": [
+        "T34"
+      ],
+      "original_source_shots": [
+        "A15"
+      ],
+      "requested_seconds": 8,
+      "lanes": {
+        "h3": [
+          {
+            "old_clip": "clip_15",
+            "shared_source_shots": [
+              "A15"
+            ],
+            "old_generated_count": 2,
+            "old_content_issue_unresolved": false
+          }
+        ],
+        "sd25": [
+          {
+            "old_clip": "clip_15",
+            "shared_source_shots": [
+              "A15"
+            ],
+            "old_generated_count": 1,
+            "old_content_issue_unresolved": false
+          }
+        ]
+      }
+    }
+  ],
+  "planned_primary_video_units_by_lane": {
+    "h3": 17,
+    "sd25": 17
+  }
+}

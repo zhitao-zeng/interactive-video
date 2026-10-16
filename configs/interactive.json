@@ -39,5 +39,58 @@
   "services": {
     "text_endpoint": "phanthy-ds41",
     "asset_publish_dir": "outputs/.published"
+  },
+  "projects": {
+    "adventure": {
+      "production": {
+        "h3_short_edge": 768,
+        "end_card_seconds": 3,
+        "target_seconds": 180,
+        "workers": 1,
+        "max_attempts": 2,
+        "workers_by_lane": {
+          "h3": 2,
+          "sd25": 4
+        }
+      },
+      "services": {
+        "text_endpoint": "phanthy-ds41",
+        "asset_publish_dir": "/mnt/disk1/zengzhitao/interactive-video-studio/outputs/.published"
+      }
+    },
+    "romance": {
+      "production": {
+        "h3_short_edge": 544,
+        "end_card_seconds": 3,
+        "target_seconds": 180,
+        "workers": 1,
+        "max_attempts": 2,
+        "workers_by_lane": {
+          "h3": 2,
+          "sd25": 4
+        }
+      },
+      "services": {
+        "text_endpoint": "qwen-gpu52-current",
+        "asset_publish_dir": "/mnt/disk1/zengzhitao/interactive-video-studio/outputs/.published"
+      }
+    },
+    "suspense": {
+      "production": {
+        "h3_short_edge": 768,
+        "end_card_seconds": 3,
+        "target_seconds": 180,
+        "workers": 1,
+        "max_attempts": 2,
+        "workers_by_lane": {
+          "h3": 2,
+          "sd25": 4
+        }
+      },
+      "services": {
+        "text_endpoint": "phanthy-ds41",
+        "asset_publish_dir": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/outputs/.published-suspense"
+      }
+    }
   }
 }

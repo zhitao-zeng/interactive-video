@@ -60,12 +60,30 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
         # A keep/source recheck may have verified individual clips in the new
         # mode while the rest of the episode still awaits that method.
         earlier = {cid:row for cid,row in earlier.items() if review_contracts.current_review(row,mode)}
+    earlier = {cid:row for cid,row in earlier.items()
+               if not row.get('policy') or review_contracts.current_review(row,mode)}
     resume = not fresh if fresh is not None else os.environ.get("NOVEL_REVIEW_FRESH", "").strip() != "1"
     def checkpoint():
         # A long review may outlive its terminal. Save each completed take so a restart reuses it;
         # preserve confirmed findings while the final targeted checks have not run yet.
         from novel_manga.application.review.confirmed import enforce
-        pending = {cid: row for cid, row in earlier.items() if cid not in report['clips']}
+        pending = {}
+        for cid, row in (previous.get('clips') or {}).items():
+            row = {**row, 'policy': row.get('policy', previous.get('policy')),
+                   'review_mode': row.get('review_mode', previous.get('review_mode'))}
+            if cid in report['clips']:
+                continue
+            # A method change invalidates a verdict, not its recorded finding.
+            # Keep the evidence across an interruption without presenting the
+            # unvisited clip as reviewed under this method.
+            pending[cid] = row if cid in earlier else {
+                **row, 'severity': 'review_error',
+                'error': 'Review under the current policy and mode is pending'}
+            if cid not in earlier:
+                pending[cid]['previous_review'] = {
+                    'policy': row.get('policy', previous.get('policy')),
+                    'review_mode': row.get('review_mode', previous.get('review_mode')),
+                    'verify': pending[cid].pop('verify', None)}
         partial = {**report, 'clips': {**pending, **report['clips']},
                    'feedback': {**{cid: note for cid, note in previous.get('feedback', {}).items() if cid in pending},
                                 **report['feedback']}}
@@ -75,6 +93,8 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
         if clip["kind"] != "video":
             continue
         clip_id = clip["clip_id"]
+        from novel_manga.application.review.confirmed import clip_review_criteria
+        criteria = clip_review_criteria(episode_dir, clip_id)
         if video_name == "clip.mp4" and selected.get(clip_id, {}).get("video"):
             video = Path(selected[clip_id].get('postmix_video') or selected[clip_id]["video"])
             hypothesis = selected[clip_id].get("hypothesis", "")
@@ -94,8 +114,14 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
             # split the path names another clip's take - with its old mtime - and that clip's verdict landed on it.
             same_take = (old and not invalid_verdict_ids({clip_id: old}) and old.get("video") == str(video)
                     and take and old.get("take") == take
+                    and (not (criteria or old.get('review_criteria'))
+                         or old.get('review_criteria', []) == criteria)
                     and (not cast_video.enabled() or
                          ((old.get('verify') or {}).get('cast_video') or {}).get('policy') == cast_video.POLICY))
+            if old and old.get('confirmed') and not old.get('confirmed_base'):
+                # Legacy confirmed failures did not retain the unmodified broad
+                # verdict. Recheck only that take before restoring a resolved claim.
+                same_take=False
             source_changed = bool(old and (clip.get('source_trace_repaired') or 'source_segment_ids' in old)
                                   and old.get('source_segment_ids') != (clip.get('segment_ids') or []))
             speech_recovered = bool(old and (old.get('speech_gate') or {}).get('passed') is False
@@ -118,7 +144,11 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
                 cached = ((old.get('verify') or {}).get('cast_video')
                           if same_take and (source_changed or speech_recovered or ledger_changed) else None)
                 options = {'cached_cast': cached} if cached and cast_video.enabled() else {}
-                verdict = review_judges.judge_clip(clip, video, bible, location_time, hypothesis, episode_dir / "work" / "review" / clip_id, **options)
+                if criteria:
+                    options['review_criteria'] = criteria
+                verdict = review_judges.judge_clip(clip, video, bible, location_time, hypothesis,
+                                                   episode_dir / "work" / "review" / clip_id,
+                                                   **options)
             if invalid_verdict_ids({clip_id: verdict}):
                 raise ValueError('review model returned no valid severity verdict')
         except Exception as error:  # noqa: BLE001 - a judge failure is reported, never fatal
@@ -127,6 +157,7 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
             checkpoint()
             continue
         report["clips"][clip_id] = {"video": str(video), "take": take, **verdict,
+                                     **({'review_criteria': criteria} if criteria else {}),
                                      'source_segment_ids': list(clip.get('segment_ids') or []), 'ledger_snapshot': ledger_snapshot}
         if verdict.get("severity") == "fail":
             tier = review_policy.fix_tier(verdict, bible, rules)

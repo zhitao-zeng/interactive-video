@@ -1,0 +1,1574 @@
+{
+  "version": "laughing-country-vlog-h3-v3",
+  "status": "production-ready-artistic-revision-visual-reference-reviewed-audio-unverified",
+  "baseline": "/mnt/disk1/zengzhitao/worktrees/interactive-adventure-rhythm/projects/adventure/laughing-country-sound-v2",
+  "reason": "用户明确主类型旅行探险异世界伪纪录片，要求实际观看对标后改笑之国，完整H3 768P、SD不跑。",
+  "planned_body_seconds": 238,
+  "world_card_seconds": 3,
+  "end_card_seconds": 3,
+  "planned_final_seconds": 244,
+  "generation_groups": 29,
+  "stages": 66,
+  "unchanged": [
+    "原附件既定故事因果、人物身份和真人风格",
+    "知遥与系统女声、守卫男声三个原声线",
+    "同一装置/雕塑/唯一钥匙、现有十三空间和角色资产",
+    "本集完整结束后A/B/C选择，selected仍为null",
+    "旧片与全部预算、请求、回执、失败和参考声线历史"
+  ],
+  "changes": [
+    "首镜前置既有孩子被带离核心异常，不编新危险；第二镜世界介绍卡；卡标入境稍早明确时间回接。",
+    "删除开头履历铺垫，以入境实际动作和规则辨认进入；原句等义压缩，原source_shots仍完整留存。",
+    "冷开已示事件在正文只接后果、人群反应和纸条，不重演完整带离。",
+    "口播贴近本阶段观察与选择，emotion不跨阶段；通道发现仅在光照揭示后的独立阶段出现。",
+    "奇观/自拍/第一视角/动作细节交替；搜索只两次短操作，不以空景与重述填时长。",
+    "同一旅行音乐主题按发现变换稀疏程度；哭声、系统警报、取证被打断、道歉处退出，音效与动作同一阶段。",
+    "结尾历史集中压缩成一次因果复盘，再用各选项的具体规则和奇观邀请评论。",
+    "统一世界卡、水印、封面与字幕作为独立发布包装，实体法牌纸条保持原生，不恢复已取消覆盖。"
+  ],
+  "source_mapping": [
+    {
+      "shot_id": "V01",
+      "original_shot": 9,
+      "purpose": "立即展示本集核心异常",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V02",
+      "original_shot": 2,
+      "purpose": "回到入境稍早，恢复旅行者现场视角",
+      "revised_text": [
+        "我到笑之国了，先去办入境。"
+      ]
+    },
+    {
+      "shot_id": "V03",
+      "original_shot": 3,
+      "purpose": "注意到公共场所必须微笑的规定",
+      "revised_text": [
+        "法律？公共场所，必须一直笑？"
+      ]
+    },
+    {
+      "shot_id": "V04",
+      "original_shot": 4,
+      "purpose": "给规则一个真实可触的操作",
+      "revised_text": [
+        "戴上了。它监控快乐程度，数值在那块屏上。"
+      ]
+    },
+    {
+      "shot_id": "V05",
+      "original_shot": 5,
+      "purpose": "让观众看见规则作用在每个人身上",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V06",
+      "original_shot": 5,
+      "purpose": "读到悲伤的代价后改变语气",
+      "revised_text": [
+        "传播悲伤，就会送去矫正中心。这也太怪了。"
+      ]
+    },
+    {
+      "shot_id": "V07",
+      "original_shot": 6,
+      "purpose": "建立由入境点走到广场的实际位置",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V08",
+      "original_shot": 7,
+      "purpose": "短暂回到旅行观景的轻松",
+      "revised_text": [
+        "那个微笑雕塑，好大。过去看看。"
+      ]
+    },
+    {
+      "shot_id": "V09",
+      "original_shot": 8,
+      "purpose": "让现场声音打断旅行计划",
+      "revised_text": [
+        "诶？"
+      ]
+    },
+    {
+      "shot_id": "V10",
+      "original_shot": 9,
+      "purpose": "承接冷开事件的后果",
+      "revised_text": [
+        "摔一跤哭了，就被带走了……"
+      ]
+    },
+    {
+      "shot_id": "V11",
+      "original_shot": 9,
+      "purpose": "留给观众看人群的情绪和代价",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V12",
+      "original_shot": 9,
+      "purpose": "知遥从观景转为警惕",
+      "revised_text": [
+        "这里，没人敢开口。"
+      ]
+    },
+    {
+      "shot_id": "V13",
+      "original_shot": 10,
+      "purpose": "新线索是低头真实看见的物件",
+      "revised_text": [
+        "这儿有个纸团。"
+      ]
+    },
+    {
+      "shot_id": "V14",
+      "original_shot": 11,
+      "purpose": "观众与人物同时辨认会面地点",
+      "revised_text": [
+        "今晚十二点，第七井。"
+      ]
+    },
+    {
+      "shot_id": "V15",
+      "original_shot": 11,
+      "purpose": "明确晚上去核对纸条信息的选择",
+      "revised_text": [
+        "晚上去看看。"
+      ]
+    },
+    {
+      "shot_id": "V16",
+      "original_shot": 12,
+      "purpose": "昼夜换时，保持同一街道关系",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V17",
+      "original_shot": 13,
+      "purpose": "夜里向观众确认到达",
+      "revised_text": [
+        "快十二点了。我到第七井了。"
+      ]
+    },
+    {
+      "shot_id": "V18",
+      "original_shot": 14,
+      "purpose": "由白天热闹变成无人改变她的注意",
+      "revised_text": [
+        "白天还热闹，现在没人。"
+      ]
+    },
+    {
+      "shot_id": "V19",
+      "original_shot": 15,
+      "purpose": "眼前只有井盖，决定打开核对",
+      "revised_text": [
+        "只有井盖……下去看看。"
+      ]
+    },
+    {
+      "shot_id": "V20",
+      "original_shot": 16,
+      "purpose": "真实完成打开与沿梯子下降的动作",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V21",
+      "original_shot": 16,
+      "purpose": "光照到横向通道后才有新发现",
+      "revised_text": [
+        "下面真有通道！"
+      ]
+    },
+    {
+      "shot_id": "V22",
+      "original_shot": 17,
+      "purpose": "建立梯子、侧通道与大厅的可走关系",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V23",
+      "original_shot": 18,
+      "purpose": "已佩戴的装置和通道灯同时警报",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V24",
+      "original_shot": 19,
+      "purpose": "播报告知规则正作用在她身上",
+      "revised_text": [
+        "快乐指数过低，快乐指数过低，请保持微笑。"
+      ]
+    },
+    {
+      "shot_id": "V25",
+      "original_shot": 20,
+      "purpose": "后方喊声使知遥转入已见侧通道",
+      "revised_text": [
+        "抓住他！"
+      ]
+    },
+    {
+      "shot_id": "V26",
+      "original_shot": 21,
+      "purpose": "当下风险变成跑动而非站住解释",
+      "revised_text": [
+        "糟了，快被追上了！"
+      ]
+    },
+    {
+      "shot_id": "V27",
+      "original_shot": 22,
+      "purpose": "跑动进入新空间，先露出同款地标",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V28",
+      "original_shot": 23,
+      "purpose": "先让观众看出广场既熟悉又变了",
+      "revised_text": [
+        "这不是刚才的广场吗？"
+      ]
+    },
+    {
+      "shot_id": "V29",
+      "original_shot": 23,
+      "purpose": "确认进入原素材的里世界",
+      "revised_text": [
+        "这是……笑之国的里世界。"
+      ]
+    },
+    {
+      "shot_id": "V30",
+      "original_shot": 24,
+      "purpose": "装置成为继续探索的负担，完成摘下",
+      "revised_text": [
+        "不能再戴了。"
+      ]
+    },
+    {
+      "shot_id": "V31",
+      "original_shot": 25,
+      "purpose": "居民仍是真人，反差来自终于显露的情绪",
+      "revised_text": [
+        "原来，这是他们真实的样子。"
+      ]
+    },
+    {
+      "shot_id": "V32",
+      "original_shot": 26,
+      "purpose": "把刚经历的入口与情绪释放区联系起来",
+      "revised_text": [
+        "这里是情绪释放区。不快乐的人，被流放在这儿。"
+      ]
+    },
+    {
+      "shot_id": "V33",
+      "original_shot": 28,
+      "purpose": "线索直接把目标变成找钥匙",
+      "revised_text": [
+        "这里有字。离开得找钥匙。"
+      ]
+    },
+    {
+      "shot_id": "V34",
+      "original_shot": 29,
+      "purpose": "第一次搜索没有拿到物件",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V35",
+      "original_shot": 29,
+      "purpose": "第二个位置仍未发现，避免重复旁白",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V36",
+      "original_shot": 29,
+      "purpose": "搜索失败改变前往地点",
+      "revised_text": [
+        "没找到……去雕塑那边。"
+      ]
+    },
+    {
+      "shot_id": "V37",
+      "original_shot": 30,
+      "purpose": "先看见基座凹槽的唯一钥匙",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V38",
+      "original_shot": 30,
+      "purpose": "判断后真实取出唯一一把钥匙",
+      "revised_text": [
+        "应该就是这把。"
+      ]
+    },
+    {
+      "shot_id": "V39",
+      "original_shot": 31,
+      "purpose": "已有坍塌打断行动，风险不是新增袭击",
+      "revised_text": [
+        "这里在坍塌！"
+      ]
+    },
+    {
+      "shot_id": "V40",
+      "original_shot": 31,
+      "purpose": "环境恢复现实，物件状态没有丢失",
+      "revised_text": [
+        "我回来了？"
+      ]
+    },
+    {
+      "shot_id": "V41",
+      "original_shot": 33,
+      "purpose": "认出后门并用已有钥匙尝试",
+      "revised_text": [
+        "矫正中心后门。试试这把钥匙。"
+      ]
+    },
+    {
+      "shot_id": "V42",
+      "original_shot": 33,
+      "purpose": "试钥匙得到开门结果",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V43",
+      "original_shot": 34,
+      "purpose": "先交代走廊位置，不提前揭档案内容",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V44",
+      "original_shot": 35,
+      "purpose": "声音让她停步再选择靠近",
+      "revised_text": [
+        "前面有动静。"
+      ]
+    },
+    {
+      "shot_id": "V45",
+      "original_shot": 36,
+      "purpose": "系统声和现场操作让矫正的含义可见",
+      "revised_text": [
+        "快乐检测百分之十，保持微笑，保持微笑……"
+      ]
+    },
+    {
+      "shot_id": "V46",
+      "original_shot": 37,
+      "purpose": "知遥的反应来自已看到的操作",
+      "revised_text": [
+        "他们竟然把情绪当病治。"
+      ]
+    },
+    {
+      "shot_id": "V47",
+      "original_shot": 38,
+      "purpose": "原生门牌决定去档案室",
+      "revised_text": [
+        "档案室。进去看看。"
+      ]
+    },
+    {
+      "shot_id": "V48",
+      "original_shot": 39,
+      "purpose": "实际打开档案不重复推门",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V49",
+      "original_shot": 39,
+      "purpose": "照片的前后变化支撑情绪被抹去",
+      "revised_text": [
+        "真实情绪，都被抹掉了。"
+      ]
+    },
+    {
+      "shot_id": "V50",
+      "original_shot": 40,
+      "purpose": "发现证据后立刻保存到手机",
+      "revised_text": [
+        "把证据拍下来。"
+      ]
+    },
+    {
+      "shot_id": "V51",
+      "original_shot": 41,
+      "purpose": "让观众先听到接近而非新旁白",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V52",
+      "original_shot": 42,
+      "purpose": "突然喊令使她停止取证并撤离",
+      "revised_text": [
+        "抓住他！"
+      ]
+    },
+    {
+      "shot_id": "V53",
+      "original_shot": 43,
+      "purpose": "跑动里的无奈带来真实人物语气",
+      "revised_text": [
+        "怎么老是在逃跑！"
+      ]
+    },
+    {
+      "shot_id": "V54",
+      "original_shot": 44,
+      "purpose": "认出出口并看见隔离窗里的居民",
+      "revised_text": [
+        "去那边！"
+      ]
+    },
+    {
+      "shot_id": "V55",
+      "original_shot": 45,
+      "purpose": "道歉承接眼前居民和必须离开的判断",
+      "revised_text": [
+        "这个地方不能再待了。我救不了你们，只会打破我的旅行规则。对不起。"
+      ]
+    },
+    {
+      "shot_id": "V56",
+      "original_shot": 46,
+      "purpose": "沿后院侧巷真实离开城市",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V57",
+      "original_shot": 51,
+      "purpose": "离城后停一下是真实恢复呼吸，不凑时长",
+      "revised_text": []
+    },
+    {
+      "shot_id": "V58",
+      "original_shot": 47,
+      "purpose": "用已有档案见闻解释制度来源，不造新真相",
+      "revised_text": [
+        "几十年前，笑之国经历过混乱。他们认为根源是负面情绪传播，于是制定了规则。"
+      ]
+    },
+    {
+      "shot_id": "V59",
+      "original_shot": 48,
+      "purpose": "用完整扣合到强笑的一次回看让义务的代价落地",
+      "revised_text": [
+        "笑，慢慢成了义务。"
+      ]
+    },
+    {
+      "shot_id": "V60",
+      "original_shot": 49,
+      "purpose": "回看僵硬笑脸后收束已有主题",
+      "revised_text": [
+        "他们学会了笑，却忘了快乐。"
+      ]
+    },
+    {
+      "shot_id": "V61",
+      "original_shot": 51,
+      "purpose": "观众从这一站结果转向下一站问题",
+      "revised_text": [
+        "下一个国家，会怎样？"
+      ]
+    },
+    {
+      "shot_id": "V62",
+      "original_shot": 52,
+      "purpose": "明确本次是评论决定下一集目的地",
+      "revised_text": [
+        "下一站，你们选。"
+      ]
+    },
+    {
+      "shot_id": "V63",
+      "original_shot": 53,
+      "purpose": "选项A只承诺素材已有奇观和禁区",
+      "revised_text": [
+        "A，巨人花园。植物比楼高，但幽暗森林是禁地，最好别靠近。"
+      ]
+    },
+    {
+      "shot_id": "V64",
+      "original_shot": 54,
+      "purpose": "选项B展示已知人生轮换和游客短期体验",
+      "revised_text": [
+        "B，交换人生之国。每十年强制换人生，游客可以试玩二十四小时。"
+      ]
+    },
+    {
+      "shot_id": "V65",
+      "original_shot": 55,
+      "purpose": "选项C展示有效梦登记的已知义务",
+      "revised_text": [
+        "C，梦税国。每月交一个有效梦，游客也得登记。"
+      ]
+    },
+    {
+      "shot_id": "V66",
+      "original_shot": 55,
+      "purpose": "最后自然邀请，选择结果留给真实评论",
+      "revised_text": [
+        "评论A、B或C。我们下一站见。"
+      ]
+    }
+  ],
+  "reference_watch": {
+    "status": "visual-evidence-reviewed-audio-not-listened",
+    "url": "https://v.douyin.com/R98TjFvoeeI/",
+    "video_seconds": 153.158005,
+    "evidence_directory": "/mnt/disk1/zengzhitao/worktrees/interactive-adventure-rhythm/.runtime/adventure-giant-garden-watch-h3-20261014",
+    "method": "父会话正常Chrome完整播放，约2.2秒间隔网页截图；本艺术Agent查看全时段重点联系图与截图时间记录。不是逐镜精确切点统计，也未直接听到音轨。",
+    "visual_observations": [
+      {
+        "sample_times_seconds": [
+          2.098,
+          4.336,
+          6.551
+        ],
+        "observation": "夜间人物不安与巨眼花异常在世界卡前展示，先让人想确认她看到什么。",
+        "adaptation": "只使用笑之国原有哭泣带离与强笑反差作冷开，不照搬巨眼花或新增生物。"
+      },
+      {
+        "sample_times_seconds": [
+          8.78
+        ],
+        "observation": "世界片名与核心设定作为独立全画面卡出现在冷开后。",
+        "adaptation": "第一clip只有4秒核心异常，后插3秒独立世界介绍卡；原生实体文字与发布卡分开。"
+      },
+      {
+        "sample_times_seconds": [
+          19.941,
+          22.191,
+          24.439,
+          40.078,
+          42.314,
+          44.541,
+          91.133
+        ],
+        "observation": "指向碑、辨认牌面、拿水杯和市集自拍等具体动作串起旅行发现；同一处有物件、人物反应与周边环境。",
+        "adaptation": "笑之国用扣装置、捡纸团、辨认纸条、下梯、摸锁、对照照片与手机取证串起探索；不新造吃喝、摊主或花园事件。"
+      },
+      {
+        "sample_times_seconds": [
+          106.645,
+          113.314,
+          117.739,
+          122.176,
+          124.41,
+          128.813,
+          150.941
+        ],
+        "observation": "居民谈禁区、夜间继续探索、结尾回到巨眼异常；前后危险属于同一次探索。",
+        "adaptation": "保留纸条决定夜探→原有警报/追逐→里世界→取证撤离的因果；冷开事件回到正文只接新后果和反应，不完整重放。"
+      }
+    ],
+    "audio_status": "浏览器正常播放音轨有记录，但当前模型不能接收音频，没有本艺术Agent实际听审；不推断参考音色、语速、乐器、音量或配乐切点。",
+    "audio_adaptation_basis": "用户明确反馈声音平淡和缺音乐，结合本稿动作与发现设计现场发声和音乐进退；不是对参考听感的已验证复刻。",
+    "reference_observation_report": "/mnt/disk1/zengzhitao/worktrees/interactive-adventure-rhythm/.runtime/adventure-giant-garden-watch-h3-20261014/reference-observation.md",
+    "reviewed_suggestions": "已对照报告关于动作携带对白、哭声打断打卡、下井连续动作、物件状态与取证、完整离城后才投票的5项建议，落实到各阶段；原句顺序保留建议属于上轮只声音修订边界，本轮用户已授权对标改稿，因此改稿明确记录等义压缩和冷开重排，未删改既定事实。"
+  },
+  "production": {
+    "lane": "h3",
+    "native_short_edge": 768,
+    "sd_enabled": false,
+    "full_pipeline_only": true,
+    "repair_agent_model": "glm-5.3-flash",
+    "max_generated_takes_per_group": 3,
+    "keep_timeout": true,
+    "manual_per_clip_rewrite_and_retakes": false,
+    "old_clip27_fourth_take_grant_applicable": false
+  },
+  "history": {
+    "old_h3_body_generations": 38,
+    "old_sd_generated_clips": 22,
+    "old_generated_body_total_before_this_edition": 60,
+    "voice_samples": {
+      "知遥": 1,
+      "系统广播": 1,
+      "守卫喊声": 1
+    },
+    "new_edition_generated": 0,
+    "max_new_body_generations": 87,
+    "policy": "以上60是旧已生成正文合计，所有失败提交与任务回执另外原样保留；不得把新目录当清空旧次数。新内容修订独立最多3次/组，专项第4次授权不迁移。"
+  },
+  "known_limits": [
+    "H3原生中文仍可能错字，本稿没有后期盖字兜底；世界卡与对白字幕保证各自发布文字，不宣称实体中文字已合格。",
+    "逐段音乐说明与原生角色发声不等于实际音色自然、音乐连贯，必须完整生成后统一听审。",
+    "参考视觉已通过正常播放截图复核；声音尚无实际听审。当前稿可进入已授权完整H3 pipeline，但必须把实际新片音轨自然度、音乐衔接、遮盖人声等作为生成后待验事项，不用视觉截图代替声音判断。"
+  ],
+  "input_validation": {
+    "ordered_coverage": true,
+    "each_group_4_to_15_seconds_max_6_stages": true,
+    "first_group_single_cold_open_stage": true,
+    "all_speakers_reuse_existing_voice_specs": true,
+    "spoken_chinese_chars_per_second_max": 3.667,
+    "scope": "创作输入检查，不证明实际视频、语气、字幕或配乐合格。",
+    "all_groups_single_actual_location": true,
+    "all_66_stage_time_and_lighting_artistic_reviewed": true
+  },
+  "preparation_revision": {
+    "reason": "实际prepare/pack指明10个初稿生成组跨location，需要按原gate重切。",
+    "old_prepared_input_preserved_by_coordinator": true,
+    "new_generation_calls": 0,
+    "groups_before": 26,
+    "groups_after": 29,
+    "body_seconds_before": 237,
+    "body_seconds_after": 238,
+    "changes": "按真实地点拆组并将相邻同地点的落单短阶段合并；仅V59独立入境回看3→4秒用于完整扣合与强笑。无空间更名骗过校验、无共用gate更改、无旧记录删除。"
+  },
+  "lighting_revision": {
+    "reason": "首次完整入口前置翻译处理29组后clip_17未就绪：Story time Daytime与Light source Night existing lights, flashlight互相矛盾。为输入时空字段错误，非生成偏差。",
+    "cause": "本艺术Agent初稿覆盖location时按地点补白天，同时继承旧light；已按实际事件时段逐阶段审查66镜并重写scene_time/light。",
+    "video_requests_at_failure": 0,
+    "generation_counts_changed": false,
+    "repair_timeout_changed": false,
+    "shared_checker_changed": false,
+    "preserved_by_coordinator": [
+      "旧prepared输入快照",
+      "旧English请求",
+      "全部translation-result与首次失败记录"
+    ],
+    "fixed_scope": [
+      "V16明确白天到午夜的顺序全画面硬切与照明末态",
+      "从午夜第七井到里世界持续夜间",
+      "返回现实后院、矫正内部、撤离保持夜间，不能因位置是现实建筑就切白昼",
+      "室外路灯/手电、井底应急灯、室内冷白顶灯分别表达",
+      "城外复盘用夜间手机相册，当前时间不断；独立V59白天回看与A/B/C预览明确不改变当前夜间",
+      "V60不再重演白天广场，避免重复回看和隐蔽时间跳切"
+    ],
+    "audit": [
+      {
+        "shot_id": "V01",
+        "original_source_shot": 9,
+        "location": "雕塑广场",
+        "before": {
+          "shot_id": "V01",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。"
+        }
+      },
+      {
+        "shot_id": "V02",
+        "original_source_shot": 2,
+        "location": "入境大厅",
+        "before": {
+          "shot_id": "V02",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。"
+        }
+      },
+      {
+        "shot_id": "V03",
+        "original_source_shot": 3,
+        "location": "入境大厅",
+        "before": {
+          "shot_id": "V03",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。"
+        }
+      },
+      {
+        "shot_id": "V04",
+        "original_source_shot": 4,
+        "location": "入境大厅",
+        "before": {
+          "shot_id": "V04",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。"
+        }
+      },
+      {
+        "shot_id": "V05",
+        "original_source_shot": 5,
+        "location": "入境大厅",
+        "before": {
+          "shot_id": "V05",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。"
+        }
+      },
+      {
+        "shot_id": "V06",
+        "original_source_shot": 5,
+        "location": "入境大厅",
+        "before": {
+          "shot_id": "V06",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。"
+        }
+      },
+      {
+        "shot_id": "V07",
+        "original_source_shot": 6,
+        "location": "雕塑广场",
+        "before": {
+          "shot_id": "V07",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。"
+        }
+      },
+      {
+        "shot_id": "V08",
+        "original_source_shot": 7,
+        "location": "雕塑广场",
+        "before": {
+          "shot_id": "V08",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。"
+        }
+      },
+      {
+        "shot_id": "V09",
+        "original_source_shot": 8,
+        "location": "雕塑广场",
+        "before": {
+          "shot_id": "V09",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。"
+        }
+      },
+      {
+        "shot_id": "V10",
+        "original_source_shot": 9,
+        "location": "雕塑广场",
+        "before": {
+          "shot_id": "V10",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。"
+        }
+      },
+      {
+        "shot_id": "V11",
+        "original_source_shot": 9,
+        "location": "雕塑广场",
+        "before": {
+          "shot_id": "V11",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。"
+        }
+      },
+      {
+        "shot_id": "V12",
+        "original_source_shot": 9,
+        "location": "雕塑广场",
+        "before": {
+          "shot_id": "V12",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。"
+        }
+      },
+      {
+        "shot_id": "V13",
+        "original_source_shot": 10,
+        "location": "雕塑广场",
+        "before": {
+          "shot_id": "V13",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。"
+        }
+      },
+      {
+        "shot_id": "V14",
+        "original_source_shot": 11,
+        "location": "雕塑广场",
+        "before": {
+          "shot_id": "V14",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。"
+        }
+      },
+      {
+        "shot_id": "V15",
+        "original_source_shot": 11,
+        "location": "雕塑广场",
+        "before": {
+          "shot_id": "V15",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天",
+          "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。"
+        }
+      },
+      {
+        "shot_id": "V16",
+        "original_source_shot": 12,
+        "location": "第七井街道",
+        "before": {
+          "shot_id": "V16",
+          "scene_time": "夜间",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "白天转午夜；单画面顺序切换，结束为夜间",
+          "light": "先是同一井街白天自然光；随后一次全画面硬切到午夜暖白路灯，天空和窗外变暗。两种照明先后出现，不同时并列、不分屏；最终状态是夜间。"
+        }
+      },
+      {
+        "shot_id": "V17",
+        "original_source_shot": 13,
+        "location": "第七井街道",
+        "before": {
+          "shot_id": "V17",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（夜间）",
+          "light": "井街午夜暖白路灯，手电只照当前目标；无白天天光。"
+        }
+      },
+      {
+        "shot_id": "V18",
+        "original_source_shot": 14,
+        "location": "第七井街道",
+        "before": {
+          "shot_id": "V18",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（夜间）",
+          "light": "井街午夜暖白路灯，手电只照当前目标；无白天天光。"
+        }
+      },
+      {
+        "shot_id": "V19",
+        "original_source_shot": 15,
+        "location": "第七井街道",
+        "before": {
+          "shot_id": "V19",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（夜间）",
+          "light": "井街午夜暖白路灯，手电只照当前目标；无白天天光。"
+        }
+      },
+      {
+        "shot_id": "V20",
+        "original_source_shot": 16,
+        "location": "井底通道",
+        "before": {
+          "shot_id": "V20",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（夜间）",
+          "light": "井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。"
+        }
+      },
+      {
+        "shot_id": "V21",
+        "original_source_shot": 16,
+        "location": "井底通道",
+        "before": {
+          "shot_id": "V21",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（夜间）",
+          "light": "井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。"
+        }
+      },
+      {
+        "shot_id": "V22",
+        "original_source_shot": 17,
+        "location": "井底通道",
+        "before": {
+          "shot_id": "V22",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（夜间）",
+          "light": "井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。"
+        }
+      },
+      {
+        "shot_id": "V23",
+        "original_source_shot": 18,
+        "location": "井底通道",
+        "before": {
+          "shot_id": "V23",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（夜间）",
+          "light": "井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。"
+        }
+      },
+      {
+        "shot_id": "V24",
+        "original_source_shot": 19,
+        "location": "井底通道",
+        "before": {
+          "shot_id": "V24",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（夜间）",
+          "light": "井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。"
+        }
+      },
+      {
+        "shot_id": "V25",
+        "original_source_shot": 20,
+        "location": "井底通道",
+        "before": {
+          "shot_id": "V25",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（夜间）",
+          "light": "井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。"
+        }
+      },
+      {
+        "shot_id": "V26",
+        "original_source_shot": 21,
+        "location": "井底通道",
+        "before": {
+          "shot_id": "V26",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（夜间）",
+          "light": "井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。"
+        }
+      },
+      {
+        "shot_id": "V27",
+        "original_source_shot": 22,
+        "location": "里世界街区",
+        "before": {
+          "shot_id": "V27",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（里世界）",
+          "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。"
+        }
+      },
+      {
+        "shot_id": "V28",
+        "original_source_shot": 23,
+        "location": "里世界街区",
+        "before": {
+          "shot_id": "V28",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（里世界）",
+          "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。"
+        }
+      },
+      {
+        "shot_id": "V29",
+        "original_source_shot": 23,
+        "location": "里世界街区",
+        "before": {
+          "shot_id": "V29",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（里世界）",
+          "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。"
+        }
+      },
+      {
+        "shot_id": "V30",
+        "original_source_shot": 24,
+        "location": "里世界街区",
+        "before": {
+          "shot_id": "V30",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（里世界）",
+          "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。"
+        }
+      },
+      {
+        "shot_id": "V31",
+        "original_source_shot": 25,
+        "location": "里世界街区",
+        "before": {
+          "shot_id": "V31",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（里世界）",
+          "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。"
+        }
+      },
+      {
+        "shot_id": "V32",
+        "original_source_shot": 26,
+        "location": "里世界街区",
+        "before": {
+          "shot_id": "V32",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（里世界）",
+          "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。"
+        }
+      },
+      {
+        "shot_id": "V33",
+        "original_source_shot": 28,
+        "location": "里世界街区",
+        "before": {
+          "shot_id": "V33",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（里世界）",
+          "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。"
+        }
+      },
+      {
+        "shot_id": "V34",
+        "original_source_shot": 29,
+        "location": "里世界街区",
+        "before": {
+          "shot_id": "V34",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（里世界）",
+          "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。"
+        }
+      },
+      {
+        "shot_id": "V35",
+        "original_source_shot": 29,
+        "location": "里世界街区",
+        "before": {
+          "shot_id": "V35",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（里世界）",
+          "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。"
+        }
+      },
+      {
+        "shot_id": "V36",
+        "original_source_shot": 29,
+        "location": "里世界街区",
+        "before": {
+          "shot_id": "V36",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（里世界）",
+          "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。"
+        }
+      },
+      {
+        "shot_id": "V37",
+        "original_source_shot": 30,
+        "location": "里世界街区",
+        "before": {
+          "shot_id": "V37",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（里世界）",
+          "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。"
+        }
+      },
+      {
+        "shot_id": "V38",
+        "original_source_shot": 30,
+        "location": "里世界街区",
+        "before": {
+          "shot_id": "V38",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（里世界）",
+          "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。"
+        }
+      },
+      {
+        "shot_id": "V39",
+        "original_source_shot": 31,
+        "location": "里世界街区",
+        "before": {
+          "shot_id": "V39",
+          "scene_time": "夜间",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（里世界）",
+          "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。"
+        }
+      },
+      {
+        "shot_id": "V40",
+        "original_source_shot": 31,
+        "location": "矫正中心后院",
+        "before": {
+          "shot_id": "V40",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "现实后院夜间冷白外墙设备灯与门灯；暖白青绿墙只是建筑颜色，不是白昼；天空和远处街道保持暗，手电可近距离照锁孔。"
+        }
+      },
+      {
+        "shot_id": "V41",
+        "original_source_shot": 33,
+        "location": "矫正中心后院",
+        "before": {
+          "shot_id": "V41",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "现实后院夜间冷白外墙设备灯与门灯；暖白青绿墙只是建筑颜色，不是白昼；天空和远处街道保持暗，手电可近距离照锁孔。"
+        }
+      },
+      {
+        "shot_id": "V42",
+        "original_source_shot": 33,
+        "location": "矫正中心后院",
+        "before": {
+          "shot_id": "V42",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "现实后院夜间冷白外墙设备灯与门灯；暖白青绿墙只是建筑颜色，不是白昼；天空和远处街道保持暗，手电可近距离照锁孔。"
+        }
+      },
+      {
+        "shot_id": "V43",
+        "original_source_shot": 34,
+        "location": "矫正中心走廊",
+        "before": {
+          "shot_id": "V43",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。"
+        }
+      },
+      {
+        "shot_id": "V44",
+        "original_source_shot": 35,
+        "location": "矫正中心走廊",
+        "before": {
+          "shot_id": "V44",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。"
+        }
+      },
+      {
+        "shot_id": "V45",
+        "original_source_shot": 36,
+        "location": "矫正室",
+        "before": {
+          "shot_id": "V45",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "矫正室夜间运作的冷白顶灯和监控屏幕灯；窗外是走廊，没有自然日照，也没有手电光在居民脸上乱扫。"
+        }
+      },
+      {
+        "shot_id": "V46",
+        "original_source_shot": 37,
+        "location": "矫正中心走廊",
+        "before": {
+          "shot_id": "V46",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。"
+        }
+      },
+      {
+        "shot_id": "V47",
+        "original_source_shot": 38,
+        "location": "矫正中心走廊",
+        "before": {
+          "shot_id": "V47",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。"
+        }
+      },
+      {
+        "shot_id": "V48",
+        "original_source_shot": 39,
+        "location": "档案室",
+        "before": {
+          "shot_id": "V48",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。"
+        }
+      },
+      {
+        "shot_id": "V49",
+        "original_source_shot": 39,
+        "location": "档案室",
+        "before": {
+          "shot_id": "V49",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。"
+        }
+      },
+      {
+        "shot_id": "V50",
+        "original_source_shot": 40,
+        "location": "档案室",
+        "before": {
+          "shot_id": "V50",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。"
+        }
+      },
+      {
+        "shot_id": "V51",
+        "original_source_shot": 41,
+        "location": "档案室",
+        "before": {
+          "shot_id": "V51",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。"
+        }
+      },
+      {
+        "shot_id": "V52",
+        "original_source_shot": 42,
+        "location": "档案室",
+        "before": {
+          "shot_id": "V52",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。"
+        }
+      },
+      {
+        "shot_id": "V53",
+        "original_source_shot": 43,
+        "location": "矫正中心走廊",
+        "before": {
+          "shot_id": "V53",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。"
+        }
+      },
+      {
+        "shot_id": "V54",
+        "original_source_shot": 44,
+        "location": "矫正中心走廊",
+        "before": {
+          "shot_id": "V54",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。"
+        }
+      },
+      {
+        "shot_id": "V55",
+        "original_source_shot": 45,
+        "location": "矫正中心走廊",
+        "before": {
+          "shot_id": "V55",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "午夜后连续探索（现实夜间）",
+          "light": "矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。"
+        }
+      },
+      {
+        "shot_id": "V56",
+        "original_source_shot": 46,
+        "location": "城外道路",
+        "before": {
+          "shot_id": "V56",
+          "scene_time": "白天",
+          "light": "夜间现有灯光，手电随动作照明"
+        },
+        "after": {
+          "scene_time": "离城后同一夜间；尚未进入下一站",
+          "light": "城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。"
+        }
+      },
+      {
+        "shot_id": "V57",
+        "original_source_shot": 51,
+        "location": "城外道路",
+        "before": {
+          "shot_id": "V57",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "离城后同一夜间；尚未进入下一站",
+          "light": "城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。"
+        }
+      },
+      {
+        "shot_id": "V58",
+        "original_source_shot": 47,
+        "location": "城外道路",
+        "before": {
+          "shot_id": "V58",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "离城后同一夜间；尚未进入下一站",
+          "light": "城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。"
+        }
+      },
+      {
+        "shot_id": "V59",
+        "original_source_shot": 48,
+        "location": "入境大厅",
+        "before": {
+          "shot_id": "V59",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "此前白天入境的见闻回看；不改变知遥当前夜间离城时间",
+          "light": "回看同一入境大厅此前白天的窗光与暖白顶灯，画面只拍其他旅客一次扣合和强笑；这是回看，不是知遥又回大厅或再次佩戴。"
+        }
+      },
+      {
+        "shot_id": "V60",
+        "original_source_shot": 49,
+        "location": "城外道路",
+        "before": {
+          "shot_id": "V60",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "离城后同一夜间；尚未进入下一站",
+          "light": "城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。"
+        }
+      },
+      {
+        "shot_id": "V61",
+        "original_source_shot": 51,
+        "location": "城外道路",
+        "before": {
+          "shot_id": "V61",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "离城后同一夜间；尚未进入下一站",
+          "light": "城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。"
+        }
+      },
+      {
+        "shot_id": "V62",
+        "original_source_shot": 52,
+        "location": "城外道路",
+        "before": {
+          "shot_id": "V62",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "离城后同一夜间；尚未进入下一站",
+          "light": "城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。"
+        }
+      },
+      {
+        "shot_id": "V63",
+        "original_source_shot": 53,
+        "location": "巨人花园预览",
+        "before": {
+          "shot_id": "V63",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "日间目的地预览；不是知遥当前到访",
+          "light": "预览巨人花园日间树林自然光，以建筑作巨型植物尺度参照；不与笑之国当前夜间混在同一画面。"
+        }
+      },
+      {
+        "shot_id": "V64",
+        "original_source_shot": 54,
+        "location": "交换人生之国预览",
+        "before": {
+          "shot_id": "V64",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "日间目的地预览；不是知遥当前到访",
+          "light": "预览日间登记处柔和窗光与柜台普通室内灯，身份界面低亮可辨；不是实际已办理登记。"
+        }
+      },
+      {
+        "shot_id": "V65",
+        "original_source_shot": 55,
+        "location": "梦税国预览",
+        "before": {
+          "shot_id": "V65",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "日间目的地预览；不是知遥当前到访",
+          "light": "预览日间梦税局窗光与普通室内灯，收集器材质真实；不是实际已经收取某个梦。"
+        }
+      },
+      {
+        "shot_id": "V66",
+        "original_source_shot": 55,
+        "location": "城外道路",
+        "before": {
+          "shot_id": "V66",
+          "scene_time": "白天",
+          "light": "白天自然光与室内灯光"
+        },
+        "after": {
+          "scene_time": "离城后同一夜间；尚未进入下一站",
+          "light": "城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。"
+        }
+      }
+    ]
+  }
+}

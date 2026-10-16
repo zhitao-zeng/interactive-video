@@ -1,0 +1,471 @@
+{
+  "status": "editorial_candidate_not_rendered",
+  "skill": "romance-reality-show",
+  "source_script": "/mnt/disk1/zengzhitao/interactive-video-studio/inputs/packages/romance/心动未剪辑-完整创作资产包-v2/routes/shared/script.json",
+  "source_storyboard": "/mnt/disk1/zengzhitao/interactive-video-studio/inputs/packages/romance/心动未剪辑-完整创作资产包-v2/routes/shared/storyboard.json",
+  "baseline_episode": "romance-sd25_1",
+  "visual_baseline": "A; original identity and setting references; no Blender reference added",
+  "dialogue_changes": [
+    {
+      "index": 11,
+      "shot_id": "E01-03-03",
+      "before": "那你是不是特别会聊天？",
+      "after": "你店里忙吗？",
+      "reason": "把抽象的会聊天改为可以直接回答的日常问题"
+    },
+    {
+      "index": 12,
+      "shot_id": "E01-03-04",
+      "before": "我平时对着书说，它们不太搭理我。",
+      "after": "还行。不过今天有点紧张。",
+      "reason": "承认眼前的紧张，给知意接话机会"
+    },
+    {
+      "index": 13,
+      "shot_id": "E01-03-05",
+      "before": "怪不得你来了。",
+      "after": "我也是。你来了就好点了。",
+      "reason": "保留初见聊得来，也给后面的继续聊提供依据"
+    },
+    {
+      "index": 18,
+      "shot_id": "E01-04-05",
+      "before": "记住了，随心所欲。",
+      "after": "知意。记住了。",
+      "reason": "保留认真记住名字，去掉重复包装的金句"
+    },
+    {
+      "index": 23,
+      "shot_id": "E01-05-05",
+      "before": "先别谈生意。我是来约会的。",
+      "after": "刚坐下，你就跟我谈生意啊？",
+      "reason": "保留宋乔主动拉回约会话题；她已经坐下"
+    },
+    {
+      "index": 30,
+      "shot_id": "E01-07-03",
+      "before": "以前觉得，事情做完再解释，也来得及。",
+      "after": "以前一忙，就想着晚点再跟她说。",
+      "reason": "保留延迟解释的旧问题，不新增失约原因"
+    },
+    {
+      "index": 32,
+      "shot_id": "E01-07-05",
+      "before": "现在不这么想了。",
+      "after": "后来她就不等了。",
+      "reason": "保留后悔，不宣称自己已经改变"
+    },
+    {
+      "index": 51,
+      "shot_id": "E01-12-01",
+      "before": "露台。我想补上两年前没来的那顿饭。",
+      "after": "露台。两年前那顿饭，我还欠你个解释。",
+      "reason": "保留旧失约与露台邀约，符合单独聊十分钟的规则"
+    },
+    {
+      "index": 56,
+      "shot_id": "E01-13-01",
+      "before": "我约你在厨房。我还想接着聊。",
+      "after": "厨房见？刚才还没聊完呢。",
+      "reason": "把新邀约接回先前的相处"
+    },
+    {
+      "index": 59,
+      "shot_id": "E01-13-04",
+      "before": "但刚才让我想坐你旁边的，是你。",
+      "after": "刚才不是聊得挺好的吗？",
+      "reason": "保留关注当下相处，不追问前任"
+    },
+    {
+      "index": 62,
+      "shot_id": "E01-14-02",
+      "before": "我想一会儿。见面，也不代表答应什么。",
+      "after": "我再想想。去了也只是聊聊。",
+      "reason": "保留未选择与赴约不等于承诺"
+    }
+  ],
+  "cuts": [
+    {
+      "index": 1,
+      "shot_id": "E01-01-01",
+      "source_scene": 1,
+      "source_beat": 1
+    },
+    {
+      "index": 2,
+      "shot_id": "E01-01-02",
+      "source_scene": 1,
+      "source_beat": 2
+    },
+    {
+      "index": 3,
+      "shot_id": "E01-01-03",
+      "source_scene": 1,
+      "source_beat": 3
+    },
+    {
+      "index": 4,
+      "shot_id": "E01-01-04",
+      "source_scene": 1,
+      "source_beat": 4
+    },
+    {
+      "index": 5,
+      "shot_id": "E01-02-01",
+      "source_scene": 1,
+      "source_beat": 5
+    },
+    {
+      "index": 6,
+      "shot_id": "E01-02-02",
+      "source_scene": 1,
+      "source_beat": 6
+    },
+    {
+      "index": 7,
+      "shot_id": "E01-02-03",
+      "source_scene": 1,
+      "source_beat": 7
+    },
+    {
+      "index": 8,
+      "shot_id": "E01-02-04",
+      "source_scene": 1,
+      "source_beat": 8
+    },
+    {
+      "index": 9,
+      "shot_id": "E01-03-01",
+      "source_scene": 2,
+      "source_beat": 1
+    },
+    {
+      "index": 10,
+      "shot_id": "E01-03-02",
+      "source_scene": 2,
+      "source_beat": 2
+    },
+    {
+      "index": 11,
+      "shot_id": "E01-03-03",
+      "source_scene": 2,
+      "source_beat": 3
+    },
+    {
+      "index": 12,
+      "shot_id": "E01-03-04",
+      "source_scene": 2,
+      "source_beat": 4
+    },
+    {
+      "index": 13,
+      "shot_id": "E01-03-05",
+      "source_scene": 2,
+      "source_beat": 5
+    },
+    {
+      "index": 14,
+      "shot_id": "E01-04-01",
+      "source_scene": 2,
+      "source_beat": 6
+    },
+    {
+      "index": 15,
+      "shot_id": "E01-04-02",
+      "source_scene": 2,
+      "source_beat": 7
+    },
+    {
+      "index": 16,
+      "shot_id": "E01-04-03",
+      "source_scene": 2,
+      "source_beat": 8
+    },
+    {
+      "index": 17,
+      "shot_id": "E01-04-04",
+      "source_scene": 2,
+      "source_beat": 9
+    },
+    {
+      "index": 18,
+      "shot_id": "E01-04-05",
+      "source_scene": 2,
+      "source_beat": 10
+    },
+    {
+      "index": 19,
+      "shot_id": "E01-05-01",
+      "source_scene": 3,
+      "source_beat": 1
+    },
+    {
+      "index": 20,
+      "shot_id": "E01-05-02",
+      "source_scene": 3,
+      "source_beat": 2
+    },
+    {
+      "index": 21,
+      "shot_id": "E01-05-03",
+      "source_scene": 3,
+      "source_beat": 3
+    },
+    {
+      "index": 22,
+      "shot_id": "E01-05-04",
+      "source_scene": 3,
+      "source_beat": 4
+    },
+    {
+      "index": 23,
+      "shot_id": "E01-05-05",
+      "source_scene": 3,
+      "source_beat": 5
+    },
+    {
+      "index": 24,
+      "shot_id": "E01-06-01",
+      "source_scene": 3,
+      "source_beat": 6
+    },
+    {
+      "index": 25,
+      "shot_id": "E01-06-02",
+      "source_scene": 3,
+      "source_beat": 7
+    },
+    {
+      "index": 26,
+      "shot_id": "E01-06-03",
+      "source_scene": 3,
+      "source_beat": 8
+    },
+    {
+      "index": 27,
+      "shot_id": "E01-06-04",
+      "source_scene": 3,
+      "source_beat": 9
+    },
+    {
+      "index": 28,
+      "shot_id": "E01-07-01",
+      "source_scene": 4,
+      "source_beat": 1
+    },
+    {
+      "index": 29,
+      "shot_id": "E01-07-02",
+      "source_scene": 4,
+      "source_beat": 2
+    },
+    {
+      "index": 30,
+      "shot_id": "E01-07-03",
+      "source_scene": 4,
+      "source_beat": 3
+    },
+    {
+      "index": 31,
+      "shot_id": "E01-07-04",
+      "source_scene": 4,
+      "source_beat": 4
+    },
+    {
+      "index": 32,
+      "shot_id": "E01-07-05",
+      "source_scene": 4,
+      "source_beat": 5
+    },
+    {
+      "index": 33,
+      "shot_id": "E01-08-01",
+      "source_scene": 5,
+      "source_beat": 1
+    },
+    {
+      "index": 34,
+      "shot_id": "E01-08-02",
+      "source_scene": 5,
+      "source_beat": 2
+    },
+    {
+      "index": 35,
+      "shot_id": "E01-08-03",
+      "source_scene": 5,
+      "source_beat": 3
+    },
+    {
+      "index": 36,
+      "shot_id": "E01-08-04",
+      "source_scene": 5,
+      "source_beat": 4
+    },
+    {
+      "index": 37,
+      "shot_id": "E01-08-05",
+      "source_scene": 5,
+      "source_beat": 5
+    },
+    {
+      "index": 38,
+      "shot_id": "E01-08-06",
+      "source_scene": 5,
+      "source_beat": 6
+    },
+    {
+      "index": 39,
+      "shot_id": "E01-09-01",
+      "source_scene": 5,
+      "source_beat": 7
+    },
+    {
+      "index": 40,
+      "shot_id": "E01-09-02",
+      "source_scene": 5,
+      "source_beat": 8
+    },
+    {
+      "index": 41,
+      "shot_id": "E01-09-03",
+      "source_scene": 5,
+      "source_beat": 9
+    },
+    {
+      "index": 42,
+      "shot_id": "E01-09-04",
+      "source_scene": 5,
+      "source_beat": 10
+    },
+    {
+      "index": 43,
+      "shot_id": "E01-09-05",
+      "source_scene": 5,
+      "source_beat": 11
+    },
+    {
+      "index": 44,
+      "shot_id": "E01-09-06",
+      "source_scene": 5,
+      "source_beat": 12
+    },
+    {
+      "index": 45,
+      "shot_id": "E01-10-01",
+      "source_scene": 5,
+      "source_beat": 13
+    },
+    {
+      "index": 46,
+      "shot_id": "E01-10-02",
+      "source_scene": 5,
+      "source_beat": 14
+    },
+    {
+      "index": 47,
+      "shot_id": "E01-11-01",
+      "source_scene": 6,
+      "source_beat": 1
+    },
+    {
+      "index": 48,
+      "shot_id": "E01-11-02",
+      "source_scene": 6,
+      "source_beat": 2
+    },
+    {
+      "index": 49,
+      "shot_id": "E01-11-03",
+      "source_scene": 6,
+      "source_beat": 3
+    },
+    {
+      "index": 50,
+      "shot_id": "E01-11-04",
+      "source_scene": 6,
+      "source_beat": 4
+    },
+    {
+      "index": 51,
+      "shot_id": "E01-12-01",
+      "source_scene": 6,
+      "source_beat": 5
+    },
+    {
+      "index": 52,
+      "shot_id": "E01-12-02",
+      "source_scene": 6,
+      "source_beat": 6
+    },
+    {
+      "index": 53,
+      "shot_id": "E01-12-03",
+      "source_scene": 6,
+      "source_beat": 7
+    },
+    {
+      "index": 54,
+      "shot_id": "E01-12-04",
+      "source_scene": 6,
+      "source_beat": 8
+    },
+    {
+      "index": 55,
+      "shot_id": "E01-12-05",
+      "source_scene": 6,
+      "source_beat": 9
+    },
+    {
+      "index": 56,
+      "shot_id": "E01-13-01",
+      "source_scene": 6,
+      "source_beat": 10
+    },
+    {
+      "index": 57,
+      "shot_id": "E01-13-02",
+      "source_scene": 6,
+      "source_beat": 11
+    },
+    {
+      "index": 58,
+      "shot_id": "E01-13-03",
+      "source_scene": 6,
+      "source_beat": 12
+    },
+    {
+      "index": 59,
+      "shot_id": "E01-13-04",
+      "source_scene": 6,
+      "source_beat": 13
+    },
+    {
+      "index": 60,
+      "shot_id": "E01-13-05",
+      "source_scene": 6,
+      "source_beat": 14
+    },
+    {
+      "index": 61,
+      "shot_id": "E01-14-01",
+      "source_scene": 6,
+      "source_beat": 15
+    },
+    {
+      "index": 62,
+      "shot_id": "E01-14-02",
+      "source_scene": 6,
+      "source_beat": 16
+    },
+    {
+      "index": 63,
+      "shot_id": "E01-14-03",
+      "source_scene": 6,
+      "source_beat": 17
+    }
+  ],
+  "body_seconds": 183,
+  "vote_seconds": 3,
+  "generation_submissions": 0,
+  "next_stage": "Pack and compile this candidate via the production path before a separately initiated render; old clip_plan and performance translations must not be reused."
+}

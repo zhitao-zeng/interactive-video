@@ -67,10 +67,13 @@ def current_takes(directory: Path, plan: dict, review: dict) -> dict:
 
 
 def read_reconciled(directory: Path, local: dict, flash: dict, *, apply_confirmed: bool = True) -> tuple[dict, dict, dict]:
+    from novel_manga.application.review.confirmed import clip_review_criteria
     plan = read(directory / "clip_plan.json", {})
     previous = read(directory / "episode_review.json", {})
     takes = current_takes(directory, plan, previous)
-    result = reconciliation.reconcile_review(directory, plan, previous, takes, local, flash)
+    criteria = {cid: clip_review_criteria(directory, cid) for cid in takes}
+    result = reconciliation.reconcile_review(directory, plan, previous, takes, local, flash,
+                                             review_criteria=criteria)
     if apply_confirmed and any(row.get("confirmed") for row in previous.get("clips", {}).values()):
         from novel_manga.application.review.confirmed import enforce
         result = enforce(directory, result, previous)

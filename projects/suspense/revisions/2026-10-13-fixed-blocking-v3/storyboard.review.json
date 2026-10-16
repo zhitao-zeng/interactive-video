@@ -1,0 +1,567 @@
+{
+  "title": "凌晨两点，谁进过空房？",
+  "status": "prepared_for_reviewed_generation",
+  "body_seconds": 177,
+  "total_seconds": 180,
+  "shots": [
+    {
+      "id": "S01",
+      "start_seconds": 0,
+      "end_seconds": 4,
+      "duration_seconds": 4,
+      "location": "走廊双人位",
+      "in_frame": [
+        "沈序",
+        "徐程"
+      ],
+      "action": "保持对视与自然呼吸，不迈步，不开门。",
+      "speaker": "",
+      "dialogue": "",
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "次日｜调查现场",
+        "左：801 空房　右：802 徐程住处"
+      ],
+      "source_shots": [
+        "B01",
+        "B02"
+      ]
+    },
+    {
+      "id": "S02",
+      "start_seconds": 4,
+      "end_seconds": 14,
+      "duration_seconds": 10,
+      "location": "徐程对话位",
+      "in_frame": [
+        "徐程"
+      ],
+      "action": "徐程保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "徐程",
+      "dialogue": "昨晚两点，我听见801那边有人敲墙。那屋空了半年了。",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "source_shots": [
+        "B02"
+      ]
+    },
+    {
+      "id": "S03",
+      "start_seconds": 14,
+      "end_seconds": 23,
+      "duration_seconds": 9,
+      "location": "沈序对话位",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "沈序",
+      "dialogue": "房主请我来核对情况。你当时看见人了吗？",
+      "on_camera_dialogue": true,
+      "on_screen_text": [
+        "沈序｜受房主委托调查"
+      ],
+      "source_shots": [
+        "B04",
+        "B09"
+      ]
+    },
+    {
+      "id": "S04",
+      "start_seconds": 23,
+      "end_seconds": 28,
+      "duration_seconds": 5,
+      "location": "徐程对话位",
+      "in_frame": [
+        "徐程"
+      ],
+      "action": "徐程保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "徐程",
+      "dialogue": "没看见。我一直在自己房里。",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "source_shots": [
+        "B09"
+      ]
+    },
+    {
+      "id": "S05",
+      "start_seconds": 28,
+      "end_seconds": 34,
+      "duration_seconds": 6,
+      "location": "沈序对话位",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "沈序",
+      "dialogue": "我先进去看看。你在这儿等一下。",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "source_shots": [
+        "B04",
+        "B05"
+      ]
+    },
+    {
+      "id": "S06",
+      "start_seconds": 34,
+      "end_seconds": 38,
+      "duration_seconds": 4,
+      "location": "走廊入门位",
+      "in_frame": [
+        "沈序",
+        "徐程"
+      ],
+      "action": "沈序只向前一步跨入左侧801门槛，停在刚入门处；徐程不动。",
+      "speaker": "",
+      "dialogue": "",
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "source_shots": [
+        "B04",
+        "B05"
+      ]
+    },
+    {
+      "id": "S07",
+      "start_seconds": 38,
+      "end_seconds": 42,
+      "duration_seconds": 4,
+      "location": "801桌侧",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "只垂眼观察充电手机，不移动脚步，不触摸桌上物件。",
+      "speaker": "",
+      "dialogue": "",
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "source_shots": [
+        "B05"
+      ]
+    },
+    {
+      "id": "S08",
+      "start_seconds": 42,
+      "end_seconds": 46,
+      "duration_seconds": 4,
+      "location": "801手机特写",
+      "in_frame": [],
+      "action": "手机、线、插头保持不动，无人无手进入画面。",
+      "speaker": "",
+      "dialogue": "",
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "source_shots": [
+        "B07"
+      ]
+    },
+    {
+      "id": "S09",
+      "start_seconds": 46,
+      "end_seconds": 50,
+      "duration_seconds": 4,
+      "location": "801桌侧",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序抬眼朝画外出口方向看一下；身体和脚不移动。",
+      "speaker": "",
+      "dialogue": "",
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "source_shots": [
+        "B05",
+        "B07",
+        "B08"
+      ]
+    },
+    {
+      "id": "S10",
+      "start_seconds": 50,
+      "end_seconds": 54,
+      "duration_seconds": 4,
+      "location": "走廊出门位",
+      "in_frame": [
+        "沈序",
+        "徐程"
+      ],
+      "action": "沈序只向前一步跨到走廊灰砖上，停住并看向徐程。不走过楼梯、不绕角。",
+      "speaker": "",
+      "dialogue": "",
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "source_shots": [
+        "B09"
+      ]
+    },
+    {
+      "id": "S11",
+      "start_seconds": 54,
+      "end_seconds": 68,
+      "duration_seconds": 14,
+      "location": "沈序对话位",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "沈序",
+      "dialogue": "801里留着一部充电的手机。房主给的开门记录，也有一条异常。",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "source_shots": [
+        "B03",
+        "B07",
+        "B09"
+      ]
+    },
+    {
+      "id": "S12",
+      "start_seconds": 68,
+      "end_seconds": 77,
+      "duration_seconds": 9,
+      "location": "沈序对话位",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "沈序",
+      "dialogue": "昨晚一点五十二分，这个密码开过801的门。",
+      "on_camera_dialogue": true,
+      "on_screen_text": [
+        "801 开门记录",
+        "昨晚 01:52",
+        "使用的密码：徐程（临时）"
+      ],
+      "source_shots": [
+        "B03"
+      ]
+    },
+    {
+      "id": "S13",
+      "start_seconds": 77,
+      "end_seconds": 82,
+      "duration_seconds": 5,
+      "location": "沈序对话位",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "沈序",
+      "dialogue": "这上面的徐程，是你？",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "source_shots": [
+        "B03",
+        "B09"
+      ]
+    },
+    {
+      "id": "S14",
+      "start_seconds": 82,
+      "end_seconds": 88,
+      "duration_seconds": 6,
+      "location": "徐程对话位",
+      "in_frame": [
+        "徐程"
+      ],
+      "action": "徐程保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "徐程",
+      "dialogue": "是我。可那是以前的临时密码。",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "source_shots": [
+        "B03",
+        "B09",
+        "B15"
+      ]
+    },
+    {
+      "id": "S15",
+      "start_seconds": 88,
+      "end_seconds": 95,
+      "duration_seconds": 7,
+      "location": "沈序对话位",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "沈序",
+      "dialogue": "昨晚这次开门，是你用的吗？",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "source_shots": [
+        "B03",
+        "B09"
+      ]
+    },
+    {
+      "id": "S16",
+      "start_seconds": 95,
+      "end_seconds": 100,
+      "duration_seconds": 5,
+      "location": "徐程对话位",
+      "in_frame": [
+        "徐程"
+      ],
+      "action": "徐程保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "徐程",
+      "dialogue": "不是。我昨晚没出去。",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "source_shots": [
+        "B09"
+      ]
+    },
+    {
+      "id": "S17",
+      "start_seconds": 100,
+      "end_seconds": 108,
+      "duration_seconds": 8,
+      "location": "沈序对话位",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "沈序",
+      "dialogue": "这里记的是用过哪个密码。",
+      "on_camera_dialogue": true,
+      "on_screen_text": [
+        "记录的是「使用的密码」",
+        "徐程（临时）"
+      ],
+      "source_shots": [
+        "B03",
+        "B12"
+      ]
+    },
+    {
+      "id": "S18",
+      "start_seconds": 108,
+      "end_seconds": 117,
+      "duration_seconds": 9,
+      "location": "沈序对话位",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "沈序",
+      "dialogue": "如果别人知道这个密码，留下的也会是你这个名字。",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "source_shots": [
+        "B10",
+        "B12"
+      ]
+    },
+    {
+      "id": "S19",
+      "start_seconds": 117,
+      "end_seconds": 123,
+      "duration_seconds": 6,
+      "location": "徐程对话位",
+      "in_frame": [
+        "徐程"
+      ],
+      "action": "徐程保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "徐程",
+      "dialogue": "那为什么还叫我的名字？",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "source_shots": [
+        "B15"
+      ]
+    },
+    {
+      "id": "S20",
+      "start_seconds": 123,
+      "end_seconds": 133,
+      "duration_seconds": 10,
+      "location": "沈序对话位",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "沈序",
+      "dialogue": "旧标签得查门锁后台。这个密码，你有没有告诉过别人？",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "source_shots": [
+        "B10",
+        "B15"
+      ]
+    },
+    {
+      "id": "S21",
+      "start_seconds": 133,
+      "end_seconds": 137,
+      "duration_seconds": 4,
+      "location": "徐程对话位",
+      "in_frame": [
+        "徐程"
+      ],
+      "action": "徐程短促吸气，微微移开视线，肩部衣料轻动，保持原地沉默。",
+      "speaker": "",
+      "dialogue": "",
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "source_shots": [
+        "B11",
+        "B14"
+      ]
+    },
+    {
+      "id": "S22",
+      "start_seconds": 137,
+      "end_seconds": 147,
+      "duration_seconds": 10,
+      "location": "沈序对话位",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "沈序",
+      "dialogue": "你说没出门，我记下了。我问的是：密码还给过谁？",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "source_shots": [
+        "B10",
+        "B11",
+        "B12"
+      ]
+    },
+    {
+      "id": "S23",
+      "start_seconds": 147,
+      "end_seconds": 151,
+      "duration_seconds": 4,
+      "location": "徐程对话位",
+      "in_frame": [
+        "徐程"
+      ],
+      "action": "徐程保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "徐程",
+      "dialogue": "我……",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "source_shots": [
+        "B11"
+      ]
+    },
+    {
+      "id": "S24",
+      "start_seconds": 151,
+      "end_seconds": 159,
+      "duration_seconds": 8,
+      "location": "沈序对话位",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "沈序",
+      "dialogue": "先核对哪一条，才能知道是谁进了801？",
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "source_shots": [
+        "B12",
+        "B13",
+        "B14",
+        "B15"
+      ]
+    },
+    {
+      "id": "S25",
+      "start_seconds": 159,
+      "end_seconds": 165,
+      "duration_seconds": 6,
+      "location": "沈序对话位",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "沈序",
+      "dialogue": "先查监控，看看谁来过。",
+      "on_camera_dialogue": true,
+      "on_screen_text": [
+        "A 查监控｜谁来过"
+      ],
+      "source_shots": [
+        "B13"
+      ]
+    },
+    {
+      "id": "S26",
+      "start_seconds": 165,
+      "end_seconds": 171,
+      "duration_seconds": 6,
+      "location": "沈序对话位",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "沈序",
+      "dialogue": "继续问徐程，密码给过谁。",
+      "on_camera_dialogue": true,
+      "on_screen_text": [
+        "B 问徐程｜密码给过谁"
+      ],
+      "source_shots": [
+        "B10",
+        "B11",
+        "B14"
+      ]
+    },
+    {
+      "id": "S27",
+      "start_seconds": 171,
+      "end_seconds": 177,
+      "duration_seconds": 6,
+      "location": "沈序对话位",
+      "in_frame": [
+        "沈序"
+      ],
+      "action": "沈序保持原地与对方交谈，仅有符合语意的轻微目光和表情变化。",
+      "speaker": "沈序",
+      "dialogue": "查门锁，旧密码为什么还能用。",
+      "on_camera_dialogue": true,
+      "on_screen_text": [
+        "801 开门记录｜徐程（临时）",
+        "C 查门锁｜旧密码为何能用"
+      ],
+      "source_shots": [
+        "B15"
+      ]
+    }
+  ],
+  "interaction": {
+    "id": "fixed-blocking-v3-end",
+    "series_title": "凌晨两点，谁进过空房？",
+    "question": "先查哪一条？",
+    "seconds": 3,
+    "ambience_shot_index": 1,
+    "options": [
+      {
+        "id": "A",
+        "label": "查监控",
+        "next": "第二集A入口"
+      },
+      {
+        "id": "B",
+        "label": "问徐程",
+        "next": "第二集B入口"
+      },
+      {
+        "id": "C",
+        "label": "查门锁",
+        "next": "第二集C入口"
+      }
+    ],
+    "selected": null,
+    "theme": {
+      "background": "#24282B",
+      "foreground": "#EEE8DC",
+      "secondary": "#A9B2B5"
+    }
+  }
+}

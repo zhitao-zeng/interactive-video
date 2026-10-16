@@ -1,0 +1,479 @@
+{
+  "profile": {
+    "style": "weimei",
+    "frame": "16:9",
+    "tier": "quality",
+    "genre": "generic",
+    "resolution": "720p",
+    "expressions": false,
+    "two_views": "off",
+    "episode_shape": "fixed",
+    "speech_gate": "enforce",
+    "props": false,
+    "native_h3_short_edge": 768,
+    "repair_backend": "sandbox_agent"
+  },
+  "bible": {
+    "novel_title": "未署名的花",
+    "genre": "原创互动恋爱体验节目",
+    "visual_style": "乙女游戏过场动画质感的美型半写实三维CG，无描边",
+    "palette": "奶油白、灰蓝、暖金、鼠尾草绿、克制暗红",
+    "style_fingerprint": "flowers-weimei-v1",
+    "characters": [
+      {
+        "name": "阮夏",
+        "role": "主角",
+        "gender": "女",
+        "age": "27岁",
+        "appearance": "暖棕齐肩发、柔和椭圆脸与杏眼；杏色衬衫、海军蓝长裙、米白低跟鞋。",
+        "wardrobe": "杏色衬衫＋海军蓝长裙＋米白鞋",
+        "face_anchors": [
+          "暖棕齐肩发、柔和椭圆脸与杏眼；杏色衬衫、海军蓝长裙、米白低跟鞋。"
+        ],
+        "voice_profile_id": "flowers-C01-v1"
+      },
+      {
+        "name": "闻屿",
+        "role": "主角",
+        "gender": "男",
+        "age": "29岁",
+        "appearance": "黑短发、长窄椭圆脸、较窄眼型与清楚下颌；灰蓝卷袖衬衫、炭灰裤、棕鞋。",
+        "wardrobe": "灰蓝衬衫＋炭灰长裤＋棕鞋",
+        "face_anchors": [
+          "黑短发、长窄椭圆脸、较窄眼型与清楚下颌；灰蓝卷袖衬衫、炭灰裤、棕鞋。"
+        ],
+        "voice_profile_id": "flowers-C02-v1"
+      },
+      {
+        "name": "程越",
+        "role": "主角",
+        "gender": "男",
+        "age": "28岁",
+        "appearance": "棕色微卷短发、较宽柔方脸、较圆眼睛与笑窝；米白针织短袖、棕裤、白鞋。",
+        "wardrobe": "米白针织短袖＋棕裤＋白鞋",
+        "face_anchors": [
+          "棕色微卷短发、较宽柔方脸、较圆眼睛与笑窝；米白针织短袖、棕裤、白鞋。"
+        ],
+        "voice_profile_id": "flowers-C03-v1"
+      },
+      {
+        "name": "许棠",
+        "role": "主角",
+        "gender": "女",
+        "age": "26岁",
+        "appearance": "黑色利落短波波头、较长脸与清楚下巴；鼠尾草绿短袖、米白长裤、棕鞋。",
+        "wardrobe": "鼠尾草绿短袖＋米白长裤＋棕鞋",
+        "face_anchors": [
+          "黑色利落短波波头、较长脸与清楚下巴；鼠尾草绿短袖、米白长裤、棕鞋。"
+        ],
+        "voice_profile_id": "flowers-C04-v1"
+      }
+    ],
+    "locations": [
+      "温室咖啡厅：北墙西侧门；北墙四格行李位；东北咖啡吧；东墙花园窗；西墙展示轨；中央椭圆低桌与固定四椅。"
+    ],
+    "props": [
+      {
+        "name": "栀子花",
+        "appearance": "单支短茎白栀子，重瓣奶白花朵和宽厚深绿叶；阮夏收到的只有一支。",
+        "category": "其他"
+      },
+      {
+        "name": "玫瑰花",
+        "appearance": "单支暗红玫瑰，细绿茎和绿叶；许棠收到的一支。",
+        "category": "其他"
+      },
+      {
+        "name": "鸢尾花",
+        "appearance": "单支蓝紫鸢尾，直立与下垂瓣、窄叶。",
+        "category": "其他"
+      },
+      {
+        "name": "向日葵",
+        "appearance": "单支小型黄向日葵，棕色花盘、宽叶。",
+        "category": "其他"
+      },
+      {
+        "name": "嘉宾行李箱",
+        "appearance": "四只独立硬壳行李：阮夏奶油、闻屿炭灰、程越橄榄灰、许棠焦糖；北墙由西到东各一格，四箱落地。",
+        "category": "其他"
+      },
+      {
+        "name": "玻璃水杯",
+        "appearance": "四只朴素透明饮水杯，各在对应座前；拿起放回保持同一只。",
+        "category": "其他"
+      },
+      {
+        "name": "空白花笺",
+        "appearance": "米白空白厚纸花笺，留言全部后期添加；不让模型生成手写字。",
+        "category": "其他"
+      }
+    ],
+    "continuity_rules": [
+      "人物/发型/衣装保持已审单人参考；保持唯美三维CG，不能变真人。",
+      "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。",
+      "起身只发生一次，起身后原椅空置；回座要完成动作，不由下一镜凭空恢复。",
+      "匿名笔友配对：阮夏—闻屿，许棠—程越。",
+      "节目花的四种含义属于创作规则，不是现实人格或传统花语判断。",
+      "花信邀请须得到回复，不代表已承诺恋爱；片尾投票未选，不提前拍决定。"
+    ]
+  },
+  "script": {
+    "video_title": "未署名的花｜认花小样",
+    "source_title": "未署名的花 第一集",
+    "episode_index": 1,
+    "profile": {
+      "style": "weimei",
+      "frame": "16:9",
+      "tier": "quality",
+      "genre": "generic",
+      "resolution": "720p",
+      "expressions": false,
+      "two_views": "off",
+      "episode_shape": "fixed",
+      "speech_gate": "enforce",
+      "props": false,
+      "native_h3_short_edge": 768,
+      "repair_backend": "sandbox_agent"
+    },
+    "production_mode": "romance_conversation",
+    "hook": "她拿着收到的花问错人，真正的笔友接上一句昨晚的细节。",
+    "summary": "制作小样：先问错送花人，笔友随后用昨晚细节主动澄清。",
+    "shots": [
+      {
+        "index": 1,
+        "origin_index": 1,
+        "shot_id": "F01",
+        "label": "F01",
+        "segment_id": "flowers_01",
+        "source_quote": "F01｜先认错了\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。\n动作：阮夏看向程越询问收到的栀子，程越直接否认。阮夏尴尬地笑一下，把花握低至膝前，许棠自然听，闻屿等待问答结束。\n阮夏：这朵花，是你送的？\n程越：我送的不是这个。\n阮夏：哦，那我猜错了。\n程越：没事，先喝口水。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+        "source_shot": "F01",
+        "source_kind": "original_authored_screenplay",
+        "location": "温室咖啡厅",
+        "scene_id": "flowers_ep01_greenhouse",
+        "scene_time": "雨后傍晚连续时段",
+        "characters": [
+          "阮夏",
+          "闻屿",
+          "程越",
+          "许棠"
+        ],
+        "in_frame": [
+          "阮夏",
+          "闻屿",
+          "程越",
+          "许棠"
+        ],
+        "extras": [],
+        "listeners": [
+          "闻屿",
+          "许棠"
+        ],
+        "wears": {},
+        "props": [
+          "栀子花",
+          "嘉宾行李箱",
+          "玻璃水杯"
+        ],
+        "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。",
+        "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。",
+        "motion_prompt": "阮夏看向程越询问收到的栀子，程越直接否认。阮夏尴尬地笑一下，把花握低至膝前，许棠自然听，闻屿等待问答结束。",
+        "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+        "camera": "主参考机位，西南侧向东北的四人中远景，先建立四椅与原位置；保持人物自然朝桌内，不强求四人都正对镜头。",
+        "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+        "shot_scale": "中远景",
+        "duration_seconds": 12,
+        "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+        "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+        "turns": [
+          {
+            "speaker_name": "阮夏",
+            "delivery_mode": "visible_dialogue",
+            "text": "这朵花，是你送的？",
+            "emotion": "自然接话"
+          },
+          {
+            "speaker_name": "程越",
+            "delivery_mode": "visible_dialogue",
+            "text": "我送的不是这个。",
+            "emotion": "自然接话"
+          },
+          {
+            "speaker_name": "阮夏",
+            "delivery_mode": "visible_dialogue",
+            "text": "哦，那我猜错了。",
+            "emotion": "自然接话"
+          },
+          {
+            "speaker_name": "程越",
+            "delivery_mode": "visible_dialogue",
+            "text": "没事，先喝口水。",
+            "emotion": "自然接话"
+          }
+        ],
+        "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia holds her single white gardenia; the flower is not handed over. The other three received flower letters remain inside their owners' suitcases. Use one incarnation of each guest and no native text. Use the southwest-to-northeast master view and a medium-wide four-person composition. Keep natural inward seated orientations, not four front-facing performances. <Subject 1> looks toward <Subject 3> while holding her received gardenia. <DIALOGUE_1> <Subject 3> answers her directly. <DIALOGUE_2> <Subject 1> briefly smiles at her mistake, lowering the flower to her own lap once. <DIALOGUE_3> <Subject 3> indicates her existing water glass without picking it up. <DIALOGUE_4> The other two quietly listen. End with all four at the same seats and the gardenia still with <Subject 1>.",
+        "source_segment": "F01",
+        "source_scene": 1,
+        "source_beat": 1,
+        "pilot_source_shot": "F01"
+      },
+      {
+        "index": 2,
+        "origin_index": 2,
+        "shot_id": "F02",
+        "label": "F02",
+        "segment_id": "flowers_02",
+        "source_quote": "F02｜真正的笔友\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。\n动作：闻屿接上阮夏昨晚布展的真实细节，阮夏转向他，认出匿名笔友并确认送花人。她仍握着栀子，没有递出或再次高举。\n闻屿：昨晚那幅画，挂好了？\n阮夏：你怎么知道？\n闻屿：你发给我那张照片，右边钉子都掉了。\n阮夏：所以，花是你送的？\n闻屿：嗯。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+        "source_shot": "F02",
+        "source_kind": "original_authored_screenplay",
+        "location": "温室咖啡厅",
+        "scene_id": "flowers_ep01_greenhouse",
+        "scene_time": "雨后傍晚连续时段",
+        "characters": [
+          "阮夏",
+          "闻屿",
+          "程越",
+          "许棠"
+        ],
+        "in_frame": [
+          "阮夏",
+          "闻屿"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "栀子花",
+          "嘉宾行李箱",
+          "玻璃水杯"
+        ],
+        "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+        "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+        "motion_prompt": "闻屿接上阮夏昨晚布展的真实细节，阮夏转向他，认出匿名笔友并确认送花人。她仍握着栀子，没有递出或再次高举。",
+        "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+        "camera": "机位位于茶几东侧，朝西侧阮夏与闻屿的双人中景；两人的相对世界位置不变，程越与许棠在原座画外。",
+        "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+        "shot_scale": "中景",
+        "duration_seconds": 12,
+        "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+        "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+        "turns": [
+          {
+            "speaker_name": "闻屿",
+            "delivery_mode": "visible_dialogue",
+            "text": "昨晚那幅画，挂好了？",
+            "emotion": "自然接话"
+          },
+          {
+            "speaker_name": "阮夏",
+            "delivery_mode": "visible_dialogue",
+            "text": "你怎么知道？",
+            "emotion": "自然接话"
+          },
+          {
+            "speaker_name": "闻屿",
+            "delivery_mode": "visible_dialogue",
+            "text": "你发给我那张照片，右边钉子都掉了。",
+            "emotion": "自然接话"
+          },
+          {
+            "speaker_name": "阮夏",
+            "delivery_mode": "visible_dialogue",
+            "text": "所以，花是你送的？",
+            "emotion": "自然接话"
+          },
+          {
+            "speaker_name": "闻屿",
+            "delivery_mode": "visible_dialogue",
+            "text": "嗯。",
+            "emotion": "自然接话"
+          }
+        ],
+        "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia holds her single white gardenia; the flower is not handed over. The other three received flower letters remain inside their owners' suitcases. Use one incarnation of each guest and no native text. Camera on the east side looks toward the western pair in a medium two-shot: <Subject 1> remains northwest and <Subject 2> southwest. Only those two are framed; <Subject 3> and <Subject 4> stay seated off-camera at northeast and southeast. <Subject 2> addresses <Subject 1> about the picture frame from their anonymous chat. <DIALOGUE_1> She turns her gaze toward him. <DIALOGUE_2> <DIALOGUE_3> She glances briefly at the gardenia in her lap, then back to him. <DIALOGUE_4> He confirms simply. <DIALOGUE_5> Keep the same two chairs and identities throughout; the flower remains with her.",
+        "source_segment": "F02",
+        "source_scene": 1,
+        "source_beat": 2,
+        "pilot_source_shot": "F02"
+      }
+    ],
+    "skipped_segments": []
+  },
+  "groups": [
+    {
+      "source_segment": "F01",
+      "shot_indexes": [
+        1
+      ],
+      "request_seconds": 12
+    },
+    {
+      "source_segment": "F02",
+      "shot_indexes": [
+        2
+      ],
+      "request_seconds": 12,
+      "location_reference": "series_assets/locations/location_001/coverage-east-west.jpeg"
+    }
+  ],
+  "overlays": [],
+  "interaction": {
+    "id": "flowers-ep01-END",
+    "series_title": "未署名的花",
+    "question": "今晚，她的花送给谁？",
+    "seconds": 3,
+    "options": [
+      {
+        "id": "A",
+        "label": "栀子给闻屿",
+        "next": "第二集A：窗边续聊"
+      },
+      {
+        "id": "B",
+        "label": "玫瑰给程越",
+        "next": "第二集B：一起做咖啡"
+      },
+      {
+        "id": "C",
+        "label": "今晚留花",
+        "next": "第二集C：和许棠聊聊"
+      }
+    ],
+    "selected": null,
+    "theme": {
+      "background": "#F4EEE4",
+      "foreground": "#344A5C",
+      "secondary": "#AB8869"
+    }
+  },
+  "voice_specs": {
+    "阮夏": {
+      "sample_text": "这朵花，是你送的？哦，那我猜错了。你怎么知道？所以，花是你送的？刚才那段，能剪掉吗？你刚才还点头。阮夏。别再叫我晚点下班",
+      "prompt": "Adult female Mandarin, warm and lively, natural conversational pace.",
+      "picture": "series_assets/characters/character_001/turnaround.jpeg",
+      "origin": "reuse_existing_generated_timbre",
+      "old_voice_name": "许知意"
+    },
+    "闻屿": {
+      "sample_text": "昨晚那幅画，挂好了？你发给我那张照片，右边钉子都掉了。嗯。闻屿。那是你自己起的。你发消息也不慢。现在等你喝完水。你的花先",
+      "prompt": "Adult male Mandarin, calm lower register, concise and attentive.",
+      "picture": "series_assets/characters/character_002/turnaround.jpeg",
+      "origin": "reuse_existing_generated_timbre",
+      "old_voice_name": "周叙"
+    },
+    "程越": {
+      "sample_text": "我送的不是这个。没事，先喝口水。先喝口水，刚才都没顾上。没有，这杯就是给你的。程越，开咖啡店的。那你千万别说是哪场。好，",
+      "prompt": "Adult male Mandarin, relaxed brighter register, easy conversational warmth.",
+      "picture": "series_assets/characters/character_003/turnaround.jpeg",
+      "origin": "reuse_existing_generated_timbre",
+      "old_voice_name": "陆屿"
+    },
+    "许棠": {
+      "sample_text": "你问得太认真了，我都差点信了。我点的是水，不是他。许棠，做活动的。那我可能催过你。我的那封，还在箱子里。我拿一下。别带工",
+      "prompt": "Adult female Mandarin, clear direct delivery, lightly playful when replying.",
+      "picture": "series_assets/characters/character_004/turnaround.jpeg",
+      "origin": "reuse_existing_generated_timbre",
+      "old_voice_name": "宋乔"
+    }
+  },
+  "reference_images": [
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/characters/ruanxia.png",
+      "path": "series_assets/characters/character_001/turnaround.jpeg",
+      "scope": "single_person_full_body"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/characters/wenyu.png",
+      "path": "series_assets/characters/character_002/turnaround.jpeg",
+      "scope": "single_person_full_body"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/characters/chengyue.png",
+      "path": "series_assets/characters/character_003/turnaround.jpeg",
+      "scope": "single_person_full_body"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/characters/xutang.png",
+      "path": "series_assets/characters/character_004/turnaround.jpeg",
+      "scope": "single_person_full_body"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/locations/greenhouse.png",
+      "path": "series_assets/locations/location_001/establishing.jpeg",
+      "scope": "empty_location"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/locations/greenhouse-east-west.png",
+      "path": "series_assets/locations/location_001/coverage-east-west.jpeg",
+      "scope": "location_camera_coverage"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/props/01-栀子花.png",
+      "path": "series_assets/props/prop_001/turnaround.jpeg",
+      "scope": "single_prop"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/props/02-玫瑰花.png",
+      "path": "series_assets/props/prop_002/turnaround.jpeg",
+      "scope": "single_prop"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/props/03-鸢尾花.png",
+      "path": "series_assets/props/prop_003/turnaround.jpeg",
+      "scope": "single_prop"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/props/04-向日葵.png",
+      "path": "series_assets/props/prop_004/turnaround.jpeg",
+      "scope": "single_prop"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/props/05-嘉宾行李箱.jpeg",
+      "path": "series_assets/props/prop_005/turnaround.jpeg",
+      "scope": "prop_design_sheet"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/props/06-玻璃水杯.jpeg",
+      "path": "series_assets/props/prop_006/turnaround.jpeg",
+      "scope": "single_prop"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/props/07-空白花笺.jpeg",
+      "path": "series_assets/props/prop_007/turnaround.jpeg",
+      "scope": "single_prop"
+    }
+  ],
+  "reference_audios": [
+    {
+      "name": "阮夏",
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/voices/阮夏.wav",
+      "path": "series_assets/voices/阮夏.wav",
+      "text": "没人？那我先挑了。我来之前，列了十条择偶标准。现在只记得一条：有话直说，别让我猜。",
+      "origin": "reused-existing-generated-timbre"
+    },
+    {
+      "name": "闻屿",
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/voices/闻屿.wav",
+      "path": "series_assets/voices/闻屿.wav",
+      "text": "周叙，建筑师。以前觉得，事情做完再解释，也来得及。现在不这么想了。好久不见，知意。",
+      "origin": "reused-existing-generated-timbre"
+    },
+    {
+      "name": "程越",
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/voices/程越.wav",
+      "path": "series_assets/voices/程越.wav",
+      "text": "陆屿，开书店的。我平时对着书说，它们不太搭理我。我能坐这儿吗？记住了，随心所欲。",
+      "origin": "reused-existing-generated-timbre"
+    },
+    {
+      "name": "许棠",
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/delivery/romance/flowers-20261014/material-package/assets/voices/许棠.wav",
+      "path": "series_assets/voices/许棠.wav",
+      "text": "宋乔，做陶的。我能加入吗？先别谈生意。我是来约会的。明早去喝咖啡？杯子的事，回来再说。",
+      "origin": "reused-existing-generated-timbre"
+    }
+  ],
+  "source_seconds": 24,
+  "source_archive": null,
+  "origin": "Original creative package authorized by user on 2026-10-14",
+  "generation_scope": "Two 12-second native clips plus a 3-second preview choice card; no full-episode generation."
+}

@@ -30,12 +30,18 @@ class MediaOperations:
             raise ValueError('NOVEL_RENDER_WORKERS and NOVEL_RENDER_INFLIGHT must be nonnegative')
         if os.environ.get('NOVEL_AGENT_MANAGED') == '1' and inflight <= 0:
             raise ValueError('managed episode rendering requires a positive NOVEL_RENDER_INFLIGHT')
+        profile = read_json(self.ctx.novel_dir / 'profile.json')
+        bgm = Path(profile['bgm_path']) if profile.get('bgm_path') else None
+        if bgm is not None:
+            bgm = bgm if bgm.is_absolute() else self.ctx.novel_dir / bgm
+            if not bgm.is_file():
+                raise ValueError(f'configured episode background music is missing: {bgm}')
         runner = ThinMediaRunner(novel_dir=self.ctx.novel_dir, episode_dir=self.ctx.episode_dir,
             settings=Settings.from_env(provider='phanrouter', output_root=self.ctx.run_dir,
-                                       admission_mode='preview'),
+                                       admission_mode='preview', bgm_path=bgm),
             bible=StoryBible.model_validate(read_json(self.ctx.novel_dir / 'story_bible.json')),
             workers=workers, inflight=inflight, max_attempts=1,
-            profile=read_json(self.ctx.novel_dir / 'profile.json'))
+            profile=profile)
         runner.context.asr_helper = self.ctx.project_root / 'scripts/thin_asr_segments.py'
         runner.context.source_novel_dir = getattr(self.ctx, 'source_novel_dir', None) or self.ctx.novel_dir
         runner.context.options.first_pass_only = os.environ.get('NOVEL_FIRST_PASS_ONLY') == '1'
@@ -170,7 +176,9 @@ class MediaOperations:
         if local_inputs:
             stage(self.ctx)
         path = self.ctx.episode_dir/'clip_plan.json'
-        pending_script = self.ctx.input_mode == 'script' and not (self.ctx.run_dir/'prepared.json').is_file()
+        pending_script = (self.ctx.input_mode == 'script'
+            and not (self.ctx.run_dir/'prepared.json').is_file()
+            and not media_started(self.ctx.episode_dir))
         if not path.is_file() or payload.get('file') or pending_script:
             adopted = self.drafts.adopt(payload)
             if adopted.get('ok') is not True:

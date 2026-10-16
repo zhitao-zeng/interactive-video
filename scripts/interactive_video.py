@@ -1,4 +1,4 @@
-"""Interactive studio: import, prepare, assets, run and status."""
+"""Interactive studio: package/intent → creative Agent → preparation, production and review."""
 from pathlib import Path
 import argparse
 import json
@@ -11,6 +11,12 @@ sys.path.insert(0,str(ROOT/'src'))
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     commands=parser.add_subparsers(dest='command',required=True)
+    creative=commands.add_parser('create',help='Write a complete screenplay/storyboard with one creator Agent')
+    creative.add_argument('--task',type=Path,required=True,help='Creative intent or complete package adaptation task')
+    creative.add_argument('--output-dir',type=Path,required=True)
+    creative.add_argument('--config',type=Path)
+    creative.add_argument('--resume',action='store_true')
+    creative.add_argument('--feedback',type=Path)
     incoming=commands.add_parser('import')
     incoming.add_argument('package',choices=['adventure','suspense','romance'])
     incoming.add_argument('archive',type=Path)
@@ -30,8 +36,16 @@ def main():
     production.add_argument('--resume-unsubmitted',action='store_true',help='Retry infrastructure failure only when no video task or take exists')
     production.add_argument('--resume',action='store_true',help='Resume original task receipts, takes and bounded review history; never clear them')
     status=commands.add_parser('status');status.add_argument('--project',choices=['adventure','romance','suspense'],default='adventure')
+    status.add_argument('--edition',help='Read one retained edition and its real generation history')
     args=parser.parse_args()
-    if args.command=='import':
+    if args.command=='create':
+        from novel_manga.interactive.creation import run
+        from novel_manga.application.agents.sandbox import load_config
+        result=run(args.task,args.output_dir,resume=args.resume,feedback=args.feedback,
+                   config=load_config(args.config) if args.config else None)
+        print(json.dumps(result,ensure_ascii=False,indent=2))
+        return 0 if result['status']=='creative_candidate' else 2
+    elif args.command=='import':
         from novel_manga.interactive.importing import import_package
         result=import_package(args.archive,ROOT/'inputs/packages'/args.package)
         print(json.dumps({'package':args.package,'files':len(result['files'])},ensure_ascii=False))
@@ -67,7 +81,8 @@ def main():
             if Path(args.edition).name!=args.edition:raise ValueError('Edition must be an output directory name')
             from novel_manga.interactive.authored import build_authored_voices
             from novel_manga.interactive.runtime import runner_for
-            novel=ROOT/'outputs'/args.edition
+            from novel_manga.interactive.production import edition_directory
+            novel=edition_directory(ROOT,args.project,args.edition)
             if args.kind in ('all','images'):
                 runner=runner_for(ROOT,novel,'h3',project=args.project)
                 runner.build_assets()
@@ -89,6 +104,10 @@ def main():
         result=run_episode(ROOT,args.lane,project=args.project,resume_unsubmitted=args.resume_unsubmitted,resume=args.resume,edition=args.edition)
         return 0 if result['status']=='accepted' else 2
     else:
+        if args.edition:
+            from novel_manga.interactive.production import edition_status
+            print(json.dumps(edition_status(ROOT,args.project,args.edition),ensure_ascii=False))
+            return 0
         from novel_manga.util import read_json
         from novel_manga.interactive.production import active_runner
         for lane in ['h3','sd25']:

@@ -139,6 +139,14 @@ def container_running(name: str) -> bool:
     return name in result.stdout.split()
 
 
+def thinking_budget(config: dict) -> int | None:
+    if config.get('max_thinking_tokens') is not None:
+        return int(config['max_thinking_tokens'])
+    if ((config.get('extra_body') or {}).get('thinking') or {}).get('type') == 'disabled':
+        return 0
+    return None
+
+
 def provider_container_args(config: dict) -> list[str]:
     """Provider-specific network/request options; credentials stay in the environment."""
     args = []
@@ -146,14 +154,15 @@ def provider_container_args(config: dict) -> list[str]:
         args.extend(['--network', str(config['docker_network'])])
     if config.get('context_window'):
         args.extend(['-e', f"CLAUDE_CODE_MAX_CONTEXT_TOKENS={int(config['context_window'])}"])
-    if config.get('max_thinking_tokens') is not None:
-        args.extend(['-e', f"MAX_THINKING_TOKENS={int(config['max_thinking_tokens'])}",
-                     '-e', 'CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1'])
     body = dict(config.get('extra_body') or {})
     if config.get('chat_template_kwargs') is not None:
         body['chat_template_kwargs'] = config['chat_template_kwargs']
     if body:
         args.extend(['-e', 'CLAUDE_CODE_EXTRA_BODY='+json.dumps(body)])
+    budget = thinking_budget(config)
+    if budget is not None:
+        args.extend(['-e', f'MAX_THINKING_TOKENS={budget}',
+                     '-e', 'CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1'])
     return args
 
 

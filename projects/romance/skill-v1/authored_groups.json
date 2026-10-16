@@ -1,0 +1,161 @@
+[
+  {
+    "source_segment": "E01-01",
+    "shot_indexes": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "request_seconds": 14
+  },
+  {
+    "source_segment": "E01-02",
+    "shot_indexes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "request_seconds": 12
+  },
+  {
+    "source_segment": "E01-03",
+    "shot_indexes": [
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "request_seconds": 14
+  },
+  {
+    "source_segment": "E01-04",
+    "shot_indexes": [
+      14,
+      15,
+      16,
+      17,
+      18
+    ],
+    "request_seconds": 13
+  },
+  {
+    "source_segment": "E01-05",
+    "shot_indexes": [
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "request_seconds": 15
+  },
+  {
+    "source_segment": "E01-06",
+    "shot_indexes": [
+      24,
+      25,
+      26,
+      27
+    ],
+    "request_seconds": 11
+  },
+  {
+    "source_segment": "E01-07",
+    "shot_indexes": [
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "request_seconds": 14
+  },
+  {
+    "source_segment": "E01-08",
+    "shot_indexes": [
+      33,
+      34,
+      35,
+      36
+    ],
+    "request_seconds": 9
+  },
+  {
+    "source_segment": "E01-08",
+    "shot_indexes": [
+      37
+    ],
+    "request_seconds": 4
+  },
+  {
+    "source_segment": "E01-08",
+    "shot_indexes": [
+      38
+    ],
+    "request_seconds": 4
+  },
+  {
+    "source_segment": "E01-09",
+    "shot_indexes": [
+      39,
+      40,
+      41,
+      42,
+      43,
+      44
+    ],
+    "request_seconds": 14
+  },
+  {
+    "source_segment": "E01-10",
+    "shot_indexes": [
+      45,
+      46
+    ],
+    "request_seconds": 5
+  },
+  {
+    "source_segment": "E01-11",
+    "shot_indexes": [
+      47,
+      48,
+      49,
+      50
+    ],
+    "request_seconds": 14
+  },
+  {
+    "source_segment": "E01-12",
+    "shot_indexes": [
+      51,
+      52,
+      53,
+      54,
+      55
+    ],
+    "request_seconds": 15
+  },
+  {
+    "source_segment": "E01-13",
+    "shot_indexes": [
+      56,
+      57,
+      58,
+      59,
+      60
+    ],
+    "request_seconds": 15
+  },
+  {
+    "source_segment": "E01-14",
+    "shot_indexes": [
+      61,
+      62,
+      63
+    ],
+    "request_seconds": 10
+  }
+]

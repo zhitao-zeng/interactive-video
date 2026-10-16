@@ -1,0 +1,58 @@
+{
+  "owner": "Codex suspense 01a133e5",
+  "status": "assets_complete",
+  "native_video_resolution": "480p",
+  "export_canvas": [
+    1080,
+    1920
+  ],
+  "original_reused": [
+    "inputs/packages/suspense/角色资产/沈序-身份基准-v1.0.png"
+  ],
+  "generated": [
+    {
+      "name": "徐程",
+      "path": "assets/suspense/xucheng-reference.png",
+      "purpose": "同一人物脸部与全身外观；31岁为制作选角设定，不定义案情"
+    },
+    {
+      "name": "公寓走廊",
+      "path": "assets/suspense/corridor.png",
+      "purpose": "801左802右、同侧相邻共墙"
+    },
+    {
+      "name": "801室内",
+      "path": "assets/suspense/room801.png",
+      "purpose": "固定桌面物件与共墙标记"
+    },
+    {
+      "name": "802室内",
+      "path": "assets/suspense/room802.png",
+      "purpose": "徐程住处、调查段始终留在门内"
+    }
+  ],
+  "evidence": {
+    "root": "assets/suspense/evidence",
+    "files": [
+      "log.png",
+      "maintenance.png",
+      "notebook.png",
+      "attachment.png",
+      "old-card.png",
+      "comparison.png"
+    ],
+    "source": "已确认分镜的证据文字",
+    "lettering": "确定性字体排版；准确字样另由交付证据层保证可读"
+  },
+  "voices": {
+    "沈序": "成年男中低音、克制清楚、约190字/分钟",
+    "徐程": "成年男中音、轻微疲惫与紧张，不阴险"
+  },
+  "case_bible": "原包未包含完整第一案底稿；不影响本集制作，后续真相仍不得自行补定",
+  "original_consulted": [
+    "inputs/packages/suspense/角色资产/沈序-综合视觉卡-v1.0.png"
+  ],
+  "voice_bank": "outputs/suspense-master/series_assets/voices/voices.json",
+  "trial_delivery": "delivery/suspense/sd25/episode01.mp4",
+  "trial_content_review": "skipped_by_user"
+}

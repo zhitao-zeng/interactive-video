@@ -262,3 +262,22 @@ def test_multi_clip_source_candidate_is_not_prepared_twice_before_render(tmp_pat
     monkeypatch.setattr(upstream,'input_proposal',lambda *a:RepairProposal({'changed':['a','b']},script=read_json(d/'chapter_script.json'),plan=plan,notes={},changes={}))
     out=managed.prepare_agent_batch(d,['a','b'])
     assert calls==['a'] and out['input_changed']==['a','b']
+
+
+def test_merged_binding_patch_needs_request_check_before_publication(tmp_path,monkeypatch):
+    from novel_manga.application.repair import agent,managed,history
+    from novel_manga.repair.proposal import RepairProposal
+    from tests.test_repair_agent import configured
+    d,clips,_=configured(tmp_path)
+    original=read_json(d/'chapter_script.json');before=read_json(d/'clip_plan.json')
+    plan=copy.deepcopy(before);plan['clips'][0]['prompt_h3']+=' corrected'
+    proposal=RepairProposal({'changed':['a']},script=original,plan=plan,notes={},changes={'a':{}})
+    monkeypatch.setattr(agent,'propose',lambda *a,**k:{'action':'input','reason':'registered binding mismatch',
+        'evidence':['input/reference.jpg'],'source_patch':{'shots':[{'index':1,'props':['key']}]}})
+    monkeypatch.setattr(agent,'source_proposal',lambda *a,**k:proposal)
+    checked=[]
+    monkeypatch.setattr(agent,'check_request',lambda c,*a:checked.append(c['clip_id']) or {'consistent':False,'problems':['wrong source relation']})
+    result=managed.prepare(d,['a'])
+    assert checked and result['skip_render']
+    assert read_json(d/'chapter_script.json')==original and read_json(d/'clip_plan.json')==before
+    assert history.generation_counts(d)=={}

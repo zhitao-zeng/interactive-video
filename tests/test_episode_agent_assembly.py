@@ -260,6 +260,30 @@ def test_failed_render_returns_evidence_before_encoding_then_finishes_candidate_
     assert history.generation_counts(ctx.episode_dir)==counts
 
 
+@pytest.mark.parametrize('failure', ['feedback','speech_failed','review_error'])
+def test_batch_review_finish_retains_failures_without_assembling_a_failed_candidate(host, failure):
+    ctx, tools, events, state = host
+    state[failure] = {'clip_01':'unresolved picture issue'} if failure == 'feedback' else ['clip_01']
+    tools.dispatch('render')
+    assert events == ['render','review']
+    atomic_write_json(ctx.work_dir/'input/manifest.json', {'production_mode':'batch_review'})
+    counts = history.generation_counts(ctx.episode_dir)
+    result = tools.dispatch('finish')
+    assert result['ok'] is True and result['passed'] is False and result['movie'] is None
+    assert events == ['render','review']
+    assert history.generation_counts(ctx.episode_dir) == counts
+    assert read_json(ctx.run_dir/'final-candidate/manifest.json')['passed'] is False
+
+
+def test_batch_review_finish_reuses_the_accepted_assembly(host):
+    ctx, tools, events, _ = host
+    tools.dispatch('render')
+    atomic_write_json(ctx.work_dir/'input/manifest.json', {'production_mode':'batch_review'})
+    result = tools.dispatch('finish')
+    assert result['passed'] is True and result['movie']
+    assert events == ['render','review','assemble']
+
+
 def test_content_pass_cannot_bypass_failed_final_technical_qc(host):
     ctx,tools,events,state = host
     state['technical_passed']=False

@@ -1,0 +1,219 @@
+{
+  "owner": "/root/backrooms_assets",
+  "reviewed_at": 1791976951.9860694,
+  "status": "passed-for-production-references",
+  "method": "API gpt-image-2 via existing PhanRouterMediaProvider; each raw image individually inspected with view_image; bounded targeted API edits",
+  "accepted_assets": 9,
+  "reused_identity_assets": 1,
+  "generated_selected_assets": 8,
+  "api_tasks": 11,
+  "rejected_versions": 3,
+  "shots_generated_by_this_agent": 0,
+  "receipts": [
+    {
+      "asset_id": "location_001",
+      "version": "v1",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "task_id": "task_20261014190427_wvpk6pu2",
+      "bytes": 5433001,
+      "image": {
+        "width": 1536,
+        "height": 2720,
+        "format": "PNG"
+      },
+      "duration_s": 98.6,
+      "art_state": "rejected",
+      "art_reason": "view_image 拒绝：远处亮口出现真实户外树木，误导为可见出口；左侧深水落差视觉偏弱。保留原版，通过同 API 修成封闭池厅和可读浅深边界，不将本版接入产线。",
+      "receipt": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_001/v1.receipt.json",
+      "art_review": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_001/v1.art-review.json"
+    },
+    {
+      "asset_id": "location_001",
+      "version": "v2",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "task_id": "task_20261014190706_b3ucmmma",
+      "bytes": 5659084,
+      "image": {
+        "width": 1536,
+        "height": 2720,
+        "format": "PNG"
+      },
+      "duration_s": 119.0,
+      "art_state": "accepted",
+      "art_reason": "view_image 核对：远处不再有户外树木或开放出口；左侧深青深水与右侧可见白砖的浅水带形成明确边界，巨大白砖主柱与近水线青色地标一致，空场景无人物/文字。可作本集空间 master；仅支持建筑和构图，水深仍须剧情动作确认。",
+      "receipt": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_001/v2.receipt.json",
+      "art_review": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_001/v2.art-review.json"
+    },
+    {
+      "asset_id": "location_002",
+      "version": "v1",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "task_id": "task_20261014190937_8q1xuhrm",
+      "bytes": 4804124,
+      "image": {
+        "width": 1440,
+        "height": 2560,
+        "format": "PNG"
+      },
+      "duration_s": 97.5,
+      "art_state": "accepted",
+      "art_reason": "view_image 核对：同一白砖主柱占左前景，青色水线地标可识别，浅水白砖带绕右侧进入亮口；亮口后依旧蓝绿积水池厅，无户外出口，无可见上行台阶、人物或额外道具。材料/照明/尺度承接 master，可作近柱视角。",
+      "receipt": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_002/v1.receipt.json",
+      "art_review": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_002/v1.art-review.json"
+    },
+    {
+      "asset_id": "location_003",
+      "version": "v1",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "task_id": "task_20261014190937_a1wedi4p",
+      "bytes": 5474611,
+      "image": {
+        "width": 1536,
+        "height": 2720,
+        "format": "PNG"
+      },
+      "duration_s": 82.5,
+      "art_state": "accepted",
+      "art_reason": "view_image 核对：从安全白砖台面俯看向深水下降的直阶，前三阶清楚后逐渐消失，水底不可见；远池壁垂直且无扶手/梯/出口，白砖和青色水线/温润天光继承 master，无人无杆。下行阶不会与通往干地的上行阶误认。",
+      "receipt": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_003/v1.receipt.json",
+      "art_review": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_003/v1.art-review.json"
+    },
+    {
+      "asset_id": "location_004",
+      "version": "v1",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "task_id": "task_20261014190937_god01mfq",
+      "bytes": 5067193,
+      "image": {
+        "width": 1440,
+        "height": 2560,
+        "format": "PNG"
+      },
+      "duration_s": 67.1,
+      "art_state": "rejected",
+      "art_reason": "view_image 拒绝：A 左侧封闭暗廊正确，但 B 右侧变成敞开池厅旁窄边，缺少可辨认的干走廊和遮挡尽头的转角；前方安全选择与稿不符。v1 保留不入产线，同 API 做最后一版右廊修正。",
+      "receipt": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_004/v1.receipt.json",
+      "art_review": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_004/v1.art-review.json"
+    },
+    {
+      "asset_id": "location_004",
+      "version": "v2",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "task_id": "task_20261014191124_qulh2h13",
+      "bytes": 5578100,
+      "image": {
+        "width": 1440,
+        "height": 2560,
+        "format": "PNG"
+      },
+      "duration_s": 104.3,
+      "art_state": "accepted",
+      "art_reason": "view_image 核对：同一平台现在有且只有两个干地可达口：A 左封闭暗廊、B 右封闭明亮白砖走廊且远端被墙/转角遮住；前景完整干白砖区和周边蓝绿水可辨，无门板/字/人物/第三口，保持 master 白砖青色水线与暖天光。原错误 B 池厅版不使用。",
+      "receipt": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_004/v2.receipt.json",
+      "art_review": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_004/v2.art-review.json"
+    },
+    {
+      "asset_id": "location_005",
+      "version": "v1",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "task_id": "task_20261014191544_2bc8gtx4",
+      "bytes": 5364667,
+      "image": {
+        "width": 1440,
+        "height": 2560,
+        "format": "PNG"
+      },
+      "duration_s": 90.3,
+      "art_state": "rejected",
+      "art_reason": "view_image 拒绝：四级上阶方向正确，但 A 左暗口仍有水且与楼梯顶干地不连通，无法从同平台步行选择；主柱青色水线被画成长垂直色带，与master地标不一致。v1保留，同API最后一版仅修连通干地/低水线条。",
+      "receipt": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_005/v1.receipt.json",
+      "art_review": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_005/v1.art-review.json"
+    },
+    {
+      "asset_id": "location_005",
+      "version": "v2",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "task_id": "task_20261014191822_obe31o9n",
+      "bytes": 5023071,
+      "image": {
+        "width": 1536,
+        "height": 2720,
+        "format": "PNG"
+      },
+      "duration_s": 138.0,
+      "art_state": "accepted",
+      "art_reason": "view_image 核对：恰好四级短阶从同柱旁浅水向上连接干平台，A左暗廊有干地与平台相接、B右亮廊同层且尽头遮挡；主柱已回到近水线单条青砖地标，无人物/字/新道具。最左侧为不与平台相通的积水建筑凹区，不是第三个可步行选项；两条实际可达通道和004对应。",
+      "receipt": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_005/v2.receipt.json",
+      "art_review": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/location_005/v2.art-review.json"
+    },
+    {
+      "asset_id": "prop_001",
+      "version": "v1",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "task_id": "task_20261014190437_fi4ujw36",
+      "bytes": 4586425,
+      "image": {
+        "width": 1536,
+        "height": 2720,
+        "format": "PNG"
+      },
+      "duration_s": 83.0,
+      "art_state": "accepted",
+      "art_reason": "view_image 核对：一根完整伸缩黑色自拍杆、空夹头、无手机或人物，能够作为拆下手机后的探水状态参考。",
+      "receipt": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/prop_001/v1.receipt.json",
+      "art_review": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/prop_001/v1.art-review.json"
+    },
+    {
+      "asset_id": "prop_002",
+      "version": "v1",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "task_id": "task_20261014190437_br82t4na",
+      "bytes": 4676847,
+      "image": {
+        "width": 1536,
+        "height": 2720,
+        "format": "PNG"
+      },
+      "duration_s": 91.5,
+      "art_state": "accepted",
+      "art_reason": "view_image 核对：单一小型双圆 LED 黑色头灯、普通弹性头带、灯关闭且无文字，符合原包视觉卡配件；无人物或额外设备。",
+      "receipt": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/prop_002/v1.receipt.json",
+      "art_review": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/prop_002/v1.art-review.json"
+    },
+    {
+      "asset_id": "prop_003",
+      "version": "v1",
+      "model": "gpt-image-2",
+      "provider": "PhanRouterMediaProvider",
+      "task_id": "task_20261014190437_2yiun7l8",
+      "bytes": 4954053,
+      "image": {
+        "width": 1536,
+        "height": 2720,
+        "format": "PNG"
+      },
+      "duration_s": 84.3,
+      "art_state": "accepted",
+      "art_reason": "view_image 核对：只有一只透明半瓶水和一根未开封素棕包装能量棒，无重复补给、文字、背包或人物；状态和原稿库存一致。",
+      "receipt": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/prop_003/v1.receipt.json",
+      "art_review": "projects/suspense/materials/backrooms-ep01-v2/assets/generated/prop_003/v1.art-review.json"
+    }
+  ],
+  "scope": "Reference-image readiness only; does not certify H3 rendered film, speech, continuity or episode review",
+  "selected_mapping": "asset-images.json",
+  "notes": [
+    "Identity reused from supplied single portrait without redraw or composite-scene reference.",
+    "Original model responses retained; generated .jpeg filenames contain actual PNG bytes as recorded by provider; existing image reader inspects contents.",
+    "005 includes far-left water bay without dry access, distinct from its exactly two reachable dry passage mouths."
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "version": "laughing-country-vlog-h3-v3",
+  "series_title": "知遥的旅行",
+  "episode": "EP01",
+  "world_name": "笑之国",
+  "core_setting": "公共场所必须保持微笑",
+  "temporal_note": "入境当日 · 稍早",
+  "insert_after_generation_group": "VLOG-G01",
+  "seconds": 3,
+  "full_frame": true,
+  "style": "统一竖屏世界介绍卡；浅暖白、青绿和石灰色承接本系列，文字高对比且大；世界名居中最大，剧名与集数较小，核心设定一行；不照搬对标美术。",
+  "generation_required": false,
+  "source": "世界名与规则来自原附件；发布包装由用户本轮明确要求。",
+  "policy": "此独立发布卡与统一小水印不等于恢复实体告示牌、纸条的后期贴字。",
+  "watermark": {
+    "text": "知遥的旅行",
+    "position": "upper_right",
+    "avoid_face_and_subtitles": true
+  },
+  "publication": {
+    "world_card": {
+      "after_clip_id": "clip_01",
+      "seconds": 3,
+      "series_title": "知遥的旅行",
+      "episode": "EP01",
+      "title": "笑之国",
+      "premise": "公共场所必须保持微笑",
+      "time_note": "入境当日 · 稍早"
+    },
+    "watermark": "知遥的旅行 · EP01"
+  },
+  "sound": "首镜结束前约0.8秒环境音自然淡出延续到卡面；不新增配乐，不生成准确汉字卡任务。"
+}

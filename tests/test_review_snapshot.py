@@ -5,6 +5,7 @@ import novel_manga.application.identity.ledger_resolution as ledger_resolution
 
 import json
 import sys
+import pytest
 from pathlib import Path
 
 import novel_manga.application.identity.ledger_judges as ledger_judges
@@ -143,3 +144,44 @@ def test_same_video_requires_new_review_when_mode_changes_or_is_unknown(tmp_path
     second.pop('review_mode');atomic_write_json(ep/'episode_review.json',second)
     assert review_episode.review_episode(ep,fresh=False)['review_mode']=='verify'
     assert calls==['classic','verify','verify'] and video.read_bytes()==b'unchanged take'
+
+
+@pytest.mark.parametrize('confirmed_failure',[False,True])
+def test_mode_change_checkpoint_retains_unvisited_evidence_without_certifying_it(tmp_path,monkeypatch,confirmed_failure):
+    from novel_manga.util import atomic_write_json,read_json
+    from novel_manga.review.storage import take_identity
+    from novel_manga.review.contracts import POLICY
+    book=tmp_path/'book';ep=book/'book_1';rows={};clips=[]
+    for cid in ['a','b']:
+        video=ep/'work/clips'/cid/'attempt_01/clip.mp4'
+        video.parent.mkdir(parents=True);video.write_bytes(cid.encode())
+        rows[cid]={'video':str(video),'take':take_identity(video),'severity':'pass','verify':{'verdict':'fine'}}
+        clips.append({'clip_id':cid,'kind':'video'})
+    if confirmed_failure:
+        rows['b']['confirmed']={**{k:rows['b'][k]for k in ['video','take']},
+            'issue':'已确认的重复人物','instruction':'人物只出现一次'}
+    atomic_write_json(book/'story_bible.json',{'novel_title':'n','genre':'g','visual_style':'v',
+        'palette':'p','style_fingerprint':'f','characters':[],'locations':[]})
+    atomic_write_json(ep/'clip_plan.json',{'clips':clips})
+    path=ep/'episode_review.json'
+    atomic_write_json(path,{'policy':POLICY,'review_mode':'classic','clips':rows,'feedback':{}})
+    monkeypatch.setenv('NOVEL_REVIEW_MODE','verify')
+    monkeypatch.setenv('NOVEL_REVIEW_CAST_VIDEO','0')
+    monkeypatch.setattr(review_judges,'judge_clip',lambda *a,**k:{'severity':'pass'})
+    def interrupt_checkpoint(target,data):
+        atomic_write_json(target,data)
+        if target==path:raise InterruptedError('test stops after the first checkpoint')
+    monkeypatch.setattr(review_episode,'atomic_write_json',interrupt_checkpoint)
+    with pytest.raises(InterruptedError):review_episode.review_episode(ep,fresh=False)
+    saved=read_json(path)
+    assert saved['clips']['a']['severity']=='pass'
+    assert saved['clips']['b']['severity']==('fail' if confirmed_failure else 'review_error')
+    if confirmed_failure:
+        assert saved['clips']['b']['confirmed']['instruction']=='人物只出现一次'
+        assert saved['feedback']['b']=='人物只出现一次'
+    else:
+        from novel_manga.review.reconciliation import missing_reviews,inspection_counts
+        current={'b':{k:rows['b'][k]for k in ['video','take']}}
+        assert missing_reviews(saved,current,'all',review_mode='verify')==['b']
+        counts=inspection_counts(saved,current,['b'])
+        assert counts['passed']==0 and counts['unchecked']==1

@@ -1,0 +1,212 @@
+{
+  "status": "authoring_checks_complete",
+  "body_shots": 32,
+  "body_seconds": 177,
+  "tail_seconds": 3,
+  "tail_frames": 75,
+  "source_shots_covered": [
+    "B01",
+    "B02",
+    "B03",
+    "B04",
+    "B05",
+    "B06",
+    "B07",
+    "B08",
+    "B09",
+    "B10",
+    "B11",
+    "B12",
+    "B13",
+    "B14",
+    "B15",
+    "B16",
+    "B17"
+  ],
+  "dialogue_character_total": 191,
+  "dialogue_budget": [
+    {
+      "shot": "S02",
+      "speaker": "徐程",
+      "characters": 6,
+      "available_seconds": 4,
+      "estimated_seconds_at_175_cpm": 2.06
+    },
+    {
+      "shot": "S03",
+      "speaker": "沈序",
+      "characters": 8,
+      "available_seconds": 6,
+      "estimated_seconds_at_175_cpm": 2.74
+    },
+    {
+      "shot": "S04",
+      "speaker": "徐程",
+      "characters": 11,
+      "available_seconds": 6,
+      "estimated_seconds_at_175_cpm": 3.77
+    },
+    {
+      "shot": "S05",
+      "speaker": "沈序",
+      "characters": 3,
+      "available_seconds": 6,
+      "estimated_seconds_at_175_cpm": 1.03
+    },
+    {
+      "shot": "S06",
+      "speaker": "沈序",
+      "characters": 5,
+      "available_seconds": 6,
+      "estimated_seconds_at_175_cpm": 1.71
+    },
+    {
+      "shot": "S07",
+      "speaker": "徐程",
+      "characters": 6,
+      "available_seconds": 3,
+      "estimated_seconds_at_175_cpm": 2.06
+    },
+    {
+      "shot": "S08",
+      "speaker": "沈序",
+      "characters": 5,
+      "available_seconds": 7,
+      "estimated_seconds_at_175_cpm": 1.71
+    },
+    {
+      "shot": "S09",
+      "speaker": "徐程",
+      "characters": 4,
+      "available_seconds": 3,
+      "estimated_seconds_at_175_cpm": 1.37
+    },
+    {
+      "shot": "S10",
+      "speaker": "沈序",
+      "characters": 12,
+      "available_seconds": 5,
+      "estimated_seconds_at_175_cpm": 4.11
+    },
+    {
+      "shot": "S11",
+      "speaker": "沈序",
+      "characters": 7,
+      "available_seconds": 5,
+      "estimated_seconds_at_175_cpm": 2.4
+    },
+    {
+      "shot": "S12",
+      "speaker": "沈序",
+      "characters": 5,
+      "available_seconds": 5,
+      "estimated_seconds_at_175_cpm": 1.71
+    },
+    {
+      "shot": "S13",
+      "speaker": "沈序",
+      "characters": 7,
+      "available_seconds": 5,
+      "estimated_seconds_at_175_cpm": 2.4
+    },
+    {
+      "shot": "S14",
+      "speaker": "沈序",
+      "characters": 9,
+      "available_seconds": 7,
+      "estimated_seconds_at_175_cpm": 3.09
+    },
+    {
+      "shot": "S15",
+      "speaker": "沈序",
+      "characters": 9,
+      "available_seconds": 6,
+      "estimated_seconds_at_175_cpm": 3.09
+    },
+    {
+      "shot": "S16",
+      "speaker": "徐程",
+      "characters": 10,
+      "available_seconds": 7,
+      "estimated_seconds_at_175_cpm": 3.43
+    },
+    {
+      "shot": "S17",
+      "speaker": "沈序",
+      "characters": 5,
+      "available_seconds": 6,
+      "estimated_seconds_at_175_cpm": 1.71
+    },
+    {
+      "shot": "S19",
+      "speaker": "沈序",
+      "characters": 14,
+      "available_seconds": 7,
+      "estimated_seconds_at_175_cpm": 4.8
+    },
+    {
+      "shot": "S21",
+      "speaker": "沈序",
+      "characters": 17,
+      "available_seconds": 9,
+      "estimated_seconds_at_175_cpm": 5.83
+    },
+    {
+      "shot": "S22",
+      "speaker": "沈序",
+      "characters": 5,
+      "available_seconds": 6,
+      "estimated_seconds_at_175_cpm": 1.71
+    },
+    {
+      "shot": "S25",
+      "speaker": "沈序",
+      "characters": 3,
+      "available_seconds": 5,
+      "estimated_seconds_at_175_cpm": 1.03
+    },
+    {
+      "shot": "S28",
+      "speaker": "沈序",
+      "characters": 10,
+      "available_seconds": 5,
+      "estimated_seconds_at_175_cpm": 3.43
+    },
+    {
+      "shot": "S29",
+      "speaker": "沈序",
+      "characters": 7,
+      "available_seconds": 4,
+      "estimated_seconds_at_175_cpm": 2.4
+    },
+    {
+      "shot": "S30",
+      "speaker": "沈序",
+      "characters": 7,
+      "available_seconds": 4,
+      "estimated_seconds_at_175_cpm": 2.4
+    },
+    {
+      "shot": "S31",
+      "speaker": "沈序",
+      "characters": 8,
+      "available_seconds": 5,
+      "estimated_seconds_at_175_cpm": 2.74
+    },
+    {
+      "shot": "S32",
+      "speaker": "沈序",
+      "characters": 8,
+      "available_seconds": 4,
+      "estimated_seconds_at_175_cpm": 2.74
+    }
+  ],
+  "duration_overruns_at_slow_reference_rate": [],
+  "screenplay_and_shot_dialogue_match": true,
+  "not_verified": [
+    "Actual voice performance and pauses",
+    "Visual generation and continuity",
+    "Final media length and quality",
+    "Later-route hidden case facts"
+  ]
+}

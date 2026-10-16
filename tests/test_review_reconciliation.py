@@ -70,6 +70,66 @@ def test_source_priority_does_not_hide_a_fresh_requested_review_method():
     assert list(records.values())==[verify]
 
 
+def test_old_confirm_record_does_not_overwrite_resolved_scoped_keep_on_same_take():
+    case = cases()[0]
+    cid = next(iter(case['takes']))
+    old = copy.deepcopy(case['previous'])
+    criteria = ['镜头切换可接受；核对当前空间关系。']
+    old['clips'][cid].update(video=case['takes'][cid]['video'], take=case['takes'][cid]['take'],
+                             review_criteria=criteria, severity='pass', tier='optional',
+                             confirmed={'issue': '旧严格判词', 'instruction': '核实空间关系',
+                                        'check': {**case['takes'][cid], 'result': 'resolved',
+                                                  'review_criteria': criteria}})
+    key = rules.evidence_key(1, cid, case['takes'][cid]['video'], case['takes'][cid]['take'])
+    confirm = {**case['local'][0], 'ep': 1, 'clip': cid, 'video': case['takes'][cid]['video'],
+               'take': case['takes'][cid]['take'], 'mode': 'confirm'}
+    result = rules.reconcile_review(Path('/book/book_1'), case['plan'], old, case['takes'], {key: confirm}, {})
+    assert result['clips'][cid]['review_criteria'] == criteria
+    assert result['clips'][cid]['confirmed']['check']['result'] == 'resolved'
+    assert result['clips'][cid]['severity'] == 'pass'
+
+
+@pytest.mark.parametrize('assessment', ['pass', 'fail'])
+def test_fresh_scoped_agent_confirm_replaces_resolved_old_claim(assessment):
+    from novel_manga.review.contracts import POLICY
+    case = cases()[0]
+    cid = next(iter(case['takes']))
+    current = case['takes'][cid]
+    criteria = ['Allow brief contact; assess actual flower and seat continuity.']
+    previous = copy.deepcopy(case['previous'])
+    previous['clips'][cid].update(
+        video=current['video'], take=current['take'], severity='fail', tier='must_fix',
+        verify={'verdict': 'obvious', 'evidence': 'previous broad complaint'},
+        review_criteria=criteria,
+        confirmed={'issue': 'older confirmed duplicate rose', 'instruction': 'keep the rose on the table',
+                   'check': {**current, 'result': 'resolved', 'review_criteria': criteria}})
+    agent_review = {'schema': 'scoped-agent-review-v1', 'clip_id': cid,
+                    'video': current['video'], 'take': current['take'],
+                    'task_id': 'current-task', 'author_session': 'current-session',
+                    'review_criteria': criteria, 'assessment': assessment,
+                    'judgment': 'new scoped review evidence', 'observations': [
+                        {'kind': 'video_frame', 'file': 'input/frame.jpg', 'times': '7s',
+                         'observation': 'current observed state'}],
+                    'reviewed_findings': []}
+    picture = {'video': current['video'], 'take': current['take'],
+               'severity': assessment, 'tier': 'must_fix' if assessment == 'fail' else 'optional',
+               'review_criteria': criteria, 'scoped_agent_review': agent_review,
+               'contested_evidence': {'prior_automated_review': previous['clips'][cid],
+                                      'reviewed_findings': []},
+               'verify': {'verdict': 'obvious' if assessment == 'fail' else 'fine'},
+               'feedback': 'new scoped review evidence' if assessment == 'fail' else ''}
+    record = {'ep': 1, 'clip': cid, **current, 'mode': 'confirm', 'policy': POLICY,
+              'review_mode': 'verify', 'verdict': 'obvious' if assessment == 'fail' else 'fine',
+              'picture_review': picture, 'review_criteria': criteria,
+              'task_id': 'current-task', 'author_session': 'current-session'}
+    key = rules.evidence_key(1, cid, current['video'], current['take'])
+    result = rules.reconcile_review(Path('/book/book_1'), case['plan'], previous, case['takes'], {key: record}, {})
+    row = result['clips'][cid]
+    assert row['scoped_agent_review']['assessment'] == assessment
+    assert row['contested_evidence']['prior_automated_review']['confirmed']['issue'] == 'older confirmed duplicate rose'
+    assert row['severity'] == assessment
+
+
 def test_current_take_selection_keeps_project_relative_paths(tmp_path, monkeypatch):
     monkeypatch.setattr(store, 'ROOT', tmp_path)
     episode = tmp_path / 'outputs/n/n_1'; episode.mkdir(parents=True)

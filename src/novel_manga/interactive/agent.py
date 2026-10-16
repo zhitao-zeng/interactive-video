@@ -27,8 +27,9 @@ def run(runner, lane, *, resume=False, destination=None, independent_report=None
         from novel_manga.application.review.independent import register
         register(runner.context.episode_dir,
                  read_json(runner.context.episode_dir/'thin_media_report.json',{}),independent_report)
-    reuse = resume and media_matches(runner.context.clip_plan,
-        read_json(runner.context.episode_dir/'thin_media_report.json',{}), notes=runner.context.feedback)
+    media = read_json(runner.context.episode_dir/'thin_media_report.json',{}) if resume else {}
+    reuse = resume and not media.get('failed_clips') and media_matches(
+        runner.context.clip_plan, media, notes=runner.context.feedback)
     previous = runner.context.profile
     runner.context.profile = {**previous, 'repair_backend': 'sandbox_agent'}
     final_review=None

@@ -1,0 +1,102 @@
+{
+  "room_m": [
+    6,
+    5,
+    2.7
+  ],
+  "chairs": {
+    "NW": {
+      "xy": [
+        2.0996643735620717,
+        2.0397227693167412
+      ],
+      "facing": -1
+    },
+    "NE": {
+      "xy": [
+        3.5280392410106494,
+        1.9044935981050775
+      ],
+      "facing": -1
+    },
+    "SW": {
+      "xy": [
+        1.785361496336605,
+        -0.10492325363906202
+      ],
+      "facing": 1
+    },
+    "SE": {
+      "xy": [
+        3.8249768036093816,
+        -0.6781327408575356
+      ],
+      "facing": 1
+    }
+  },
+  "camera": {
+    "eye": [
+      0.43874787032749957,
+      -4.5960700337389255,
+      1.84
+    ],
+    "target": [
+      3.8831473935615763,
+      2.624464013292836,
+      1.84
+    ],
+    "fov": 51.18407077022825,
+    "shift_y": 0.1858150554172038
+  },
+  "resolution": [
+    1310,
+    680
+  ],
+  "table_xy": [
+    3.363942180299949,
+    0.8349608294232085
+  ],
+  "table_radii": [
+    0.8138483702629649,
+    0.49
+  ],
+  "credenza": {
+    "low": [
+      2.1,
+      4.6,
+      0
+    ],
+    "high": [
+      4.3,
+      4.98,
+      0.62
+    ],
+    "vase": [
+      2.9,
+      4.77,
+      0.77
+    ]
+  },
+  "luggage_xy": {
+    "许知意": [
+      4.55,
+      4.7
+    ],
+    "陆屿": [
+      5.0,
+      4.7
+    ],
+    "宋乔": [
+      5.45,
+      4.7
+    ]
+  },
+  "reference_master_bounds": [
+    0,
+    0,
+    1310,
+    680
+  ],
+  "dimensions": "Camera and visible furniture projections fitted to the supplied master panel; exact metric reconstruction is underdetermined from one image. Chair/table dimensions and unobserved depths remain declared design assumptions.",
+  "near_floor_extension_m": -1.6
+}

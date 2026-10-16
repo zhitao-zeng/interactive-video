@@ -1,0 +1,601 @@
+{
+  "source": "心动未剪辑（原创互动恋综提案）",
+  "style": "photographic",
+  "scenes": [
+    {
+      "id": "S01",
+      "name": "海边小屋客厅",
+      "primary": true,
+      "summary": "四个人能看见彼此的反应，也保留礼貌距离；窗边明亮位置属于知意的主动选择。暖色空间承接轻松初识与重逢时的不自在。",
+      "anchors": [
+        {
+          "name": "三格海景窗",
+          "desc": "东墙整面橡木竖梃三格窗；窗外蓝灰海平线。标准主视角里窗在画面右侧。"
+        },
+        {
+          "name": "四椅与椭圆矮桌",
+          "desc": "中央一张胡桃木椭圆矮桌，四把象牙白软包橡木扶手椅，北侧两把、南侧两把。"
+        },
+        {
+          "name": "北墙木门",
+          "desc": "北墙西侧一扇平整橡木入户门；各人从同一扇门进入。"
+        },
+        {
+          "name": "陶瓶边柜",
+          "desc": "北墙中段低橡木边柜，上面仅一只陶土色圆瓶。"
+        },
+        {
+          "name": "燕麦色地毯",
+          "desc": "四椅下同一块矩形燕麦色平织地毯；地毯方向不旋转。"
+        }
+      ],
+      "lighting": [
+        {
+          "state": "傍晚",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. An empty intimate coastal Chinese villa living room, about six by five meters, seen toward the north wall from the southwest corner. A THREE-PANEL oak-framed sea window occupies the EAST wall at picture RIGHT. Plain oak entry door at northwest rear LEFT. Low oak credenza on the north wall with one terracotta round vase. One low oval walnut coffee table, exactly FOUR ivory upholstered oak armchairs, two north and two south of the table, on one rectangular oatmeal woven rug. No extra chairs, sofa or stools. Empty scene, no people, no text. Warm low afternoon daylight from the east window at picture RIGHT, blue-gray sea outside, gentle neutral interior fill, no abrupt sunset shift."
+        },
+        {
+          "state": "夜间",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. An empty intimate coastal Chinese villa living room, about six by five meters, seen toward the north wall from the southwest corner. A THREE-PANEL oak-framed sea window occupies the EAST wall at picture RIGHT. Plain oak entry door at northwest rear LEFT. Low oak credenza on the north wall with one terracotta round vase. One low oval walnut coffee table, exactly FOUR ivory upholstered oak armchairs, two north and two south of the table, on one rectangular oatmeal woven rug. No extra chairs, sofa or stools. Empty scene, no people, no text. Dark blue sea beyond the same east window, soft warm concealed interior lighting, same exposure on furniture, no extra lamps or changed layout."
+        }
+      ],
+      "image": {
+        "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. An empty intimate coastal Chinese villa living room, about six by five meters, seen toward the north wall from the southwest corner. A THREE-PANEL oak-framed sea window occupies the EAST wall at picture RIGHT. Plain oak entry door at northwest rear LEFT. Low oak credenza on the north wall with one terracotta round vase. One low oval walnut coffee table, exactly FOUR ivory upholstered oak armchairs, two north and two south of the table, on one rectangular oatmeal woven rug. No extra chairs, sofa or stools. Empty scene, no people, no text. Warm low afternoon daylight from the east window at picture RIGHT, blue-gray sea outside, gentle neutral interior fill, no abrupt sunset shift.",
+        "negativePrompt": "people, human figures, faces, silhouettes of people, human reflections, crowds, illustration, anime, brush strokes, warped perspective, melted geometry, floating objects, extra furniture, text, logos, watermark",
+        "sheet": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Matte plaster, visible natural wood grain, linen weave and realistic paper fibers, clean but inhabited surfaces, restrained warm neutrals. ONE 16:9 landscape environment reference sheet. Upper-left MASTER panel about 72% width by 70% height, right column and bottom row form an L-shaped detail border, thin hairline rules. Every small panel is an exact close-up of a named anchor visible in the master view; nothing invented that is not present in the master view. THE SPACE MUST BE IDENTICAL ACROSS ALL PANELS. Absolutely no people anywhere, no human reflections. An empty intimate coastal Chinese villa living room, about six by five meters, seen toward the north wall from the southwest corner. A THREE-PANEL oak-framed sea window occupies the EAST wall at picture RIGHT. Plain oak entry door at northwest rear LEFT. Low oak credenza on the north wall with one terracotta round vase. One low oval walnut coffee table, exactly FOUR ivory upholstered oak armchairs, two north and two south of the table, on one rectangular oatmeal woven rug. No extra chairs, sofa or stools. Warm low afternoon daylight from the east window at picture RIGHT, blue-gray sea outside, gentle neutral interior fill, no abrupt sunset shift.",
+        "tags": [
+          "photographic",
+          "live-action",
+          "environment sheet",
+          "natural materials",
+          "continuity"
+        ]
+      },
+      "usage": {
+        "episodes": [
+          1,
+          2,
+          4,
+          6,
+          7,
+          8
+        ],
+        "beats": [
+          "把决定权拿回来",
+          "观众选择真的发生",
+          "把自己的计划说出来",
+          "每个人都有拒绝权",
+          "改变需要付出实际代价",
+          "选择可继续的生活"
+        ]
+      },
+      "referenceStatus": "已生成并人工目视核对",
+      "masterImage": "images/海边小屋客厅-sheet.png",
+      "orientationRule": "方位仅为本项目房屋布局坐标（图上方为北），不是实地地理朝向；标准主视角窗在右，反打不得镜像房屋。",
+      "setDressing": "桌面母版为空；首集水杯、笔和卡片按连续性记录逐场加入。其余装饰只保留北墙柜上的陶瓶。",
+      "surfaceNote": "客厅地毯外为暖灰米色大块石材地面，按母图锁定；前采室为浅橡木地板，两个房间不混用。",
+      "lightingImages": {
+        "傍晚": "images/海边小屋客厅-sheet.png",
+        "夜间": "images/客厅-夜间-sheet.png"
+      }
+    },
+    {
+      "id": "S02",
+      "name": "开放式厨房与餐桌",
+      "primary": true,
+      "summary": "邀请可以从一起坐下喝水开始。开放厨房延续房屋材质，又用岛台形成轻松的共同活动区。",
+      "anchors": [
+        {
+          "name": "橡木下柜",
+          "desc": "西侧通长平板橡木下柜，无拉手凸起。"
+        },
+        {
+          "name": "灰绿砖墙",
+          "desc": "下柜上方整条低饱和灰绿矩形砖背墙。"
+        },
+        {
+          "name": "浅石岛台",
+          "desc": "中央长方浅奶油石材岛台，胡桃木细边。"
+        },
+        {
+          "name": "双高脚凳",
+          "desc": "岛台面向客厅一侧只有两把浅木高脚凳。"
+        },
+        {
+          "name": "米色吊灯",
+          "desc": "岛台上方单只扁圆亚麻罩吊灯。"
+        }
+      ],
+      "lighting": [
+        {
+          "state": "清晨",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Empty open kitchen adjoining the living room of a contemporary coastal Chinese villa. West wall flat-front oak lower cabinets under one continuous muted sage rectangular tile backsplash. One rectangular pale cream stone island with a slim walnut edge, exactly two light-oak stools on the living-room side, one flattened round linen pendant centered above. No other seats or signage. Empty scene, no people, no text. Soft pale morning daylight from the living-room side, neutral white countertop and warm oak, pendant unlit."
+        },
+        {
+          "state": "夜间",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Empty open kitchen adjoining the living room of a contemporary coastal Chinese villa. West wall flat-front oak lower cabinets under one continuous muted sage rectangular tile backsplash. One rectangular pale cream stone island with a slim walnut edge, exactly two light-oak stools on the living-room side, one flattened round linen pendant centered above. No other seats or signage. Empty scene, no people, no text. Warm practical light from the single linen pendant, soft under-cabinet illumination, cool dark ambient outside, same architecture and counter layout."
+        }
+      ],
+      "image": {
+        "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Empty open kitchen adjoining the living room of a contemporary coastal Chinese villa. West wall flat-front oak lower cabinets under one continuous muted sage rectangular tile backsplash. One rectangular pale cream stone island with a slim walnut edge, exactly two light-oak stools on the living-room side, one flattened round linen pendant centered above. No other seats or signage. Empty scene, no people, no text. Soft pale morning daylight from the living-room side, neutral white countertop and warm oak, pendant unlit.",
+        "negativePrompt": "people, human figures, faces, silhouettes of people, human reflections, crowds, illustration, anime, brush strokes, warped perspective, melted geometry, floating objects, extra furniture, text, logos, watermark",
+        "sheet": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Matte plaster, visible natural wood grain, linen weave and realistic paper fibers, clean but inhabited surfaces, restrained warm neutrals. ONE 16:9 landscape environment reference sheet. Upper-left MASTER panel about 72% width by 70% height, right column and bottom row form an L-shaped detail border, thin hairline rules. Every small panel is an exact close-up of a named anchor visible in the master view; nothing invented that is not present in the master view. THE SPACE MUST BE IDENTICAL ACROSS ALL PANELS. Absolutely no people anywhere, no human reflections. Empty open kitchen adjoining the living room of a contemporary coastal Chinese villa. West wall flat-front oak lower cabinets under one continuous muted sage rectangular tile backsplash. One rectangular pale cream stone island with a slim walnut edge, exactly two light-oak stools on the living-room side, one flattened round linen pendant centered above. No other seats or signage. Soft pale morning daylight from the living-room side, neutral white countertop and warm oak, pendant unlit.",
+        "tags": [
+          "photographic",
+          "live-action",
+          "environment sheet",
+          "natural materials",
+          "continuity"
+        ]
+      },
+      "usage": {
+        "episodes": [
+          2,
+          3,
+          5
+        ],
+        "beats": [
+          "观众选择真的发生",
+          "旧事没有免责答案",
+          "照顾也需要先问"
+        ]
+      },
+      "referenceStatus": "已生成并目视核对；见新增美术生成提示词.json",
+      "masterImage": "images/厨房-夜间.png",
+      "orientationRule": "标准主视角里的左右是机位定义；换角度保持物件在空间中的真实位置。",
+      "masterState": "夜间",
+      "lightingImages": {
+        "清晨": "images/厨房-清晨.png",
+        "夜间": "images/厨房-夜间.png"
+      }
+    },
+    {
+      "id": "S03",
+      "name": "二楼公共休息区",
+      "primary": true,
+      "summary": "供知意短暂退出约会与处理工作消息的安静角落；不是卧室，也不暗示偷拍。",
+      "anchors": [
+        {
+          "name": "窗下长凳",
+          "desc": "窄长矩形窗下固定橡木长凳。"
+        },
+        {
+          "name": "深青坐垫",
+          "desc": "长凳一整块深青布坐垫，两只米白靠垫。"
+        },
+        {
+          "name": "圆角矮书架",
+          "desc": "左侧一组圆角开放橡木矮书架。"
+        },
+        {
+          "name": "落地纸灯",
+          "desc": "右侧一盏细杆米白圆纸罩落地灯。"
+        }
+      ],
+      "lighting": [
+        {
+          "state": "日间",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Empty upstairs public reading nook in a coastal Chinese villa. Fixed oak bench below one narrow horizontal rectangular window, one dark-teal bench cushion and exactly two ivory throw pillows. Rounded open low oak bookshelf at LEFT. One slender floor lamp with a round ivory paper shade at RIGHT. No bed or bedroom furnishings. Empty scene, no people, no text. Soft neutral daylight across the bench, paper lamp unlit, muted sea-blue outside."
+        },
+        {
+          "state": "夜间",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Empty upstairs public reading nook in a coastal Chinese villa. Fixed oak bench below one narrow horizontal rectangular window, one dark-teal bench cushion and exactly two ivory throw pillows. Rounded open low oak bookshelf at LEFT. One slender floor lamp with a round ivory paper shade at RIGHT. No bed or bedroom furnishings. Empty scene, no people, no text. Warm glow from the one paper-shade floor lamp, dark window, unchanged teal and ivory cushions."
+        }
+      ],
+      "image": {
+        "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Empty upstairs public reading nook in a coastal Chinese villa. Fixed oak bench below one narrow horizontal rectangular window, one dark-teal bench cushion and exactly two ivory throw pillows. Rounded open low oak bookshelf at LEFT. One slender floor lamp with a round ivory paper shade at RIGHT. No bed or bedroom furnishings. Empty scene, no people, no text. Soft neutral daylight across the bench, paper lamp unlit, muted sea-blue outside.",
+        "negativePrompt": "people, human figures, faces, silhouettes of people, human reflections, crowds, illustration, anime, brush strokes, warped perspective, melted geometry, floating objects, extra furniture, text, logos, watermark",
+        "sheet": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Matte plaster, visible natural wood grain, linen weave and realistic paper fibers, clean but inhabited surfaces, restrained warm neutrals. ONE 16:9 landscape environment reference sheet. Upper-left MASTER panel about 72% width by 70% height, right column and bottom row form an L-shaped detail border, thin hairline rules. Every small panel is an exact close-up of a named anchor visible in the master view; nothing invented that is not present in the master view. THE SPACE MUST BE IDENTICAL ACROSS ALL PANELS. Absolutely no people anywhere, no human reflections. Empty upstairs public reading nook in a coastal Chinese villa. Fixed oak bench below one narrow horizontal rectangular window, one dark-teal bench cushion and exactly two ivory throw pillows. Rounded open low oak bookshelf at LEFT. One slender floor lamp with a round ivory paper shade at RIGHT. No bed or bedroom furnishings. Soft neutral daylight across the bench, paper lamp unlit, muted sea-blue outside.",
+        "tags": [
+          "photographic",
+          "live-action",
+          "environment sheet",
+          "natural materials",
+          "continuity"
+        ]
+      },
+      "usage": {
+        "episodes": [
+          3,
+          4,
+          7
+        ],
+        "beats": [
+          "旧事没有免责答案",
+          "把自己的计划说出来",
+          "改变需要付出实际代价"
+        ]
+      },
+      "referenceStatus": "已生成并目视核对；见新增美术生成提示词.json",
+      "masterImage": "images/公共休息区-日间.png",
+      "orientationRule": "标准主视角里的左右是机位定义；换角度保持物件在空间中的真实位置。",
+      "masterState": "日间",
+      "lightingImages": {
+        "日间": "images/公共休息区-日间.png",
+        "夜间": "images/公共休息区-夜间.png"
+      }
+    },
+    {
+      "id": "S04",
+      "name": "单人告白间",
+      "primary": true,
+      "summary": "单人前采和告白使用同一空间，背景安静，让眼神与停顿成立；固定灯位不随人物立场变化。",
+      "anchors": [
+        {
+          "name": "单把无扶手椅",
+          "desc": "中央只一把象牙白软包无扶手椅，弧形靠背。"
+        },
+        {
+          "name": "沙色墙",
+          "desc": "整面浅沙色细纹灰泥墙，无装饰画。"
+        },
+        {
+          "name": "左侧褐麻帘",
+          "desc": "标准正面画面左侧一幅通高灰褐亚麻帘。"
+        },
+        {
+          "name": "右侧圆边桌",
+          "desc": "画面右侧一张深胡桃木小圆边桌，默认空台面。"
+        },
+        {
+          "name": "浅橡木地板",
+          "desc": "浅橡木长条地板，纹理方向朝背景墙。"
+        }
+      ],
+      "lighting": [
+        {
+          "state": "录制日",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Empty single-person interview alcove in a contemporary coastal Chinese villa. Fixed frontal view: exactly ONE armless ivory upholstered curved-back chair in the center, warm sand-beige fine plaster wall behind, full-height taupe linen curtain at picture LEFT, one empty small dark walnut circular side table at picture RIGHT, pale oak plank floor. No windows, paintings, second chair, studio equipment or people. Empty scene, no people, no text. Soft large neutral studio key from upper picture LEFT and gentle frontal fill, stable white balance; no visible studio equipment."
+        },
+        {
+          "state": "夜间",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Empty single-person interview alcove in a contemporary coastal Chinese villa. Fixed frontal view: exactly ONE armless ivory upholstered curved-back chair in the center, warm sand-beige fine plaster wall behind, full-height taupe linen curtain at picture LEFT, one empty small dark walnut circular side table at picture RIGHT, pale oak plank floor. No windows, paintings, second chair, studio equipment or people. Empty scene, no people, no text. The same soft neutral studio key and front fill as the recorded interview; controlled windowless set, no blue night filter and no layout changes."
+        }
+      ],
+      "image": {
+        "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Empty single-person interview alcove in a contemporary coastal Chinese villa. Fixed frontal view: exactly ONE armless ivory upholstered curved-back chair in the center, warm sand-beige fine plaster wall behind, full-height taupe linen curtain at picture LEFT, one empty small dark walnut circular side table at picture RIGHT, pale oak plank floor. No windows, paintings, second chair, studio equipment or people. Empty scene, no people, no text. Soft large neutral studio key from upper picture LEFT and gentle frontal fill, stable white balance; no visible studio equipment.",
+        "negativePrompt": "people, human figures, faces, silhouettes of people, human reflections, crowds, illustration, anime, brush strokes, warped perspective, melted geometry, floating objects, extra furniture, text, logos, watermark",
+        "sheet": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Matte plaster, visible natural wood grain, linen weave and realistic paper fibers, clean but inhabited surfaces, restrained warm neutrals. ONE 16:9 landscape environment reference sheet. Upper-left MASTER panel about 72% width by 70% height, right column and bottom row form an L-shaped detail border, thin hairline rules. Every small panel is an exact close-up of a named anchor visible in the master view; nothing invented that is not present in the master view. THE SPACE MUST BE IDENTICAL ACROSS ALL PANELS. Absolutely no people anywhere, no human reflections. Empty single-person interview alcove in a contemporary coastal Chinese villa. Fixed frontal view: exactly ONE armless ivory upholstered curved-back chair in the center, warm sand-beige fine plaster wall behind, full-height taupe linen curtain at picture LEFT, one empty small dark walnut circular side table at picture RIGHT, pale oak plank floor. No windows, paintings, second chair, studio equipment or people. Soft large neutral studio key from upper picture LEFT and gentle frontal fill, stable white balance; no visible studio equipment.",
+        "tags": [
+          "photographic",
+          "live-action",
+          "environment sheet",
+          "natural materials",
+          "continuity"
+        ]
+      },
+      "usage": {
+        "episodes": [
+          1,
+          2,
+          4,
+          5,
+          6,
+          8
+        ],
+        "beats": [
+          "把决定权拿回来",
+          "观众选择真的发生",
+          "把自己的计划说出来",
+          "照顾也需要先问",
+          "每个人都有拒绝权",
+          "选择可继续的生活"
+        ]
+      },
+      "referenceStatus": "已生成并人工目视核对",
+      "masterImage": "images/单人告白间-sheet.png",
+      "orientationRule": "标准主视角里的左右是机位定义；换角度保持物件在空间中的真实位置。",
+      "lightingImages": {
+        "录制日": "images/单人告白间-sheet.png",
+        "夜间": "images/单人告白间-sheet.png"
+      }
+    },
+    {
+      "id": "S05",
+      "name": "小屋露台",
+      "primary": true,
+      "summary": "海景给旧关系留出呼吸空间，两把椅子强调可以并坐谈话，但距离必须由人物自己改变。",
+      "anchors": [
+        {
+          "name": "白色矮女儿墙",
+          "desc": "海侧一条圆角白色实心矮墙。"
+        },
+        {
+          "name": "浅木地台",
+          "desc": "平行海岸铺设的浅木地板。"
+        },
+        {
+          "name": "双编绳椅",
+          "desc": "两把米色编绳扶手椅，轮廓与尺寸相同。"
+        },
+        {
+          "name": "小圆桌",
+          "desc": "两椅间一张米白小圆桌。"
+        },
+        {
+          "name": "帆布遮阳篷",
+          "desc": "上方一幅浅奶油帆布遮阳篷，不新增串灯。"
+        }
+      ],
+      "lighting": [
+        {
+          "state": "晴天下午",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Empty seaside terrace of a contemporary coastal Chinese villa. Rounded white solid low parapet along the sea, light-oak deck boards parallel to the shoreline, exactly two matching beige woven-rope armchairs with one small ivory round table between them, one pale cream canvas awning overhead. Calm sea and uncluttered horizon, no string lights or additional furniture. Empty scene, no people, no text. Gentle late-afternoon natural daylight under the canvas shade, blue-gray calm sea, readable rope texture."
+        },
+        {
+          "state": "夜间",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Empty seaside terrace of a contemporary coastal Chinese villa. Rounded white solid low parapet along the sea, light-oak deck boards parallel to the shoreline, exactly two matching beige woven-rope armchairs with one small ivory round table between them, one pale cream canvas awning overhead. Calm sea and uncluttered horizon, no string lights or additional furniture. Empty scene, no people, no text. Dark navy sea and softly lit white parapet from hidden warm fixtures, natural night exposure, no extra decorative lighting."
+        }
+      ],
+      "image": {
+        "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Empty seaside terrace of a contemporary coastal Chinese villa. Rounded white solid low parapet along the sea, light-oak deck boards parallel to the shoreline, exactly two matching beige woven-rope armchairs with one small ivory round table between them, one pale cream canvas awning overhead. Calm sea and uncluttered horizon, no string lights or additional furniture. Empty scene, no people, no text. Gentle late-afternoon natural daylight under the canvas shade, blue-gray calm sea, readable rope texture.",
+        "negativePrompt": "people, human figures, faces, silhouettes of people, human reflections, crowds, illustration, anime, brush strokes, warped perspective, melted geometry, floating objects, extra furniture, text, logos, watermark",
+        "sheet": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. Matte plaster, visible natural wood grain, linen weave and realistic paper fibers, clean but inhabited surfaces, restrained warm neutrals. ONE 16:9 landscape environment reference sheet. Upper-left MASTER panel about 72% width by 70% height, right column and bottom row form an L-shaped detail border, thin hairline rules. Every small panel is an exact close-up of a named anchor visible in the master view; nothing invented that is not present in the master view. THE SPACE MUST BE IDENTICAL ACROSS ALL PANELS. Absolutely no people anywhere, no human reflections. Empty seaside terrace of a contemporary coastal Chinese villa. Rounded white solid low parapet along the sea, light-oak deck boards parallel to the shoreline, exactly two matching beige woven-rope armchairs with one small ivory round table between them, one pale cream canvas awning overhead. Calm sea and uncluttered horizon, no string lights or additional furniture. Gentle late-afternoon natural daylight under the canvas shade, blue-gray calm sea, readable rope texture.",
+        "tags": [
+          "photographic",
+          "live-action",
+          "environment sheet",
+          "natural materials",
+          "continuity"
+        ]
+      },
+      "usage": {
+        "episodes": [
+          2,
+          3,
+          5,
+          6,
+          7,
+          8
+        ],
+        "beats": [
+          "观众选择真的发生",
+          "旧事没有免责答案",
+          "照顾也需要先问",
+          "每个人都有拒绝权",
+          "改变需要付出实际代价",
+          "选择可继续的生活"
+        ]
+      },
+      "referenceStatus": "已生成并目视核对；见新增美术生成提示词.json",
+      "masterImage": "images/露台-夜间.png",
+      "orientationRule": "标准主视角里的左右是机位定义；换角度保持物件在空间中的真实位置。",
+      "masterState": "夜间",
+      "lightingImages": {
+        "晴天下午": "images/露台-晴天下午.png",
+        "夜间": "images/露台-夜间.png"
+      }
+    }
+  ],
+  "props": [
+    {
+      "id": "P01",
+      "name": "纸质邀请卡",
+      "summary": "公开约会邀请、接受与婉拒，保存真实选择后果。",
+      "scale": "手持级",
+      "anchors": [
+        {
+          "name": "A6竖版",
+          "desc": "105×148毫米，厚约0.4毫米；四角3毫米圆角。"
+        },
+        {
+          "name": "暖白纸纤维",
+          "desc": "350克暖象牙白无涂层纸，正背同色。"
+        },
+        {
+          "name": "细铜边框",
+          "desc": "正面一条低饱和铜色细边，距边7毫米；背面无框。"
+        },
+        {
+          "name": "空白书写区",
+          "desc": "图像母版不含字，姓名、地点、时间全部后期叠加。"
+        }
+      ],
+      "states": [
+        {
+          "state": "空白正面",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. One A6 portrait invitation card, 105 by 148 millimeters, handheld scale, warm ivory 350 gsm uncoated paper with visible fine fibers, four subtly rounded corners. One thin muted copper rectangular border inset 7 millimeters on the front; back plain ivory. Absolutely blank central face, no text, handwriting, logo or emblem. Pure white background, no people, no hands. Front face visible, blank writable center and one copper border."
+        },
+        {
+          "state": "空白背面",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. One A6 portrait invitation card, 105 by 148 millimeters, handheld scale, warm ivory 350 gsm uncoated paper with visible fine fibers, four subtly rounded corners. One thin muted copper rectangular border inset 7 millimeters on the front; back plain ivory. Absolutely blank central face, no text, handwriting, logo or emblem. Pure white background, no people, no hands. Back face visible, plain ivory without border or text."
+        },
+        {
+          "state": "已填写底板",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. One A6 portrait invitation card, 105 by 148 millimeters, handheld scale, warm ivory 350 gsm uncoated paper with visible fine fibers, four subtly rounded corners. One thin muted copper rectangular border inset 7 millimeters on the front; back plain ivory. Absolutely blank central face, no text, handwriting, logo or emblem. Pure white background, no people, no hands. Keep the physical front card blank; composited writing will be added after generation, do not generate any lettering."
+        }
+      ],
+      "relatedScenes": [
+        "S01",
+        "S04",
+        "S05",
+        "S02"
+      ],
+      "carriedBy": [
+        "许知意",
+        "周叙",
+        "陆屿",
+        "宋乔"
+      ],
+      "image": {
+        "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. One A6 portrait invitation card, 105 by 148 millimeters, handheld scale, warm ivory 350 gsm uncoated paper with visible fine fibers, four subtly rounded corners. One thin muted copper rectangular border inset 7 millimeters on the front; back plain ivory. Absolutely blank central face, no text, handwriting, logo or emblem. Pure white background, no people, no hands. Front face visible, blank writable center and one copper border.",
+        "negativePrompt": "people, human figures, faces, silhouettes of people, human reflections, crowds, illustration, anime, brush strokes, warped perspective, melted geometry, floating objects, extra furniture, text, logos, watermark, hands, fingers, arms, holding gestures",
+        "sheet": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. ONE 16:9 landscape prop sheet with a master three-quarter view in the upper-left and an L-shaped detail border on the bottom and right. Pure white background in EVERY panel. One A6 portrait invitation card, 105 by 148 millimeters, handheld scale, warm ivory 350 gsm uncoated paper with visible fine fibers, four subtly rounded corners. One thin muted copper rectangular border inset 7 millimeters on the front; back plain ivory. Absolutely blank central face, no text, handwriting, logo or emblem. Pure white background, no people, no hands. Show front, back, side and material details of the same object. No people, no hands, no fingers. Matte plaster, visible natural wood grain, linen weave and realistic paper fibers, clean but inhabited surfaces, restrained warm neutrals.",
+        "tags": [
+          "photographic",
+          "prop sheet",
+          "white background",
+          "handheld scale"
+        ]
+      },
+      "usage": {
+        "episodes": [
+          1,
+          2,
+          6,
+          7,
+          8
+        ],
+        "beats": [
+          "把决定权拿回来",
+          "观众选择真的发生",
+          "每个人都有拒绝权",
+          "选择可继续的生活"
+        ]
+      },
+      "referenceStatus": "已生成并人工目视核对",
+      "masterImage": "images/纸质邀请卡-sheet.png",
+      "textPolicy": "生成图保持空白；剧情文字使用后期图层，不以图像模型输出的文字为准。"
+    },
+    {
+      "id": "P02",
+      "name": "知意的手机",
+      "summary": "收到驻留录取与确认回执，承载自己的未来计划。",
+      "scale": "手持级",
+      "anchors": [
+        {
+          "name": "浅灰绿素壳",
+          "desc": "无品牌雾面浅灰绿直边手机壳。"
+        },
+        {
+          "name": "双圆后摄",
+          "desc": "背面左上竖排两只黑色圆摄像头，不多镜头。"
+        },
+        {
+          "name": "黑色平屏",
+          "desc": "正面黑色平整屏幕，细黑边框。"
+        }
+      ],
+      "states": [
+        {
+          "state": "熄屏正面",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. A single modern unbranded smartphone at handheld scale, approximately 150 by 72 millimeters. Matte pale sage-gray flat-edged case, exactly two vertically aligned black circular rear cameras at the top-left of the back, black flat front display with a thin black bezel. No brand marks. Pure white background, no people, no hands. Front display is uniformly black, no generated interface."
+        },
+        {
+          "state": "背面",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. A single modern unbranded smartphone at handheld scale, approximately 150 by 72 millimeters. Matte pale sage-gray flat-edged case, exactly two vertically aligned black circular rear cameras at the top-left of the back, black flat front display with a thin black bezel. No brand marks. Pure white background, no people, no hands. Show the pale sage-gray case and exactly two rear lenses."
+        },
+        {
+          "state": "消息底板",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. A single modern unbranded smartphone at handheld scale, approximately 150 by 72 millimeters. Matte pale sage-gray flat-edged case, exactly two vertically aligned black circular rear cameras at the top-left of the back, black flat front display with a thin black bezel. No brand marks. Pure white background, no people, no hands. Front display remains dark blank for later compositing of a message interface; no text rendered by the image model."
+        }
+      ],
+      "relatedScenes": [
+        "S03",
+        "S04"
+      ],
+      "carriedBy": [
+        "许知意"
+      ],
+      "image": {
+        "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. A single modern unbranded smartphone at handheld scale, approximately 150 by 72 millimeters. Matte pale sage-gray flat-edged case, exactly two vertically aligned black circular rear cameras at the top-left of the back, black flat front display with a thin black bezel. No brand marks. Pure white background, no people, no hands. Front display is uniformly black, no generated interface.",
+        "negativePrompt": "people, human figures, faces, silhouettes of people, human reflections, crowds, illustration, anime, brush strokes, warped perspective, melted geometry, floating objects, extra furniture, text, logos, watermark, hands, fingers, arms, holding gestures",
+        "sheet": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. ONE 16:9 landscape prop sheet with a master three-quarter view in the upper-left and an L-shaped detail border on the bottom and right. Pure white background in EVERY panel. A single modern unbranded smartphone at handheld scale, approximately 150 by 72 millimeters. Matte pale sage-gray flat-edged case, exactly two vertically aligned black circular rear cameras at the top-left of the back, black flat front display with a thin black bezel. No brand marks. Pure white background, no people, no hands. Show front, back, side and material details of the same object. No people, no hands, no fingers. Matte plaster, visible natural wood grain, linen weave and realistic paper fibers, clean but inhabited surfaces, restrained warm neutrals.",
+        "tags": [
+          "photographic",
+          "prop sheet",
+          "white background",
+          "handheld scale"
+        ]
+      },
+      "usage": {
+        "episodes": [
+          2,
+          3,
+          4,
+          7,
+          8
+        ],
+        "beats": [
+          "把自己的计划说出来",
+          "改变需要付出实际代价"
+        ]
+      },
+      "referenceStatus": "已生成并目视核对；见新增美术生成提示词.json",
+      "masterImage": "images/手机-sheet.png",
+      "textPolicy": "生成图保持空白；剧情文字使用后期图层，不以图像模型输出的文字为准。",
+      "masterState": "熄屏正面"
+    },
+    {
+      "id": "P03",
+      "name": "行程便签",
+      "summary": "显示未经询问的安排和重新商议后的具体约定。",
+      "scale": "手持级",
+      "anchors": [
+        {
+          "name": "横版长方卡",
+          "desc": "横版150×100毫米，直角。"
+        },
+        {
+          "name": "浅灰网格",
+          "desc": "暖米白纸面覆极浅灰5毫米方格。"
+        },
+        {
+          "name": "左上铜圆点",
+          "desc": "左上角一枚3毫米铜色圆点，不能变为图标或文字。"
+        }
+      ],
+      "states": [
+        {
+          "state": "空白计划纸",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. One small landscape planning note at handheld scale, 150 by 100 millimeters. Warm off-white paper with an extremely pale gray 5-millimeter square grid and one tiny copper dot in the top-left corner. Square corners, no writing or logos. Pure white background, no people, no hands. Flat front view, blank grid and a single top-left copper dot."
+        },
+        {
+          "state": "计划信息底板",
+          "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. One small landscape planning note at handheld scale, 150 by 100 millimeters. Warm off-white paper with an extremely pale gray 5-millimeter square grid and one tiny copper dot in the top-left corner. Square corners, no writing or logos. Pure white background, no people, no hands. Same blank card for later overlay of schedule text; no generated writing."
+        }
+      ],
+      "relatedScenes": [
+        "S01",
+        "S03",
+        "S05"
+      ],
+      "carriedBy": [
+        "周叙",
+        "许知意"
+      ],
+      "image": {
+        "prompt": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. One small landscape planning note at handheld scale, 150 by 100 millimeters. Warm off-white paper with an extremely pale gray 5-millimeter square grid and one tiny copper dot in the top-left corner. Square corners, no writing or logos. Pure white background, no people, no hands. Flat front view, blank grid and a single top-left copper dot.",
+        "negativePrompt": "people, human figures, faces, silhouettes of people, human reflections, crowds, illustration, anime, brush strokes, warped perspective, melted geometry, floating objects, extra furniture, text, logos, watermark, hands, fingers, arms, holding gestures",
+        "sheet": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading. ONE 16:9 landscape prop sheet with a master three-quarter view in the upper-left and an L-shaped detail border on the bottom and right. Pure white background in EVERY panel. One small landscape planning note at handheld scale, 150 by 100 millimeters. Warm off-white paper with an extremely pale gray 5-millimeter square grid and one tiny copper dot in the top-left corner. Square corners, no writing or logos. Pure white background, no people, no hands. Show front, back, side and material details of the same object. No people, no hands, no fingers. Matte plaster, visible natural wood grain, linen weave and realistic paper fibers, clean but inhabited surfaces, restrained warm neutrals.",
+        "tags": [
+          "photographic",
+          "prop sheet",
+          "white background",
+          "handheld scale"
+        ]
+      },
+      "usage": {
+        "episodes": [
+          4,
+          5,
+          7
+        ],
+        "beats": [
+          "照顾也需要先问",
+          "改变需要付出实际代价"
+        ]
+      },
+      "referenceStatus": "已生成并目视核对；见新增美术生成提示词.json",
+      "masterImage": "images/行程便签-sheet.png",
+      "textPolicy": "生成图保持空白；剧情文字使用后期图层，不以图像模型输出的文字为准。",
+      "masterState": "空白计划纸"
+    }
+  ],
+  "lang": "zh",
+  "version": "2.0",
+  "designStatus": "全季基础场景与道具母图齐备；第一集及三版第二集使用规格",
+  "stylePreset": {
+    "label": "真人影视写实",
+    "render": "Photorealistic live-action production reference photography, natural materials, accurate architectural perspective, neutral editorial color grading",
+    "surface": "Matte plaster, visible natural wood grain, linen weave and realistic paper fibers, clean but inhabited surfaces, restrained warm neutrals.",
+    "negative": "people, human figures, faces, silhouettes of people, human reflections, crowds, illustration, anime, brush strokes, warped perspective, melted geometry, floating objects, extra furniture, text, logos, watermark",
+    "tags": [
+      "photographic",
+      "live-action",
+      "environment sheet",
+      "natural materials",
+      "continuity"
+    ]
+  }
+}

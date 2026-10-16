@@ -120,15 +120,27 @@ def inspection_counts(review: dict, takes: dict, expected: list[str]) -> dict:
     return counts
 
 
-def reconcile_review(directory: Path, plan: dict, previous: dict, takes: dict, local: dict, flash: dict) -> dict:
+def reconcile_review(directory: Path, plan: dict, previous: dict, takes: dict, local: dict, flash: dict,
+                     *, review_criteria: dict | None = None) -> dict:
     """Apply the existing evidence priority to an explicit current-take snapshot."""
     ep = ep_names.chapter_of(directory.name)
     clips = copy.deepcopy(previous.get("clips") or {})
     for cid, current in takes.items():
         old = clips.get(cid) or {}
         matches = old.get("video") == current["video"] and old.get("take") == current["take"]
+        criteria = review_criteria.get(cid, []) if review_criteria is not None else None
+        if (matches and criteria is not None and old.get('scoped_agent_review')
+                and old.get('review_criteria') != criteria):
+            old = {**current, 'severity': 'review_error',
+                   'error': 'host criteria changed; current take awaiting review',
+                   'previous_review': old}
+            clips[cid] = old
         key = evidence_key(ep, cid, current["video"], current["take"])
         record = local.get(key)
+        scoped = ((record or {}).get('picture_review') or {}).get('scoped_agent_review')
+        if (scoped and criteria is not None
+                and (not criteria or record.get('review_criteria') != criteria)):
+            record = None  # stale scoped evidence has no ordinary-confirm fallback priority
         incoming = verdict_from_record(record) if record else {}
         mode = incoming.get('review_mode')
         new_method = (review_contracts.current_review(incoming,mode)
@@ -143,9 +155,32 @@ def reconcile_review(directory: Path, plan: dict, previous: dict, takes: dict, l
         # the single canonical verdict as usual.
         final_gate = old.get("verified") or {}
         legacy_final = matches and final_gate and record and record.get("verdict") == final_gate.get("verdict")
-        if record and (new_method or not matches or not old.get("verify") or legacy_final or (record.get("mode") == "confirm" and not old.get("flash_checked"))
-                       or (record.get("mode") == "joint" and not old.get("joint_checked"))
-                       or (record.get('mode') == 'source_confirm' and old.get('source_confirmed_at') != record.get('source_confirmed_at'))):
+        scoped_acceptance = (matches and old.get('review_criteria')
+                             and (criteria is None or old.get('review_criteria') == criteria)
+                             and (old.get('confirmed') or {}).get('check', {}).get('result') == 'resolved'
+                             and (old.get('confirmed') or {}).get('check', {}).get('review_criteria') == old.get('review_criteria'))
+        picture = (record or {}).get('picture_review') or {}
+        agent_review = picture.get('scoped_agent_review') or {}
+        fresh_scoped_confirm = bool(
+            record and record.get('mode') == 'confirm'
+            and agent_review.get('schema') == 'scoped-agent-review-v1'
+            and agent_review.get('clip_id') == cid
+            and agent_review.get('video') == current['video']
+            and agent_review.get('take') == current['take']
+            and agent_review.get('task_id') == record.get('task_id')
+            and agent_review.get('author_session') == record.get('author_session')
+            and record.get('author_session') and record.get('task_id')
+            and agent_review.get('review_criteria') == record.get('review_criteria')
+            and picture.get('review_criteria') == record.get('review_criteria')
+            and bool(record.get('review_criteria')))
+        ordinary_update = (not scoped_acceptance and
+                           (new_method or not matches or not old.get("verify") or legacy_final
+                            or (record and record.get("mode") == "confirm" and not old.get("flash_checked"))
+                            or (record and record.get("mode") == "joint" and not old.get("joint_checked"))
+                            or (record and record.get('mode') == 'source_confirm'
+                                and old.get('source_confirmed_at') != record.get('source_confirmed_at')))
+                           if record else False)
+        if record and (fresh_scoped_confirm or ordinary_update):
             clips[cid] = incoming
         elif not matches:
             clips[cid] = {**current, "severity": "review_error", "error": "current take awaiting precise review"}

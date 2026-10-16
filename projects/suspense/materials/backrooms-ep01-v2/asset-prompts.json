@@ -1,0 +1,75 @@
+{
+  "owner": "/root/backrooms_package_review; prompts only, generation owned by root/asset Agent",
+  "common_direction": "Photorealistic contemporary smartphone documentary reference, portrait 9:16. A beautiful immense indoor poolroom with milky white ceramic square tiles, clean turquoise water and soft warm skylight, physically legible shallow and deep areas. Natural materials, no visible people, no human shadows, no monsters, no text, no arrows, no diagram labels, no UI, no collage, no swimming-pool advertising props. These are five views of one connected locality; preserve the square white landmark column, tile grid and skylight direction. Huge scale conveyed by high ceilings and repeated structure, without impossible warping.",
+  "assets": [
+    {
+      "id": "location_001",
+      "name": "池室浅深交界",
+      "kind": "location",
+      "path": "series_assets/locations/location_001/establishing.jpeg",
+      "prompt": "Standing-height rear-phone viewpoint at the starting shallows, looking north. In the lower right the white square floor tiles are distinctly visible under about 12 cm of clear water. An abrupt drop-off along the left of this shallow strip turns into dark teal deep water; the water is still turquoise, not a black horror pit. The shallow strip continues on the right toward a single enormous square white tiled pillar ahead. The pillar's east-facing edge has one narrow dark teal tile band near the waterline as a recognizable landmark. High white tiled walls, calm reflections and diffuse bright skylight. The shallow/deep boundary occupies the lower half and is unmistakable; no feet or human figure in this empty establishing reference.",
+      "reference_priority": "master geometry first; other room views reuse this architecture and colour"
+    },
+    {
+      "id": "location_002",
+      "name": "池室大柱与亮口",
+      "kind": "location",
+      "path": "series_assets/locations/location_002/establishing.jpeg",
+      "prompt": "A rear-phone viewpoint beside the east/right side of the same immense square white tiled pillar. Show its narrow dark teal tile band near the east waterline. A continuous ankle-deep white tiled strip bends around its right edge and continues toward a bright white tiled arch to the north. Through the arch is another larger water-filled hall with the same materials, clearly not dry land. The immense pillar occupies the left foreground and blocks the stair behind its north face from this viewpoint. Keep a connected shallow strip around the north side so a return can reach the hidden upward stair. No extra open exit or second competing landmark pillar in the foreground; human-height camera, no aerial viewpoint."
+    },
+    {
+      "id": "location_003",
+      "name": "池室下行水阶",
+      "kind": "location",
+      "path": "series_assets/locations/location_003/establishing.jpeg",
+      "prompt": "Rear-phone downward-oblique viewpoint from a safe ankle-deep white tiled landing in the larger hall reached through the bright arch. A single broad straight staircase descends west from this landing into deep clear turquoise water. The first three square white tiled steps are visible; subsequent steps gradually disappear below darker water, with no visible bottom. The far side is a sheer white tiled pool wall with no ladder or handrail. The safe landing stays visible along the lower right; not a staircase rising to an exit, not a funnel or underwater portal. Bright soft skylight, calm surface, no rods or person yet. Preserve the same tile scale and architecture as the master shallow view."
+    },
+    {
+      "id": "location_004",
+      "name": "池室干平台双通道",
+      "kind": "location",
+      "path": "series_assets/locations/location_004/establishing.jpeg",
+      "prompt": "Rear-phone viewpoint on a small dry white tiled platform about 55 cm above the same turquoise pool. The camera faces north, with the ascent staircase behind the camera. Show exactly two reachable passages ahead from this same platform: on the left a fully enclosed dark corridor with ceiling and both side walls, solid dry tiled floor visible for the first few metres, no visible end; on the right a softly lit white tiled corridor whose next turn blocks the end. No door panels, no letters, no magical glow, no destinations beyond the first bend. Leave a dry inner area wide enough for one explorer to sit, with the platform edge and surrounding blue-green water visible to establish safety. Keep white tile size, huge column architecture and diffuse skylight consistent with previous references."
+    },
+    {
+      "id": "prop_001",
+      "name": "空伸缩自拍杆",
+      "kind": "prop",
+      "path": "series_assets/props/prop_001/turnaround.jpeg",
+      "prompt": "Single realistic compact black telescopic selfie stick extended to about 1.2 metres, slender matte black metal segments, simple black hand grip, empty black phone clamp at its tip. The clamp holds no phone. One stick only, full object clearly visible diagonally against neutral pale gray studio background, natural product photography, no hands, no person, no water, no text, no collage. This is a normal phone selfie stick used temporarily to probe water, not a trekking pole or weapon."
+    },
+    {
+      "id": "prop_002",
+      "name": "小型头灯",
+      "kind": "prop",
+      "path": "series_assets/props/prop_002/turnaround.jpeg",
+      "prompt": "Single realistic small rectangular black outdoor headlamp with two round front LED lenses and a plain adjustable black elastic forehead strap. Compact human-sized, matching the supplied character visual-card accessory design. Lamp off, natural neutral pale gray product-photo background, one complete object only, no head or person, no text, no collage, no glowing beam or futuristic equipment."
+    },
+    {
+      "id": "prop_003",
+      "name": "随身补给",
+      "kind": "prop",
+      "path": "series_assets/props/prop_003/turnaround.jpeg",
+      "prompt": "Only two small ordinary travel supplies together as one clear reference: one transparent 500 ml drinking-water bottle filled exactly halfway with a plain gray cap and no printed label, and one small sealed plain muted brown energy-bar wrapper with no readable text. Normal human scale against neutral light gray background. No duplicated bottles or bars, no backpack, no person, no food spread, no product logo, no collage. These same two items are taken from the explorer's dry backpack after reaching the platform."
+    },
+    {
+      "id": "location_005",
+      "name": "池室柱后上行阶",
+      "kind": "location",
+      "path": "series_assets/locations/location_005/establishing.jpeg",
+      "prompt": "Reverse rear-phone standing viewpoint on the north side of the SAME enormous square white tiled landmark pillar, reached by returning on its connected ankle-deep shallow strip and rounding its north side. The pillar fills the right/near side and its east-facing narrow dark teal tile band is just visible around its edge, matching the master. Immediately behind the pillar is one short straight UPWARD staircase of exactly four broad white tiled steps, rising from about 12 cm shallow water to a dry platform about 55 cm above water. Every step climbs up toward visible dry tiles, not down into a deep pool. The dry platform is wide enough for one seated explorer, with the same two distant passage mouths beyond its far edge, A left enclosed dark and B right softly lit white tiled corridor, no text. The approach shallow tiles remain connected around the pillar. Soft warm skylight and clear turquoise water, same tile scale and architecture. Human-height camera at the stair bottom facing north, no person, no feet, no rods, no extra stairs, no outdoor trees or new exit."
+    }
+  ],
+  "identity_reference": {
+    "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/.runtime/backrooms-reference-20261014/package/角色资产/弥夏-身份基准-v1.0.png",
+    "path": "series_assets/characters/character_001/turnaround.jpeg",
+    "scope": "identity_portrait",
+    "policy": "Keep supplied face, short black hair, black tank and graphite jacket/backpack straps. No redraw of identity, no composite card as filming frame."
+  },
+  "review_points": [
+    "all locations visibly share white tiles/turquoise water and one continuous local geometry",
+    "upward stair stays behind the landmark pillar and cannot become the downward stair",
+    "dry platform has exactly A-left enclosed dark passage and B-right lit corridor",
+    "selfie stick clamp is empty; lamp/food cards contain only intended objects"
+  ]
+}

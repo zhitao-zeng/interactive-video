@@ -1,0 +1,21 @@
+{
+  "status": "review_draft",
+  "question": "明天先查哪边？",
+  "choices": [
+    {
+      "id": "A",
+      "text": "沿脚印找新路",
+      "reason": "核对现在能走的方向"
+    },
+    {
+      "id": "B",
+      "text": "在地面查站房",
+      "reason": "核对旧入口线索"
+    }
+  ],
+  "planned_start_seconds": 177,
+  "seconds": 3,
+  "frames": 75,
+  "route_selected": null,
+  "truth_revealed": false
+}

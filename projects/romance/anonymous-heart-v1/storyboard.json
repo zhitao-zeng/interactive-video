@@ -1,0 +1,1272 @@
+{
+  "episode": 1,
+  "body_seconds": 192,
+  "end_seconds": 3,
+  "shots": [
+    {
+      "index": 1,
+      "origin_index": 1,
+      "shot_id": "F01",
+      "label": "F01",
+      "segment_id": "flowers_01",
+      "source_quote": "F01｜先认错了\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。\n动作：阮夏看向程越询问收到的栀子，程越直接否认。阮夏尴尬地笑一下，把花握低至膝前，许棠自然听，闻屿等待问答结束。\n阮夏：这朵花，是你送的？\n程越：我送的不是这个。\n阮夏：哦，那我猜错了。\n程越：没事，先喝口水。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "source_shot": "F01",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "extras": [],
+      "listeners": [
+        "闻屿",
+        "许棠"
+      ],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。",
+      "motion_prompt": "阮夏看向程越询问收到的栀子，程越直接否认。阮夏尴尬地笑一下，把花握低至膝前，许棠自然听，闻屿等待问答结束。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "camera": "主参考机位，西南侧向东北的四人中远景，先建立四椅与原位置；保持人物自然朝桌内，不强求四人都正对镜头。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中远景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "这朵花，是你送的？",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "程越",
+          "delivery_mode": "visible_dialogue",
+          "text": "我送的不是这个。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "哦，那我猜错了。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "程越",
+          "delivery_mode": "visible_dialogue",
+          "text": "没事，先喝口水。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia holds her single white gardenia; the flower is not handed over. The other three received flower letters remain inside their owners' suitcases. Use one incarnation of each guest and no native text. Use the southwest-to-northeast master view and a medium-wide four-person composition. Keep natural inward seated orientations, not four front-facing performances. <Subject 1> looks toward <Subject 3> while holding her received gardenia. <DIALOGUE_1> <Subject 3> answers her directly. <DIALOGUE_2> <Subject 1> briefly smiles at her mistake, lowering the flower to her own lap once. <DIALOGUE_3> <Subject 3> indicates her existing water glass without picking it up. <DIALOGUE_4> The other two quietly listen. End with all four at the same seats and the gardenia still with <Subject 1>.",
+      "source_segment": "F01",
+      "source_scene": 1,
+      "source_beat": 1
+    },
+    {
+      "index": 2,
+      "origin_index": 2,
+      "shot_id": "F02",
+      "label": "F02",
+      "segment_id": "flowers_02",
+      "source_quote": "F02｜真正的笔友\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。\n动作：闻屿接上阮夏昨晚布展的真实细节，阮夏转向他，认出匿名笔友并确认送花人。她仍握着栀子，没有递出或再次高举。\n闻屿：昨晚那幅画，挂好了？\n阮夏：你怎么知道？\n闻屿：你发给我那张照片，右边钉子都掉了。\n阮夏：所以，花是你送的？\n闻屿：嗯。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "source_shot": "F02",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "闻屿"
+      ],
+      "extras": [],
+      "listeners": [],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "motion_prompt": "闻屿接上阮夏昨晚布展的真实细节，阮夏转向他，认出匿名笔友并确认送花人。她仍握着栀子，没有递出或再次高举。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "camera": "机位位于茶几东侧，朝西侧阮夏与闻屿的双人中景；两人的相对世界位置不变，程越与许棠在原座画外。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "闻屿",
+          "delivery_mode": "visible_dialogue",
+          "text": "昨晚那幅画，挂好了？",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "你怎么知道？",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "闻屿",
+          "delivery_mode": "visible_dialogue",
+          "text": "你发给我那张照片，右边钉子都掉了。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "所以，花是你送的？",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "闻屿",
+          "delivery_mode": "visible_dialogue",
+          "text": "嗯。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia holds her single white gardenia; the flower is not handed over. The other three received flower letters remain inside their owners' suitcases. Use one incarnation of each guest and no native text. Camera on the east side looks toward the western pair in a medium two-shot: <Subject 1> remains northwest and <Subject 2> southwest. Only those two are framed; <Subject 3> and <Subject 4> stay seated off-camera at northeast and southeast. <Subject 2> addresses <Subject 1> about the picture frame from their anonymous chat. <DIALOGUE_1> She turns her gaze toward him. <DIALOGUE_2> <DIALOGUE_3> She glances briefly at the gardenia in her lap, then back to him. <DIALOGUE_4> He confirms simply. <DIALOGUE_5> Keep the same two chairs and identities throughout; the flower remains with her.",
+      "source_segment": "F02",
+      "source_scene": 1,
+      "source_beat": 2
+    },
+    {
+      "index": 3,
+      "origin_index": 3,
+      "shot_id": "F03",
+      "label": "F03",
+      "segment_id": "flowers_03",
+      "source_quote": "F03｜救不了的开场\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。\n动作：阮夏向许棠自嘲，许棠接住尴尬。两位男嘉宾同场自然听，不补上吃醋或抢人表情。\n阮夏：刚才那段，能剪掉吗？\n许棠：你问得太认真了，我都差点信了。\n阮夏：你刚才还点头。\n许棠：我点的是水，不是他。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "source_shot": "F03",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "extras": [],
+      "listeners": [
+        "闻屿",
+        "程越"
+      ],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "motion_prompt": "阮夏向许棠自嘲，许棠接住尴尬。两位男嘉宾同场自然听，不补上吃醋或抢人表情。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "camera": "主参考机位，西南侧向东北的四人中远景，先建立四椅与原位置；保持人物自然朝桌内，不强求四人都正对镜头。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中远景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "刚才那段，能剪掉吗？",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "许棠",
+          "delivery_mode": "visible_dialogue",
+          "text": "你问得太认真了，我都差点信了。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "你刚才还点头。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "许棠",
+          "delivery_mode": "visible_dialogue",
+          "text": "我点的是水，不是他。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia holds her single white gardenia; the flower is not handed over. The other three received flower letters remain inside their owners' suitcases. Use one incarnation of each guest and no native text. Use the southwest-to-northeast master view and a medium-wide four-person composition. Keep natural inward seated orientations, not four front-facing performances. <Subject 1> looks at <Subject 4>, self-conscious but amused. <DIALOGUE_1> <DIALOGUE_2> <DIALOGUE_3> <DIALOGUE_4> The two men listen with small natural reactions, not competitive grimaces. No guest changes seats.",
+      "source_segment": "F03",
+      "source_scene": 1,
+      "source_beat": 3
+    },
+    {
+      "index": 4,
+      "origin_index": 4,
+      "shot_id": "F04",
+      "label": "F04",
+      "segment_id": "flowers_04",
+      "source_quote": "F04｜把网名换成名字\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。\n动作：阮夏与闻屿正式交换名字，以网名回收匿名交流。后期跟随这次有效介绍展示两人的花笺档案卡。\n阮夏：阮夏。别再叫我晚点下班了。\n闻屿：闻屿。那是你自己起的。\n阮夏：嗯，起的时候真没下班。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "source_shot": "F04",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "闻屿"
+      ],
+      "extras": [],
+      "listeners": [],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "motion_prompt": "阮夏与闻屿正式交换名字，以网名回收匿名交流。后期跟随这次有效介绍展示两人的花笺档案卡。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "camera": "机位位于茶几东侧，朝西侧阮夏与闻屿的双人中景；两人的相对世界位置不变，程越与许棠在原座画外。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "阮夏。别再叫我晚点下班了。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "闻屿",
+          "delivery_mode": "visible_dialogue",
+          "text": "闻屿。那是你自己起的。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "嗯，起的时候真没下班。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia holds her single white gardenia; the flower is not handed over. The other three received flower letters remain inside their owners' suitcases. Use one incarnation of each guest and no native text. Camera on the east side looks toward the western pair in a medium two-shot: <Subject 1> remains northwest and <Subject 2> southwest. Only those two are framed; <Subject 3> and <Subject 4> stay seated off-camera at northeast and southeast. <Subject 1> introduces her actual name to <Subject 2>. <DIALOGUE_1> He answers plainly. <DIALOGUE_2> She responds with a small shared joke about her screen name. <DIALOGUE_3> Keep both in the same two-shot; no native name graphics.",
+      "source_segment": "F04",
+      "source_scene": 1,
+      "source_beat": 4
+    },
+    {
+      "index": 5,
+      "origin_index": 5,
+      "shot_id": "F05",
+      "label": "F05",
+      "segment_id": "flowers_05",
+      "source_quote": "F05｜水先留下\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。\n动作：程越示意阮夏座前原有水杯，没有新增一只杯。阮夏用空着的一只手拿起自己那杯，花仍握在另一只手；喝一小口后把杯放回原杯位。\n程越：先喝口水，刚才都没顾上。\n阮夏：谢谢。水我没认错吧？\n程越：没有，这杯就是给你的。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "source_shot": "F05",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "程越"
+      ],
+      "extras": [],
+      "listeners": [],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "motion_prompt": "程越示意阮夏座前原有水杯，没有新增一只杯。阮夏用空着的一只手拿起自己那杯，花仍握在另一只手；喝一小口后把杯放回原杯位。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "camera": "从南侧看北侧阮夏与程越双人中景；闻屿、许棠仍在南侧原座画外，不转成对镜独白。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "程越",
+          "delivery_mode": "visible_dialogue",
+          "text": "先喝口水，刚才都没顾上。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "谢谢。水我没认错吧？",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "程越",
+          "delivery_mode": "visible_dialogue",
+          "text": "没有，这杯就是给你的。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia holds her single white gardenia; the flower is not handed over. The other three received flower letters remain inside their owners' suitcases. Use one incarnation of each guest and no native text. Use a south-side medium two-shot of <Subject 1> northwest and <Subject 3> northeast. <Subject 2> and <Subject 4> retain their southern seats outside frame. <Subject 3> indicates the existing water glass in front of <Subject 1>, not a new glass. <DIALOGUE_1> She picks up her own glass with her free hand while retaining the gardenia in the other. <DIALOGUE_2> <DIALOGUE_3> She takes a small sip and returns that glass to its original table position.",
+      "source_segment": "F05",
+      "source_scene": 1,
+      "source_beat": 5
+    },
+    {
+      "index": 6,
+      "origin_index": 6,
+      "shot_id": "F06",
+      "label": "F06",
+      "segment_id": "flowers_06",
+      "source_quote": "F06｜职业变成聊天\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。\n动作：程越、许棠交换名字与职业，把活动催单作为相处入口。后期显示两人的档案卡，其他嘉宾安静听。\n程越：程越，开咖啡店的。\n许棠：许棠，做活动的。那我可能催过你。\n程越：那你千万别说是哪场。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "source_shot": "F06",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "extras": [],
+      "listeners": [
+        "阮夏",
+        "闻屿"
+      ],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "motion_prompt": "程越、许棠交换名字与职业，把活动催单作为相处入口。后期显示两人的档案卡，其他嘉宾安静听。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "camera": "主参考机位，西南侧向东北的四人中远景，先建立四椅与原位置；保持人物自然朝桌内，不强求四人都正对镜头。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中远景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "程越",
+          "delivery_mode": "visible_dialogue",
+          "text": "程越，开咖啡店的。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "许棠",
+          "delivery_mode": "visible_dialogue",
+          "text": "许棠，做活动的。那我可能催过你。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "程越",
+          "delivery_mode": "visible_dialogue",
+          "text": "那你千万别说是哪场。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia holds her single white gardenia; the flower is not handed over. The other three received flower letters remain inside their owners' suitcases. Use one incarnation of each guest and no native text. Use the southwest-to-northeast master view and a medium-wide four-person composition. Keep natural inward seated orientations, not four front-facing performances. <Subject 3> introduces himself to the group. <DIALOGUE_1> <Subject 4> replies with her own name and job, then a work-related tease. <DIALOGUE_2> He takes it lightly. <DIALOGUE_3> The others listen, no invented job props or graphics.",
+      "source_segment": "F06",
+      "source_scene": 1,
+      "source_beat": 6
+    },
+    {
+      "index": 7,
+      "origin_index": 7,
+      "shot_id": "F07",
+      "label": "F07",
+      "segment_id": "flowers_07",
+      "source_quote": "F07｜她也有一封花信\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。\n动作：许棠从东南椅起身，沿东侧通道走到北墙最东焦糖箱，打开箱子的前侧拉链，取出一支玫瑰和无字花笺，再关上箱子。原椅此时空着；其他三人保留原座。\n许棠：我的那封，还在箱子里。我拿一下。\n程越：好，我等你。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠离开东南椅，站在北墙最东焦糖箱前，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠持玫瑰与花笺，焦糖箱已关，东南椅空着。",
+      "source_shot": "F07",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "extras": [],
+      "listeners": [
+        "阮夏",
+        "闻屿"
+      ],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯",
+        "玫瑰花",
+        "空白花笺"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，其他三份匿名花信在各自行李箱中；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。",
+      "motion_prompt": "许棠从东南椅起身，沿东侧通道走到北墙最东焦糖箱，打开箱子的前侧拉链，取出一支玫瑰和无字花笺，再关上箱子。原椅此时空着；其他三人保留原座。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠离开东南椅，站在北墙最东焦糖箱前，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠持玫瑰与花笺，焦糖箱已关，东南椅空着。",
+      "camera": "主参考机位，西南侧向东北的四人中远景，先建立四椅与原位置；保持人物自然朝桌内，不强求四人都正对镜头。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中远景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "许棠",
+          "delivery_mode": "visible_dialogue",
+          "text": "我的那封，还在箱子里。我拿一下。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "程越",
+          "delivery_mode": "visible_dialogue",
+          "text": "好，我等你。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia holds her single white gardenia; the flower is not handed over. The other three received flower letters remain inside their owners' suitcases. Use one incarnation of each guest and no native text. Use the southwest-to-northeast master view and a medium-wide four-person composition. Keep natural inward seated orientations, not four front-facing performances. <Subject 4> stands from the southeast chair once. <DIALOGUE_1> <Subject 3> answers before she leaves. <DIALOGUE_2> She walks along the clear east aisle to her caramel suitcase in the easternmost north-wall alcove, opens its front compartment, removes one red rose and a blank cream note, and closes it. Her southeast chair stays empty; the other three remain seated. End with her standing by her own closed suitcase holding her flower letter.",
+      "source_segment": "F07",
+      "source_scene": 1,
+      "source_beat": 7
+    },
+    {
+      "index": 8,
+      "origin_index": 8,
+      "shot_id": "F08",
+      "label": "F08",
+      "segment_id": "flowers_08",
+      "source_quote": "F08｜另一位也认出来了\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠离开东南椅，站在北墙最东焦糖箱前，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠持玫瑰与花笺，焦糖箱已关，东南椅空着。\n动作：许棠沿原通道返回东南椅并坐下，把花笺与玫瑰放在自己座前桌面；只读取已有留言，程越承认匿名笔友身份。花笺文字后期叠加。\n许棠：别带工作来。是你写的？\n程越：是我。结果今天还想着店里。\n许棠：那你也没做到。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "source_shot": "F08",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "extras": [],
+      "listeners": [
+        "阮夏",
+        "闻屿"
+      ],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯",
+        "玫瑰花",
+        "空白花笺"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠离开东南椅，站在北墙最东焦糖箱前，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠持玫瑰与花笺，焦糖箱已关，东南椅空着。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠离开东南椅，站在北墙最东焦糖箱前，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠持玫瑰与花笺，焦糖箱已关，东南椅空着。",
+      "motion_prompt": "许棠沿原通道返回东南椅并坐下，把花笺与玫瑰放在自己座前桌面；只读取已有留言，程越承认匿名笔友身份。花笺文字后期叠加。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "camera": "主参考机位，西南侧向东北的四人中远景，先建立四椅与原位置；保持人物自然朝桌内，不强求四人都正对镜头。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中远景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "许棠",
+          "delivery_mode": "visible_dialogue",
+          "text": "别带工作来。是你写的？",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "程越",
+          "delivery_mode": "visible_dialogue",
+          "text": "是我。结果今天还想着店里。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "许棠",
+          "delivery_mode": "visible_dialogue",
+          "text": "那你也没做到。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang has the southeast chair assigned, currently empty. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia holds her single white gardenia; the flower is not handed over. Xu Tang starts beside her closed caramel suitcase, holding her received red rose and blank note; her southeast chair is empty. The other three are seated. Use one incarnation of each guest and no native text. Use the southwest-to-northeast master view and a medium-wide four-person composition. Keep natural inward seated orientations, not four front-facing performances. <Subject 4> returns by the east aisle and sits in her original southeast chair once, placing her red rose and blank cream note on the table beside her own glass. She addresses <Subject 3>. <DIALOGUE_1> He acknowledges the authored note. <DIALOGUE_2> She responds directly. <DIALOGUE_3> No native printing on the note.",
+      "source_segment": "F08",
+      "source_scene": 1,
+      "source_beat": 8
+    },
+    {
+      "index": 9,
+      "origin_index": 9,
+      "shot_id": "F09",
+      "label": "F09",
+      "segment_id": "flowers_09",
+      "source_quote": "F09｜线上话多，线下话少\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。\n动作：阮夏试探线上线下差别，闻屿回到当下她刚放下的水杯。没有旁白替两人宣布心动。\n阮夏：你在手机上，话没这么少啊。\n闻屿：你发消息也不慢。\n阮夏：那现在呢？\n闻屿：现在等你喝完水。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "source_shot": "F09",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "闻屿"
+      ],
+      "extras": [],
+      "listeners": [],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯",
+        "玫瑰花",
+        "空白花笺"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "motion_prompt": "阮夏试探线上线下差别，闻屿回到当下她刚放下的水杯。没有旁白替两人宣布心动。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "camera": "机位位于茶几东侧，朝西侧阮夏与闻屿的双人中景；两人的相对世界位置不变，程越与许棠在原座画外。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "你在手机上，话没这么少啊。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "闻屿",
+          "delivery_mode": "visible_dialogue",
+          "text": "你发消息也不慢。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "那现在呢？",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "闻屿",
+          "delivery_mode": "visible_dialogue",
+          "text": "现在等你喝完水。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia holds her single white gardenia; the flower is not handed over. Xu Tang is seated southeast, with her received rose and blank note on the table by her own glass; the remaining flower letters stay in their owners' suitcases. Use one incarnation of each guest and no native text. Camera on the east side looks toward the western pair in a medium two-shot: <Subject 1> remains northwest and <Subject 2> southwest. Only those two are framed; <Subject 3> and <Subject 4> stay seated off-camera at northeast and southeast. <Subject 1> playfully questions <Subject 2> about the difference between text and meeting. <DIALOGUE_1> <DIALOGUE_2> <DIALOGUE_3> He glances briefly at her existing water glass, then meets her gaze. <DIALOGUE_4> Both stay seated, with natural pauses rather than performed dramatic silence.",
+      "source_segment": "F09",
+      "source_scene": 1,
+      "source_beat": 9
+    },
+    {
+      "index": 10,
+      "origin_index": 10,
+      "shot_id": "F10",
+      "label": "F10",
+      "segment_id": "flowers_10",
+      "source_quote": "F10｜新人的邀请\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。\n动作：程越给出明天咖啡的具体可能性，阮夏接受尝一小杯的提议，不把这一句变成已经确定独处约会。\n程越：想试试咖啡吗？\n阮夏：一点点吧，我怕晚上睡不着。\n程越：那明天。我给你做小杯的。\n阮夏：好，明天。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "source_shot": "F10",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "程越"
+      ],
+      "extras": [],
+      "listeners": [],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯",
+        "玫瑰花",
+        "空白花笺"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "motion_prompt": "程越给出明天咖啡的具体可能性，阮夏接受尝一小杯的提议，不把这一句变成已经确定独处约会。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "camera": "从南侧看北侧阮夏与程越双人中景；闻屿、许棠仍在南侧原座画外，不转成对镜独白。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "程越",
+          "delivery_mode": "visible_dialogue",
+          "text": "想试试咖啡吗？",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "一点点吧，我怕晚上睡不着。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "程越",
+          "delivery_mode": "visible_dialogue",
+          "text": "那明天。我给你做小杯的。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "好，明天。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia holds her single white gardenia; the flower is not handed over. Xu Tang is seated southeast, with her received rose and blank note on the table by her own glass; the remaining flower letters stay in their owners' suitcases. Use one incarnation of each guest and no native text. Use a south-side medium two-shot of <Subject 1> northwest and <Subject 3> northeast. <Subject 2> and <Subject 4> retain their southern seats outside frame. <Subject 3> offers a future small coffee to <Subject 1>. <DIALOGUE_1> She answers about tonight. <DIALOGUE_2> He adjusts the proposal to tomorrow. <DIALOGUE_3> She responds. <DIALOGUE_4> Neither stands or produces a new cup. This exchange is heard by the other two; do not manufacture jealous expressions.",
+      "source_segment": "F10",
+      "source_scene": 1,
+      "source_beat": 10
+    },
+    {
+      "index": 11,
+      "origin_index": 11,
+      "shot_id": "F11",
+      "label": "F11",
+      "segment_id": "flowers_11",
+      "source_quote": "F11｜照顾谁都一样吗\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。\n动作：许棠直接问程越，自己的在意是否和普通待客不同；程越不空口许诺唯一，允许她继续判断。\n许棠：你是不是对谁都这么周到？\n程越：开店有点习惯了。\n许棠：那我怎么分得出来？\n程越：你可以再看看，别急着信我。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "source_shot": "F11",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "程越",
+        "许棠"
+      ],
+      "extras": [],
+      "listeners": [],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯",
+        "玫瑰花",
+        "空白花笺"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "motion_prompt": "许棠直接问程越，自己的在意是否和普通待客不同；程越不空口许诺唯一，允许她继续判断。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "camera": "机位位于茶几西侧，朝东侧程越与许棠双人中景；阮夏与闻屿仍在西侧原座画外。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "许棠",
+          "delivery_mode": "visible_dialogue",
+          "text": "你是不是对谁都这么周到？",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "程越",
+          "delivery_mode": "visible_dialogue",
+          "text": "开店有点习惯了。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "许棠",
+          "delivery_mode": "visible_dialogue",
+          "text": "那我怎么分得出来？",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "程越",
+          "delivery_mode": "visible_dialogue",
+          "text": "你可以再看看，别急着信我。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia holds her single white gardenia; the flower is not handed over. Xu Tang is seated southeast, with her received rose and blank note on the table by her own glass; the remaining flower letters stay in their owners' suitcases. Use one incarnation of each guest and no native text. Camera from the west looks toward the eastern pair, <Subject 3> northeast and <Subject 4> southeast, in a medium two-shot. The western pair stay off-camera at their own seats. <Subject 4> asks <Subject 3> a direct question about how he treats people. <DIALOGUE_1> He answers honestly. <DIALOGUE_2> <DIALOGUE_3> <DIALOGUE_4> Maintain a conversational tone, not a polished monologue or accusation. Her rose and note remain beside her glass.",
+      "source_segment": "F11",
+      "source_scene": 1,
+      "source_beat": 11
+    },
+    {
+      "index": 12,
+      "origin_index": 12,
+      "shot_id": "F12",
+      "label": "F12",
+      "segment_id": "flowers_12",
+      "source_quote": "F12｜温室里真实的小事\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。\n动作：闻屿指向阮夏座前桌面的阴影空位，不换椅、不拉窗、不添花瓶。阮夏把原栀子平放自己座前桌面并松手，闻屿不拿走。\n阮夏：这里有点晒。\n闻屿：你的花先放这边，别一直攥着。\n阮夏：你帮我看着，别又认错人了。\n闻屿：不会。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "source_shot": "F12",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "extras": [],
+      "listeners": [
+        "程越",
+        "许棠"
+      ],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯",
+        "玫瑰花",
+        "空白花笺"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏手持收到的一支白色栀子，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。阮夏把栀子握在自己膝前，花未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "motion_prompt": "闻屿指向阮夏座前桌面的阴影空位，不换椅、不拉窗、不添花瓶。阮夏把原栀子平放自己座前桌面并松手，闻屿不拿走。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "camera": "主参考机位，西南侧向东北的四人中远景，先建立四椅与原位置；保持人物自然朝桌内，不强求四人都正对镜头。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中远景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "这里有点晒。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "闻屿",
+          "delivery_mode": "visible_dialogue",
+          "text": "你的花先放这边，别一直攥着。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "你帮我看着，别又认错人了。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "闻屿",
+          "delivery_mode": "visible_dialogue",
+          "text": "不会。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia holds her single white gardenia; the flower is not handed over. Xu Tang is seated southeast, with her received rose and blank note on the table by her own glass; the remaining flower letters stay in their owners' suitcases. Use one incarnation of each guest and no native text. Use the southwest-to-northeast master view and a medium-wide four-person composition. Keep natural inward seated orientations, not four front-facing performances. <Subject 1> notices the afternoon light. <DIALOGUE_1> <Subject 2> indicates an empty shaded spot on the table beside her own glass. <DIALOGUE_2> She lays her original gardenia on that spot and releases it once. <DIALOGUE_3> <DIALOGUE_4> The flower now rests by her northwest seat; nobody takes it. No chair or lighting equipment moves.",
+      "source_segment": "F12",
+      "source_scene": 1,
+      "source_beat": 12
+    },
+    {
+      "index": 13,
+      "origin_index": 13,
+      "shot_id": "F13",
+      "label": "F13",
+      "segment_id": "flowers_13",
+      "source_quote": "F13｜被看见的小迟疑\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。\n动作：许棠询问阮夏此刻的感受，阮夏承认误认时的笃定与现在的不自在。两位男嘉宾保留自己的位置与听见的事实。\n许棠：找到了，还紧张？\n阮夏：网上不用跟人对眼。\n许棠：那你刚才问得挺勇敢。\n阮夏：我以为自己猜中了。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "source_shot": "F13",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "extras": [],
+      "listeners": [
+        "闻屿",
+        "程越"
+      ],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯",
+        "玫瑰花",
+        "空白花笺"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "motion_prompt": "许棠询问阮夏此刻的感受，阮夏承认误认时的笃定与现在的不自在。两位男嘉宾保留自己的位置与听见的事实。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "camera": "南侧略偏西的两位女生关系中景，阮夏在西北、许棠在东南；两位男嘉宾在原椅，入画者保持安静。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "许棠",
+          "delivery_mode": "visible_dialogue",
+          "text": "找到了，还紧张？",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "网上不用跟人对眼。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "许棠",
+          "delivery_mode": "visible_dialogue",
+          "text": "那你刚才问得挺勇敢。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "我以为自己猜中了。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia's received white gardenia rests on the table at her northwest seat. Xu Tang is seated southeast, with her received rose and blank note on the table by her own glass; the remaining flower letters stay in their owners' suitcases. Use one incarnation of each guest and no native text. Use a readable medium relationship composition between <Subject 1> northwest and <Subject 4> southeast; the two men retain their own seats and listen without invented jealous reactions. <Subject 4> asks <Subject 1> about her hesitation. <DIALOGUE_1> <DIALOGUE_2> <DIALOGUE_3> <DIALOGUE_4> Focus on their actual response chain; the two men stay in place and do not react as if they heard a private interview.",
+      "source_segment": "F13",
+      "source_scene": 1,
+      "source_beat": 13
+    },
+    {
+      "index": 14,
+      "origin_index": 14,
+      "shot_id": "F14",
+      "label": "F14",
+      "segment_id": "flowers_14",
+      "source_quote": "F14｜把选择留给她\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。\n动作：闻屿回收匿名记录中阮夏尚未发出的晚霞照片，给窗边续聊一个具体动机；本段不拿出手机，不假装已经约会。\n闻屿：前天那张晚霞，我还没看到呢。\n阮夏：晚霞那张？\n闻屿：嗯。你说回头发，就没下文了。\n阮夏：在手机里，等会儿给你看。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "source_shot": "F14",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "extras": [],
+      "listeners": [
+        "程越",
+        "许棠"
+      ],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯",
+        "玫瑰花",
+        "空白花笺"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "motion_prompt": "闻屿回收匿名记录中阮夏尚未发出的晚霞照片，给窗边续聊一个具体动机；本段不拿出手机，不假装已经约会。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "camera": "主参考机位，西南侧向东北的四人中远景，先建立四椅与原位置；保持人物自然朝桌内，不强求四人都正对镜头。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中远景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "闻屿",
+          "delivery_mode": "visible_dialogue",
+          "text": "前天那张晚霞，我还没看到呢。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "晚霞那张？",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "闻屿",
+          "delivery_mode": "visible_dialogue",
+          "text": "嗯。你说回头发，就没下文了。",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "在手机里，等会儿给你看。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia's received white gardenia rests on the table at her northwest seat. Xu Tang is seated southeast, with her received rose and blank note on the table by her own glass; the remaining flower letters stay in their owners' suitcases. Use one incarnation of each guest and no native text. Use the southwest-to-northeast master view and a medium-wide four-person composition. Keep natural inward seated orientations, not four front-facing performances. <Subject 2> refers to the sunset photo already established in the anonymous record. <DIALOGUE_1> <DIALOGUE_2> <DIALOGUE_3> <DIALOGUE_4> <Subject 1> accepts showing it later, without retrieving a phone yet. Preserve the two original flowers and all table positions.",
+      "source_segment": "F14",
+      "source_scene": 1,
+      "source_beat": 14
+    },
+    {
+      "index": 15,
+      "origin_index": 15,
+      "shot_id": "F15",
+      "label": "F15",
+      "segment_id": "flowers_15",
+      "source_quote": "F15｜花信规则\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。\n动作：四人安静看向桌面与彼此。后期节目规则卡提示：栀子续聊、玫瑰单独认识、鸢尾问清一件事、向日葵一起做事；可以不送。只显示后期说明，不在本场新增公共花材或要求嘉宾朗读。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "source_shot": "F15",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "extras": [],
+      "listeners": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯",
+        "玫瑰花",
+        "空白花笺"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "motion_prompt": "四人安静看向桌面与彼此。后期节目规则卡提示：栀子续聊、玫瑰单独认识、鸢尾问清一件事、向日葵一起做事；可以不送。只显示后期说明，不在本场新增公共花材或要求嘉宾朗读。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "camera": "主参考机位，西南侧向东北的四人中远景，先建立四椅与原位置；保持人物自然朝桌内，不强求四人都正对镜头。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中远景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "",
+          "delivery_mode": "silent_action",
+          "text": "四人安静看向桌面与彼此。后期节目规则卡提示：栀子续聊、玫瑰单独认识、鸢尾问清一件事、向日葵一起做事；可以不送。只显示后期说明，不在本场新增公共花材或要求嘉宾朗读。",
+          "emotion": ""
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia's received white gardenia rests on the table at her northwest seat. Xu Tang is seated southeast, with her received rose and blank note on the table by her own glass; the remaining flower letters stay in their owners' suitcases. Use one incarnation of each guest and no native text. Use the southwest-to-northeast master view and a medium-wide four-person composition. Keep natural inward seated orientations, not four front-facing performances. The four seated adults quietly look between the existing table flowers and each other without reaching for or choosing anything. The programme rule graphic is added later, not generated in the scene. No new flower stock appears in this shot. Everyone is silently attentive; no narration or invented speech.",
+      "source_segment": "F15",
+      "source_scene": 1,
+      "source_beat": 15
+    },
+    {
+      "index": 16,
+      "origin_index": 16,
+      "shot_id": "F16",
+      "label": "F16",
+      "segment_id": "flowers_16",
+      "source_quote": "F16｜决定之前\n开始：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。\n动作：许棠询问阮夏，阮夏尚未送花，回看闻屿后又看一眼程越。她收到的栀子仍在自己座前，不能转赠旧礼物。片尾选择尚未获选。\n许棠：你现在想送哪朵？\n阮夏：等一下。我得想想。\n结束：温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "source_shot": "F16",
+      "source_kind": "original_authored_screenplay",
+      "location": "温室咖啡厅",
+      "scene_id": "flowers_ep01_greenhouse",
+      "scene_time": "雨后傍晚连续时段",
+      "characters": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "in_frame": [
+        "阮夏",
+        "闻屿",
+        "程越",
+        "许棠"
+      ],
+      "extras": [],
+      "listeners": [
+        "闻屿",
+        "程越"
+      ],
+      "wears": {},
+      "props": [
+        "栀子花",
+        "嘉宾行李箱",
+        "玻璃水杯",
+        "玫瑰花",
+        "空白花笺"
+      ],
+      "visual_prompt": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "start_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "motion_prompt": "许棠询问阮夏，阮夏尚未送花，回看闻屿后又看一眼程越。她收到的栀子仍在自己座前，不能转赠旧礼物。片尾选择尚未获选。",
+      "end_state": "温室咖啡厅，北墙西侧门、北墙四格行李位、东北咖啡吧、东墙花园窗，中央一张椭圆矮茶几和四把米白木扶手椅。阮夏固定西北椅，程越固定东北椅，闻屿固定西南椅，许棠固定东南椅，皆面向茶几内侧。北墙四格从西到东依次是阮夏奶油白箱、闻屿炭灰箱、程越橄榄灰箱、许棠焦糖箱，四箱均直立在地面且拉杆收起。四只普通透明玻璃水杯各在茶几对应座位前，茶几原有小花瓶、托盘和灯不移动。阮夏收到的一支白色栀子已平放她座前桌面，闻屿与程越收到的两份花信仍在各自行李箱中，许棠已取出自己的玫瑰和花笺；全场四位成人且衣装不变。栀子已松手，未移交。许棠回到东南椅，玫瑰和花笺放在她座前桌面；焦糖箱关好留在原格。",
+      "camera": "主参考机位，西南侧向东北的四人中远景，先建立四椅与原位置；保持人物自然朝桌内，不强求四人都正对镜头。",
+      "light": "雨后温室柔和傍晚光；参考图建筑/家具及CG材质保持",
+      "shot_scale": "中远景",
+      "duration_seconds": 12,
+      "sfx": "安静温室底声；对白优先，后期音乐另加，原生不生成音乐。",
+      "avoid": "重复人物、自动换座、原生字幕、衣装变化、真人画风、额外说话",
+      "turns": [
+        {
+          "speaker_name": "许棠",
+          "delivery_mode": "visible_dialogue",
+          "text": "你现在想送哪朵？",
+          "emotion": "自然接话"
+        },
+        {
+          "speaker_name": "阮夏",
+          "delivery_mode": "visible_dialogue",
+          "text": "等一下。我得想想。",
+          "emotion": "自然接话"
+        }
+      ],
+      "authored_frame": "Clearly beautified semi-realistic high-end 3D otome-game cutscene animation, no outlines, luminous clean CG skin, sculpted refined facial features and grouped hair highlights; preserve the adopted CG references, not photographic live action. The same empty greenhouse cafe reference defines architecture and furniture only. Exactly four adult guests, four cream wooden armchairs and one low oval coffee table. <Subject 1> Ruan Xia occupies the northwest chair; <Subject 3> Cheng Yue the northeast chair; <Subject 2> Wen Yu the southwest chair; <Subject 4> Xu Tang the southeast chair. These are world positions, not screen positions; all chairs face inward. The north wall has the northwest door and four luggage alcoves, then the northeast coffee bar; garden windows are east. Four upright closed hard-shell suitcases stand on the floor in the north-wall alcoves from west to east: cream for Ruan Xia, charcoal for Wen Yu, gray-olive for Cheng Yue, caramel for Xu Tang. Each guest has one clear water glass on the table by their seat. No furniture or baggage moves; off-camera objects stay at their world positions. Ruan Xia's received white gardenia rests on the table at her northwest seat. Xu Tang is seated southeast, with her received rose and blank note on the table by her own glass; the remaining flower letters stay in their owners' suitcases. Use one incarnation of each guest and no native text. Use the southwest-to-northeast master view and a medium-wide four-person composition. Keep natural inward seated orientations, not four front-facing performances. <Subject 4> asks <Subject 1> about tonight's invitation. <DIALOGUE_1> <DIALOGUE_2> <Subject 1> briefly looks toward <Subject 2>, then <Subject 3>, without choosing or taking a new flower. Her received gardenia stays on the table at northwest; the rose stays at southeast. End before the decision, with all four still in their own seats.",
+      "source_segment": "F16",
+      "source_scene": 1,
+      "source_beat": 16
+    }
+  ],
+  "groups": [
+    {
+      "source_segment": "F01",
+      "shot_indexes": [
+        1
+      ],
+      "request_seconds": 12
+    },
+    {
+      "source_segment": "F02",
+      "shot_indexes": [
+        2
+      ],
+      "request_seconds": 12,
+      "location_reference": "series_assets/locations/location_001/coverage-east-west.jpeg"
+    },
+    {
+      "source_segment": "F03",
+      "shot_indexes": [
+        3
+      ],
+      "request_seconds": 12
+    },
+    {
+      "source_segment": "F04",
+      "shot_indexes": [
+        4
+      ],
+      "request_seconds": 12,
+      "location_reference": "series_assets/locations/location_001/coverage-east-west.jpeg"
+    },
+    {
+      "source_segment": "F05",
+      "shot_indexes": [
+        5
+      ],
+      "request_seconds": 12
+    },
+    {
+      "source_segment": "F06",
+      "shot_indexes": [
+        6
+      ],
+      "request_seconds": 12
+    },
+    {
+      "source_segment": "F07",
+      "shot_indexes": [
+        7
+      ],
+      "request_seconds": 12
+    },
+    {
+      "source_segment": "F08",
+      "shot_indexes": [
+        8
+      ],
+      "request_seconds": 12
+    },
+    {
+      "source_segment": "F09",
+      "shot_indexes": [
+        9
+      ],
+      "request_seconds": 12,
+      "location_reference": "series_assets/locations/location_001/coverage-east-west.jpeg"
+    },
+    {
+      "source_segment": "F10",
+      "shot_indexes": [
+        10
+      ],
+      "request_seconds": 12
+    },
+    {
+      "source_segment": "F11",
+      "shot_indexes": [
+        11
+      ],
+      "request_seconds": 12
+    },
+    {
+      "source_segment": "F12",
+      "shot_indexes": [
+        12
+      ],
+      "request_seconds": 12
+    },
+    {
+      "source_segment": "F13",
+      "shot_indexes": [
+        13
+      ],
+      "request_seconds": 12
+    },
+    {
+      "source_segment": "F14",
+      "shot_indexes": [
+        14
+      ],
+      "request_seconds": 12
+    },
+    {
+      "source_segment": "F15",
+      "shot_indexes": [
+        15
+      ],
+      "request_seconds": 12
+    },
+    {
+      "source_segment": "F16",
+      "shot_indexes": [
+        16
+      ],
+      "request_seconds": 12
+    }
+  ]
+}

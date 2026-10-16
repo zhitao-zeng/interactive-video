@@ -296,7 +296,7 @@ def test_build_assets_checks_only_used_images_and_rebuilds_a_bad_used_card(tmp_p
         return original_open(path, *args, **kwargs)
     monkeypatch.setattr(Image, "open", observe)
     assert runner.build_assets() is manifest
-    assert waits == [selected] and opened == [selected]
+    assert waits == [selected] and opened == [selected, selected]
     assert all(p.read_bytes() == b"broken" for p in (unused, old_sheet, backup))
 
 
@@ -306,6 +306,24 @@ def test_missing_image_keeps_its_pending_task(tmp_path):
     task.write_text("pending")
     assert asset_inspection.purge_unreadable(tmp_path, paths=[path]) == []
     assert task.read_text() == "pending"
+
+
+def test_small_valid_existing_detail_is_not_deleted_or_marked_broken(tmp_path):
+    path=tmp_path/'existing-detail.jpeg'
+    Image.new('RGB',(384,176),'white').save(path)
+    assert path.stat().st_size<20000
+    before=path.read_bytes()
+    assert asset_inspection.purge_unreadable(tmp_path,paths=[path])==[]
+    assert asset_inspection.broken_assets(None,None,paths=[path])==[]
+    assert path.read_bytes()==before
+
+
+@pytest.mark.parametrize('content',[b'<html>upstream error</html>'*1000,b'\xff\xd8\xfftruncated JPEG'])
+def test_asset_readability_still_rejects_html_and_truncated_images(tmp_path,content):
+    path=tmp_path/'broken.jpeg';path.write_bytes(content)
+    assert asset_inspection.broken_assets(None,None,paths=[path])==[path]
+    assert asset_inspection.purge_unreadable(tmp_path,paths=[path])==[path]
+    assert not path.exists()
 
 
 def test_quality_phase_card_does_not_require_an_unreferenced_expression_sheet(tmp_path, monkeypatch):

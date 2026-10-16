@@ -13,22 +13,30 @@ from novel_manga.providers.phanrouter import PhanRouterMediaProvider
 
 
 class Client:
-    def __init__(self, conflicts: int = 0, head_status: int = 200):
+    def __init__(self, conflicts: int = 0, head_status: int = 200, conflict_status: int = 400):
         self.calls: list[dict] = []
         self.heads: list[str] = []
         self.conflicts = conflicts
         self.head_status = head_status
         self.n = 0
+        self.conflict_status = conflict_status
+        self.queries = []
+        self.statuses = ['Active']
 
     def head(self, url, timeout=None, headers=None, follow_redirects=False):
         self.heads.append(url)
         return SimpleNamespace(status_code=self.head_status)
 
     def post(self, url, headers=None, json=None, timeout=None):
+        if url.endswith('/open/GetAsset'):
+            self.queries.append(json)
+            status = self.statuses.pop(0) if len(self.statuses)>1 else self.statuses[0]
+            return SimpleNamespace(status_code=200, raise_for_status=lambda: None,
+                                   json=lambda: {'Result': {'Status': status}})
         self.calls.append({"url": url, "headers": headers, "json": json})
         if self.conflicts:
             self.conflicts -= 1
-            return SimpleNamespace(status_code=400, text='{"Error":"Conflict: asset name already exists"}',
+            return SimpleNamespace(status_code=self.conflict_status, text='{"Error":"Conflict: asset name already exists"}',
                                    raise_for_status=lambda: None, json=lambda: {})
         self.n += 1
         return SimpleNamespace(status_code=200, text="", raise_for_status=lambda: None,
@@ -72,6 +80,44 @@ def test_name_clash_gets_a_suffix(tmp_path):
     p.client = Client(conflicts=1)
     assert p._restore_image_url(ImageResult(path=card, public_url="https://cdn.example/card.jpg")) == "asset://asset-1"
     assert [c["json"]["Name"][-2:] for c in p.client.calls][1] == "-2"
+
+
+def test_long_edition_name_can_register_without_losing_the_content_suffix(tmp_path):
+    import hashlib
+    p, _, _ = provider(tmp_path)
+    p.client = Client(conflicts=1, conflict_status=409)
+    card = tmp_path/'outputs'/'adventure-laughing-country-sd25-480-sound-v2'/'series_assets'/'characters'/'character_001'
+    card.mkdir(parents=True)
+    image = card/'turnaround.jpeg'; image.write_bytes(b'long-edition-photo')
+    result = p._restore_image_url(ImageResult(path=image, public_url='https://cdn.example/card.jpg'))
+    names = [c['json']['Name'] for c in p.client.calls]
+    assert result == 'asset://asset-1'
+    assert all(len(n) <= 62 for n in names)
+    assert names[1] == names[0]+'-2'
+    assert names[0].endswith(hashlib.sha256(image.read_bytes()).hexdigest()[:10])
+
+
+def test_registered_reference_waits_for_processing_and_reuses_active_id(tmp_path, monkeypatch):
+    from novel_manga.providers import phanrouter_references
+    p, client, card = provider(tmp_path)
+    client.statuses = ['Processing', 'Active']
+    slept=[]; monkeypatch.setattr(phanrouter_references.time, 'sleep', slept.append)
+    image = ImageResult(path=card, public_url='https://cdn.example/card.jpg')
+    assert p._restore_image_url(image) == 'asset://asset-1'
+    assert slept == [5] and len(client.calls)==1 and len(client.queries)==2
+    assert json.loads(card.with_suffix('.jpeg.asset.json').read_text())['status']=='Active'
+    assert p._restore_image_url(image) == 'asset://asset-1'
+    assert len(client.calls)==1 and len(client.queries)==2
+
+
+def test_failed_asset_processing_cannot_become_a_video_reference(tmp_path):
+    import pytest
+    p, client, card = provider(tmp_path)
+    client.statuses = ['Failed']
+    with pytest.raises(RuntimeError, match='processing Failed'):
+        p._restore_image_url(ImageResult(path=card, public_url='https://cdn.example/card.jpg'))
+    record=json.loads(card.with_suffix('.jpeg.asset.json').read_text())
+    assert record['asset_id']=='asset-1' and record['status']=='Failed'
 
 
 def test_off_by_default_and_inline_stays_inline(tmp_path):
