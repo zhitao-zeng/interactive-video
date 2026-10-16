@@ -52,7 +52,7 @@
 
 **Interfaces:** Main owns source and project manifests; local aliases select the existing project-owned data and resolve old editions without copying media.
 
-- [ ] Bind only project-owned historical inputs/outputs/delivery/reference paths in the isolated/main worktrees; retain a plain path/size inventory and original snapshot refs. Do not overwrite existing data.
-- [ ] Run CLI help plus read-only status for one actual edition per project; compare its original path, report and stored generation count. Expected: original state reported, no media/model calls or count changes.
-- [ ] Run the complete suite and one independent whole-branch review; fix important findings with regressions, retain minor/ruling notes if any.
-- [ ] Commit and integrate locally through shared-pipeline/main. Update the sole-maintenance instructions and own coordination row, retain old worktrees and other uncommitted work, report exact validation and anything unverified.
+- [x] Bind only project-owned historical inputs/outputs/delivery/reference paths in the isolated/main worktrees; retain a plain path/size inventory and original snapshot refs. Do not overwrite existing data.
+- [x] Run CLI help plus read-only status for one actual edition per project; compare its original path, report and stored generation count. Expected: original state reported, no media/model calls or count changes.
+- [x] Run the complete suite and one independent whole-branch review; fix important findings with regressions, retain minor/ruling notes if any.
+- [x] Commit and integrate locally through shared-pipeline/main. Update the sole-maintenance instructions and own coordination row, retain old worktrees and other uncommitted work, report exact validation and anything unverified.
