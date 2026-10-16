@@ -5,6 +5,39 @@ import shutil
 from concurrent.futures import ThreadPoolExecutor
 from novel_manga.interactive.runtime import configure, runner_for
 from novel_manga.util import atomic_write_json, read_json
+from novel_manga.interactive.intake import PROJECTS
+
+
+def edition_directory(root: Path, project: str, edition: str) -> Path:
+    if Path(edition).name!=edition:
+        raise ValueError('Edition must be an output directory name')
+    novel=(root/'outputs'/edition).resolve()
+    directory=novel/(edition+'_1')
+    if not (directory/'clip_plan.json').is_file():
+        raise FileNotFoundError('Prepare the edition before rendering')
+    owner=read_json(directory/'intake.json',{}).get('project')
+    owner=owner or next((name for name in PROJECTS if edition.startswith(name+'-')),None)
+    if owner and owner!=project:
+        raise ValueError(f'Edition belongs to project {owner}, not {project}')
+    return novel
+
+
+def edition_status(root: Path, project: str, edition: str) -> dict:
+    """Read retained state without instantiating a renderer or accepting old verdicts."""
+    from novel_manga.application.repair.history import generation_counts
+    novel=edition_directory(root,project,edition);directory=novel/(novel.name+'_1')
+    report=read_json(directory/'thin_media_report.json',{})
+    final=read_json(directory/'final_cut_review.json',{})
+    quality=report.get('quality_review') or {}
+    status=report.get('status','not_completed')
+    if quality.get('passed') is False or final.get('passed') is False:
+        status='candidate'
+    counts=generation_counts(directory)
+    return {'project':project,'edition':edition,'episode_dir':str(directory),'status':status,
+            'source_status':report.get('status'),'generation_counts':counts,
+            'generation_total':sum(counts.values()),'final_review_complete':final.get('complete'),
+            'final_review_passed':final.get('passed'),'remaining_findings':len(final.get('issues',[])),
+            'final_video':final.get('movie') or (report.get('assembly') or {}).get('final_video')}
 
 
 def active_runner(root: Path, lane: str, project: str = 'adventure') -> int | None:
@@ -54,7 +87,7 @@ def lane_workspace(root: Path, lane: str, project: str = 'adventure') -> Path:
     master=root/f'outputs/{project}-master'
     novel=root/f'outputs/{project}-{lane}'
     if novel.exists():
-        return novel
+        return novel.resolve()
     episode=master/(master.name+'_1')
     pack(episode)  # includes the common voice reference now present on disk
     plan=read_json(episode/'clip_plan.json',{})
@@ -80,16 +113,21 @@ def can_resume_unsubmitted(episode: Path, report: dict) -> bool:
 def run_episode(root: Path, lane: str, *, project: str = 'adventure', resume_unsubmitted: bool = False, resume: bool = False,
                 edition: str | None = None) -> dict:
     if edition:
-        if Path(edition).name != edition:raise ValueError('Edition must be an output directory name')
-        novel=root/'outputs'/edition
-        if not (novel/(edition+'_1')/'clip_plan.json').is_file():raise FileNotFoundError('Prepare the edition before rendering')
+        novel=edition_directory(root,project,edition)
     else:
         novel=lane_workspace(root,lane,project)
     episode=novel/(novel.name+'_1')
     runner=runner_for(root,novel,lane,project=project)
     report_path=episode/'thin_media_report.json'
     label=edition.removeprefix(project+'-') if edition else lane
-    destination=root/f'delivery/{project}/{label}'
+    destination=(root/f'delivery/{project}/{label}').resolve()
+    saved_final=read_json(episode/'final_cut_review.json',{})
+    saved_movie=Path(saved_final.get('movie') or '')
+    if saved_movie.is_file() and saved_movie.parent.parent.name=='versions':
+        saved_destination=saved_movie.parent.parent.parent
+        saved_receipt=read_json(saved_destination/'delivery.json',{})
+        if saved_receipt.get('final_video')==str(saved_movie):
+            destination=saved_destination
     # A completed attempt is inspected/exported, never silently given a new take budget.
     retry = resume_unsubmitted and report_path.is_file()
     if retry:

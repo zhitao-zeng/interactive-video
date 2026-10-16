@@ -3,12 +3,29 @@ from pathlib import Path
 import os
 import json
 from novel_manga.application.configuration import environment
+from novel_manga.interactive.intake import PROJECTS
+
+
+def project_config(root: Path, project: str) -> dict:
+    """One maintained configuration with explicit per-project production choices."""
+    if project not in PROJECTS:
+        raise ValueError(f'Unknown interactive project: {project}')
+    config=json.loads((root/'configs/interactive.json').read_text())
+    selected=config.get('projects',{}).get(project,{})
+    result={**config}
+    for section in ('production','services'):
+        result[section]={**config.get(section,{}),**selected.get(section,{})}
+    result['production']['workers_by_lane']={
+        **config.get('production',{}).get('workers_by_lane',{}),
+        **selected.get('production',{}).get('workers_by_lane',{})}
+    return result
 
 
 def configure(root: Path, lane: str = 'h3', *, project: str = 'adventure') -> None:
     source = environment(root, {})
     os.environ.update(environment(root))
-    services = json.loads((root/'configs/interactive.json').read_text()).get('services', {})
+    config=project_config(root,project)
+    services = config.get('services', {})
     text_endpoint = os.environ.get('NOVEL_INTERACTIVE_TEXT_ENDPOINT') or services.get('text_endpoint', 'phanthy-ds41')
     channel_path = root/f'.runtime/{project}-demo/asset-channel.json'
     channel = json.loads(channel_path.read_text()) if channel_path.is_file() else {}
@@ -20,7 +37,7 @@ def configure(root: Path, lane: str = 'h3', *, project: str = 'adventure') -> No
         'NOVEL_H3_TRANSLATION_ENDPOINT': text_endpoint, 'NOVEL_H3_REQUEST_CHECK_ENDPOINT': text_endpoint,
         'SECOND_REVIEW_JUDGE': text_endpoint,
         'NOVEL_LOCAL_H3_URL': 'pool' if lane == 'h3' else '',
-        'NOVEL_H3_SHORT_EDGE': str(json.loads((root/'configs/interactive.json').read_text()).get('production', {}).get('h3_short_edge', 544)),
+        'NOVEL_H3_SHORT_EDGE': str(config.get('production', {}).get('h3_short_edge', 544)),
         'NOVEL_VIDEO_MODEL': 'minimax-h3-ref2va-turbo' if lane == 'h3' else 'sd2.5',
         'NOVEL_QUOTA_STOP_FILE': str(root/f'.runtime/{project}-demo/sd25-quota.stop') if lane=='sd25' else '',
         'PHANROUTER_VIDEO_KEY_VAR': 'PHANROUTER_API_KEY' if lane == 'h3' else 'PHANROUTER_SD25_KEY',
@@ -37,7 +54,8 @@ def configure(root: Path, lane: str = 'h3', *, project: str = 'adventure') -> No
 
 
 def runner_for(root: Path, novel: Path, lane: str, *, project: str | None = None):
-    configure(root, lane, project=project or novel.name.rsplit('-',1)[0])
+    project=project or next((name for name in PROJECTS if novel.name.startswith(name+'-')),'adventure')
+    configure(root, lane, project=project)
     from novel_manga.config import Settings
     from novel_manga.models.bible import StoryBible
     from novel_manga.application.rendering.flow import ThinMediaRunner
@@ -46,8 +64,7 @@ def runner_for(root: Path, novel: Path, lane: str, *, project: str | None = None
     if lane=='h3' and profile.get('native_h3_short_edge') is not None:
         os.environ['NOVEL_H3_SHORT_EDGE']=str(profile['native_h3_short_edge'])
     settings = Settings.from_env(provider='phanrouter', output_root=novel.parent, admission_mode='preview')
-    profile=load_profile(novel)
-    defaults=json.loads((root/'configs/interactive.json').read_text())['production'].get('workers_by_lane', {})
+    defaults=project_config(root,project)['production'].get('workers_by_lane', {})
     workers=int(profile.get('workers_by_lane', {}).get(lane, defaults.get(lane, 1)))
     return ThinMediaRunner(novel_dir=novel, episode_dir=novel/(novel.name+'_1'), settings=settings,
                            bible=StoryBible.model_validate_json((novel/'story_bible.json').read_text()),
