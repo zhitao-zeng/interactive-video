@@ -329,6 +329,61 @@ def test_scoped_agent_review_is_unavailable_without_host_criteria(episode):
                                                work_dir=work, author_session='session-1')
 
 
+@pytest.mark.parametrize('subtitle_issue', ['画面底部出现未计划对白字幕', ''])
+def test_scoped_keep_must_adjudicate_native_subtitle_blocker(episode, subtitle_issue):
+    directory, raw, mixed, _, _, _, _ = episode
+    work, artifact = _scoped_review_artifact(directory, raw, mixed)
+    review = read_json(directory / 'episode_review.json')
+    review['clips']['a'].update(unplanned_subtitles=True, subtitle_issue=subtitle_issue)
+    atomic_write_json(directory / 'episode_review.json', review)
+    before = (directory / 'episode_review.json').read_bytes()
+    with pytest.raises(ValueError, match='each current automated blocker'):
+        execution.recheck_current_clip(directory, 'a', review_artifact=artifact,
+                                       work_dir=work, author_session='session-1')
+    assert (directory / 'episode_review.json').read_bytes() == before
+    artifact['reviewed_findings'].append({
+        'finding': subtitle_issue or 'unplanned_subtitles', 'disposition': 'not_demonstrated'})
+    assert execution.recheck_current_clip(
+        directory, 'a', review_artifact=artifact, work_dir=work,
+        author_session='session-1')['accepted'] == ['a']
+
+
+@pytest.mark.parametrize('criteria', [['新的验收标准'], []])
+@pytest.mark.parametrize('state', ['new_failure', 'fallback_confirm', 'saved_acceptance'])
+def test_reconciliation_cannot_replay_scoped_pass_after_host_criteria_change(episode, criteria, state):
+    from novel_manga.application.review import store
+    directory, raw, mixed, _, _, _, _ = episode
+    work, artifact = _scoped_review_artifact(directory, raw, mixed)
+    review = read_json(directory / 'episode_review.json')
+    review['clips']['a']['confirmed'] = {
+        'video': str(mixed), 'take': artifact['take'], 'issue': '旧空间问题',
+        'instruction': '核对旧空间问题'}
+    atomic_write_json(directory / 'episode_review.json', review)
+    artifact['reviewed_findings'].extend([
+        {'finding': value, 'disposition': 'not_demonstrated'}
+        for value in ('旧空间问题', '核对旧空间问题')])
+    execution.recheck_current_clip(directory, 'a', review_artifact=artifact,
+                                   work_dir=work, author_session='session-1')
+    saved = read_json(directory / 'episode_review.json')
+    if state != 'saved_acceptance':
+        saved['clips']['a'] = {
+            'video': str(mixed), 'take': artifact['take'],
+            'severity': 'fail', 'tier': 'must_fix', 'review_criteria': criteria,
+            'verify': {'verdict': 'obvious'}, 'defect_issue': '新标准下的实际缺陷'}
+        if state == 'new_failure':
+            saved['clips']['a']['flash_checked'] = True
+        atomic_write_json(directory / 'episode_review.json', saved)
+    atomic_write_json(directory / 'review_criteria.json', {'clips': {'a': criteria}})
+    local = store.load_evidence([directory.parent / 'repair_manager/verified.jsonl'])
+    result, _ = store.reconcile(directory, local, {}, write=False)
+    row = result['clips']['a']
+    assert row['severity'] in {'fail', 'review_error'}
+    assert row.get('verify', {}).get('verdict') != 'fine'
+    if state != 'saved_acceptance':
+        assert row['defect_issue'] == '新标准下的实际缺陷'
+        assert row['review_criteria'] == criteria
+
+
 def test_changed_mode_keep_cannot_be_reused_as_the_previous_mode(episode,monkeypatch):
     from novel_manga.application.review import episode as review_episode, evidence
     from novel_manga.review.contracts import POLICY, current_review

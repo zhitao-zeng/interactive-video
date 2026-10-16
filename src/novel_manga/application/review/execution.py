@@ -145,7 +145,8 @@ def validate_scoped_agent_review(directory, cid, artifact, *, work_dir, author_s
         raise ValueError('review_file needs at least one timed current video frame observation')
 
     required_findings = []
-    for value in (old.get('identity_issue'), old.get('story_issue'), old.get('defect_issue')):
+    subtitle = (old.get('subtitle_issue') or 'unplanned_subtitles') if old.get('unplanned_subtitles') else None
+    for value in (old.get('identity_issue'), old.get('story_issue'), old.get('defect_issue'), subtitle):
         if isinstance(value, str) and value.strip() and value not in required_findings:
             required_findings.append(value)
     presentation = old.get('presentation_check') or {}

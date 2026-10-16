@@ -153,7 +153,9 @@ def enforce(directory, report, previous, *, verify=False, review_criteria=None):
         if criteria is None:
             criteria = clip_review_criteria(directory, cid)
         criteria = list(criteria)
-        criteria_changed = bool(criteria) and check.get('review_criteria') != criteria
+        criteria_changed = (bool(criteria) and check.get('review_criteria') != criteria
+                            or not criteria and bool(check.get('review_criteria'))
+                            and check.get('result') == 'resolved')
         if claim.get('video') == video and claim.get('take') == take and not criteria_changed:
             if (criteria and check.get('video') == video and check.get('take') == take
                     and check.get('review_criteria') == criteria):
@@ -165,7 +167,9 @@ def enforce(directory, report, previous, *, verify=False, review_criteria=None):
                 checked = True
         else:
             checked = (check.get('video') == video and check.get('take') == take
-                       and (not criteria or check.get('review_criteria') == criteria))
+                       and not criteria_changed)
+        if criteria_changed:
+            claim.pop('check', None)
         if verify and not checked:
             try:
                 if criteria:
