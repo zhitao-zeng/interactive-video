@@ -4,6 +4,21 @@ from PIL import Image, ImageDraw, ImageFont
 from novel_manga.util import run
 
 
+def shift_events(events, cut, seconds):
+    """Keep approved scene labels on their footage, excluding the inserted card."""
+    shifted=[]
+    for event in events:
+        start,end=event['start'],event['end']
+        if end<=cut:
+            shifted.append(dict(event))
+        elif start>=cut:
+            shifted.append({**event,'start':start+seconds,'end':end+seconds})
+        else:
+            shifted.extend([{**event,'end':cut},
+                            {**event,'start':cut+seconds,'end':end+seconds}])
+    return shifted
+
+
 def world_card_boundary(publication: dict, timeline: list[dict]) -> tuple[float, float]:
     card = publication['world_card']
     row = next(row for row in timeline if row['unit_id'] == card['after_clip_id'])

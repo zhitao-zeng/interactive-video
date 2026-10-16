@@ -186,6 +186,8 @@ def deliver(runner, report: dict, destination: Path) -> dict:
         body,publication=package_body(body,publication_config,assembly.get('timeline',[]),
                                     destination,ctx.settings.font_path,ctx.settings.width,ctx.settings.height,
                                     boundary_has_speech=boundary_has_speech)
+        from novel_manga.interactive.packaging import shift_events
+        events=shift_events(events,publication['world_card']['start'],publication['world_card']['seconds'])
     card=destination/'interaction.jpeg'
     _card(card,interaction,ctx.settings.font_path,ctx.settings.width,ctx.settings.height)
     tail=destination/'interaction.mp4'
@@ -350,7 +352,7 @@ def export_context(runner,report):
     inputs.pop('native_judgments',None)
     inputs['assembly']=report.get('assembly')
     inputs['delivery_inputs']={name:read_json(ctx.episode_dir/name,{}) for name in
-                              ('interaction.json','delivery_policy.json','overlays.json','evidence_surfaces.json')}
+                              ('interaction.json','delivery_policy.json','overlays.json','evidence_surfaces.json','publication.json')}
     inputs['captions']=take_identity(Path((report.get('assembly') or {}).get('ass','')))
     inputs['frame']=[ctx.settings.width,ctx.settings.height,str(ctx.settings.font_path)]
     return inputs

@@ -34,3 +34,8 @@ assets/
 # Local package symlinks and supplied image trees
 /inputs
 /projects/**/source/images
+
+# Local bindings to retained project reference data (including directory symlinks).
+/projects/**/assets
+/projects/**/series_assets
+/projects/**/source/images

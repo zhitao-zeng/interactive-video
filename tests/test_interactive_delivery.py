@@ -132,6 +132,7 @@ def labelled_delivery(tmp_path,monkeypatch):
     report={'assembly':{'final_video':str(assembled),'ass':str(ass),'timeline':timeline,'thin_passed':True},
             'quality_review':{'passed':True,'content_passed':True},'clips':[]}
     commands=[]
+    monkeypatch.setattr(delivery,'inspect_media',lambda *a,**k:{'passed':True,'checks':{}})
     monkeypatch.setattr(delivery,'_card',lambda *a:None)
     monkeypatch.setattr(delivery,'run',lambda command:commands.append(command))
     monkeypatch.setattr(delivery.subprocess,'run',lambda command,**kw:commands.append(command) or SimpleNamespace(returncode=0,stderr=''))
@@ -225,3 +226,15 @@ def test_independent_ambience_uses_asset_instead_of_spoken_body_window(labelled_
     assert receipt['ambience_source']['kind']=='independent_asset'
     extraction=[c for c in case.commands if str(audio) in c]
     assert len(extraction)==1 and '-ss' not in extraction[0]
+
+
+def test_world_card_change_invalidates_cached_export(labelled_delivery,monkeypatch):
+    import json
+    from novel_manga.interactive import delivery
+    from types import SimpleNamespace
+    case=labelled_delivery;runner=SimpleNamespace(context=case.ctx)
+    monkeypatch.setattr('novel_manga.application.review.final_cut.context',lambda *a:{'constant':'same movie'})
+    before=delivery.export_context(runner,case.report)
+    (case.ctx.episode_dir/'publication.json').write_text(json.dumps({'world_card':{'text':'new card'}}))
+    after=delivery.export_context(runner,case.report)
+    assert before!=after

@@ -46,3 +46,13 @@ def test_world_card_does_not_replay_spoken_tail_but_keeps_wordless_ambience(tmp_
     samples=array.array('h',pcm)
     rms=math.sqrt(sum(x*x for x in samples)/len(samples))
     assert rms < 1 if has_speech else rms > 100
+
+
+def test_approved_labels_split_around_inserted_world_card():
+    from novel_manga.interactive.packaging import shift_events
+    events=[{'text':'before','start':1,'end':3},{'text':'cross','start':3,'end':5},
+            {'text':'after','start':4,'end':6}]
+    result=shift_events(events,4,3)
+    assert result==[{'text':'before','start':1,'end':3},{'text':'cross','start':3,'end':4},
+                    {'text':'cross','start':7,'end':8},{'text':'after','start':7,'end':9}]
+    assert events[1]['end']==5

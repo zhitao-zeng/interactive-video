@@ -124,7 +124,8 @@ def test_authorized_extra_uses_agent_preparation_and_waits_for_validated_inputs(
     d,clips,_=configured(tmp_path)
     record=history.load(d);record['prior_generation_counts']={'clips':{'a':3,'b':3}};history.save(d,record)
     history.grant_conditional_extra(d,'a',authorization='explicit reviewed extra',reason='existing reference candidate')
-    assert managed.candidates(d)[0]==['a']
+    assert managed.candidates(d)[0]==['a','b']  # b may still prepare upstream inputs, never a new video
+    assert history.conditional_extra(d,'b')=={}
     before=copy.deepcopy(clips)
     monkeypatch.setattr(agent,'propose',lambda directory,clip,verdict:{
         'action':'edit','reason':'fix','evidence':['input/prompt.txt'],
@@ -183,9 +184,11 @@ def test_sandbox_exports_copies_and_requires_current_output(tmp_path,monkeypatch
         assert primary['actual_request']==clips[0]['prompt_h3']
         assert primary['request_rules']==evidence['request_rules']
         prompt=(work/'prompt.txt').read_text()
-        assert 'first parallel Read tool batch' in prompt
+        assert 'Read input/primary.json first.' in prompt
+        assert all('/work/'+row['path'] in prompt for row in primary['current_frames'])
         assert '/work/input/take-1/frames/frame_1.jpg' in prompt
-        assert 'name: video-repair' in prompt
+        assert 'Read .claude/skills/video-repair/SKILL.md' in prompt
+        assert 'name: video-repair' in (work/'.claude/skills/video-repair/SKILL.md').read_text()
         assert evidence['takes'] and (work/evidence['takes'][0]['path']/'clip.mp4').is_file()
         assert (work/'.claude/skills/video-repair/SKILL.md').is_file()
         (work/'output').mkdir()

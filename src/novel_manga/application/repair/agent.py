@@ -336,8 +336,10 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
         asset['selected_reference_paths']=[ref['path'] for ref in evidence['references']
             if ref['source_path']==asset['source_path'] and
             (ref.get('role'),ref.get('name'))==(binding.get('role'),binding.get('name'))]
+    from novel_manga.application.repair import history
     from novel_manga.application.repair.history import generation_counts,generation_limit
     choices['video_remaining']=max(0,generation_limit(directory,clip['clip_id'])-generation_counts(directory).get(clip['clip_id'],0))
+    choices['video_preparation_remaining']=history.remaining_takes(directory,clip['clip_id'],preparation=True)
     choices['upstream_remaining']=max(0,upstream.limit(directory,clip['clip_id'])-len(upstream.records(directory,clip['clip_id'])))
     from novel_manga.application.review.final_dispute import available as dispute_available
     choices['final_dispute_remaining']=int(dispute_available(directory,clip['clip_id']))
@@ -376,12 +378,14 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
         'upstream':'input/upstream.json',
         **({'final_cut':final_cut} if final_cut is not None else {}),
         'candidate_revision':len(feedback)+1, 'candidate_limit':MAX_CANDIDATES})
+    frame_paths = ', '.join('/work/'+row['path'] for row in current.get('frames', []))
     (work/'prompt.txt').write_text('Read input/primary.json first. When primary.final_cut is present, first open its frames[].path JPEGs '
                                  'and verify the related final-cut findings against those actual pictures and source_basis. '
                                  'Their seconds are global within the reviewed final movie, and may include a neighbouring clip boundary. '
                                  'Native footage cannot substitute for final-movie continuity. Reports are findings to verify, not picture facts to assume. '
                                  'Then open primary.current_frames[].path JPEGs; without final_cut, start with those current native-take images. '
                                  'This compact file contains the current request, local shots, relevant source passages, references and verdict. '
+                                 'Actual current-take image paths: '+frame_paths+'. '
                                  'Read .claude/skills/video-repair/SKILL.md. Diagnose this failed clip from input/. '
                                  'Read input/upstream.json for reviewed alternative assets, source correction suggestions, audio candidates and current permissions. '
                                  'Choose input for source/reference corrections, asset for a necessary missing corrected reference, audio for interaction ambience assembly, '

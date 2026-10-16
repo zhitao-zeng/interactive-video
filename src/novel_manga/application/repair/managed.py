@@ -60,14 +60,25 @@ def input_state(directory: Path, clip: dict, verdict: dict, takes: dict, *, inpu
     from novel_manga.application.preparation.request_check import POLICY as INPUT_POLICY
     from novel_manga.application.repair.agent import enabled, FRAME_HANDOFF_POLICY, load_config
     runtime=load_config() if enabled(directory) else None
+    profile = read(directory.parent/'profile.json', {})
+    execution = {}
+    if runtime is not None:
+        options = {**(runtime.get('extra_body') or {}), **(runtime.get('repair_extra_body') or {})}
+        execution['repair_agent_max_output_tokens'] = options.get('max_tokens')
+        from novel_manga.application.agents.sandbox import thinking_budget
+        if (budget := thinking_budget({**runtime, 'extra_body': options})) is not None:
+            execution['repair_agent_max_thinking_tokens'] = budget
     allowances={}
     if runtime is not None:
         cid=clip['clip_id'];video_limit=generation_limit(directory,cid);upstream_limit=upstream.limit(directory,cid)
         allowances={'video_limit':video_limit,
                     'video_remaining':max(0,video_limit-history.generation_counts(directory).get(cid,0)),
+                    'video_preparation_remaining':history.remaining_takes(directory,cid,preparation=True),
                     'upstream_limit':upstream_limit,
                     'upstream_remaining':max(0,upstream_limit-len(upstream.records(directory,cid)))}
-    return {**({'repair_evidence_policy':FRAME_HANDOFF_POLICY,
+    return {**execution,
+            **{key:profile[key] for key in ('repair_agent_model','repair_agent_endpoint') if profile.get(key)},
+            **({'repair_evidence_policy':FRAME_HANDOFF_POLICY,
                 'repair_allowances':allowances,
                 'repair_runtime':{**{k:runtime.get(k) for k in ('model','effort','context_window','max_thinking_tokens','repair_extra_body')},
                                   'tool_choice':{'type':'auto','disable_parallel_tool_use':True}}}
@@ -98,7 +109,7 @@ def candidates(directory: Path, review: dict | None = None) -> tuple[list[str],d
         if ((cid not in review.get('feedback',{}) and not identity_issues(clip)) or verdict.get('technical') or clip.get('kind')!='video'
                 or not takes.get(cid) or verdict.get('video')!=takes[cid]['video'] or verdict.get('take')!=takes[cid]['take']):
             continue
-        if (counts.get(cid,0)>=generation_limit(directory,cid,grants=grants)
+        if (counts.get(cid,0)>=budget_limit(directory,cid,grants=grants)
                 and not (agent_enabled(directory) and (upstream.available(directory,cid)
                                                        or final_dispute.available(directory,cid)))):
             blocked[cid]='effective clip retry budget used'
@@ -181,7 +192,7 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
     for cid in targets:
         if cid in input_changed:continue
         counts = generated_counts(history.load(directory))
-        if (counts.get(cid, 0) >= generation_limit(directory, cid)
+        if (counts.get(cid, 0) >= history.preparation_limit(directory, cid)
                 and not upstream.available(directory,cid) and not final_dispute.available(directory,cid)):
             blocked[cid] = 'effective clip retry budget used'
             continue
@@ -205,8 +216,10 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
                     or read(directory/'review_feedback.json', {}) != notes_before
                     or read(directory/'episode_review.json', {}).get('clips',{}).get(cid,{}).get('final_cut') != verdict.get('final_cut')):
                 raise ValueError('episode inputs changed while repair agent was running')
-        def require_video_budget():
-            if generated_counts(history.load(directory)).get(cid,0) >= generation_limit(directory,cid):
+        def require_video_budget(*, preparation=False):
+            limit = history.preparation_limit(directory,cid) if preparation else generation_limit(directory,cid)
+            if (generated_counts(history.load(directory)).get(cid,0) >= limit
+                    or history.remaining_takes(directory,cid,preparation=preparation) <= 0):
                 raise ValueError('effective clip retry budget used')
         try:
             # A repeated canvas layout can come from the actual reference sheet.
@@ -269,6 +282,11 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
                                 proposal=((agent.source_proposal(directory,plan,clip,decision) if decision.get('source_patch')
                                            else upstream.input_proposal(directory,plan,clip,decision)) if action=='input'
                                           else upstream.create_asset(directory,clip,decision))
+                                if action=='input' and decision.get('source_patch'):
+                                    target=next(c for c in proposal.plan['clips'] if c['clip_id']==cid)
+                                    check=agent.check_request(target,directory.parent)
+                                    if check.get('consistent') is not True or check.get('problems'):
+                                        raise ValueError('source binding input check failed: '+str(check.get('problems') or check.get('error') or 'no consistency verdict'))
                             except ValueError as error:
                                 raise agent.CandidateRejected(str(error),decision,stage='upstream_input') from error
                             require_current_inputs()
@@ -293,7 +311,7 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
                             changed.extend(result['changed']);accepted.extend(result['accepted'])
                         candidate_row['recheck_result'] = copy.deepcopy(result)
                     else:
-                        try:require_video_budget()
+                        try:require_video_budget(preparation=action=='edit')
                         except ValueError as error:
                             raise agent.CandidateRejected(str(error)+
                                 '; input/asset/audio preparation remains available; correct the earliest supported layer or stop, '
@@ -308,7 +326,7 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
                             updated = clip
                         check = agent.check_request(updated,directory.parent)
                         candidate_row['check'] = copy.deepcopy(check)
-                        require_current_inputs();require_video_budget()
+                        require_current_inputs();require_video_budget(preparation=action=='edit')
                         service_error = check.get('error') or (check.get('scope_check') or {}).get('error')
                         if service_error:
                             raise ValueError('agent candidate request check unavailable: '+str(service_error))
@@ -320,6 +338,7 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
                                                           decision,stage='check_request',check=check)
                         if action == 'edit':
                             publish_candidate(directory,proposal,'agent_prompt',{cid})
+                            history.mark_extra_prepared(directory,[cid])
                         else:
                             publish_retake(directory,retake_proposal(plan,cid,decision))
                         changed.append(cid)

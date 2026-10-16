@@ -85,3 +85,5 @@ companion.752's formal targeted review remained incomplete, and722 retained an
 unresolved background-prop finding. Recorded improvement is not universal or
 whole-episode acceptance. Choose the camera from the current task and evidence;
 historical examples do not override an approved moving shot or grant a retake.
+
+An explicitly authorized pending take is reported as video_preparation_remaining. When it exceeds video_remaining, a proven English-only defect may prepare a changed edit and pass the normal independent request check; the host marks it prepared and sampling still waits for generation preflight. It does not permit an unchanged extra seed or any unapproved generation.

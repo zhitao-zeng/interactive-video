@@ -14,6 +14,7 @@ def context(directory, media, movie):
     delivery=read_json(directory/'delivery_policy.json',{})
     audio=delivery.get('interaction_ambience')or{}
     return {'movie':take_identity(Path(movie)), 'plan':plan_fingerprint(plan),
+            **({'publication':read_json(directory/'publication.json')} if (directory/'publication.json').is_file() else {}),
             'delivery_policy':delivery,
             'ambience_asset':take_identity(Path(audio['path'])) if audio.get('path') else None,
             'clip_ambience_assets':{key:take_identity(Path(value['path']))

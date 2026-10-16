@@ -86,6 +86,18 @@ def validate_group(answer, selected):
             raise ValueError('final reviewer clip has no cited visible evidence')
 
 
+def delivered_spans(media, receipt):
+    """Map native assembly spans to the actual postproduction movie clock."""
+    card=((receipt or {}).get('publication') or {}).get('world_card')
+    spans=[dict(row) for row in (media.get('assembly') or {}).get('timeline',[])]
+    if card:
+        for span in spans:
+            if float(span['start'])>=float(card['start']):
+                span['start']=float(span['start'])+float(card['seconds'])
+                span['end']=float(span['end'])+float(card['seconds'])
+    return spans
+
+
 def ambience_speech_issues(media, receipt, frames):
     """Sentence ASR proves speech overlap; it does not prove subjective sound quality."""
     source=(receipt or {}).get('ambience_source')
@@ -94,7 +106,7 @@ def ambience_speech_issues(media, receipt, frames):
         from novel_manga.application.repair.ambience import validate
         validate(source)
         return []
-    spans={r['unit_id']:r for r in (media.get('assembly') or {}).get('timeline',[])}
+    spans={r['unit_id']:r for r in delivered_spans(media,receipt)}
     row=next((r for r in media.get('clips',[]) if r['clip_id']==source['clip_id']),None)
     span=spans.get(source['clip_id'])
     if not row or not span:return []
@@ -142,7 +154,7 @@ def review_assembly(runner, media, *, receipt=None):
         info=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_format','-of','json',str(movie)],text=True))
         duration=float(info['format']['duration'])
         clips={c['clip_id']:c for c in ctx.clip_plan['clips'] if c.get('kind')=='video'}
-        spans=[r for r in (media.get('assembly') or {}).get('timeline',[]) if r.get('unit_id') in clips]
+        spans=[r for r in delivered_spans(media,receipt) if r.get('unit_id') in clips]
         if set(r['unit_id'] for r in spans)!=set(clips):raise ValueError('assembly does not cover all planned video clips')
         def frame(cid,second,label):
             second=min(max(0,second),duration-.08);path=target/f'frame-{len(final["frames"]):03d}.jpg'
@@ -153,6 +165,10 @@ def review_assembly(runner, media, *, receipt=None):
         for span in spans:
             start,end=float(span['start']),float(span['end'])
             for label,t in [('start',start+.15),('middle',(start+end)/2),('end',end-.20)]:frame(span['unit_id'],t,label)
+            card=((receipt or {}).get('publication') or {}).get('world_card')
+            if card and card.get('after_clip_id')==span['unit_id']:
+                frame(span['unit_id'],float(card['start'])+float(card['seconds'])/2,
+                      'world introduction card; approved postproduction')
         interaction=(receipt or {}).get('interaction') or {}
         if interaction.get('ambience_shot_index'):
             cid=next((cid for cid,c in clips.items() if interaction['ambience_shot_index'] in c.get('shot_indexes',[])),None)
@@ -163,9 +179,13 @@ def review_assembly(runner, media, *, receipt=None):
             row['expected_captions']=[c['text'] for c in cues if c['start']<=row['seconds']<c['end']]
             row['approved_labels']=[e['text'] for e in (receipt or {}).get('evidence_events',[])
                                     if e['start']<=row['seconds']<e['end']]
+            if 'world introduction card' in row['label']:
+                row['approved_labels'].extend(v for k,v in card.items()
+                                              if isinstance(v,str) and k!='after_clip_id')
         bible=ctx.bible.model_dump(mode='json') if hasattr(ctx.bible,'model_dump') else {}
         source_context={'bible':bible,'script':ctx.script,'layout':before['layout'],'interaction':interaction,
                         'allowed_overlays':(receipt or {}).get('evidence_events',[]),
+                        'publication':(receipt or {}).get('publication',{}),
                         'caption_cues':cues,'postprocessing':(receipt or {}).get('packaging',{}),
                         'caption_origin':'approved ASS added during assembly/postproduction; global movie time',
                         'delivery_policy':(receipt or {}).get('delivery_policy',{})}

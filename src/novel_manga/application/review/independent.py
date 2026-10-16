@@ -162,11 +162,13 @@ def observe(directory, final, *, config=None, dispute=None):
         relative = str(target.relative_to(work))
         originals[relative] = frame['path']
         frames.append({**frame, 'path': relative})
-    primary = [f for f in frames if f['label'] == 'middle' or 'interaction card' in f['label']]
+    primary = [f for f in frames if f['label'] == 'middle' or 'card' in f['label']]
     if dispute is not None:
         disputed_paths = {p for issue in dispute['findings'] for p in issue.get('frame_paths', [])}
         primary = [f for f in frames if f in primary or originals[f['path']] in disputed_paths]
     source = {k: final['context'].get(k) for k in ('script', 'bible', 'layout')}
+    if 'publication' in final['context']:
+        source['publication']=final['context']['publication']
     prior = [{k: v for k, v in issue.items() if k != 'frame_paths'} for issue in previous.get('issues', [])]
     atomic_write_json(inputs/'review.json', {'frames': frames, 'primary_frames': primary,
         'approved_source': source, 'approved_references': copy_references(directory, final, inputs), 'prior_findings': prior,

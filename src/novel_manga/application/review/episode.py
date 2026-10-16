@@ -69,6 +69,8 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
         from novel_manga.application.review.confirmed import enforce
         pending = {}
         for cid, row in (previous.get('clips') or {}).items():
+            row = {**row, 'policy': row.get('policy', previous.get('policy')),
+                   'review_mode': row.get('review_mode', previous.get('review_mode'))}
             if cid in report['clips']:
                 continue
             # A method change invalidates a verdict, not its recorded finding.

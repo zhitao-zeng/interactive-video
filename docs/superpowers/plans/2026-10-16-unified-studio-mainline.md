@@ -31,9 +31,9 @@
 
 **Interfaces:** Preserve existing episode tools and `run_session(work_dir, prompt_text, *, resume, timeout, config, expected_output, enable_tools, project_root)`; creation uses that same adapter.
 
-- [ ] Capture tracked diffs and new text/code files with an isolated Git index, commit snapshot refs, merge in the isolated worktree and reconcile each actual conflict.
-- [ ] Retain both sets of existing Codex tests, run them against the unified implementation, fix any missing creator/production behavior. Expected: both modes pass without Docker/model calls.
-- [ ] Run the integrated full suite, resolve important integration failures, and commit the source integration.
+- [x] Capture tracked diffs and new text/code files with an isolated Git index, commit snapshot refs, merge in the isolated worktree and reconcile each actual conflict.
+- [x] Retain both sets of existing Codex tests, run them against the unified implementation, fix any missing creator/production behavior. Expected: both modes pass without Docker/model calls.
+- [x] Run the integrated full suite, resolve important integration failures, and commit the source integration.
 
 ### Task 2: Central project configuration and historical edition selection
 
