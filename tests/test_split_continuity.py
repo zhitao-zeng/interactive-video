@@ -300,11 +300,11 @@ def test_asset_opt_in_survives_conductor_batch_and_provider(tmp_path, monkeypatc
     calls = []
     def handle(request):
         calls.append(str(request.url))
-        return httpx.Response(200, json={"Result": {"Id": "asset-test"}})
+        return httpx.Response(200, json={"Result": {"Id": "asset-test", "Status": "Active"}})
     provider.client = httpx.Client(transport=httpx.MockTransport(handle))
     card = episode / "card.jpeg"
     Image.new("RGB", (8, 8), "white").save(card)
     assert provider._restore_image_url(ImageResult(path=card, public_url="https://cdn.test/card.jpeg")) == "asset://asset-test"
-    assert len(calls) == 1 and calls[0].endswith("/open/CreateAsset")
+    assert len(calls) == 2 and calls[0].endswith("/open/CreateAsset") and calls[1].endswith('/open/GetAsset')
     provider.client.close()
     batch.cards.shutdown()

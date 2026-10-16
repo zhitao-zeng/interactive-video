@@ -104,3 +104,18 @@ def test_resume_reuses_only_report_matching_current_requests(monkeypatch,tmp_pat
     monkeypatch.setattr('novel_manga.application.rendering.reviewed.run',lambda *a,**k:seen.append(k) or {})
     agent.run(runner,'h3',resume=True)
     assert seen==[{'repair_existing':True} if matches else {}]
+
+
+@pytest.mark.parametrize('lane',['h3','sd25'])
+def test_resume_returns_missing_clips_to_renderer_even_when_inputs_match(monkeypatch,tmp_path,lane):
+    from types import SimpleNamespace
+    from novel_manga.interactive import agent
+    atomic_write_json(tmp_path/'thin_media_report.json',{'clips':[{'clip_id':'a','selected':None}],
+                                                       'failed_clips':['a']})
+    runner=SimpleNamespace(context=SimpleNamespace(profile={},clip_plan={'clips':[{'clip_id':'a'}]},
+                                                   episode_dir=tmp_path,feedback={}))
+    monkeypatch.setattr('novel_manga.application.review.execution.media_matches',lambda *a,**k:True)
+    seen=[]
+    monkeypatch.setattr('novel_manga.application.rendering.reviewed.run',lambda *a,**k:seen.append(k) or {})
+    agent.run(runner,lane,resume=True)
+    assert seen==[{}]

@@ -60,12 +60,18 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
         # A keep/source recheck may have verified individual clips in the new
         # mode while the rest of the episode still awaits that method.
         earlier = {cid:row for cid,row in earlier.items() if review_contracts.current_review(row,mode)}
+    earlier = {cid:row for cid,row in earlier.items()
+               if not row.get('policy') or review_contracts.current_review(row,mode)}
     resume = not fresh if fresh is not None else os.environ.get("NOVEL_REVIEW_FRESH", "").strip() != "1"
     def checkpoint():
         # A long review may outlive its terminal. Save each completed take so a restart reuses it;
         # preserve confirmed findings while the final targeted checks have not run yet.
         from novel_manga.application.review.confirmed import enforce
-        pending = {cid: row for cid, row in earlier.items() if cid not in report['clips']}
+        claims = {cid:{**row,'policy':row.get('policy',previous.get('policy')),
+                       'review_mode':row.get('review_mode',previous.get('review_mode'))}
+                  for cid,row in (previous.get('clips') or {}).items()
+                  if row.get('confirmed') and cid not in report['clips']}
+        pending = {**claims, **{cid: row for cid, row in earlier.items() if cid not in report['clips']}}
         partial = {**report, 'clips': {**pending, **report['clips']},
                    'feedback': {**{cid: note for cid, note in previous.get('feedback', {}).items() if cid in pending},
                                 **report['feedback']}}
@@ -96,6 +102,10 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
                     and take and old.get("take") == take
                     and (not cast_video.enabled() or
                          ((old.get('verify') or {}).get('cast_video') or {}).get('policy') == cast_video.POLICY))
+            if old and old.get('confirmed') and not old.get('confirmed_base'):
+                # Legacy confirmed failures did not retain the unmodified broad
+                # verdict. Recheck only that take before restoring a resolved claim.
+                same_take=False
             source_changed = bool(old and (clip.get('source_trace_repaired') or 'source_segment_ids' in old)
                                   and old.get('source_segment_ids') != (clip.get('segment_ids') or []))
             speech_recovered = bool(old and (old.get('speech_gate') or {}).get('passed') is False

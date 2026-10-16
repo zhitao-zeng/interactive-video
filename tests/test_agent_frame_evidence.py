@@ -265,7 +265,8 @@ def test_primary_input_exposes_actual_current_frames_before_full_episode_evidenc
         assert primary['verdict'] == verdict
         assert evidence['segments'] == segments and len(evidence['takes']) == 2
         prompt = (work/'prompt.txt').read_text()
-        assert prompt.startswith('Read input/primary.json first and immediately open its current_frames[].path JPEGs.')
+        assert prompt.startswith('In your first parallel Read tool batch, read input/primary.json and open these current-take JPEGs: ')
+        assert all('/work/'+row['path'] in prompt for row in primary['current_frames'])
         assert 'evidence.json retains complete history' in prompt
         write(work/'output/decision.json', {'action': 'stop', 'reason': 'fixture',
                                           'evidence': ['input/primary.json']})

@@ -39,6 +39,45 @@ def test_cache_miss_does_not_write_or_review(tmp_path,monkeypatch):
     assert not out['quality_review']['passed'] and not list(tmp_path.iterdir())
 
 
+def test_resumed_render_reviews_new_take_without_discarding_unchanged_confirmation(tmp_path,monkeypatch):
+    from novel_manga.application.review import episode,cast_video
+    from support.managed_episode import fixture_episode
+    d,clips,rows=fixture_episode(tmp_path)
+    (d.parent/'story_bible.json').write_text(json.dumps({'novel_title':'test','genre':'travel',
+        'visual_style':'live','palette':'green','style_fingerprint':'f','characters':[]}))
+    old={'policy':episode.review_contracts.POLICY,'review_mode':'classic','clips':{
+        cid:{**row,'severity':'pass','story_ok':True,'tier':'optional','verify':{'verdict':'fine'},
+             'flash_checked':True} for cid,row in rows.items()},'feedback':{}}
+    (d/'episode_review.json').write_text(json.dumps(old))
+    media=json.loads((d/'thin_media_report.json').read_text())
+    media['assembly']={'thin_passed':True}
+    monkeypatch.setattr(reviewed.history,'adopt_reviewed_run',lambda *a:None)
+    monkeypatch.setattr(reviewed.history,'begin_trial',lambda *a,**k:None)
+    monkeypatch.setattr(reviewed.history,'load',lambda *a:{'trials':[{}]})
+    monkeypatch.setattr(reviewed.history,'save',lambda *a:None)
+    monkeypatch.setattr(reviewed.history,'generation_counts',lambda *a:{'a':2,'b':1})
+    monkeypatch.setattr(reviewed.managed,'candidates',lambda *a:([],{}))
+    monkeypatch.setattr(episode.review_evidence,'load_review_rules',lambda *a:{})
+    monkeypatch.setattr(episode.review_evidence,'review_mode',lambda *a:'classic')
+    monkeypatch.setattr(cast_video,'enabled',lambda:False)
+    judged=[]
+    def judge(clip,*a,**k):
+        judged.append(clip['clip_id'])
+        return {'severity':'pass','identity_ok':True,'story_ok':True}
+    monkeypatch.setattr(episode.review_judges,'judge_clip',judge)
+    monkeypatch.setattr(reviewed,'_review',lambda directory,**kw:episode.review_episode(directory,**kw))
+    def render():
+        (d/'a.mp4').write_bytes(b'new take')
+        return media
+    ctx=RenderContext(episode_dir=d,clip_plan={'clips':clips},feedback={},options=RenderOptions(cache_only=False))
+    result=reviewed.run(SimpleNamespace(context=ctx,run=render))
+    assert judged==['a']
+    assert result['quality_review']['passed']
+    saved=json.loads((d/'episode_review.json').read_text())
+    assert saved['clips']['b']['take']==rows['b']['take']
+    assert saved['clips']['b']['flash_checked'] is True
+
+
 def test_existing_repair_cannot_accept_media_from_an_older_plan(tmp_path):
     import pytest
     (tmp_path/'thin_media_report.json').write_text(json.dumps({'clips':[{'clip_id':'a'}],'clip_plan_fingerprint':'old'}))

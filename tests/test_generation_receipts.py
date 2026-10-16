@@ -217,6 +217,27 @@ def test_owned_completion_is_counted_even_if_current_report_has_a_new_plan(episo
     assert state['trials'][0]['renders'][0]['candidate_video'] is None
 
 
+def test_a_gap_filled_during_another_clip_repair_still_spends_its_own_budget(episode):
+    directory, clip, _ = episode
+    state=history.load(directory)
+    state['trials'][0]['clips'].append('missing')
+    state['trials'].append({'id':2,'managed':True,'clips':['c'],'expected_plan':'changed plan',
+                            'expected_notes':{},'renders':[]})
+    history.save(directory,state)
+    output=directory/'work/clips/missing/attempt_01/clip.mp4';output.parent.mkdir(parents=True)
+    request={'clip_id':'missing','prompt':'unchanged missing shot','duration':5}
+    unowned=history.generation_request(directory,output,request,expected_plan='unmanaged plan',expected_notes={})
+    assert history.GENERATION_FIELD not in unowned
+    owned=history.generation_request(directory,output,request,expected_plan='changed plan',expected_notes={})
+    assert owned[history.GENERATION_FIELD]['trial']==1
+    (output.parent/'request.json').write_text(json.dumps(owned));task(output,'new-gap-task')
+    output.write_bytes(b'new missing video');history.complete_generation(directory,'missing',output,duration=5)
+    assert history.generation_counts(directory)=={'missing':1}
+    resumed=history.generation_request(directory,output,request,expected_plan='changed plan',expected_notes={})
+    assert resumed[history.GENERATION_FIELD]==json.loads((output.parent/'request.json').read_text())[history.GENERATION_FIELD]
+    assert history.generation_counts(directory)=={'missing':1}
+
+
 def test_renumbered_pending_clip_keeps_its_original_generation_owner(episode):
     directory, clip, _ = episode
     r = runner(directory, clip, lambda *a, **kw: pytest.fail('not submitted here'))

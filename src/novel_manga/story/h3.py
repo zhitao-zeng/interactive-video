@@ -54,6 +54,9 @@ REQUEST_CONTENT_RULES = (
     "The current correction replaces conflicting storyboard wording only in its stated scope. "
     "Integrate its visual, sound and speaking-timing requirements into the affected shots at their authored positions. "
     "Remove obsolete effects AND their sound cues. Preserve unaffected action order and dialogue. "
+    "H3 directions are English. Chinese characters appear only inside the existing bound <d> dialogue. "
+    "Native writing uses supplied visual references and English visual directions. "
+    "Spoken words remain exactly the existing bound source dialogue. "
 )
 
 

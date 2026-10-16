@@ -83,7 +83,7 @@ def test_provider_auto_publishes_before_the_probe(tmp_path, monkeypatch):
                     return None
 
                 def json(self):
-                    return {"Result": {"Id": "asset-1"}}
+                    return {"Result": {"Id": "asset-1", "Status": "Active"}}
             return R()
 
     class S:
@@ -91,6 +91,7 @@ def test_provider_auto_publishes_before_the_probe(tmp_path, monkeypatch):
         phanrouter_asset_group_id = "g1"
         phanrouter_base_url = "https://provider.example/api"
         request_timeout = 30
+        poll_timeout = 30
         inline_reference_images = False
         reference_images_via_assets = True
         output_root = tmp_path / "outputs"
@@ -105,3 +106,25 @@ def test_provider_auto_publishes_before_the_probe(tmp_path, monkeypatch):
     assert published.is_file()                                  # 自动发布发生在探针之前
     assert calls and f"turnaround-{digest[:12]}.jpeg" in calls[0]
     assert json.loads(image.with_suffix(".jpeg.asset.json").read_text())["asset_id"] == "asset-1"
+
+
+def test_large_png_reference_is_transported_as_jpeg_without_changing_the_source(tmp_path):
+    from PIL import Image
+    card = tmp_path/'outputs'/'travel'/'series_assets'/'locations'/'location_001'
+    card.mkdir(parents=True)
+    image = card/'establishing.jpeg'
+    Image.effect_noise((1800, 3200), 90).convert('RGB').save(image, format='PNG')
+    before = image.read_bytes()
+    assert len(before) > 2*1024*1024
+    root = tmp_path/'published'
+    old = publish_file(image, root)
+    assert old.read_bytes() == before
+    transformed = publish_file(image, root, reference=True)
+    assert transformed == old and image.read_bytes() == before
+    with Image.open(transformed) as result:
+        assert result.format == 'JPEG'
+        assert max(result.size) == 1280
+        assert abs(result.width/result.height-1800/3200) < .002
+    assert transformed.stat().st_size < 1024*1024
+    first = transformed.stat().st_mtime_ns
+    assert publish_file(image, root, reference=True).stat().st_mtime_ns == first

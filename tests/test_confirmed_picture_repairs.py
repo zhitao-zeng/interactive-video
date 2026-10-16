@@ -1,9 +1,39 @@
 import copy,json
+import pytest
 from pathlib import Path
 from novel_manga.application.review import confirmed
 from novel_manga.application.review.store import import_confirmed_findings
 from novel_manga.application.repair.managed import candidates
 from support.managed_episode import fixture_episode
+
+
+def test_policy_refresh_checkpoint_keeps_unreviewed_findings_without_reusing_old_verdict(tmp_path,monkeypatch):
+    from novel_manga.application.review import episode,cast_video
+    d,clips,rows=fixture_episode(tmp_path)
+    (d.parent/'story_bible.json').write_text(json.dumps({'novel_title':'test','genre':'travel',
+        'visual_style':'live','palette':'green','style_fingerprint':'f','characters':[]}))
+    report=json.loads((d/'episode_review.json').read_text());report.update(policy='old-review',review_mode='classic')
+    (d/'episode_review.json').write_text(json.dumps(report))
+    import_confirmed_findings(d,{'b':{**{k:rows['b'][k] for k in ['video','take']},
+        'issue':'raw contains dialogue captions','instruction':'clean image without native captions'}})
+    monkeypatch.setattr(episode.review_evidence,'load_review_rules',lambda *a:{})
+    monkeypatch.setattr(episode.review_evidence,'review_mode',lambda *a:'classic')
+    monkeypatch.setattr(cast_video,'enabled',lambda:False)
+    called=[]
+    def interrupted(clip,*a,**k):
+        called.append(clip['clip_id'])
+        if clip['clip_id']=='b':raise KeyboardInterrupt()
+        return {'severity':'pass','identity_ok':True}
+    monkeypatch.setattr(episode.review_judges,'judge_clip',interrupted)
+    with pytest.raises(KeyboardInterrupt):episode.review_episode(d,fresh=False)
+    saved=json.loads((d/'episode_review.json').read_text())
+    assert saved['clips']['b']['confirmed']['issue']=='raw contains dialogue captions'
+    assert saved['clips']['b']['policy']=='old-review'
+    called.clear()
+    monkeypatch.setattr(episode.review_judges,'judge_clip',lambda clip,*a,**k:
+        called.append(clip['clip_id']) or {'severity':'pass','identity_ok':True})
+    final=episode.review_episode(d,fresh=False)
+    assert called==['b'] and final['clips']['b']['confirmed']
 
 
 def test_confirmed_failure_enters_repair_and_cannot_be_cleared_by_broad_pass(tmp_path):
@@ -51,6 +81,52 @@ def test_positive_checks_have_one_unambiguous_aggregate_result():
     assert finding_result(good)['result']=='resolved'
     assert finding_result({'checks':[{'met':False,'evidence':'开场面罩打开'}]})['result']=='unresolved'
     assert finding_result({'checks':[{'met':None,'evidence':'看不清'}]})['result']=='uncertain'
+
+
+def test_resolved_claim_restores_broad_pass_and_preserves_unrelated_failure():
+    from novel_manga.application.review.confirmed import apply_claim
+    video='current.mp4';take=[1,2,3]
+    claim={'video':'old.mp4','take':[0,0,0],'issue':'old eye box','instruction':'visible eyes'}
+    for severity in ['pass','fail']:
+        base={'severity':severity,'story_ok':severity=='pass','story_issue':'different failure' if severity=='fail' else ''}
+        unresolved=apply_claim(base,claim,video,take)
+        assert unresolved['severity']=='fail'
+        resolved={**claim,'check':{'video':video,'take':take,'result':'resolved'}}
+        result=apply_claim(unresolved,resolved,video,take)
+        assert result['severity']==severity
+        assert result['story_issue']==base['story_issue']
+
+
+@pytest.mark.parametrize('severity,tier', [('pass',None),('minor',None),('fail','optional'),('fail','must_fix')])
+def test_resolved_overlay_clears_its_stale_retake_feedback(tmp_path,severity,tier):
+    d,clips,rows=fixture_episode(tmp_path)
+    video=rows['a']['video'];take=rows['a']['take']
+    claim={'video':'old.mp4','take':[0,0,0],'issue':'old eye box','instruction':'visible eyes',
+           'check':{'video':video,'take':take,'result':'resolved'}}
+    row=confirmed.apply_claim({'video':video,'take':take,'severity':severity,'tier':tier,
+                               'identity_ok':False,'feedback':'keep each person distinct'},
+                              {k:v for k,v in claim.items() if k!='check'},video,take)
+    report={'clips':{'a':row},'feedback':{'a':'visible eyes'}}
+    previous={'clips':{'a':{'confirmed':claim}}}
+    result=confirmed.enforce(d,report,previous)
+    assert result['clips']['a']['severity']==severity
+    assert ('a' in result['feedback']) is (tier=='must_fix')
+    if tier=='must_fix':assert result['feedback']['a']=='keep each person distinct'
+    assert ('a' in candidates(d,result)[0]) is (tier=='must_fix')
+
+
+def test_resolved_claim_preserves_an_independent_current_repair_instruction(tmp_path):
+    d,clips,rows=fixture_episode(tmp_path)
+    video=rows['a']['video'];take=rows['a']['take']
+    claim={'video':'old.mp4','take':[0,0,0],'issue':'old captions','instruction':'remove native captions',
+           'check':{'video':video,'take':take,'result':'resolved'}}
+    base={'video':video,'take':take,'severity':'fail','tier':'must_fix','visual_defects':True,
+          'visual_defect_kind':'spatial','feedback':'two bodies occupy separate space'}
+    row=confirmed.apply_claim(base,{k:v for k,v in claim.items() if k!='check'},video,take)
+    report={'clips':{'a':row},'feedback':{'a':'two bodies occupy separate space'}}
+    result=confirmed.enforce(d,report,{'clips':{'a':{'confirmed':claim}}})
+    assert result['feedback']['a']=='two bodies occupy separate space'
+    assert result['clips']['a']['severity']=='fail' and candidates(d,result)[0]==['a']
 
 
 def test_visual_review_does_not_invent_a_speech_failure_from_silent_frames():

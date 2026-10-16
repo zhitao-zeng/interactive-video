@@ -5,6 +5,23 @@ description: Author, execute and repair one novel episode from original text or 
 
 # Episode production
 
+For `phase: creation_only` in the manifest, read
+[the unified creator contract](references/creative-authoring.md) and follow that
+file-only phase. It owns complete script/storyboard/interaction and spatial design;
+the media render/repair operations below belong to a later authorized phase.
+The manifest lists the selected genre, camera, voice, blockout, method and repair
+references in this same package. Read the supplied original material and images.
+
+For `phase: script_preparation`, use the script-mode output contract below in a
+file-only workspace. Compile the supplied approved screenplay and selected image
+references into `output/requests.json`; host workflow tools are absent. Preserve
+the script, groups, timing and reference order. The host checks and films later.
+
+For dialogue creation or permitted wording revision in any genre, also read
+[dialogue craft](references/dialogue-craft.md). Keep wording naturalness separate
+from vocal performance; a low voice or breath cue cannot repair exposition-like
+dialogue. Script-mode protected words remain unchanged.
+
 ## Core repair principles
 
 - **Replace superseded logic.** When correcting timing, actions or states, rewrite
@@ -93,6 +110,11 @@ When a source draft needs an existing actor's phase or another input correction
 before first filming, use `adopt` to save the validated draft without video,
 then `apply` the source-backed correction and `render` the prepared plan.
 Task-specific editorial instructions remain authoritative on every continuation.
+For native H3 speech, use the authoring reference's performance guidance: establish
+the starting state, place clause-specific delivery before the bound utterance, and
+describe a meaningful speech ending. An explicitly selected no-audio-reference mode
+requires zero actual audio conditions as well as matching prose; keep required
+voice locks and the host's reference-selection authority.
 For a missing or incorrect setting, `input.locations` can draw a source-supported
 empty scene and bind it to this episode's shots. Use `status.input_repairs` to
 inspect partial progress. When it provides `resume_action`, submit that action

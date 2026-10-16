@@ -1,5 +1,14 @@
 # Production contract
 
+This document describes the **locked-audio workflow** when selected by the task
+and provider. Its mandatory per-turn recording and reference-audio fields belong
+to that mode. For native H3, follow the current host's
+[episode output contract](../../../../skills/episode-production/references/output-contract.md)
+and [speech-performance guidance](../../../../skills/episode-production/references/authoring.md):
+dialogue can be generated with the video, timing comes from that actual speech,
+and an explicitly selected no-reference request carries zero audio conditions.
+The existence of a casting sample does not select locked-audio mode.
+
 ## Contents
 
 - Input and episode boundaries
@@ -72,7 +81,7 @@ Store API task identifiers and request hashes for resumability, but never store 
 - Generate speaking video with the configured image-to-video provider, speaker keyframe, and exact reference audio.
 - Default video submission concurrency to two. Increase only after observing provider stability, CPU/memory pressure, and rate limits.
 - Keep Qwen TTS voice assignments stable for the full novel. Synthesize each turn independently so failures can be regenerated without changing other timings.
-- Always synthesize and lock turn audio before video generation. Pass that file as reference audio and use the same locked audio in final composition; do not add a lip-sync postprocessor.
+- In this selected locked-audio mode, synthesize and lock turn audio before video generation. Pass that file as reference audio and use the same locked audio in final composition; do not add a lip-sync postprocessor.
 
 ## Resume and failure policy
 

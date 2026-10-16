@@ -55,8 +55,6 @@ def purge_unreadable(root: Path, *, paths=None) -> list[Path]:
         if path.name.startswith("."):
             continue  # review markers and other dotfiles are not cards
         try:
-            if path.stat().st_size < 20000:
-                raise ValueError("too small to be a generated card")
             with Image.open(path) as image:
                 image.load()
             continue
@@ -75,7 +73,7 @@ def broken_assets(ctx, manifest, *, paths=None) -> list[Path]:
                  for value in (record.primary_image, getattr(record, "secondary_image", None)) if value]
     broken: list[Path] = []
     for path in dict.fromkeys(paths):
-        if not path.is_file() or path.stat().st_size < 20000:
+        if not path.is_file():
             broken.append(path)
             continue
         try:

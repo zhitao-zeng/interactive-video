@@ -43,7 +43,7 @@ ASK = (
     "Do not copy input field labels, shot numbers or item headings. "
     "Place each supplied <DIALOGUE_N> marker verbatim, exactly once and in order, where the utterance occurs. "
     "The marker is replaced with the full bound utterance, speaker and voice reference. "
-    "Write its vocal delivery once as a separate English sentence beside it, combining the supplied emotion "
+    "Write its vocal delivery once as a separate English sentence immediately before it, combining the supplied emotion "
     "with the dramatic intention; do not also narrate speaking/finishing or another vocal tone. "
     "Express the specific spoken reaction: what word receives emphasis, how breath and pace change "
     "at the authored discovery, and how the sentence ends. Preserve the same vocal identity while "

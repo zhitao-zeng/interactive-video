@@ -1,0 +1,4098 @@
+{
+  "source_archive": "/home/zengzhitao/.codex/attachments/32987c33-46f0-48ac-b8be-191762d38f34/探险视频 第一集.zip",
+  "identity_image": "/mnt/disk1/zengzhitao/worktrees/interactive-adventure-rhythm/.runtime/adventure-incoming-laughing-country-20261013/角色资产/知遥-身份基准-v1.1.png",
+  "source_seconds": 291,
+  "source_shots": [
+    {
+      "shot": 1,
+      "start": 0,
+      "end": 4,
+      "seconds": 4,
+      "kind": "原文台词",
+      "words": "大家好，我是知遥，一个旅行者。",
+      "chinese_chars": 12
+    },
+    {
+      "shot": 2,
+      "start": 4,
+      "end": 10,
+      "seconds": 6,
+      "kind": "原文台词",
+      "words": "今天我来到了笑之国，现在要去办理入境手续。",
+      "chinese_chars": 19
+    },
+    {
+      "shot": 3,
+      "start": 10,
+      "end": 19,
+      "seconds": 9,
+      "kind": "原文台词",
+      "words": "这里就是入境点啦。排队时看到这个告示牌，说是必须要遵守这上面的规则。",
+      "chinese_chars": 31
+    },
+    {
+      "shot": 4,
+      "start": 19,
+      "end": 30,
+      "seconds": 11,
+      "kind": "原文台词",
+      "words": "我脸上这个装置，每个人必须在笑之国佩戴，它是监控我们快乐程度的，数值会在这个大屏幕显示。",
+      "chinese_chars": 40
+    },
+    {
+      "shot": 5,
+      "start": 30,
+      "end": 42,
+      "seconds": 12,
+      "kind": "原文台词",
+      "words": "然后公共场所必须保持微笑，如果传播悲伤情绪，就会被送进这个快乐矫正中心。这些规则都好神经啊！",
+      "chinese_chars": 42
+    },
+    {
+      "shot": 6,
+      "start": 42,
+      "end": 45,
+      "seconds": 3,
+      "kind": "衔接空镜",
+      "words": "",
+      "chinese_chars": 0
+    },
+    {
+      "shot": 7,
+      "start": 45,
+      "end": 52,
+      "seconds": 7,
+      "kind": "原文台词",
+      "words": "这就是笑之国的地标雕塑，过去打个卡，给你们看看雕像。",
+      "chinese_chars": 23
+    },
+    {
+      "shot": 8,
+      "start": 52,
+      "end": 56,
+      "seconds": 4,
+      "kind": "原文台词",
+      "words": "诶，去看看发生了什么——",
+      "chinese_chars": 9
+    },
+    {
+      "shot": 9,
+      "start": 56,
+      "end": 64,
+      "seconds": 8,
+      "kind": "原文台词",
+      "words": "有个小孩就是摔一跤哭了，就被带走了，所有人都不敢说话。好可怕。",
+      "chinese_chars": 27
+    },
+    {
+      "shot": 10,
+      "start": 64,
+      "end": 68,
+      "seconds": 4,
+      "kind": "原文台词",
+      "words": "这里好奇怪，这里有个纸团……",
+      "chinese_chars": 11
+    },
+    {
+      "shot": 11,
+      "start": 68,
+      "end": 75,
+      "seconds": 7,
+      "kind": "原文台词",
+      "words": "上面约的是今晚十二点，第七井。今晚我们就去看看。",
+      "chinese_chars": 21
+    },
+    {
+      "shot": 12,
+      "start": 75,
+      "end": 79,
+      "seconds": 4,
+      "kind": "衔接空镜",
+      "words": "",
+      "chinese_chars": 0
+    },
+    {
+      "shot": 13,
+      "start": 79,
+      "end": 83,
+      "seconds": 4,
+      "kind": "原文台词",
+      "words": "快十二点了，我现在在第七井。",
+      "chinese_chars": 12
+    },
+    {
+      "shot": 14,
+      "start": 83,
+      "end": 89,
+      "seconds": 6,
+      "kind": "原文台词",
+      "words": "这里白天还挺热闹的，现在一个人都没有。",
+      "chinese_chars": 17
+    },
+    {
+      "shot": 15,
+      "start": 89,
+      "end": 95,
+      "seconds": 6,
+      "kind": "原文台词",
+      "words": "我已经到了，但什么也没有啊，只有一个井盖。",
+      "chinese_chars": 18
+    },
+    {
+      "shot": 16,
+      "start": 95,
+      "end": 100,
+      "seconds": 5,
+      "kind": "原文台词",
+      "words": "下去看看——下面居然真的有通道！",
+      "chinese_chars": 13
+    },
+    {
+      "shot": 17,
+      "start": 100,
+      "end": 103,
+      "seconds": 3,
+      "kind": "衔接空镜",
+      "words": "",
+      "chinese_chars": 0
+    },
+    {
+      "shot": 18,
+      "start": 103,
+      "end": 105,
+      "seconds": 2,
+      "kind": "原文音效",
+      "words": "（被发现的警报声）",
+      "chinese_chars": 7
+    },
+    {
+      "shot": 19,
+      "start": 105,
+      "end": 111,
+      "seconds": 6,
+      "kind": "原文台词",
+      "words": "快乐指数过低，快乐指数过低，请保持微笑。",
+      "chinese_chars": 17
+    },
+    {
+      "shot": 20,
+      "start": 111,
+      "end": 113,
+      "seconds": 2,
+      "kind": "原文台词",
+      "words": "抓住他！",
+      "chinese_chars": 3
+    },
+    {
+      "shot": 21,
+      "start": 113,
+      "end": 116,
+      "seconds": 3,
+      "kind": "原文台词",
+      "words": "糟了，快被追上了！",
+      "chinese_chars": 7
+    },
+    {
+      "shot": 22,
+      "start": 116,
+      "end": 119,
+      "seconds": 3,
+      "kind": "衔接空镜",
+      "words": "",
+      "chinese_chars": 0
+    },
+    {
+      "shot": 23,
+      "start": 119,
+      "end": 123,
+      "seconds": 4,
+      "kind": "原文台词",
+      "words": "这是……笑之国的里世界。",
+      "chinese_chars": 9
+    },
+    {
+      "shot": 24,
+      "start": 123,
+      "end": 127,
+      "seconds": 4,
+      "kind": "原文台词",
+      "words": "这个装置不能再戴了。",
+      "chinese_chars": 9
+    },
+    {
+      "shot": 25,
+      "start": 127,
+      "end": 133,
+      "seconds": 6,
+      "kind": "原文台词",
+      "words": "原来这才是他们真实的模样。这些都是什么？",
+      "chinese_chars": 18
+    },
+    {
+      "shot": 26,
+      "start": 133,
+      "end": 142,
+      "seconds": 9,
+      "kind": "原文台词",
+      "words": "所以那个地下大厅，就是他们的情绪释放区。不快乐的人就被流放到了这里。",
+      "chinese_chars": 31
+    },
+    {
+      "shot": 27,
+      "start": 142,
+      "end": 145,
+      "seconds": 3,
+      "kind": "衔接空镜",
+      "words": "",
+      "chinese_chars": 0
+    },
+    {
+      "shot": 28,
+      "start": 145,
+      "end": 149,
+      "seconds": 4,
+      "kind": "原文台词",
+      "words": "这里有字，看来得去找钥匙了。",
+      "chinese_chars": 12
+    },
+    {
+      "shot": 29,
+      "start": 149,
+      "end": 156,
+      "seconds": 7,
+      "kind": "原文台词",
+      "words": "一路找过来都没看到钥匙，只有去雕塑那里看看了。",
+      "chinese_chars": 21
+    },
+    {
+      "shot": 30,
+      "start": 156,
+      "end": 161,
+      "seconds": 5,
+      "kind": "原文台词",
+      "words": "那是什么？应该就是这把钥匙了。",
+      "chinese_chars": 13
+    },
+    {
+      "shot": 31,
+      "start": 161,
+      "end": 166,
+      "seconds": 5,
+      "kind": "原文台词",
+      "words": "这个世界正在坍塌——我这是回来了！",
+      "chinese_chars": 14
+    },
+    {
+      "shot": 32,
+      "start": 166,
+      "end": 169,
+      "seconds": 3,
+      "kind": "衔接空镜",
+      "words": "",
+      "chinese_chars": 0
+    },
+    {
+      "shot": 33,
+      "start": 169,
+      "end": 175,
+      "seconds": 6,
+      "kind": "原文台词",
+      "words": "这里是矫正中心后门，看来关键线索就在里面。",
+      "chinese_chars": 19
+    },
+    {
+      "shot": 34,
+      "start": 175,
+      "end": 177,
+      "seconds": 2,
+      "kind": "衔接空镜",
+      "words": "",
+      "chinese_chars": 0
+    },
+    {
+      "shot": 35,
+      "start": 177,
+      "end": 183,
+      "seconds": 6,
+      "kind": "原文台词",
+      "words": "千万小心，不要被发现了。前面有动静，去看看。",
+      "chinese_chars": 18
+    },
+    {
+      "shot": 36,
+      "start": 183,
+      "end": 187,
+      "seconds": 4,
+      "kind": "原文台词",
+      "words": "快乐检测 10%，保持微笑，保持微笑……",
+      "chinese_chars": 12
+    },
+    {
+      "shot": 37,
+      "start": 187,
+      "end": 191,
+      "seconds": 4,
+      "kind": "原文台词",
+      "words": "他们竟然把情绪当病治。",
+      "chinese_chars": 10
+    },
+    {
+      "shot": 38,
+      "start": 191,
+      "end": 194,
+      "seconds": 3,
+      "kind": "原文台词",
+      "words": "档案室，进去看看。",
+      "chinese_chars": 7
+    },
+    {
+      "shot": 39,
+      "start": 194,
+      "end": 199,
+      "seconds": 5,
+      "kind": "原文台词",
+      "words": "这些都是被抹去真实情绪的人。",
+      "chinese_chars": 13
+    },
+    {
+      "shot": 40,
+      "start": 199,
+      "end": 203,
+      "seconds": 4,
+      "kind": "原文台词",
+      "words": "得把这些证据拍下来！",
+      "chinese_chars": 9
+    },
+    {
+      "shot": 41,
+      "start": 203,
+      "end": 205,
+      "seconds": 2,
+      "kind": "衔接空镜",
+      "words": "",
+      "chinese_chars": 0
+    },
+    {
+      "shot": 42,
+      "start": 205,
+      "end": 207,
+      "seconds": 2,
+      "kind": "原文台词",
+      "words": "抓住他！",
+      "chinese_chars": 3
+    },
+    {
+      "shot": 43,
+      "start": 207,
+      "end": 210,
+      "seconds": 3,
+      "kind": "原文台词",
+      "words": "怎么老是在逃跑？",
+      "chinese_chars": 7
+    },
+    {
+      "shot": 44,
+      "start": 210,
+      "end": 213,
+      "seconds": 3,
+      "kind": "原文台词",
+      "words": "去那边看看。",
+      "chinese_chars": 5
+    },
+    {
+      "shot": 45,
+      "start": 213,
+      "end": 221,
+      "seconds": 8,
+      "kind": "原文台词",
+      "words": "这个地方不能再待了——我救不了你们，只会打破我的旅行规则。对不起。",
+      "chinese_chars": 28
+    },
+    {
+      "shot": 46,
+      "start": 221,
+      "end": 224,
+      "seconds": 3,
+      "kind": "衔接空镜",
+      "words": "",
+      "chinese_chars": 0
+    },
+    {
+      "shot": 47,
+      "start": 224,
+      "end": 235,
+      "seconds": 11,
+      "kind": "原文台词",
+      "words": "几十年前，笑之国曾经历过混乱时期，大家认为问题的根源是负面情绪传播，于是制定了规则。",
+      "chinese_chars": 38
+    },
+    {
+      "shot": 48,
+      "start": 235,
+      "end": 239,
+      "seconds": 4,
+      "kind": "原文台词",
+      "words": "慢慢地，笑容变成了一种义务。",
+      "chinese_chars": 12
+    },
+    {
+      "shot": 49,
+      "start": 239,
+      "end": 246,
+      "seconds": 7,
+      "kind": "原文台词",
+      "words": "但当笑容成为规则时，人们学会了笑，却会忘记快乐。",
+      "chinese_chars": 21
+    },
+    {
+      "shot": 50,
+      "start": 246,
+      "end": 249,
+      "seconds": 3,
+      "kind": "衔接空镜",
+      "words": "",
+      "chinese_chars": 0
+    },
+    {
+      "shot": 51,
+      "start": 249,
+      "end": 253,
+      "seconds": 4,
+      "kind": "原文台词",
+      "words": "下一个国家，又会是怎样的呢？",
+      "chinese_chars": 12
+    },
+    {
+      "shot": 52,
+      "start": 253,
+      "end": 257,
+      "seconds": 4,
+      "kind": "新增结尾口播",
+      "words": "下一站去哪，交给你们选。",
+      "chinese_chars": 10
+    },
+    {
+      "shot": 53,
+      "start": 257,
+      "end": 268,
+      "seconds": 11,
+      "kind": "新增结尾口播",
+      "words": "A，巨人花园。植物比楼还高，但当地人提醒，幽暗森林是禁地，最好不要靠近。",
+      "chinese_chars": 29
+    },
+    {
+      "shot": 54,
+      "start": 268,
+      "end": 279,
+      "seconds": 11,
+      "kind": "新增结尾口播",
+      "words": "B，交换人生之国。这里每十年强制更换人生，游客可以领二十四小时试玩。",
+      "chinese_chars": 29
+    },
+    {
+      "shot": 55,
+      "start": 279,
+      "end": 291,
+      "seconds": 12,
+      "kind": "新增结尾口播",
+      "words": "C，梦税国。每月要交一个有效梦，游客也得登记。评论A、B或C，我们下一站见。",
+      "chinese_chars": 27
+    }
+  ],
+  "profile": {
+    "style": "travel-live",
+    "frame": "9:16",
+    "tier": "quality",
+    "genre": "generic",
+    "resolution": "480p",
+    "expressions": false,
+    "two_views": "off",
+    "episode_shape": "fixed",
+    "speech_gate": "enforce",
+    "props": true,
+    "camera_policy": "authored",
+    "repair_agent_model": "glm-5.3-flash"
+  },
+  "bible": {
+    "novel_title": "知遥的旅行：笑之国",
+    "genre": "旅行探险、异世界伪纪录片、规则悬疑",
+    "visual_style": "真人写实、真实皮肤材质与自然行为，架空国家采用实景电影摄影而非动画",
+    "palette": "暖白、青绿、灰石；里世界去饱和灰色",
+    "style_fingerprint": "laughing-country-live-v1",
+    "characters": [
+      {
+        "name": "知遥",
+        "role": "主角",
+        "gender": "女",
+        "age": "年轻成年",
+        "appearance": "用户知遥v1.1身份基准的同一真人女性，黑色高马尾，真实自然五官",
+        "wardrobe": "米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表",
+        "hair": "黑色高马尾",
+        "voice_profile_id": "zhiyao-v1"
+      },
+      {
+        "name": "系统广播",
+        "role": "画外解说",
+        "gender": "女",
+        "appearance": "仅为装置及现场喇叭的声音，不作为可见角色",
+        "wardrobe": "不适用"
+      },
+      {
+        "name": "守卫喊声",
+        "role": "画外解说",
+        "gender": "男",
+        "appearance": "守卫的画外喊声；可见守卫为无名群众，不使用知遥或系统头像",
+        "wardrobe": "现场无名守卫普通制服"
+      }
+    ],
+    "locations": [
+      "入境大厅：现代真人架空城市入境点，暖白墙、青绿框架、几何微笑图形；同一队列从入口到柜台，右侧规则牌、脸侧装置托盘，后方显示屏。图为无人空间，牌和屏均留空。",
+      "雕塑广场：同一城市暖白与青绿建筑，宽阔步行广场；中央一座简洁微笑人脸石雕，下方矮基座；右后方通向第七井的窄街。雕像与内世界同款同朝向；无人。",
+      "第七井街道：广场右侧同一条窄街，暖白墙与青绿窗框，圆形低矮井口、平坦铁井盖、井内金属梯；远处露出广场同款微笑石雕。夜间暖白路灯，街道空无一人。",
+      "井底通道：竖井梯子在近处左侧，混凝土狭窄通道向远处地下大厅延伸；中段右侧是侧通道入口，墙上小监控灯与喇叭。无人物。灰绿应急灯，手电补光由镜头决定。",
+      "里世界街区：现实雕塑广场和街道的同一布局与朝向；暖白青绿建筑此时灰暗、墙面破损，中央同款微笑人脸石雕和基座凹槽。地下大厅入口在近处，街道末端有柜子、墙角和留空字迹平面。居民仍为真人。参考图无人。",
+      "矫正中心后院：现实城市正常暖白青绿建筑与冷白设备灯；后门位于画面正前方，围墙在右，通向外围街道的侧巷在左；门上空白机构牌、普通锁孔，绝非里世界。无人。",
+      "矫正中心走廊：从后门通往观察窗的窄走廊，冷白灯和通风设施；窗内为矫正室，再下一个转角左侧为档案室门，右侧为后院侧门；玻璃隔离窗与侧门同框。无人，门牌留空。",
+      "矫正室：从走廊观察窗看室内，冷白灯，普通座椅与设备控制台、脸侧监控装置，显示屏留空。无血腥、无酷刑器具；参考无人，居民与工作人员只按剧情出现。",
+      "档案室：矫正中心转角的普通小档案室，灰白文件柜、桌面文件夹、可拍照的纸页，门外是既有走廊；没有新增秘密组织、精确年份。参考无人，文字与照片内容由本镜决定。",
+      "城外道路：笑之国外围道路，暖白青绿城区、微笑雕塑在远处逐渐变小；道路通向城外，普通风和自然天光，无人。知遥已摘下装置。",
+      "巨人花园预览：真人实景电影视觉的架空旅行地，巨型蘑菇、比楼高的植物和树屋，远处为幽暗森林边缘；只展示地点，没有守护者或秘密揭晓，无人。",
+      "交换人生之国预览：真人电影视觉，普通登记柜台的空白身份抽取界面，后方可见两种生活空间；这是目的地预览，不展示作弊系统或已选身份，无人。",
+      "梦税国预览：真人电影视觉的架空梦税局，登记柜台和朴素梦境收集器，屏幕留空；仅为目的地预览，没有展示某个已采集的梦、处罚或真相，无人。"
+    ],
+    "props": [
+      {
+        "name": "快乐监控装置",
+        "appearance": "同一只小型灰白脸侧监控装置，青绿细边、单一固定侧扣、小屏幕；只是穿戴道具，不是面具、人物或整套护甲",
+        "wearable": false,
+        "quote": "我脸上这个装置，每个人必须在笑之国佩戴"
+      },
+      {
+        "name": "微笑地标雕塑",
+        "appearance": "同一座简洁石质微笑人脸地标雕塑，矮方形基座，基座有小凹槽；现实与里世界是同一形状与位置，不含文字",
+        "quote": "这就是笑之国的地标雕塑"
+      },
+      {
+        "name": "唯一钥匙",
+        "appearance": "同一把普通旧银色金属钥匙，椭圆环、直柄、三个齿，小型真实手持尺寸；画面只有一把",
+        "quote": "应该就是这把钥匙了"
+      }
+    ],
+    "continuity_rules": [
+      "事实和三声源来自原附件，知遥身份与真人参考不变；允许本次明确记录的等义压缩、现场口播与冷开重排。",
+      "第一组是白天广场事件冷开，时间晚于入境；第二镜是发布世界卡标明入境当日稍早，再接入境正文。",
+      "装置在冷开时已佩戴，正文入境开始尚未佩戴；V04工作人员扣合后持续佩戴，里世界解扣后永不恢复；末尾扣合是其他旅客回看。",
+      "昼转夜是顺序全画面切换，现实与里世界是同一广场布局；不分屏、不拼贴，不用人物复制做比较。",
+      "尚未找到钥匙前不出现；雕塑凹槽取出唯一一把，坍塌回现实仍持有，开后门后收入外套口袋。",
+      "知遥口播可以现场自拍，也可在镜头对着物体时画外说；系统/守卫声在画外不代表画面必须无人，人物可见性以每阶段in_frame为准。",
+      "下井决定、梯子下降、发现通道三阶段分开；每条emotion只指导本条text，不引用下一阶段台词或发现。",
+      "守卫追逐、情绪释放区、钥匙、坍塌、矫正取证、撤离与历史事实保留；不新增袭击鬼影、幕后组织、纸条发送者、旅行规则条款或居民获救。",
+      "系统百分之十来自原10%，机械播报与知遥声线不同；两处抓住他沿原文保留。",
+      "完整本地故事结束后才给A/B/C预览与评论投票，无已选路线、伪造票数或提前揭晓后三国真相。",
+      "实体法牌、纸条、机构牌、墙字只原生生成；禁用后期盖字、色块、场景字幕与预览标签，保留对白字幕、世界介绍卡、统一水印和3秒完整选择卡。",
+      "时间按事件而非地点名：白天入境与广场→V16同井街顺序昼转午夜→井底、里世界、返回现实后院与矫正内部、撤离持续午夜夜间；当前城外复盘与结尾也在同夜。V59是其他旅客此前白天回看；A/B/C是日间预览，不是当前到访。"
+    ]
+  },
+  "voice_specs": {
+    "知遥": {
+      "picture": "series_assets/characters/character_001/turnaround.jpeg",
+      "sample_text": "大家好，我是知遥，一个旅行者。下一个国家，又会是怎样的呢？下一站去哪，交给你们选。",
+      "prompt": "A solo live-action voice casting recording. <Subject 1> is the adult Chinese woman in <Picture 1>, retaining her face, black high ponytail and beige outdoor jacket. One person against a plain neutral backdrop. Natural young adult female Mandarin voice, warm clear medium register, conversational travel-vlog delivery, subtle natural breath. Static medium close-up; natural lip synchronization."
+    },
+    "系统广播": {
+      "picture": "series_assets/locations/location_004/establishing.jpeg",
+      "sample_text": "快乐指数过低，快乐指数过低，请保持微笑。快乐检测 10%，保持微笑，保持微笑……",
+      "prompt": "Use <Picture 1> only as the design reference for an empty corridor. No person visible. A solo off-screen female neutral synthetic public-address system voice, crisp controlled Mandarin, distinctly mechanical and not the traveller voice."
+    },
+    "守卫喊声": {
+      "picture": "series_assets/locations/location_007/establishing.jpeg",
+      "sample_text": "抓住他！抓住他！",
+      "prompt": "Use <Picture 1> only as the design reference for an empty corridor. No person visible. One adult male guard voice, firm rough medium-low Mandarin shout coming from behind the camera, distinct from female traveller and system voice. Say the two short calls with a natural gap; add no other words."
+    }
+  },
+  "groups": [
+    {
+      "source_segment": "VLOG-G01",
+      "shot_indexes": [
+        1
+      ]
+    },
+    {
+      "source_segment": "VLOG-G02",
+      "shot_indexes": [
+        2,
+        3
+      ]
+    },
+    {
+      "source_segment": "VLOG-G03",
+      "shot_indexes": [
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "source_segment": "VLOG-G04",
+      "shot_indexes": [
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "source_segment": "VLOG-G05",
+      "shot_indexes": [
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "source_segment": "VLOG-G06",
+      "shot_indexes": [
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "source_segment": "VLOG-G07",
+      "shot_indexes": [
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "source_segment": "VLOG-G08",
+      "shot_indexes": [
+        20,
+        21
+      ]
+    },
+    {
+      "source_segment": "VLOG-G09",
+      "shot_indexes": [
+        22,
+        23,
+        24
+      ]
+    },
+    {
+      "source_segment": "VLOG-G10",
+      "shot_indexes": [
+        25,
+        26
+      ]
+    },
+    {
+      "source_segment": "VLOG-G11",
+      "shot_indexes": [
+        27,
+        28,
+        29,
+        30
+      ]
+    },
+    {
+      "source_segment": "VLOG-G12",
+      "shot_indexes": [
+        31,
+        32
+      ]
+    },
+    {
+      "source_segment": "VLOG-G13",
+      "shot_indexes": [
+        33,
+        34,
+        35,
+        36
+      ]
+    },
+    {
+      "source_segment": "VLOG-G14",
+      "shot_indexes": [
+        37,
+        38,
+        39
+      ]
+    },
+    {
+      "source_segment": "VLOG-G15",
+      "shot_indexes": [
+        40,
+        41,
+        42
+      ]
+    },
+    {
+      "source_segment": "VLOG-G16",
+      "shot_indexes": [
+        43,
+        44
+      ]
+    },
+    {
+      "source_segment": "VLOG-G17",
+      "shot_indexes": [
+        45
+      ]
+    },
+    {
+      "source_segment": "VLOG-G18",
+      "shot_indexes": [
+        46,
+        47
+      ]
+    },
+    {
+      "source_segment": "VLOG-G19",
+      "shot_indexes": [
+        48,
+        49
+      ]
+    },
+    {
+      "source_segment": "VLOG-G20",
+      "shot_indexes": [
+        50,
+        51,
+        52
+      ]
+    },
+    {
+      "source_segment": "VLOG-G21",
+      "shot_indexes": [
+        53,
+        54,
+        55
+      ]
+    },
+    {
+      "source_segment": "VLOG-G22",
+      "shot_indexes": [
+        56,
+        57
+      ]
+    },
+    {
+      "source_segment": "VLOG-G23",
+      "shot_indexes": [
+        58
+      ]
+    },
+    {
+      "source_segment": "VLOG-G24",
+      "shot_indexes": [
+        59
+      ]
+    },
+    {
+      "source_segment": "VLOG-G25",
+      "shot_indexes": [
+        60,
+        61,
+        62
+      ]
+    },
+    {
+      "source_segment": "VLOG-G26",
+      "shot_indexes": [
+        63
+      ]
+    },
+    {
+      "source_segment": "VLOG-G27",
+      "shot_indexes": [
+        64
+      ]
+    },
+    {
+      "source_segment": "VLOG-G28",
+      "shot_indexes": [
+        65
+      ]
+    },
+    {
+      "source_segment": "VLOG-G29",
+      "shot_indexes": [
+        66
+      ]
+    }
+  ],
+  "interaction": {
+    "id": "laughing-country-EP01-END",
+    "series_title": "知遥的旅行",
+    "question": "下一站去哪？",
+    "seconds": 3,
+    "options": [
+      {
+        "id": "A",
+        "label": "巨人花园",
+        "reason": "植物比楼高｜幽暗森林是禁地",
+        "next": "下一期A：巨人花园"
+      },
+      {
+        "id": "B",
+        "label": "交换人生之国",
+        "reason": "每十年强制轮换｜游客24小时试玩",
+        "next": "下一期B：交换人生之国"
+      },
+      {
+        "id": "C",
+        "label": "梦税国",
+        "reason": "每月交有效梦｜游客也登记",
+        "next": "下一期C：梦税国"
+      }
+    ],
+    "selected": null,
+    "type": "next_episode_comment_vote",
+    "publishing_status": "not_published",
+    "vote_deadline": null
+  },
+  "overlays": [],
+  "evidence_surfaces": {
+    "version": "laughing-country-vlog-h3-v3",
+    "surfaces": [
+      {
+        "id": "native-V02",
+        "kind": "text_panel",
+        "shot_ids": [
+          "V02"
+        ],
+        "required_shots": [
+          "V02"
+        ],
+        "text": "笑之国",
+        "target": "the existing physical sign, paper, wall or screen; native generation only, no post-production text covering"
+      },
+      {
+        "id": "native-V03",
+        "kind": "text_panel",
+        "shot_ids": [
+          "V03"
+        ],
+        "required_shots": [
+          "V03"
+        ],
+        "text": "笑之国法律\n必须佩戴快乐监控装置\n公共场所保持微笑\n传播悲伤情绪者送往快乐矫正中心",
+        "target": "the existing physical sign, paper, wall or screen; native generation only, no post-production text covering"
+      },
+      {
+        "id": "native-V14",
+        "kind": "text_panel",
+        "shot_ids": [
+          "V14"
+        ],
+        "required_shots": [
+          "V14"
+        ],
+        "text": "今晚十二点，第七井",
+        "target": "the existing physical sign, paper, wall or screen; native generation only, no post-production text covering"
+      },
+      {
+        "id": "native-V33",
+        "kind": "text_panel",
+        "shot_ids": [
+          "V33"
+        ],
+        "required_shots": [
+          "V33"
+        ],
+        "text": "离开这里，需要钥匙。",
+        "target": "the existing physical sign, paper, wall or screen; native generation only, no post-production text covering"
+      },
+      {
+        "id": "native-V41",
+        "kind": "text_panel",
+        "shot_ids": [
+          "V41"
+        ],
+        "required_shots": [
+          "V41"
+        ],
+        "text": "快乐矫正中心",
+        "target": "the existing physical sign, paper, wall or screen; native generation only, no post-production text covering"
+      },
+      {
+        "id": "native-V45",
+        "kind": "text_panel",
+        "shot_ids": [
+          "V45"
+        ],
+        "required_shots": [
+          "V45"
+        ],
+        "text": "10%",
+        "target": "the existing physical sign, paper, wall or screen; native generation only, no post-production text covering"
+      },
+      {
+        "id": "native-V47",
+        "kind": "text_panel",
+        "shot_ids": [
+          "V47"
+        ],
+        "required_shots": [
+          "V47"
+        ],
+        "text": "档案室",
+        "target": "the existing physical sign, paper, wall or screen; native generation only, no post-production text covering"
+      }
+    ],
+    "timing": "Actual observed entity surfaces only, never authored-duration inference.",
+    "fact_boundary": "Exact native strings are from original screenplay except user-specified sign title 笑之国法律; no new laws."
+  },
+  "script": {
+    "authored_family": "travel",
+    "video_title": "知遥的旅行 EP01：笑之国",
+    "source_title": "笑之国旅行伪纪录片修订 v3",
+    "episode_index": 1,
+    "profile": {
+      "style": "travel-live",
+      "frame": "9:16",
+      "tier": "quality",
+      "genre": "generic",
+      "resolution": "480p",
+      "expressions": false,
+      "two_views": "off",
+      "episode_shape": "fixed",
+      "speech_gate": "enforce",
+      "props": true,
+      "camera_policy": "authored",
+      "repair_agent_model": "glm-5.3-flash"
+    },
+    "hook": "笑之国里，孩子哭泣立即被带走，周围人仍强笑；世界卡后回到入境稍早，跟随知遥辨认规则、查纸条并探索。",
+    "summary": "知遥到笑之国入境，看见强制微笑规则；广场哭泣事件和纸条改变行程，夜探第七井进入里世界，找钥匙返回矫正中心取证后撤离；本集结束由观众选下一站。",
+    "shots": [
+      {
+        "index": 1,
+        "origin_index": 1,
+        "shot_id": "V01",
+        "label": "V01",
+        "segment_id": "vlog_seg_1",
+        "source_shot": 9,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头09：孩子刚哭便被守卫带离；切到伸出手又收回的家长，再到周围人的僵硬笑脸。知遥只拍到过程，没有上前解决；最后一句回自拍低声说。\n原文：有个小孩就是摔一跤哭了，就被带走了，所有人都不敢说话。好可怕。\n新版处理：立即展示本集核心异常；白天广场，第一视角从孩子跌坐哭泣移向守卫将其带离的背影；周围成年人仍勉强微笑，远处同款微笑雕塑可辨。只取事件短切，不拍殴打、不加哭喊台词。\n新版对白：无对白\n本轮时空修正：白天；广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "location": "雕塑广场",
+        "scene_id": "雕塑广场",
+        "scene_time": "白天",
+        "characters": [],
+        "in_frame": [],
+        "extras": [
+          "哭泣的孩子",
+          "无名守卫",
+          "僵硬微笑的人群"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：雕塑广场。白天广场，第一视角从孩子跌坐哭泣移向守卫将其带离的背影；周围成年人仍勉强微笑，远处同款微笑雕塑可辨。只取事件短切，不拍殴打、不加哭喊台词。 本镜故事时间：白天。本镜实际照明：广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "motion_prompt": "白天广场，第一视角从孩子跌坐哭泣移向守卫将其带离的背影；周围成年人仍勉强微笑，远处同款微笑雕塑可辨。只取事件短切，不拍殴打、不加哭喊台词。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "胸前手持视角，一次短转镜，人物全身比例真实",
+        "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "shot_scale": "胸前手持视角，一次短转镜，人物全身比例真实",
+        "duration_seconds": 4,
+        "sfx": "一声真实孩子哭泣，守卫脚步与广场背景，附近交谈突然收低；没有新增语言。",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "立即展示本集核心异常"
+      },
+      {
+        "index": 2,
+        "origin_index": 2,
+        "shot_id": "V02",
+        "label": "V02",
+        "segment_id": "vlog_seg_2",
+        "source_shot": 2,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头02：自拍转为肩后跟拍，走向入境柜台；同一条队伍保持方向连续，门头准确显示“笑之国”。\n原文：今天我来到了笑之国，现在要去办理入境手续。\n新版处理：回到入境稍早，恢复旅行者现场视角；知遥入境排队自拍，边跟队列向柜台走；门头在后景，不先大段介绍履历。\n新版对白：我到笑之国了，先去办入境。\n本轮时空修正：白天；入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "location": "入境大厅",
+        "scene_id": "入境大厅",
+        "scene_time": "白天",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [
+          "入境工作人员",
+          "排队旅客"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。 当前空间：入境大厅。知遥入境排队自拍，边跟队列向柜台走；门头在后景，不先大段介绍履历。 仅在原有实体牌面、纸张或屏幕上原生呈现本镜指定文字；不后期盖字，不改变实体表面位置。 本镜故事时间：白天。本镜实际照明：入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "motion_prompt": "知遥入境排队自拍，边跟队列向柜台走；门头在后景，不先大段介绍履历。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "正常手臂距离中近景自拍，人脸不过度广角",
+        "light": "入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "shot_scale": "正常手臂距离中近景自拍，人脸不过度广角",
+        "duration_seconds": 5,
+        "sfx": "队列脚步、人群低语、衣料摩擦",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "我到笑之国了，先去办入境。",
+            "emotion": "刚到新地方的轻快分享；随着走路自然换气，“笑之国”清楚，最后一句是眼下行动，不播报。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "同一个轻巧的拨弦旅行主题，少量木质打击、无歌词；低于人声，脚步清楚，绝不逐镜换歌或盖住口播。",
+          "ducking": true
+        },
+        "purpose": "回到入境稍早，恢复旅行者现场视角",
+        "native_text": [
+          "笑之国"
+        ]
+      },
+      {
+        "index": 3,
+        "origin_index": 3,
+        "shot_id": "V03",
+        "label": "V03",
+        "segment_id": "vlog_seg_3",
+        "source_shot": 3,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头03：柜台中景→知遥目光→规则牌特写。牌上仅写：必须佩戴快乐监控装置；公共场所保持微笑；传播悲伤情绪者送往快乐矫正中心。台词连续，不停下来完整重念牌文。\n原文：这里就是入境点啦。排队时看到这个告示牌，说是必须要遵守这上面的规则。\n新版处理：注意到公共场所必须微笑的规定；从知遥手指指向规则牌切到原生牌面，牌面端正、浅底黑字；标题及三条已知规则可辨，不逐字念整块牌。\n新版对白：法律？公共场所，必须一直笑？\n本轮时空修正：白天；入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "location": "入境大厅",
+        "scene_id": "入境大厅",
+        "scene_time": "白天",
+        "characters": [],
+        "in_frame": [],
+        "extras": [
+          "排队旅客"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。 当前空间：入境大厅。从知遥手指指向规则牌切到原生牌面，牌面端正、浅底黑字；标题及三条已知规则可辨，不逐字念整块牌。 仅在原有实体牌面、纸张或屏幕上原生呈现本镜指定文字；不后期盖字，不改变实体表面位置。 本镜故事时间：白天。本镜实际照明：入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "motion_prompt": "从知遥手指指向规则牌切到原生牌面，牌面端正、浅底黑字；标题及三条已知规则可辨，不逐字念整块牌。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角牌面正面中近景，短暂停住辨认",
+        "light": "入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "shot_scale": "第一视角牌面正面中近景，短暂停住辨认",
+        "duration_seconds": 4,
+        "sfx": "同一大厅队列底噪，人物衣料轻响",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "法律？公共场所，必须一直笑？",
+            "emotion": "先辨认，再短促疑问；“必须”稍重，句尾是刚看到的不解，不提前解释后果。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "同一个轻巧的拨弦旅行主题，少量木质打击、无歌词；低于人声，脚步清楚，绝不逐镜换歌或盖住口播。",
+          "ducking": true
+        },
+        "purpose": "注意到公共场所必须微笑的规定",
+        "native_text": [
+          "笑之国法律",
+          "必须佩戴快乐监控装置",
+          "公共场所保持微笑",
+          "传播悲伤情绪者送往快乐矫正中心"
+        ]
+      },
+      {
+        "index": 4,
+        "origin_index": 4,
+        "shot_id": "V04",
+        "label": "V04",
+        "segment_id": "vlog_seg_4",
+        "source_shot": 4,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头04：工作人员给知遥戴上脸侧装置，自拍近景用手指示佩戴处；切到大厅大屏，显示佩戴者头像及实时快乐程度。使用同款装置，画面不添加未提供的合格阈值。\n原文：我脸上这个装置，每个人必须在笑之国佩戴，它是监控我们快乐程度的，数值会在这个大屏幕显示。\n新版处理：给规则一个真实可触的操作；工作人员给知遥脸侧扣上同一个小型装置一次；知遥轻摸扣合处，抬眼向大厅大屏示意。\n新版对白：戴上了。它监控快乐程度，数值在那块屏上。\n本轮时空修正：白天；入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "location": "入境大厅",
+        "scene_id": "入境大厅",
+        "scene_time": "白天",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [
+          "入境工作人员"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 开始时知遥脸侧无装置，工作人员本镜扣上同一个装置一次。 尚未找到钥匙，不预先出现。 当前空间：入境大厅。工作人员给知遥脸侧扣上同一个小型装置一次；知遥轻摸扣合处，抬眼向大厅大屏示意。 本镜故事时间：白天。本镜实际照明：入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "motion_prompt": "工作人员给知遥脸侧扣上同一个小型装置一次；知遥轻摸扣合处，抬眼向大厅大屏示意。",
+        "start_state": "开始时知遥脸侧无装置，工作人员本镜扣上同一个装置一次。 尚未找到钥匙，不预先出现。",
+        "end_state": "知遥已佩戴装置，指向同一大厅屏幕；此后到里世界摘下前持续佩戴。",
+        "camera": "侧近景扣合后回正常自拍，不多出第二个装置",
+        "light": "入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "shot_scale": "侧近景扣合后回正常自拍，不多出第二个装置",
+        "duration_seconds": 6,
+        "sfx": "一次卡扣轻响、显示屏低位电子底音",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "戴上了。它监控快乐程度，数值在那块屏上。",
+            "emotion": "扣合后才说“戴上了”；边触摸边介绍，重点是“监控”，到屏幕是顺眼前动作指认，不主持腔。"
+          }
+        ],
+        "device_state": "put_on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "旅行主题逐渐收低，扣合轻响和近距离口播清楚。",
+          "ducking": true
+        },
+        "purpose": "给规则一个真实可触的操作"
+      },
+      {
+        "index": 5,
+        "origin_index": 5,
+        "shot_id": "V05",
+        "label": "V05",
+        "segment_id": "vlog_seg_5",
+        "source_shot": 5,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头05：摄像机扫过微笑的人群，再切规则牌里的矫正中心示意图；回知遥近景，最后一句略压低音量。脸上装置仍在。\n原文：然后公共场所必须保持微笑，如果传播悲伤情绪，就会被送进这个快乐矫正中心。这些规则都好神经啊！\n新版处理：让观众看见规则作用在每个人身上；视线镜头扫到队列几位不同旅客，人人脸侧同款装置，保持略僵的笑；不生成任何快乐合格阈值。\n新版对白：无对白\n本轮时空修正：白天；入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "location": "入境大厅",
+        "scene_id": "入境大厅",
+        "scene_time": "白天",
+        "characters": [],
+        "in_frame": [],
+        "extras": [
+          "佩戴装置的旅客"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：入境大厅。视线镜头扫到队列几位不同旅客，人人脸侧同款装置，保持略僵的笑；不生成任何快乐合格阈值。 本镜故事时间：白天。本镜实际照明：入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "motion_prompt": "视线镜头扫到队列几位不同旅客，人人脸侧同款装置，保持略僵的笑；不生成任何快乐合格阈值。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "眼平中景一次轻转，两个旅客作空间参照",
+        "light": "入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "shot_scale": "眼平中景一次轻转，两个旅客作空间参照",
+        "duration_seconds": 2,
+        "sfx": "队列移动声、低位设备声",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "旅行主题的最后几个拨弦音收下，后面留出更安静空间。",
+          "ducking": true
+        },
+        "purpose": "让观众看见规则作用在每个人身上"
+      },
+      {
+        "index": 6,
+        "origin_index": 6,
+        "shot_id": "V06",
+        "label": "V06",
+        "segment_id": "vlog_seg_6",
+        "source_shot": 5,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头05：摄像机扫过微笑的人群，再切规则牌里的矫正中心示意图；回知遥近景，最后一句略压低音量。脸上装置仍在。\n原文：然后公共场所必须保持微笑，如果传播悲伤情绪，就会被送进这个快乐矫正中心。这些规则都好神经啊！\n新版处理：读到悲伤的代价后改变语气；知遥仍在大厅出口，目光从规则牌回到镜头；最后一句低声靠近说，装置仍在脸侧。\n新版对白：传播悲伤，就会送去矫正中心。这也太怪了。\n本轮时空修正：白天；入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "location": "入境大厅",
+        "scene_id": "入境大厅",
+        "scene_time": "白天",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [
+          "佩戴装置的旅客"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：入境大厅。知遥仍在大厅出口，目光从规则牌回到镜头；最后一句低声靠近说，装置仍在脸侧。 本镜故事时间：白天。本镜实际照明：入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "motion_prompt": "知遥仍在大厅出口，目光从规则牌回到镜头；最后一句低声靠近说，装置仍在脸侧。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "正常距离自拍近景，人物边走边说",
+        "light": "入境大厅白天窗光与暖白顶灯；肤色自然，牌面照明均匀。",
+        "shot_scale": "正常距离自拍近景，人物边走边说",
+        "duration_seconds": 5,
+        "sfx": "远处大厅声，正在走出的脚步",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "传播悲伤，就会送去矫正中心。这也太怪了。",
+            "emotion": "“矫正中心”收紧；最后一句压低、像怕旁边人听见，短而具体，不拉长吓人。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "读到悲伤的代价后改变语气"
+      },
+      {
+        "index": 7,
+        "origin_index": 7,
+        "shot_id": "V07",
+        "label": "V07",
+        "segment_id": "vlog_seg_7",
+        "source_shot": 6,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头06：从入境大厅出口看向广场的短镜，给出出口与广场方位；下一镜抵达广场，不凭空移位。\n原文：\n新版处理：建立由入境点走到广场的实际位置；镜头随着脚步走出出口，暖白青绿入口退到侧后，前方广场和微笑雕塑进入视线。\n新版对白：无对白\n本轮时空修正：白天；广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "location": "雕塑广场",
+        "scene_id": "雕塑广场",
+        "scene_time": "白天",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：雕塑广场。镜头随着脚步走出出口，暖白青绿入口退到侧后，前方广场和微笑雕塑进入视线。 本镜故事时间：白天。本镜实际照明：广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "motion_prompt": "镜头随着脚步走出出口，暖白青绿入口退到侧后，前方广场和微笑雕塑进入视线。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角向前移动，不慢速空景",
+        "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "shot_scale": "第一视角向前移动，不慢速空景",
+        "duration_seconds": 2,
+        "sfx": "大厅声退下，广场脚步和风进入",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "建立由入境点走到广场的实际位置"
+      },
+      {
+        "index": 8,
+        "origin_index": 8,
+        "shot_id": "V08",
+        "label": "V08",
+        "segment_id": "vlog_seg_8",
+        "source_shot": 7,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头07：从广场入口沿行进方向拍巨大微笑雕塑；知遥和雕塑短暂同框，再抬镜拍全貌。背景角落预先带到井边街道，地理关系先建立。\n原文：这就是笑之国的地标雕塑，过去打个卡，给你们看看雕像。\n新版处理：短暂回到旅行观景的轻松；知遥与微笑雕塑短暂同框；她往基座走，镜头随视线抬到雕塑顶，不扩大到超出原资产的怪物尺度。\n新版对白：那个微笑雕塑，好大。过去看看。\n本轮时空修正：白天；广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "location": "雕塑广场",
+        "scene_id": "雕塑广场",
+        "scene_time": "白天",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [
+          "广场居民"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "微笑地标雕塑",
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：雕塑广场。知遥与微笑雕塑短暂同框；她往基座走，镜头随视线抬到雕塑顶，不扩大到超出原资产的怪物尺度。 本镜故事时间：白天。本镜实际照明：广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "motion_prompt": "知遥与微笑雕塑短暂同框；她往基座走，镜头随视线抬到雕塑顶，不扩大到超出原资产的怪物尺度。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "正常自拍接一次向上转镜",
+        "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "shot_scale": "正常自拍接一次向上转镜",
+        "duration_seconds": 4,
+        "sfx": "广场自然脚步、衣料和风",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "那个微笑雕塑，好大。过去看看。",
+            "emotion": "恢复一点打卡的兴趣，轻微笑意；“过去看看”利落地接步伐，不夸张喊奇观。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "同一个轻巧的拨弦旅行主题，少量木质打击、无歌词；低于人声，脚步清楚，绝不逐镜换歌或盖住口播。",
+          "ducking": true
+        },
+        "purpose": "短暂回到旅行观景的轻松"
+      },
+      {
+        "index": 9,
+        "origin_index": 9,
+        "shot_id": "V09",
+        "label": "V09",
+        "segment_id": "vlog_seg_9",
+        "source_shot": 8,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头08：自拍时被侧后方哭声打断，迅速转镜；画面先见孩子跌坐在地，守卫转身。\n原文：诶，去看看发生了什么——\n新版处理：让现场声音打断旅行计划；知遥听见侧后方哭声，停下向雕塑走的动作，摄像机转向孩子刚被带离的位置；接冷开之后的新信息，不重放冷开的完整带离动作。\n新版对白：诶？\n本轮时空修正：白天；广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "location": "雕塑广场",
+        "scene_id": "雕塑广场",
+        "scene_time": "白天",
+        "characters": [],
+        "in_frame": [],
+        "extras": [
+          "孩子",
+          "家长",
+          "守卫"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：雕塑广场。知遥听见侧后方哭声，停下向雕塑走的动作，摄像机转向孩子刚被带离的位置；接冷开之后的新信息，不重放冷开的完整带离动作。 本镜故事时间：白天。本镜实际照明：广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "motion_prompt": "知遥听见侧后方哭声，停下向雕塑走的动作，摄像机转向孩子刚被带离的位置；接冷开之后的新信息，不重放冷开的完整带离动作。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "自拍被声音打断后转第一视角",
+        "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "shot_scale": "自拍被声音打断后转第一视角",
+        "duration_seconds": 2,
+        "sfx": "孩子远去哭声先进入，音乐立即退出，脚步停一下",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "诶？",
+            "emotion": "真实被打断的短问，注意力已离开镜头；只说这个反应，不带后面的判断。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "让现场声音打断旅行计划"
+      },
+      {
+        "index": 10,
+        "origin_index": 10,
+        "shot_id": "V10",
+        "label": "V10",
+        "segment_id": "vlog_seg_10",
+        "source_shot": 9,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头09：孩子刚哭便被守卫带离；切到伸出手又收回的家长，再到周围人的僵硬笑脸。知遥只拍到过程，没有上前解决；最后一句回自拍低声说。\n原文：有个小孩就是摔一跤哭了，就被带走了，所有人都不敢说话。好可怕。\n新版处理：承接冷开事件的后果；守卫和孩子已走到广场远端，只见逐渐远去背影；前景人群安静。镜头不再重复孩子跌倒和被抓起。\n新版对白：摔一跤哭了，就被带走了……\n本轮时空修正：白天；广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "location": "雕塑广场",
+        "scene_id": "雕塑广场",
+        "scene_time": "白天",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：雕塑广场。守卫和孩子已走到广场远端，只见逐渐远去背影；前景人群安静。镜头不再重复孩子跌倒和被抓起。 本镜故事时间：白天。本镜实际照明：广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "motion_prompt": "守卫和孩子已走到广场远端，只见逐渐远去背影；前景人群安静。镜头不再重复孩子跌倒和被抓起。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角眼平中景沿人群间隙看向远处",
+        "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "shot_scale": "第一视角眼平中景沿人群间隙看向远处",
+        "duration_seconds": 4,
+        "sfx": "哭声逐渐远去，广场谈话停止",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "摔一跤哭了，就被带走了……",
+            "emotion": "压低声赶紧告诉观众所见，重读“就”；尾巴轻轻落下，边看边说而非总结新闻。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "承接冷开事件的后果"
+      },
+      {
+        "index": 11,
+        "origin_index": 11,
+        "shot_id": "V11",
+        "label": "V11",
+        "segment_id": "vlog_seg_11",
+        "source_shot": 9,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头09：孩子刚哭便被守卫带离；切到伸出手又收回的家长，再到周围人的僵硬笑脸。知遥只拍到过程，没有上前解决；最后一句回自拍低声说。\n原文：有个小孩就是摔一跤哭了，就被带走了，所有人都不敢说话。好可怕。\n新版处理：留给观众看人群的情绪和代价；家长向远处伸手又收回；旁边成年人维持僵硬笑容，不新增劝说对白。\n新版对白：无对白\n本轮时空修正：白天；广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "location": "雕塑广场",
+        "scene_id": "雕塑广场",
+        "scene_time": "白天",
+        "characters": [],
+        "in_frame": [],
+        "extras": [
+          "孩子家长",
+          "微笑的居民"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：雕塑广场。家长向远处伸手又收回；旁边成年人维持僵硬笑容，不新增劝说对白。 本镜故事时间：白天。本镜实际照明：广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "motion_prompt": "家长向远处伸手又收回；旁边成年人维持僵硬笑容，不新增劝说对白。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "肩部至手的细节接僵硬表情，真实人体比例",
+        "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "shot_scale": "肩部至手的细节接僵硬表情，真实人体比例",
+        "duration_seconds": 2,
+        "sfx": "衣袖摩擦，远去脚步，低位广场风",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "留给观众看人群的情绪和代价"
+      },
+      {
+        "index": 12,
+        "origin_index": 12,
+        "shot_id": "V12",
+        "label": "V12",
+        "segment_id": "vlog_seg_12",
+        "source_shot": 9,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头09：孩子刚哭便被守卫带离；切到伸出手又收回的家长，再到周围人的僵硬笑脸。知遥只拍到过程，没有上前解决；最后一句回自拍低声说。\n原文：有个小孩就是摔一跤哭了，就被带走了，所有人都不敢说话。好可怕。\n新版处理：知遥从观景转为警惕；知遥压住不自在的表情，停步回自拍，不再继续笑着打卡。\n新版对白：这里，没人敢开口。\n本轮时空修正：白天；广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "location": "雕塑广场",
+        "scene_id": "雕塑广场",
+        "scene_time": "白天",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：雕塑广场。知遥压住不自在的表情，停步回自拍，不再继续笑着打卡。 本镜故事时间：白天。本镜实际照明：广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "motion_prompt": "知遥压住不自在的表情，停步回自拍，不再继续笑着打卡。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "普通自拍近景，注意力仍在画面侧边",
+        "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "shot_scale": "普通自拍近景，注意力仍在画面侧边",
+        "duration_seconds": 3,
+        "sfx": "低位风声，知遥短促呼吸",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "这里，没人敢开口。",
+            "emotion": "轻、短，确认现场骤静；说完听一下周围，不做戏剧化长惊叹。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "知遥从观景转为警惕"
+      },
+      {
+        "index": 13,
+        "origin_index": 13,
+        "shot_id": "V13",
+        "label": "V13",
+        "segment_id": "vlog_seg_13",
+        "source_shot": 10,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头10：孩子被带离后，知遥向雕塑底座旁走；镜头顺目光落向纸团，她蹲下捡起。不给纸团添加发送者。\n原文：这里好奇怪，这里有个纸团……\n新版处理：新线索是低头真实看见的物件；知遥看见雕塑底座附近纸团，蹲下捡起一次；保持纸团来历未知。\n新版对白：这儿有个纸团。\n本轮时空修正：白天；广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "location": "雕塑广场",
+        "scene_id": "雕塑广场",
+        "scene_time": "白天",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "微笑地标雕塑",
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：雕塑广场。知遥看见雕塑底座附近纸团，蹲下捡起一次；保持纸团来历未知。 本镜故事时间：白天。本镜实际照明：广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "motion_prompt": "知遥看见雕塑底座附近纸团，蹲下捡起一次；保持纸团来历未知。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角顺目光落到纸团和手",
+        "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "shot_scale": "第一视角顺目光落到纸团和手",
+        "duration_seconds": 2,
+        "sfx": "蹲下的衣料摩擦、拾纸轻响",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "这儿有个纸团。",
+            "emotion": "看到后低声脱口说，重心在“纸团”；只覆盖捡起动作，不先读时间地点。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "新线索是低头真实看见的物件"
+      },
+      {
+        "index": 14,
+        "origin_index": 14,
+        "shot_id": "V14",
+        "label": "V14",
+        "segment_id": "vlog_seg_14",
+        "source_shot": 11,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头11：纸张近景准确显示“今晚十二点，第七井”；知遥收好纸条，抬镜望向广场旁通往井边的街道。\n原文：上面约的是今晚十二点，第七井。今晚我们就去看看。\n新版处理：观众与人物同时辨认会面地点；纸团展开，手指压住纸边不挡字；原生纸面只写今晚十二点，第七井，稳定一会儿。\n新版对白：今晚十二点，第七井。\n本轮时空修正：白天；广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "location": "雕塑广场",
+        "scene_id": "雕塑广场",
+        "scene_time": "白天",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "微笑地标雕塑",
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：雕塑广场。纸团展开，手指压住纸边不挡字；原生纸面只写今晚十二点，第七井，稳定一会儿。 仅在原有实体牌面、纸张或屏幕上原生呈现本镜指定文字；不后期盖字，不改变实体表面位置。 本镜故事时间：白天。本镜实际照明：广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "motion_prompt": "纸团展开，手指压住纸边不挡字；原生纸面只写今晚十二点，第七井，稳定一会儿。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角纸张近景，手和纸比例自然",
+        "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "shot_scale": "第一视角纸张近景，手和纸比例自然",
+        "duration_seconds": 4,
+        "sfx": "纸张展开和轻微摩擦",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "今晚十二点，第七井。",
+            "emotion": "近距离辨认，时间地点清楚；“第七井”略停，不故作神秘，不添加发送者。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "观众与人物同时辨认会面地点",
+        "native_text": [
+          "今晚十二点，第七井"
+        ]
+      },
+      {
+        "index": 15,
+        "origin_index": 15,
+        "shot_id": "V15",
+        "label": "V15",
+        "segment_id": "vlog_seg_15",
+        "source_shot": 11,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头11：纸张近景准确显示“今晚十二点，第七井”；知遥收好纸条，抬镜望向广场旁通往井边的街道。\n原文：上面约的是今晚十二点，第七井。今晚我们就去看看。\n新版处理：明确晚上去核对纸条信息的选择；知遥收好纸条，望向广场旁已知井街，再向观众点头。\n新版对白：晚上去看看。\n本轮时空修正：白天；广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "location": "雕塑广场",
+        "scene_id": "雕塑广场",
+        "scene_time": "白天",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "微笑地标雕塑",
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：雕塑广场。知遥收好纸条，望向广场旁已知井街，再向观众点头。 本镜故事时间：白天。本镜实际照明：广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "motion_prompt": "知遥收好纸条，望向广场旁已知井街，再向观众点头。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "正常自拍中近景接视线方向",
+        "light": "广场白天自然光；人物、雕塑与纸张处于同一真实日照条件，无室内顶灯。",
+        "shot_scale": "正常自拍中近景接视线方向",
+        "duration_seconds": 2,
+        "sfx": "纸张收入口袋、外套轻响",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "晚上去看看。",
+            "emotion": "疑问转为决定，短而明确，语气谨慎但有探索欲。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "明确晚上去核对纸条信息的选择"
+      },
+      {
+        "index": 16,
+        "origin_index": 16,
+        "shot_id": "V16",
+        "label": "V16",
+        "segment_id": "vlog_seg_16",
+        "source_shot": 12,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头12：第七井所在街道同机位昼转夜：白天有人经过，灯光逐渐熄灭，最后只剩路灯照着井盖。用这一个镜头完成等待与换时，不另拍酒店休息。\n原文：\n新版处理：昼夜换时，保持同一街道关系；同一第七井街道先给白天入口再切夜晚；以单个全画面硬切完成换时，绝不同时出现昼夜上下分屏。\n新版对白：无对白\n本轮时空修正：白天转午夜；单画面顺序切换，结束为夜间；先是同一井街白天自然光；随后一次全画面硬切到午夜暖白路灯，天空和窗外变暗。两种照明先后出现，不同时并列、不分屏；最终状态是夜间。",
+        "location": "第七井街道",
+        "scene_id": "第七井街道",
+        "scene_time": "白天转午夜；单画面顺序切换，结束为夜间",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "微笑地标雕塑",
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：第七井街道。同一第七井街道先给白天入口再切夜晚；以单个全画面硬切完成换时，绝不同时出现昼夜上下分屏。 本镜故事时间：白天转午夜；单画面顺序切换，结束为夜间。本镜实际照明：先是同一井街白天自然光；随后一次全画面硬切到午夜暖白路灯，天空和窗外变暗。两种照明先后出现，不同时并列、不分屏；最终状态是夜间。",
+        "motion_prompt": "同一第七井街道先给白天入口再切夜晚；以单个全画面硬切完成换时，绝不同时出现昼夜上下分屏。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "同一机位两个顺序全画面，单视图",
+        "light": "先是同一井街白天自然光；随后一次全画面硬切到午夜暖白路灯，天空和窗外变暗。两种照明先后出现，不同时并列、不分屏；最终状态是夜间。",
+        "shot_scale": "同一机位两个顺序全画面，单视图",
+        "duration_seconds": 2,
+        "sfx": "白天远处人声切至夜风，井盖位置相同",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "同一旅行主题只留下稀疏拨弦与轻弦乐，不铺持续低频；低于近距离口播，发现通道时短暂收住。",
+          "ducking": true
+        },
+        "purpose": "昼夜换时，保持同一街道关系"
+      },
+      {
+        "index": 17,
+        "origin_index": 17,
+        "shot_id": "V17",
+        "label": "V17",
+        "segment_id": "vlog_seg_17",
+        "source_shot": 13,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头13：夜间同一井边街道，知遥低声自拍，肩后可见井盖。仅在需要时叠加“第七井”，不另加倒计时。\n原文：快十二点了，我现在在第七井。\n新版处理：夜里向观众确认到达；夜间知遥低声自拍，肩后能看见同一井盖。\n新版对白：快十二点了。我到第七井了。\n本轮时空修正：午夜后连续探索（夜间）；井街午夜暖白路灯，手电只照当前目标；无白天天光。",
+        "location": "第七井街道",
+        "scene_id": "第七井街道",
+        "scene_time": "午夜后连续探索（夜间）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：第七井街道。夜间知遥低声自拍，肩后能看见同一井盖。 本镜故事时间：午夜后连续探索（夜间）。本镜实际照明：井街午夜暖白路灯，手电只照当前目标；无白天天光。",
+        "motion_prompt": "夜间知遥低声自拍，肩后能看见同一井盖。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "夜间正常距离自拍，路灯和手电自然补光",
+        "light": "井街午夜暖白路灯，手电只照当前目标；无白天天光。",
+        "shot_scale": "夜间正常距离自拍，路灯和手电自然补光",
+        "duration_seconds": 4,
+        "sfx": "夜风、远处设备轻响、外套摩擦",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "快十二点了。我到第七井了。",
+            "emotion": "压低声音，像怕惊动空街；“快十二点”清楚，后句是现场到达，不暗示已发现通道。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "同一旅行主题只留下稀疏拨弦与轻弦乐，不铺持续低频；低于近距离口播，发现通道时短暂收住。",
+          "ducking": true
+        },
+        "purpose": "夜里向观众确认到达"
+      },
+      {
+        "index": 18,
+        "origin_index": 18,
+        "shot_id": "V18",
+        "label": "V18",
+        "segment_id": "vlog_seg_18",
+        "source_shot": 14,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头14：转镜拍白天出现过的街道，摊位关闭、窗内熄灯；同构图体现昼夜差异。\n原文：这里白天还挺热闹的，现在一个人都没有。\n新版处理：由白天热闹变成无人改变她的注意；知遥转镜看刚走过的街道；原来摊位已关、窗内熄灯，只有自己的脚步。\n新版对白：白天还热闹，现在没人。\n本轮时空修正：午夜后连续探索（夜间）；井街午夜暖白路灯，手电只照当前目标；无白天天光。",
+        "location": "第七井街道",
+        "scene_id": "第七井街道",
+        "scene_time": "午夜后连续探索（夜间）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：第七井街道。知遥转镜看刚走过的街道；原来摊位已关、窗内熄灯，只有自己的脚步。 本镜故事时间：午夜后连续探索（夜间）。本镜实际照明：井街午夜暖白路灯，手电只照当前目标；无白天天光。",
+        "motion_prompt": "知遥转镜看刚走过的街道；原来摊位已关、窗内熄灯，只有自己的脚步。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角短横移，不长时间空街环拍",
+        "light": "井街午夜暖白路灯，手电只照当前目标；无白天天光。",
+        "shot_scale": "第一视角短横移，不长时间空街环拍",
+        "duration_seconds": 3,
+        "sfx": "夜风、自己的脚步，没有新增居民声",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "白天还热闹，现在没人。",
+            "emotion": "“现在”稍慢，观察后才说“没人”；结束给夜风留一点位置，不预判危险。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "同一旅行主题只留下稀疏拨弦与轻弦乐，不铺持续低频；低于近距离口播，发现通道时短暂收住。",
+          "ducking": true
+        },
+        "purpose": "由白天热闹变成无人改变她的注意"
+      },
+      {
+        "index": 19,
+        "origin_index": 19,
+        "shot_id": "V19",
+        "label": "V19",
+        "segment_id": "vlog_seg_19",
+        "source_shot": 15,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头15：环顾一圈后低头照井盖，井盖与街道标记在同一画面，不增加第二个入口。\n原文：我已经到了，但什么也没有啊，只有一个井盖。\n新版处理：眼前只有井盖，决定打开核对；手电照同一井盖，知遥停在旁边，弯腰准备推开。\n新版对白：只有井盖……下去看看。\n本轮时空修正：午夜后连续探索（夜间）；井街午夜暖白路灯，手电只照当前目标；无白天天光。",
+        "location": "第七井街道",
+        "scene_id": "第七井街道",
+        "scene_time": "午夜后连续探索（夜间）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：第七井街道。手电照同一井盖，知遥停在旁边，弯腰准备推开。 本镜故事时间：午夜后连续探索（夜间）。本镜实际照明：井街午夜暖白路灯，手电只照当前目标；无白天天光。",
+        "motion_prompt": "手电照同一井盖，知遥停在旁边，弯腰准备推开。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角向下，单个井盖",
+        "light": "井街午夜暖白路灯，手电只照当前目标；无白天天光。",
+        "shot_scale": "第一视角向下，单个井盖",
+        "duration_seconds": 3,
+        "sfx": "脚步停下、手电开关",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "只有井盖……下去看看。",
+            "emotion": "前半是在眼前停步的困惑；后半是谨慎决定；仅说井盖与下去，不包含下一阶段通道发现。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "同一旅行主题只留下稀疏拨弦与轻弦乐，不铺持续低频；低于近距离口播，发现通道时短暂收住。",
+          "ducking": true
+        },
+        "purpose": "眼前只有井盖，决定打开核对"
+      },
+      {
+        "index": 20,
+        "origin_index": 20,
+        "shot_id": "V20",
+        "label": "V20",
+        "segment_id": "vlog_seg_20",
+        "source_shot": 16,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头16：推开井盖，握住井内梯子下降；第二句在手电照到横向通道时说。镜头分为井口俯拍、扶梯手部、井底通道三段，声音不断。\n原文：下去看看——下面居然真的有通道！\n本次只拍：到达井底，手电照出前方横向通道；梯子留在身后，首次看到通道才说这句。\n新版处理：真实完成打开与沿梯子下降的动作；井盖已打开，知遥握住井内梯子下踩两级；只拍近处的手和鞋，不重复开井盖。\n新版对白：无对白\n本轮时空修正：午夜后连续探索（夜间）；井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "location": "井底通道",
+        "scene_id": "井底通道",
+        "scene_time": "午夜后连续探索（夜间）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：井底通道。井盖已打开，知遥握住井内梯子下踩两级；只拍近处的手和鞋，不重复开井盖。 本镜故事时间：午夜后连续探索（夜间）。本镜实际照明：井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "motion_prompt": "井盖已打开，知遥握住井内梯子下踩两级；只拍近处的手和鞋，不重复开井盖。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "井口俯视接手握梯子的近景",
+        "light": "井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "shot_scale": "井口俯视接手握梯子的近景",
+        "duration_seconds": 3,
+        "sfx": "井盖最后摩擦、踩梯金属声、短混响",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "同一旅行主题只留下稀疏拨弦与轻弦乐，不铺持续低频；低于近距离口播，发现通道时短暂收住。",
+          "ducking": true
+        },
+        "purpose": "真实完成打开与沿梯子下降的动作"
+      },
+      {
+        "index": 21,
+        "origin_index": 21,
+        "shot_id": "V21",
+        "label": "V21",
+        "segment_id": "vlog_seg_21",
+        "source_shot": 16,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头16：推开井盖，握住井内梯子下降；第二句在手电照到横向通道时说。镜头分为井口俯拍、扶梯手部、井底通道三段，声音不断。\n原文：下去看看——下面居然真的有通道！\n本次只拍：到达井底，手电照出前方横向通道；梯子留在身后，首次看到通道才说这句。\n新版处理：光照到横向通道后才有新发现；知遥落到井底，手电照出原有横向通道与侧入口，见到后才开口。\n新版对白：下面真有通道！\n本轮时空修正：午夜后连续探索（夜间）；井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "location": "井底通道",
+        "scene_id": "井底通道",
+        "scene_time": "午夜后连续探索（夜间）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：井底通道。知遥落到井底，手电照出原有横向通道与侧入口，见到后才开口。 本镜故事时间：午夜后连续探索（夜间）。本镜实际照明：井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "motion_prompt": "知遥落到井底，手电照出原有横向通道与侧入口，见到后才开口。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角手电照向通道，短暂停住",
+        "light": "井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "shot_scale": "第一视角手电照向通道，短暂停住",
+        "duration_seconds": 3,
+        "sfx": "滴水、井底短回响，脚步落地",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "下面真有通道！",
+            "emotion": "光照到通道才自然抬一点语调，“真有”是意外；只覆盖这次发现，不重说下井决定。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "通道被手电照到时稀疏弦乐短暂收住，给声音混响留位置。",
+          "ducking": true
+        },
+        "purpose": "光照到横向通道后才有新发现"
+      },
+      {
+        "index": 22,
+        "origin_index": 22,
+        "shot_id": "V22",
+        "label": "V22",
+        "segment_id": "vlog_seg_22",
+        "source_shot": 17,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头17：手电光扫过空通道：井底梯子在近处，侧通道入口在中段，地下大厅开口在远处。为接下来追逐和转向给出方向。\n原文：\n新版处理：建立梯子、侧通道与大厅的可走关系；摄像机跟一步，近处井底梯子，中段右侧侧通道，远处大厅入口都可辨，尾部监控灯闪起。\n新版对白：无对白\n本轮时空修正：午夜后连续探索（夜间）；井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "location": "井底通道",
+        "scene_id": "井底通道",
+        "scene_time": "午夜后连续探索（夜间）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：井底通道。摄像机跟一步，近处井底梯子，中段右侧侧通道，远处大厅入口都可辨，尾部监控灯闪起。 本镜故事时间：午夜后连续探索（夜间）。本镜实际照明：井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "motion_prompt": "摄像机跟一步，近处井底梯子，中段右侧侧通道，远处大厅入口都可辨，尾部监控灯闪起。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "沿通道方向的单个全画面，人物不入镜",
+        "light": "井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "shot_scale": "沿通道方向的单个全画面，人物不入镜",
+        "duration_seconds": 2,
+        "sfx": "脚步回响与滴水，尾部警报开始",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "建立梯子、侧通道与大厅的可走关系"
+      },
+      {
+        "index": 23,
+        "origin_index": 23,
+        "shot_id": "V23",
+        "label": "V23",
+        "segment_id": "vlog_seg_23",
+        "source_shot": 18,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头18：井底通道监控灯由常亮转闪烁，脸侧装置同时发出警报；不给装置补充新功能。\n原文：（被发现的警报声）\n新版处理：已佩戴的装置和通道灯同时警报；知遥转向画面侧边，脸侧同一装置发出警报，墙上监控灯开始闪烁；不补装置新功能。\n新版对白：无对白\n本轮时空修正：午夜后连续探索（夜间）；井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "location": "井底通道",
+        "scene_id": "井底通道",
+        "scene_time": "午夜后连续探索（夜间）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：井底通道。知遥转向画面侧边，脸侧同一装置发出警报，墙上监控灯开始闪烁；不补装置新功能。 本镜故事时间：午夜后连续探索（夜间）。本镜实际照明：井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "motion_prompt": "知遥转向画面侧边，脸侧同一装置发出警报，墙上监控灯开始闪烁；不补装置新功能。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "紧张但可辨的自拍侧近景，装置不过大",
+        "light": "井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "shot_scale": "紧张但可辨的自拍侧近景，装置不过大",
+        "duration_seconds": 2,
+        "sfx": "突发装置警报，与灯闪同步",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "已佩戴的装置和通道灯同时警报"
+      },
+      {
+        "index": 24,
+        "origin_index": 24,
+        "shot_id": "V24",
+        "label": "V24",
+        "segment_id": "vlog_seg_24",
+        "source_shot": 19,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头19：脸侧装置近景→通道壁喇叭→知遥转身。她压住惊慌，仍被警报锁定。\n原文：快乐指数过低，快乐指数过低，请保持微笑。\n新版处理：播报告知规则正作用在她身上；知遥努力维持笑容，转身看向通道后方；广播源是既有装置和墙喇叭，不出现系统人像。\n新版对白：快乐指数过低，快乐指数过低，请保持微笑。\n本轮时空修正：午夜后连续探索（夜间）；井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "location": "井底通道",
+        "scene_id": "井底通道",
+        "scene_time": "午夜后连续探索（夜间）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：井底通道。知遥努力维持笑容，转身看向通道后方；广播源是既有装置和墙喇叭，不出现系统人像。 本镜故事时间：午夜后连续探索（夜间）。本镜实际照明：井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "motion_prompt": "知遥努力维持笑容，转身看向通道后方；广播源是既有装置和墙喇叭，不出现系统人像。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "自拍中近景，装置佩戴连续",
+        "light": "井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "shot_scale": "自拍中近景，装置佩戴连续",
+        "duration_seconds": 6,
+        "sfx": "机械播报清楚，警报退至低位、通道混响",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "系统广播",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "快乐指数过低，快乐指数过低，请保持微笑。",
+            "emotion": "沿用独立系统女声，机械、短句清晰；不模仿知遥，不补数值。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "播报告知规则正作用在她身上"
+      },
+      {
+        "index": 25,
+        "origin_index": 25,
+        "shot_id": "V25",
+        "label": "V25",
+        "segment_id": "vlog_seg_25",
+        "source_shot": 20,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头20：通道另一端出现追来的守卫；知遥转向已在前一宽景露出的侧通道。原文称呼照读。\n原文：抓住他！\n新版处理：后方喊声使知遥转入已见侧通道；通道远端无名守卫出现，知遥身体转向中段右侧的侧通道。\n新版对白：抓住他！\n本轮时空修正：午夜后连续探索（夜间）；井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "location": "井底通道",
+        "scene_id": "井底通道",
+        "scene_time": "午夜后连续探索（夜间）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [
+          "守卫"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：井底通道。通道远端无名守卫出现，知遥身体转向中段右侧的侧通道。 本镜故事时间：午夜后连续探索（夜间）。本镜实际照明：井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "motion_prompt": "通道远端无名守卫出现，知遥身体转向中段右侧的侧通道。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "肩后中景，让方向清楚",
+        "light": "井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "shot_scale": "肩后中景，让方向清楚",
+        "duration_seconds": 2,
+        "sfx": "后方喊声，接近的快速脚步",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "守卫喊声",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "抓住他！",
+            "emotion": "同一个成年男守卫声线，后方突然短喊、重读“抓住”，不加词。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "后方喊声使知遥转入已见侧通道"
+      },
+      {
+        "index": 26,
+        "origin_index": 26,
+        "shot_id": "V26",
+        "label": "V26",
+        "segment_id": "vlog_seg_26",
+        "source_shot": 21,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头21：肩后跟拍或胸前机位，跑入侧通道；回头短镜确认追兵位置，随后进入偏暗的地下大厅。\n原文：糟了，快被追上了！\n新版处理：当下风险变成跑动而非站住解释；知遥持镜跑入既有侧通道，一次回看确认守卫位置后继续前行；动作连贯，不拍长无信息追逐。\n新版对白：糟了，快被追上了！\n本轮时空修正：午夜后连续探索（夜间）；井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "location": "井底通道",
+        "scene_id": "井底通道",
+        "scene_time": "午夜后连续探索（夜间）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：井底通道。知遥持镜跑入既有侧通道，一次回看确认守卫位置后继续前行；动作连贯，不拍长无信息追逐。 本镜故事时间：午夜后连续探索（夜间）。本镜实际照明：井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "motion_prompt": "知遥持镜跑入既有侧通道，一次回看确认守卫位置后继续前行；动作连贯，不拍长无信息追逐。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "胸前跟随接一次短自拍，脸和身体比例正常",
+        "light": "井底梯口和通道为灰绿应急灯；手电光随手的动作照梯子、地面和目标，远处低亮，无自然日照。",
+        "shot_scale": "胸前跟随接一次短自拍，脸和身体比例正常",
+        "duration_seconds": 4,
+        "sfx": "跑步、喘息、背包摩擦，后方脚步",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "糟了，快被追上了！",
+            "emotion": "边跑边换短气，语速稍快、声音紧；不停步读完整句，不夸张尖叫。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "当下风险变成跑动而非站住解释"
+      },
+      {
+        "index": 27,
+        "origin_index": 27,
+        "shot_id": "V27",
+        "label": "V27",
+        "segment_id": "vlog_seg_27",
+        "source_shot": 22,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头22：地下大厅向灰暗街区的短全景，远处能辨认出与地上相同的雕塑轮廓；镜头不停留逐项展示奇观。\n原文：\n新版处理：跑动进入新空间，先露出同款地标；由通道出口跑到地下大厅开口，前方灰暗街区露出同款微笑雕塑；远处追兵脚步渐弱。\n新版对白：无对白\n本轮时空修正：午夜后连续探索（里世界）；灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "location": "里世界街区",
+        "scene_id": "里世界街区",
+        "scene_time": "午夜后连续探索（里世界）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "微笑地标雕塑",
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：里世界街区。由通道出口跑到地下大厅开口，前方灰暗街区露出同款微笑雕塑；远处追兵脚步渐弱。 本镜故事时间：午夜后连续探索（里世界）。本镜实际照明：灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "motion_prompt": "由通道出口跑到地下大厅开口，前方灰暗街区露出同款微笑雕塑；远处追兵脚步渐弱。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角向开口走，单个画面",
+        "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "shot_scale": "第一视角向开口走，单个画面",
+        "duration_seconds": 3,
+        "sfx": "脚步混响变空旷，远处脚步减弱",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "稀疏柔和弦乐保留陌生空间感，音符之间留空；不盖哭声、纸张或人物低声，保持同一场连续，不逐镜重起。",
+          "ducking": true
+        },
+        "purpose": "跑动进入新空间，先露出同款地标"
+      },
+      {
+        "index": 28,
+        "origin_index": 28,
+        "shot_id": "V28",
+        "label": "V28",
+        "segment_id": "vlog_seg_28",
+        "source_shot": 23,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头23：大厅深处开口露出灰暗街区，同样的广场轮廓和地标雕塑远影建立现实与里世界的对应；知遥停在入口，确认所见。\n原文：这是……笑之国的里世界。\n新版处理：先让观众看出广场既熟悉又变了；灰暗街区和同款雕塑完整单画面呈现；位置、基座和路向与地上广场相同，墙面破损、人群不再强笑。\n新版对白：这不是刚才的广场吗？\n本轮时空修正：午夜后连续探索（里世界）；灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "location": "里世界街区",
+        "scene_id": "里世界街区",
+        "scene_time": "午夜后连续探索（里世界）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "微笑地标雕塑",
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：里世界街区。灰暗街区和同款雕塑完整单画面呈现；位置、基座和路向与地上广场相同，墙面破损、人群不再强笑。 本镜故事时间：午夜后连续探索（里世界）。本镜实际照明：灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "motion_prompt": "灰暗街区和同款雕塑完整单画面呈现；位置、基座和路向与地上广场相同，墙面破损、人群不再强笑。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角眼平广场全景，不分屏比较",
+        "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "shot_scale": "第一视角眼平广场全景，不分屏比较",
+        "duration_seconds": 4,
+        "sfx": "空旷风、远处克制抽泣",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "这不是刚才的广场吗？",
+            "emotion": "先看清同款雕塑再问，难以置信但压低声；只描述看见的对应，不说幕后解释。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "稀疏柔和弦乐保留陌生空间感，音符之间留空；不盖哭声、纸张或人物低声，保持同一场连续，不逐镜重起。",
+          "ducking": true
+        },
+        "purpose": "先让观众看出广场既熟悉又变了"
+      },
+      {
+        "index": 29,
+        "origin_index": 29,
+        "shot_id": "V29",
+        "label": "V29",
+        "segment_id": "vlog_seg_29",
+        "source_shot": 23,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头23：大厅深处开口露出灰暗街区，同样的广场轮廓和地标雕塑远影建立现实与里世界的对应；知遥停在入口，确认所见。\n原文：这是……笑之国的里世界。\n新版处理：确认进入原素材的里世界；知遥停在大厅开口回自拍，肩后灰暗雕塑仍可见。\n新版对白：这是……笑之国的里世界。\n本轮时空修正：午夜后连续探索（里世界）；灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "location": "里世界街区",
+        "scene_id": "里世界街区",
+        "scene_time": "午夜后连续探索（里世界）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "微笑地标雕塑",
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。 当前空间：里世界街区。知遥停在大厅开口回自拍，肩后灰暗雕塑仍可见。 本镜故事时间：午夜后连续探索（里世界）。本镜实际照明：灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "motion_prompt": "知遥停在大厅开口回自拍，肩后灰暗雕塑仍可见。",
+        "start_state": "知遥脸侧持续佩戴同一个快乐监控装置。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "普通自拍近景，人眼对焦自然",
+        "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "shot_scale": "普通自拍近景，人眼对焦自然",
+        "duration_seconds": 3,
+        "sfx": "自己的呼吸、外套轻响",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "这是……笑之国的里世界。",
+            "emotion": "短暂停顿是辨认，不逐字拖；最后轻声确认，不宣布全世界真相。"
+          }
+        ],
+        "device_state": "on",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "稀疏柔和弦乐保留陌生空间感，音符之间留空；不盖哭声、纸张或人物低声，保持同一场连续，不逐镜重起。",
+          "ducking": true
+        },
+        "purpose": "确认进入原素材的里世界"
+      },
+      {
+        "index": 30,
+        "origin_index": 30,
+        "shot_id": "V30",
+        "label": "V30",
+        "segment_id": "vlog_seg_30",
+        "source_shot": 24,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头24：近景，知遥解开脸侧装置并放在入口角落，空出的脸侧与衣服状态此后连续。\n原文：这个装置不能再戴了。\n新版处理：装置成为继续探索的负担，完成摘下；知遥解开脸侧装置一次，放到入口角落；镜头清楚看到脸侧空出，不因摘下产生魔法效果。\n新版对白：不能再戴了。\n本轮时空修正：午夜后连续探索（里世界）；灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "location": "里世界街区",
+        "scene_id": "里世界街区",
+        "scene_time": "午夜后连续探索（里世界）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "快乐监控装置"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 开始时知遥仍佩戴装置，本镜解扣一次并把它留在里世界入口。 尚未找到钥匙，不预先出现。 当前空间：里世界街区。知遥解开脸侧装置一次，放到入口角落；镜头清楚看到脸侧空出，不因摘下产生魔法效果。 本镜故事时间：午夜后连续探索（里世界）。本镜实际照明：灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "motion_prompt": "知遥解开脸侧装置一次，放到入口角落；镜头清楚看到脸侧空出，不因摘下产生魔法效果。",
+        "start_state": "开始时知遥仍佩戴装置，本镜解扣一次并把它留在里世界入口。 尚未找到钥匙，不预先出现。",
+        "end_state": "装置留在里世界入口角落，知遥脸侧空出；此后不得恢复佩戴。",
+        "camera": "自拍侧近景接手放下道具的短细节",
+        "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "shot_scale": "自拍侧近景接手放下道具的短细节",
+        "duration_seconds": 3,
+        "sfx": "一次解扣声，装置声随着放远变弱",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "不能再戴了。",
+            "emotion": "轻声而干脆，边解扣边说；只说当下要摘下，不提前指认居民真实模样。"
+          }
+        ],
+        "device_state": "take_off",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "装置成为继续探索的负担，完成摘下"
+      },
+      {
+        "index": 31,
+        "origin_index": 31,
+        "shot_id": "V31",
+        "label": "V31",
+        "segment_id": "vlog_seg_31",
+        "source_shot": 25,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头25：人群不再强笑：疲惫、哭泣、发怒或木然；接知遥看向废弃面部装置和残破微笑标牌。保持居民为人，不自行增加怪物。\n原文：原来这才是他们真实的模样。这些都是什么？\n新版处理：居民仍是真人，反差来自终于显露的情绪；视线镜头见真人居民的疲惫、哭泣或沉默和废弃装置，没有怪物与变脸特效。\n新版对白：原来，这是他们真实的样子。\n本轮时空修正：午夜后连续探索（里世界）；灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "location": "里世界街区",
+        "scene_id": "里世界街区",
+        "scene_time": "午夜后连续探索（里世界）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [
+          "里世界居民"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "微笑地标雕塑"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。 当前空间：里世界街区。视线镜头见真人居民的疲惫、哭泣或沉默和废弃装置，没有怪物与变脸特效。 本镜故事时间：午夜后连续探索（里世界）。本镜实际照明：灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "motion_prompt": "视线镜头见真人居民的疲惫、哭泣或沉默和废弃装置，没有怪物与变脸特效。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角中景观察，不窥拍夸张痛苦特写",
+        "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "shot_scale": "第一视角中景观察，不窥拍夸张痛苦特写",
+        "duration_seconds": 3,
+        "sfx": "轻声抽泣、衣料，设备旧杂音",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "原来，这是他们真实的样子。",
+            "emotion": "看见后才轻声感叹，重心是“真实”，不讲解世界机制。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "稀疏柔和弦乐保留陌生空间感，音符之间留空；不盖哭声、纸张或人物低声，保持同一场连续，不逐镜重起。",
+          "ducking": true
+        },
+        "purpose": "居民仍是真人，反差来自终于显露的情绪"
+      },
+      {
+        "index": 32,
+        "origin_index": 32,
+        "shot_id": "V32",
+        "label": "V32",
+        "segment_id": "vlog_seg_32",
+        "source_shot": 26,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头26：回望刚经过的地下大厅入口；大厅、灰暗街区和入口在宽景中连起来。居民有的坐地哭泣，有的沉默，落到原文判断。\n原文：所以那个地下大厅，就是他们的情绪释放区。不快乐的人就被流放到了这里。\n新版处理：把刚经历的入口与情绪释放区联系起来；知遥回望刚经过的地下大厅入口，再对镜头说；灰暗街区与入口地理连接，居民仍在后景，不新增证明文件。\n新版对白：这里是情绪释放区。不快乐的人，被流放在这儿。\n本轮时空修正：午夜后连续探索（里世界）；灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "location": "里世界街区",
+        "scene_id": "里世界街区",
+        "scene_time": "午夜后连续探索（里世界）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [
+          "里世界居民"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "微笑地标雕塑"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。 当前空间：里世界街区。知遥回望刚经过的地下大厅入口，再对镜头说；灰暗街区与入口地理连接，居民仍在后景，不新增证明文件。 本镜故事时间：午夜后连续探索（里世界）。本镜实际照明：灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "motion_prompt": "知遥回望刚经过的地下大厅入口，再对镜头说；灰暗街区与入口地理连接，居民仍在后景，不新增证明文件。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "回望入口接自然自拍，装置已经摘下",
+        "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "shot_scale": "回望入口接自然自拍，装置已经摘下",
+        "duration_seconds": 6,
+        "sfx": "大厅回声、远处居民抽泣，口播清楚",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "这里是情绪释放区。不快乐的人，被流放在这儿。",
+            "emotion": "理解之后压低声，前半像指认刚走过的地方，后半稍沉重；保持连贯，不用全知讲课语气。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "稀疏柔和弦乐保留陌生空间感，音符之间留空；不盖哭声、纸张或人物低声，保持同一场连续，不逐镜重起。",
+          "ducking": true
+        },
+        "purpose": "把刚经历的入口与情绪释放区联系起来"
+      },
+      {
+        "index": 33,
+        "origin_index": 33,
+        "shot_id": "V33",
+        "label": "V33",
+        "segment_id": "vlog_seg_33",
+        "source_shot": 28,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头28：墙面字迹特写。为实现“有字／找钥匙”，道具补写“离开这里，需要钥匙。”；只给这条行动提示，不添加密码或新的世界规则。知遥顺街道继续找。\n原文：这里有字，看来得去找钥匙了。\n新版处理：线索直接把目标变成找钥匙；手电照墙上既有行动提示，指尖靠近墙面不遮字。\n新版对白：这里有字。离开得找钥匙。\n本轮时空修正：午夜后连续探索（里世界）；灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "location": "里世界街区",
+        "scene_id": "里世界街区",
+        "scene_time": "午夜后连续探索（里世界）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。 当前空间：里世界街区。手电照墙上既有行动提示，指尖靠近墙面不遮字。 仅在原有实体牌面、纸张或屏幕上原生呈现本镜指定文字；不后期盖字，不改变实体表面位置。 本镜故事时间：午夜后连续探索（里世界）。本镜实际照明：灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "motion_prompt": "手电照墙上既有行动提示，指尖靠近墙面不遮字。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角墙字近景，停住够辨认",
+        "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "shot_scale": "第一视角墙字近景，停住够辨认",
+        "duration_seconds": 4,
+        "sfx": "手电、衣料摩擦",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "这里有字。离开得找钥匙。",
+            "emotion": "先辨认，后句是眼前行动决定；不带下一阶段搜索结果。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "线索直接把目标变成找钥匙",
+        "native_text": [
+          "离开这里，需要钥匙。"
+        ]
+      },
+      {
+        "index": 34,
+        "origin_index": 34,
+        "shot_id": "V34",
+        "label": "V34",
+        "segment_id": "vlog_seg_34",
+        "source_shot": 29,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头29：连续三段短动作：翻找废弃柜子、查看墙角、抬头发现雕塑。每段2–3秒，原句贯穿；最后指向前面已经露出的灰暗雕塑。\n原文：一路找过来都没看到钥匙，只有去雕塑那里看看了。\n新版处理：第一次搜索没有拿到物件；知遥在已见旧柜子里快速翻找一次，柜内没有钥匙；不捡其他物件。\n新版对白：无对白\n本轮时空修正：午夜后连续探索（里世界）；灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "location": "里世界街区",
+        "scene_id": "里世界街区",
+        "scene_time": "午夜后连续探索（里世界）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "微笑地标雕塑"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。 当前空间：里世界街区。知遥在已见旧柜子里快速翻找一次，柜内没有钥匙；不捡其他物件。 本镜故事时间：午夜后连续探索（里世界）。本镜实际照明：灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "motion_prompt": "知遥在已见旧柜子里快速翻找一次，柜内没有钥匙；不捡其他物件。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角手部短动作",
+        "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "shot_scale": "第一视角手部短动作",
+        "duration_seconds": 2,
+        "sfx": "柜门轻响与翻动物件",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "off",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "第一次搜索没有拿到物件"
+      },
+      {
+        "index": 35,
+        "origin_index": 35,
+        "shot_id": "V35",
+        "label": "V35",
+        "segment_id": "vlog_seg_35",
+        "source_shot": 29,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头29：连续三段短动作：翻找废弃柜子、查看墙角、抬头发现雕塑。每段2–3秒，原句贯穿；最后指向前面已经露出的灰暗雕塑。\n原文：一路找过来都没看到钥匙，只有去雕塑那里看看了。\n新版处理：第二个位置仍未发现，避免重复旁白；手电看同条街道墙角，一次短扫确认空无钥匙，镜头随抬头方向接雕塑。\n新版对白：无对白\n本轮时空修正：午夜后连续探索（里世界）；灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "location": "里世界街区",
+        "scene_id": "里世界街区",
+        "scene_time": "午夜后连续探索（里世界）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "微笑地标雕塑"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。 当前空间：里世界街区。手电看同条街道墙角，一次短扫确认空无钥匙，镜头随抬头方向接雕塑。 本镜故事时间：午夜后连续探索（里世界）。本镜实际照明：灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "motion_prompt": "手电看同条街道墙角，一次短扫确认空无钥匙，镜头随抬头方向接雕塑。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角短扫，不停留空墙",
+        "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "shot_scale": "第一视角短扫，不停留空墙",
+        "duration_seconds": 2,
+        "sfx": "自己的脚步、外套摩擦",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "off",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "第二个位置仍未发现，避免重复旁白"
+      },
+      {
+        "index": 36,
+        "origin_index": 36,
+        "shot_id": "V36",
+        "label": "V36",
+        "segment_id": "vlog_seg_36",
+        "source_shot": 29,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头29：连续三段短动作：翻找废弃柜子、查看墙角、抬头发现雕塑。每段2–3秒，原句贯穿；最后指向前面已经露出的灰暗雕塑。\n原文：一路找过来都没看到钥匙，只有去雕塑那里看看了。\n新版处理：搜索失败改变前往地点；知遥抬头看街道尽头同款雕塑基座，开始走向那里。\n新版对白：没找到……去雕塑那边。\n本轮时空修正：午夜后连续探索（里世界）；灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "location": "里世界街区",
+        "scene_id": "里世界街区",
+        "scene_time": "午夜后连续探索（里世界）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "微笑地标雕塑"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。 当前空间：里世界街区。知遥抬头看街道尽头同款雕塑基座，开始走向那里。 本镜故事时间：午夜后连续探索（里世界）。本镜实际照明：灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "motion_prompt": "知遥抬头看街道尽头同款雕塑基座，开始走向那里。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "侧近景抬眼接第一视角朝雕塑走",
+        "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "shot_scale": "侧近景抬眼接第一视角朝雕塑走",
+        "duration_seconds": 3,
+        "sfx": "开始往雕塑走的脚步",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "没找到……去雕塑那边。",
+            "emotion": "有一点失望，看到已知地标后转为利落决定；不是慢慢解释一遍搜索过程。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "稀疏弦乐短暂收低，让新方向和脚步成为推进。",
+          "ducking": true
+        },
+        "purpose": "搜索失败改变前往地点"
+      },
+      {
+        "index": 37,
+        "origin_index": 37,
+        "shot_id": "V37",
+        "label": "V37",
+        "segment_id": "vlog_seg_37",
+        "source_shot": 30,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头30：到达雕塑底座，光照到凹槽内的金属钥匙；伸手取出，钥匙正反面短特写锁定形状，雕塑位置与白天对应。\n原文：那是什么？应该就是这把钥匙了。\n新版处理：先看见基座凹槽的唯一钥匙；到达同款雕塑基座，手电照出凹槽里同一把旧银色小钥匙，知遥还未取出。\n新版对白：无对白\n本轮时空修正：午夜后连续探索（里世界）；灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "location": "里世界街区",
+        "scene_id": "里世界街区",
+        "scene_time": "午夜后连续探索（里世界）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙",
+          "微笑地标雕塑"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。 当前空间：里世界街区。到达同款雕塑基座，手电照出凹槽里同一把旧银色小钥匙，知遥还未取出。 本镜故事时间：午夜后连续探索（里世界）。本镜实际照明：灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "motion_prompt": "到达同款雕塑基座，手电照出凹槽里同一把旧银色小钥匙，知遥还未取出。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 尚未找到钥匙，不预先出现。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "第一视角凹槽和钥匙细节，实际手持尺寸",
+        "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "shot_scale": "第一视角凹槽和钥匙细节，实际手持尺寸",
+        "duration_seconds": 2,
+        "sfx": "脚步停下、手电轻响",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "off",
+        "key_state": "absent",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "先看见基座凹槽的唯一钥匙"
+      },
+      {
+        "index": 38,
+        "origin_index": 38,
+        "shot_id": "V38",
+        "label": "V38",
+        "segment_id": "vlog_seg_38",
+        "source_shot": 30,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头30：到达雕塑底座，光照到凹槽内的金属钥匙；伸手取出，钥匙正反面短特写锁定形状，雕塑位置与白天对应。\n原文：那是什么？应该就是这把钥匙了。\n新版处理：判断后真实取出唯一一把钥匙；知遥伸手从凹槽取出钥匙一次，手中只有一把，准备离开雕塑。\n新版对白：应该就是这把。\n本轮时空修正：午夜后连续探索（里世界）；灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "location": "里世界街区",
+        "scene_id": "里世界街区",
+        "scene_time": "午夜后连续探索（里世界）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙",
+          "微笑地标雕塑"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 开始钥匙在雕塑基座凹槽，知遥本镜取出唯一一把。 当前空间：里世界街区。知遥伸手从凹槽取出钥匙一次，手中只有一把，准备离开雕塑。 本镜故事时间：午夜后连续探索（里世界）。本镜实际照明：灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "motion_prompt": "知遥伸手从凹槽取出钥匙一次，手中只有一把，准备离开雕塑。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 开始钥匙在雕塑基座凹槽，知遥本镜取出唯一一把。",
+        "end_state": "钥匙已在知遥手里，只有一把；后续坍塌、返回均保留。",
+        "camera": "第一视角取钥匙手部近景",
+        "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "shot_scale": "第一视角取钥匙手部近景",
+        "duration_seconds": 3,
+        "sfx": "钥匙碰到凹槽的轻金属响",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "应该就是这把。",
+            "emotion": "“应该”保留谨慎，取出时轻声确认；不提前说世界坍塌。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pick_up",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "判断后真实取出唯一一把钥匙"
+      },
+      {
+        "index": 39,
+        "origin_index": 39,
+        "shot_id": "V39",
+        "label": "V39",
+        "segment_id": "vlog_seg_39",
+        "source_shot": 31,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头31：匹配切点明确：先在里世界看到坍塌，随后切到现实后院，不能把两个空间变成同一地点。取钥匙后地面和雕塑开裂，知遥护头退后；灰尘亮闪匹配切到现实的矫正中心后院。后半句确认环境恢复正常，手里仍是同一把钥匙。\n原文：这个世界正在坍塌——我这是回来了！\n本次只拍：在亮闪后明确切到现实矫正中心后院，知遥抬头确认环境正常，同一把钥匙仍握在手里；不是里世界继续坍塌。\n新版处理：已有坍塌打断行动，风险不是新增袭击；取出钥匙后脚下地面和雕塑出现裂缝、灰尘，知遥握住钥匙抬臂护头退一步；不拍碎石直接伤人。\n新版对白：这里在坍塌！\n本轮时空修正：午夜后连续探索（里世界）；灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "location": "里世界街区",
+        "scene_id": "里世界街区",
+        "scene_time": "午夜后连续探索（里世界）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙",
+          "微笑地标雕塑"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 只有同一把旧银色钥匙，知遥持有。 当前空间：里世界街区。取出钥匙后脚下地面和雕塑出现裂缝、灰尘，知遥握住钥匙抬臂护头退一步；不拍碎石直接伤人。 本镜故事时间：午夜后连续探索（里世界）。本镜实际照明：灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "motion_prompt": "取出钥匙后脚下地面和雕塑出现裂缝、灰尘，知遥握住钥匙抬臂护头退一步；不拍碎石直接伤人。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 只有同一把旧银色钥匙，知遥持有。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "身体前方的手持反应，单视图",
+        "light": "灰暗里世界低位环境反射光，手电照当前目标；真人脸部保持可辨。没有白天天光，也不生成突变昼夜或额外魔法光源。",
+        "shot_scale": "身体前方的手持反应，单视图",
+        "duration_seconds": 3,
+        "sfx": "原素材坍塌裂响、灰尘落下，音乐退出",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "这里在坍塌！",
+            "emotion": "裂响出现后才急短说，带呼吸，不停步念解释。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "held",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "已有坍塌打断行动，风险不是新增袭击"
+      },
+      {
+        "index": 40,
+        "origin_index": 40,
+        "shot_id": "V40",
+        "label": "V40",
+        "segment_id": "vlog_seg_40",
+        "source_shot": 31,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头31：匹配切点明确：先在里世界看到坍塌，随后切到现实后院，不能把两个空间变成同一地点。取钥匙后地面和雕塑开裂，知遥护头退后；灰尘亮闪匹配切到现实的矫正中心后院。后半句确认环境恢复正常，手里仍是同一把钥匙。\n原文：这个世界正在坍塌——我这是回来了！\n本次只拍：在亮闪后明确切到现实矫正中心后院，知遥抬头确认环境正常，同一把钥匙仍握在手里；不是里世界继续坍塌。\n新版处理：环境恢复现实，物件状态没有丢失；灰尘遮过镜头后切到现实矫正中心后院；知遥站稳确认暖白青绿环境，手中仍是同一钥匙。\n新版对白：我回来了？\n本轮时空修正：午夜后连续探索（现实夜间）；现实后院夜间冷白外墙设备灯与门灯；暖白青绿墙只是建筑颜色，不是白昼；天空和远处街道保持暗，手电可近距离照锁孔。",
+        "location": "矫正中心后院",
+        "scene_id": "矫正中心后院",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙",
+          "微笑地标雕塑"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 只有同一把旧银色钥匙，知遥持有。 当前空间：矫正中心后院。灰尘遮过镜头后切到现实矫正中心后院；知遥站稳确认暖白青绿环境，手中仍是同一钥匙。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：现实后院夜间冷白外墙设备灯与门灯；暖白青绿墙只是建筑颜色，不是白昼；天空和远处街道保持暗，手电可近距离照锁孔。",
+        "motion_prompt": "灰尘遮过镜头后切到现实矫正中心后院；知遥站稳确认暖白青绿环境，手中仍是同一钥匙。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 只有同一把旧银色钥匙，知遥持有。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "手持自拍稳定下来，身后是现实后院",
+        "light": "现实后院夜间冷白外墙设备灯与门灯；暖白青绿墙只是建筑颜色，不是白昼；天空和远处街道保持暗，手电可近距离照锁孔。",
+        "shot_scale": "手持自拍稳定下来，身后是现实后院",
+        "duration_seconds": 3,
+        "sfx": "裂响结束，现实设备嗡鸣恢复",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "我回来了？",
+            "emotion": "先稳住呼吸再短问，仍不确定；只有确认返回，不提前说后门关键线索。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "held",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "环境恢复现实，物件状态没有丢失"
+      },
+      {
+        "index": 41,
+        "origin_index": 41,
+        "shot_id": "V41",
+        "label": "V41",
+        "segment_id": "vlog_seg_41",
+        "source_shot": 33,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头33：后院全景后靠近后门，镜头让“快乐矫正中心”标识和门的位置可辨；知遥试钥匙开后门。用这一动作连接已找到的钥匙与入内，不增加新任务。\n原文：这里是矫正中心后门，看来关键线索就在里面。\n新版处理：认出后门并用已有钥匙尝试；知遥看向原生快乐矫正中心后门牌，再低头看手中钥匙，靠近锁孔。\n新版对白：矫正中心后门。试试这把钥匙。\n本轮时空修正：午夜后连续探索（现实夜间）；现实后院夜间冷白外墙设备灯与门灯；暖白青绿墙只是建筑颜色，不是白昼；天空和远处街道保持暗，手电可近距离照锁孔。",
+        "location": "矫正中心后院",
+        "scene_id": "矫正中心后院",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 只有同一把旧银色钥匙，知遥持有。 当前空间：矫正中心后院。知遥看向原生快乐矫正中心后门牌，再低头看手中钥匙，靠近锁孔。 仅在原有实体牌面、纸张或屏幕上原生呈现本镜指定文字；不后期盖字，不改变实体表面位置。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：现实后院夜间冷白外墙设备灯与门灯；暖白青绿墙只是建筑颜色，不是白昼；天空和远处街道保持暗，手电可近距离照锁孔。",
+        "motion_prompt": "知遥看向原生快乐矫正中心后门牌，再低头看手中钥匙，靠近锁孔。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 只有同一把旧银色钥匙，知遥持有。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "正常自拍接后门中景",
+        "light": "现实后院夜间冷白外墙设备灯与门灯；暖白青绿墙只是建筑颜色，不是白昼；天空和远处街道保持暗，手电可近距离照锁孔。",
+        "shot_scale": "正常自拍接后门中景",
+        "duration_seconds": 5,
+        "sfx": "靠近门的脚步，低位设备声",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "矫正中心后门。试试这把钥匙。",
+            "emotion": "悄声指认，后句是明确尝试；不先保证钥匙能开，也不宣布真相就在里面。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "held",
+        "audio_plan": {
+          "music_cue": "稀疏柔和弦乐保留陌生空间感，音符之间留空；不盖哭声、纸张或人物低声，保持同一场连续，不逐镜重起。",
+          "ducking": true
+        },
+        "purpose": "认出后门并用已有钥匙尝试",
+        "native_text": [
+          "快乐矫正中心"
+        ]
+      },
+      {
+        "index": 42,
+        "origin_index": 42,
+        "shot_id": "V42",
+        "label": "V42",
+        "segment_id": "vlog_seg_42",
+        "source_shot": 33,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头33：后院全景后靠近后门，镜头让“快乐矫正中心”标识和门的位置可辨；知遥试钥匙开后门。用这一动作连接已找到的钥匙与入内，不增加新任务。\n原文：这里是矫正中心后门，看来关键线索就在里面。\n新版处理：试钥匙得到开门结果；同一钥匙插进普通后门锁孔，转动后门锁开，推门一次。\n新版对白：无对白\n本轮时空修正：午夜后连续探索（现实夜间）；现实后院夜间冷白外墙设备灯与门灯；暖白青绿墙只是建筑颜色，不是白昼；天空和远处街道保持暗，手电可近距离照锁孔。",
+        "location": "矫正中心后院",
+        "scene_id": "矫正中心后院",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 只有同一把旧银色钥匙，知遥持有。 当前空间：矫正中心后院。同一钥匙插进普通后门锁孔，转动后门锁开，推门一次。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：现实后院夜间冷白外墙设备灯与门灯；暖白青绿墙只是建筑颜色，不是白昼；天空和远处街道保持暗，手电可近距离照锁孔。",
+        "motion_prompt": "同一钥匙插进普通后门锁孔，转动后门锁开，推门一次。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 只有同一把旧银色钥匙，知遥持有。",
+        "end_state": "后门已打开；知遥把钥匙收进外套口袋，之后仍只有一把。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "第一视角手与锁孔近景",
+        "light": "现实后院夜间冷白外墙设备灯与门灯；暖白青绿墙只是建筑颜色，不是白昼；天空和远处街道保持暗，手电可近距离照锁孔。",
+        "shot_scale": "第一视角手与锁孔近景",
+        "duration_seconds": 3,
+        "sfx": "钥匙插入、转动、一次开锁声",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "off",
+        "key_state": "held",
+        "audio_plan": {
+          "music_cue": "音乐收低，让钥匙转动和锁响清楚。",
+          "ducking": true
+        },
+        "purpose": "试钥匙得到开门结果"
+      },
+      {
+        "index": 43,
+        "origin_index": 43,
+        "shot_id": "V43",
+        "label": "V43",
+        "segment_id": "vlog_seg_43",
+        "source_shot": 34,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头34：门内走廊宽景：刚开启的后门在近处，观察窗在前方，档案室位于再下一个转角。只补路线，不让空镜提前暴露档案内容。\n原文：\n新版处理：先交代走廊位置，不提前揭档案内容；从刚开的后门进入走廊，观察窗在前方、档案室在下个转角，后院侧门方向可辨。\n新版对白：无对白\n本轮时空修正：午夜后连续探索（现实夜间）；矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "location": "矫正中心走廊",
+        "scene_id": "矫正中心走廊",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：矫正中心走廊。从刚开的后门进入走廊，观察窗在前方、档案室在下个转角，后院侧门方向可辨。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "motion_prompt": "从刚开的后门进入走廊，观察窗在前方、档案室在下个转角，后院侧门方向可辨。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "第一视角一步向前，完整单视图",
+        "light": "矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "shot_scale": "第一视角一步向前，完整单视图",
+        "duration_seconds": 2,
+        "sfx": "灯管电流、通风、轻脚步",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "先交代走廊位置，不提前揭档案内容"
+      },
+      {
+        "index": 44,
+        "origin_index": 44,
+        "shot_id": "V44",
+        "label": "V44",
+        "segment_id": "vlog_seg_44",
+        "source_shot": 35,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头35：门内狭窄走廊跟拍；转角先听见设备与广播，贴墙向观察窗移动。\n原文：千万小心，不要被发现了。前面有动静，去看看。\n新版处理：声音让她停步再选择靠近；知遥贴墙走，听到前方设备声停一下，随后放轻脚步向观察窗移动。\n新版对白：前面有动静。\n本轮时空修正：午夜后连续探索（现实夜间）；矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "location": "矫正中心走廊",
+        "scene_id": "矫正中心走廊",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：矫正中心走廊。知遥贴墙走，听到前方设备声停一下，随后放轻脚步向观察窗移动。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "motion_prompt": "知遥贴墙走，听到前方设备声停一下，随后放轻脚步向观察窗移动。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "肩后中近景，走廊方向保持一致",
+        "light": "矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "shot_scale": "肩后中近景，走廊方向保持一致",
+        "duration_seconds": 3,
+        "sfx": "压低脚步，前方设备声逐渐清楚",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "前面有动静。",
+            "emotion": "给自己的低声提醒，听后才说；只含这句话，后面广播不提前朗读。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "声音让她停步再选择靠近"
+      },
+      {
+        "index": 45,
+        "origin_index": 45,
+        "shot_id": "V45",
+        "label": "V45",
+        "segment_id": "vlog_seg_45",
+        "source_shot": 36,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头36：透过观察窗拍被迫接受矫正的居民，屏幕准确显示10%；监控装置与入口版本一致，工作人员操作让居民保持固定笑脸。\n原文：快乐检测 10%，保持微笑，保持微笑……\n新版处理：系统声和现场操作让矫正的含义可见；透过既有观察窗看居民接受矫正，脸侧装置同款，显示屏原生10%，工作人员让居民保持笑脸；无血腥、无酷刑。\n新版对白：快乐检测百分之十，保持微笑，保持微笑……\n本轮时空修正：午夜后连续探索（现实夜间）；矫正室夜间运作的冷白顶灯和监控屏幕灯；窗外是走廊，没有自然日照，也没有手电光在居民脸上乱扫。",
+        "location": "矫正室",
+        "scene_id": "矫正室",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [
+          "矫正居民",
+          "工作人员"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：矫正室。透过既有观察窗看居民接受矫正，脸侧装置同款，显示屏原生10%，工作人员让居民保持笑脸；无血腥、无酷刑。 仅在原有实体牌面、纸张或屏幕上原生呈现本镜指定文字；不后期盖字，不改变实体表面位置。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：矫正室夜间运作的冷白顶灯和监控屏幕灯；窗外是走廊，没有自然日照，也没有手电光在居民脸上乱扫。",
+        "motion_prompt": "透过既有观察窗看居民接受矫正，脸侧装置同款，显示屏原生10%，工作人员让居民保持笑脸；无血腥、无酷刑。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "第一视角通过观察窗，不变成上帝正面拍摄",
+        "light": "矫正室夜间运作的冷白顶灯和监控屏幕灯；窗外是走廊，没有自然日照，也没有手电光在居民脸上乱扫。",
+        "shot_scale": "第一视角通过观察窗，不变成上帝正面拍摄",
+        "duration_seconds": 5,
+        "sfx": "系统声、室内设备低响",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "系统广播",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "快乐检测百分之十，保持微笑，保持微笑……",
+            "emotion": "同一机械系统女声，准确说百分之十，两次保持微笑平直而清楚，不用知遥声线。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "系统声和现场操作让矫正的含义可见",
+        "native_text": [
+          "10%"
+        ]
+      },
+      {
+        "index": 46,
+        "origin_index": 46,
+        "shot_id": "V46",
+        "label": "V46",
+        "segment_id": "vlog_seg_46",
+        "source_shot": 37,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头37：知遥近景，目光仍对着治疗室；立即回到她的行进动作，不停留做长反应。\n原文：他们竟然把情绪当病治。\n新版处理：知遥的反应来自已看到的操作；知遥从观察窗稍退一步回自拍，目光仍对着窗内，装置已摘下。\n新版对白：他们竟然把情绪当病治。\n本轮时空修正：午夜后连续探索（现实夜间）；矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "location": "矫正中心走廊",
+        "scene_id": "矫正中心走廊",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：矫正中心走廊。知遥从观察窗稍退一步回自拍，目光仍对着窗内，装置已摘下。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "motion_prompt": "知遥从观察窗稍退一步回自拍，目光仍对着窗内，装置已摘下。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "近距离低声自拍，人脸比例自然",
+        "light": "矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "shot_scale": "近距离低声自拍，人脸比例自然",
+        "duration_seconds": 3,
+        "sfx": "前方系统声压低、知遥的短呼吸",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "他们竟然把情绪当病治。",
+            "emotion": "压住震惊，重点是“情绪”和“病”，说完继续走，不做长篇道德宣讲。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "知遥的反应来自已看到的操作"
+      },
+      {
+        "index": 47,
+        "origin_index": 47,
+        "shot_id": "V47",
+        "label": "V47",
+        "segment_id": "vlog_seg_47",
+        "source_shot": 38,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头38：在同一走廊转角推开档案室门，门内只露入口，不提前展示档案内容；下一镜才进入室内。\n原文：档案室，进去看看。\n新版处理：原生门牌决定去档案室；知遥到已建立的转角，看到档案室门牌，推开这扇门一次。\n新版对白：档案室。进去看看。\n本轮时空修正：午夜后连续探索（现实夜间）；矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "location": "矫正中心走廊",
+        "scene_id": "矫正中心走廊",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：矫正中心走廊。知遥到已建立的转角，看到档案室门牌，推开这扇门一次。 仅在原有实体牌面、纸张或屏幕上原生呈现本镜指定文字；不后期盖字，不改变实体表面位置。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "motion_prompt": "知遥到已建立的转角，看到档案室门牌，推开这扇门一次。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "第一视角门牌接手推门",
+        "light": "矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "shot_scale": "第一视角门牌接手推门",
+        "duration_seconds": 3,
+        "sfx": "门轴一次轻响",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "档案室。进去看看。",
+            "emotion": "认出名牌时短轻说，后句是行动，不提前解释档案。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "稀疏柔和弦乐保留陌生空间感，音符之间留空；不盖哭声、纸张或人物低声，保持同一场连续，不逐镜重起。",
+          "ducking": true
+        },
+        "purpose": "原生门牌决定去档案室",
+        "native_text": [
+          "档案室"
+        ]
+      },
+      {
+        "index": 48,
+        "origin_index": 48,
+        "shot_id": "V48",
+        "label": "V48",
+        "segment_id": "vlog_seg_48",
+        "source_shot": 39,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头39：打开档案：不同居民矫正前后照片、情绪记录和统一微笑状态。镜头能看清前后变化，但不编写新的政令、秘密组织或具体历史年份。\n原文：这些都是被抹去真实情绪的人。\n新版处理：实际打开档案不重复推门；进入普通档案室，知遥翻开桌上一个已有档案夹，看到矫正前后照片与情绪记录；不编历史年份、组织印章或新政令。\n新版对白：无对白\n本轮时空修正：午夜后连续探索（现实夜间）；档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "location": "档案室",
+        "scene_id": "档案室",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：档案室。进入普通档案室，知遥翻开桌上一个已有档案夹，看到矫正前后照片与情绪记录；不编历史年份、组织印章或新政令。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "motion_prompt": "进入普通档案室，知遥翻开桌上一个已有档案夹，看到矫正前后照片与情绪记录；不编历史年份、组织印章或新政令。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "第一视角桌面和翻页的手",
+        "light": "档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "shot_scale": "第一视角桌面和翻页的手",
+        "duration_seconds": 3,
+        "sfx": "档案翻页声、空调低响",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "稀疏柔和弦乐保留陌生空间感，音符之间留空；不盖哭声、纸张或人物低声，保持同一场连续，不逐镜重起。",
+          "ducking": true
+        },
+        "purpose": "实际打开档案不重复推门"
+      },
+      {
+        "index": 49,
+        "origin_index": 49,
+        "shot_id": "V49",
+        "label": "V49",
+        "segment_id": "vlog_seg_49",
+        "source_shot": 39,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头39：打开档案：不同居民矫正前后照片、情绪记录和统一微笑状态。镜头能看清前后变化，但不编写新的政令、秘密组织或具体历史年份。\n原文：这些都是被抹去真实情绪的人。\n新版处理：照片的前后变化支撑情绪被抹去；镜头停在不同居民的前后照片，真实情绪与统一固定笑脸的变化能看懂，不依赖额外新增文本。\n新版对白：真实情绪，都被抹掉了。\n本轮时空修正：午夜后连续探索（现实夜间）；档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "location": "档案室",
+        "scene_id": "档案室",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：档案室。镜头停在不同居民的前后照片，真实情绪与统一固定笑脸的变化能看懂，不依赖额外新增文本。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "motion_prompt": "镜头停在不同居民的前后照片，真实情绪与统一固定笑脸的变化能看懂，不依赖额外新增文本。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "第一视角照片近景，手指对照但不遮脸",
+        "light": "档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "shot_scale": "第一视角照片近景，手指对照但不遮脸",
+        "duration_seconds": 3,
+        "sfx": "轻微翻页、人物呼吸",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "真实情绪，都被抹掉了。",
+            "emotion": "看过照片后声音收低、稍沉重；只说当下发现，不提前宣告制度被推翻。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "轻弦乐短暂收低，照片判断与翻页声优先。",
+          "ducking": true
+        },
+        "purpose": "照片的前后变化支撑情绪被抹去"
+      },
+      {
+        "index": 50,
+        "origin_index": 50,
+        "shot_id": "V50",
+        "label": "V50",
+        "segment_id": "vlog_seg_50",
+        "source_shot": 40,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头40：手机镜头对准档案，连续拍照；屏幕短暂显示已拍下的页面。手机和钥匙分别放回可明确追踪的口袋。\n原文：得把这些证据拍下来！\n新版处理：发现证据后立刻保存到手机；知遥拿同一手机对着已见档案页拍照，手机屏幕短暂可见对应页面；没有上传、发消息或救援。\n新版对白：把证据拍下来。\n本轮时空修正：午夜后连续探索（现实夜间）；档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "location": "档案室",
+        "scene_id": "档案室",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：档案室。知遥拿同一手机对着已见档案页拍照，手机屏幕短暂可见对应页面；没有上传、发消息或救援。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "motion_prompt": "知遥拿同一手机对着已见档案页拍照，手机屏幕短暂可见对应页面；没有上传、发消息或救援。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "第一视角手机和档案同时入画",
+        "light": "档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "shot_scale": "第一视角手机和档案同时入画",
+        "duration_seconds": 3,
+        "sfx": "一两声低位手机拍照声",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "把证据拍下来。",
+            "emotion": "轻但急，边举手机边说，重心“证据”；不站住解释完整调查结论。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "发现证据后立刻保存到手机"
+      },
+      {
+        "index": 51,
+        "origin_index": 51,
+        "shot_id": "V51",
+        "label": "V51",
+        "segment_id": "vlog_seg_51",
+        "source_shot": 41,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头41：档案室门外，守卫影子从走廊转角逼近，门把手开始转动。画面没有知遥，衔接取证与被发现。\n原文：\n新版处理：让观众先听到接近而非新旁白；镜头转向档案室门，门外脚步接近，门把手转动；没有新增反派特写。\n新版对白：无对白\n本轮时空修正：午夜后连续探索（现实夜间）；档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "location": "档案室",
+        "scene_id": "档案室",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：档案室。镜头转向档案室门，门外脚步接近，门把手转动；没有新增反派特写。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "motion_prompt": "镜头转向档案室门，门外脚步接近，门把手转动；没有新增反派特写。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "第一视角看门，单个完整画面",
+        "light": "档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "shot_scale": "第一视角看门，单个完整画面",
+        "duration_seconds": 2,
+        "sfx": "门外脚步接近，门把手轻响，音乐退出",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "让观众先听到接近而非新旁白"
+      },
+      {
+        "index": 52,
+        "origin_index": 52,
+        "shot_id": "V52",
+        "label": "V52",
+        "segment_id": "vlog_seg_52",
+        "source_shot": 42,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头42：档案室门外守卫出现；知遥立即合上档案，冲向走廊另一侧。原文称呼保留。\n原文：抓住他！\n新版处理：突然喊令使她停止取证并撤离；门外无名守卫出现，知遥收回手机、合上档案夹转身离开；画面里知遥可见，不因守卫画外声音移除她。\n新版对白：抓住他！\n本轮时空修正：午夜后连续探索（现实夜间）；档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "location": "档案室",
+        "scene_id": "档案室",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [
+          "守卫"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：档案室。门外无名守卫出现，知遥收回手机、合上档案夹转身离开；画面里知遥可见，不因守卫画外声音移除她。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "motion_prompt": "门外无名守卫出现，知遥收回手机、合上档案夹转身离开；画面里知遥可见，不因守卫画外声音移除她。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "肩后中景，离开的方向是走廊侧门",
+        "light": "档案室夜间现有冷白室内灯，桌面纸页与手机屏幕清楚；外面的走廊光从门缝进入，没有白天窗光。",
+        "shot_scale": "肩后中景，离开的方向是走廊侧门",
+        "duration_seconds": 2,
+        "sfx": "突入喊声，接近脚步",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "守卫喊声",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "抓住他！",
+            "emotion": "同一次成年男守卫音色，后方短喊打断安静，重读抓住，不加词。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "突然喊令使她停止取证并撤离"
+      },
+      {
+        "index": 53,
+        "origin_index": 53,
+        "shot_id": "V53",
+        "label": "V53",
+        "segment_id": "vlog_seg_53",
+        "source_shot": 43,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头43：短距离跑向侧门，自拍或胸前镜头的轻晃体现奔跑。\n原文：怎么老是在逃跑？\n新版处理：跑动里的无奈带来真实人物语气；知遥跑出档案室，沿既有走廊向后院侧门去，手机已收回口袋。\n新版对白：怎么老是在逃跑！\n本轮时空修正：午夜后连续探索（现实夜间）；矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "location": "矫正中心走廊",
+        "scene_id": "矫正中心走廊",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：矫正中心走廊。知遥跑出档案室，沿既有走廊向后院侧门去，手机已收回口袋。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "motion_prompt": "知遥跑出档案室，沿既有走廊向后院侧门去，手机已收回口袋。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "短促胸前跟随接一次自拍",
+        "light": "矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "shot_scale": "短促胸前跟随接一次自拍",
+        "duration_seconds": 3,
+        "sfx": "急脚步、背包摩擦、短促呼吸",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "怎么老是在逃跑！",
+            "emotion": "跑动短气里带无奈反问，重读“老是”；不笑闹、不放慢脚步解释。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "短而低位的弦乐节拍承接跑动，脚步、呼吸和人声优先；到歉意和离城时退出，不持续轰鸣。",
+          "ducking": true
+        },
+        "purpose": "跑动里的无奈带来真实人物语气"
+      },
+      {
+        "index": 54,
+        "origin_index": 54,
+        "shot_id": "V54",
+        "label": "V54",
+        "segment_id": "vlog_seg_54",
+        "source_shot": 44,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头44：在岔口看到通向后院的侧门，推门前短暂扫到隔离窗内的居民；知遥停一步，视线连接下一句对象。\n原文：去那边看看。\n新版处理：认出出口并看见隔离窗里的居民；知遥在岔口认出既有侧门，推门前目光扫到隔离窗内居民，停一步。\n新版对白：去那边！\n本轮时空修正：午夜后连续探索（现实夜间）；矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "location": "矫正中心走廊",
+        "scene_id": "矫正中心走廊",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [
+          "隔离窗内居民"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：矫正中心走廊。知遥在岔口认出既有侧门，推门前目光扫到隔离窗内居民，停一步。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "motion_prompt": "知遥在岔口认出既有侧门，推门前目光扫到隔离窗内居民，停一步。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "胸前机位向侧门短转，隔离窗与门同框",
+        "light": "矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "shot_scale": "胸前机位向侧门短转，隔离窗与门同框",
+        "duration_seconds": 2,
+        "sfx": "自己的脚步，后方追来脚步",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "去那边！",
+            "emotion": "跑动中一口短指令，“那边”清楚，不能拖尾或提前说歉意。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "短而低位的弦乐节拍承接跑动，脚步、呼吸和人声优先；到歉意和离城时退出，不持续轰鸣。",
+          "ducking": true
+        },
+        "purpose": "认出出口并看见隔离窗里的居民"
+      },
+      {
+        "index": 55,
+        "origin_index": 55,
+        "shot_id": "V55",
+        "label": "V55",
+        "segment_id": "vlog_seg_55",
+        "source_shot": 45,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头45：知遥对隔离窗内居民说，先看人，再握紧已拍下证据的手机；听见追兵逼近，转身退出侧门。保留“旅行规则”原句，不在此补造规则条款。\n原文：这个地方不能再待了——我救不了你们，只会打破我的旅行规则。对不起。\n新版处理：道歉承接眼前居民和必须离开的判断；知遥对隔离窗内居民说，握紧已拍证据的手机；听到追兵逼近，转身退出侧门。原素材旅行规则不补条款。\n新版对白：这个地方不能再待了。我救不了你们，只会打破我的旅行规则。对不起。\n本轮时空修正：午夜后连续探索（现实夜间）；矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "location": "矫正中心走廊",
+        "scene_id": "矫正中心走廊",
+        "scene_time": "午夜后连续探索（现实夜间）",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [
+          "隔离窗内居民"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：矫正中心走廊。知遥对隔离窗内居民说，握紧已拍证据的手机；听到追兵逼近，转身退出侧门。原素材旅行规则不补条款。 本镜故事时间：午夜后连续探索（现实夜间）。本镜实际照明：矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "motion_prompt": "知遥对隔离窗内居民说，握紧已拍证据的手机；听到追兵逼近，转身退出侧门。原素材旅行规则不补条款。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "正常距离近景，隔离窗对象可见，最后转向侧门",
+        "light": "矫正中心走廊夜间仍亮着的冷白顶灯、观察窗透出的室内设备灯；不是白天天光，不用手电代替顶灯。",
+        "shot_scale": "正常距离近景，隔离窗对象可见，最后转向侧门",
+        "duration_seconds": 8,
+        "sfx": "后方追赶脚步、短呼吸、推侧门声",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "这个地方不能再待了。我救不了你们，只会打破我的旅行规则。对不起。",
+            "emotion": "前句短急；看到居民后压住歉意，“救不了”稍重，“对不起”轻短落下；后方脚步催她走，不做哭喊独白。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "跑动节拍在停步时退下，说对不起时无音乐，真实呼吸和后方脚步优先。",
+          "ducking": true
+        },
+        "purpose": "道歉承接眼前居民和必须离开的判断"
+      },
+      {
+        "index": 56,
+        "origin_index": 56,
+        "shot_id": "V56",
+        "label": "V56",
+        "segment_id": "vlog_seg_56",
+        "source_shot": 46,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头46：矫正中心后院通向外围的侧巷，镜头顺刚才逃离的方向越过围墙，抵达城外道路。知遥不入镜，用远去脚步确认她已通过。\n原文：\n新版处理：沿后院侧巷真实离开城市；摄像机随知遥越过后院，进入已建立的侧巷，最后是城外道路；不新增追兵被击败或居民获救。\n新版对白：无对白\n本轮时空修正：离城后同一夜间；尚未进入下一站；城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "location": "城外道路",
+        "scene_id": "城外道路",
+        "scene_time": "离城后同一夜间；尚未进入下一站",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：城外道路。摄像机随知遥越过后院，进入已建立的侧巷，最后是城外道路；不新增追兵被击败或居民获救。 本镜故事时间：离城后同一夜间；尚未进入下一站。本镜实际照明：城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "motion_prompt": "摄像机随知遥越过后院，进入已建立的侧巷，最后是城外道路；不新增追兵被击败或居民获救。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "第一视角沿同一前进方向短接镜",
+        "light": "城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "shot_scale": "第一视角沿同一前进方向短接镜",
+        "duration_seconds": 3,
+        "sfx": "跑步渐远，城外风进入",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "沿后院侧巷真实离开城市"
+      },
+      {
+        "index": 57,
+        "origin_index": 57,
+        "shot_id": "V57",
+        "label": "V57",
+        "segment_id": "vlog_seg_57",
+        "source_shot": 51,
+        "source_kind": "原素材动作重排",
+        "source_quote": "附件镜头51：城外回到自拍，知遥卸下警惕，笑之国建筑在身后远处；原故事最后一句完整说完，再进入新增下一站投票。\n原文：下一个国家，又会是怎样的呢？\n新版处理：离城后停一下是真实恢复呼吸，不凑时长；城外知遥停步回自拍，身后城区和雕塑已经很远；轻吸气，脸侧仍无装置。\n新版对白：无对白\n本轮时空修正：离城后同一夜间；尚未进入下一站；城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "location": "城外道路",
+        "scene_id": "城外道路",
+        "scene_time": "离城后同一夜间；尚未进入下一站",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：城外道路。城外知遥停步回自拍，身后城区和雕塑已经很远；轻吸气，脸侧仍无装置。 本镜故事时间：离城后同一夜间；尚未进入下一站。本镜实际照明：城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "motion_prompt": "城外知遥停步回自拍，身后城区和雕塑已经很远；轻吸气，脸侧仍无装置。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "普通自拍中近景，真实休息反应",
+        "light": "城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "shot_scale": "普通自拍中近景，真实休息反应",
+        "duration_seconds": 2,
+        "sfx": "轻微喘息、自然风",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "无背景音乐；让当下真实动作声、环境声与对白承担变化。",
+          "ducking": true
+        },
+        "purpose": "离城后停一下是真实恢复呼吸，不凑时长"
+      },
+      {
+        "index": 58,
+        "origin_index": 58,
+        "shot_id": "V58",
+        "label": "V58",
+        "segment_id": "vlog_seg_58",
+        "source_shot": 47,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头47：用拍下的档案照片作过渡：情绪激烈的人群旧照、规则出台的旧告示，再切回今天的微笑标牌；只呈现原文给出的历史，不编精确年份或战争。\n原文：几十年前，笑之国曾经历过混乱时期，大家认为问题的根源是负面情绪传播，于是制定了规则。\n新版处理：用已有档案见闻解释制度来源，不造新真相；从已拍档案照片里的情绪激烈人群旧照与旧告示，顺序切回知遥城外自拍；只呈现几十年前混乱和既有规则，没有精确年份、战争或秘密组织。\n新版对白：几十年前，笑之国经历过混乱。他们认为根源是负面情绪传播，于是制定了规则。\n本轮时空修正：离城后同一夜间；尚未进入下一站；城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。\n本轮画面收敛：旧照片是当前夜间手机相册里已拍下的内容，非再次回档案室或当前变成白天。",
+        "location": "城外道路",
+        "scene_id": "城外道路",
+        "scene_time": "离城后同一夜间；尚未进入下一站",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：城外道路。夜间城外，知遥手持已拍档案的手机相册；镜头在她身边近处看已有旧照与旧告示，随后回自拍复盘。只呈现几十年前混乱和既有规则，不重新走进档案室、不编精确年份、战争或组织。 本镜故事时间：离城后同一夜间；尚未进入下一站。本镜实际照明：城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "motion_prompt": "夜间城外，知遥手持已拍档案的手机相册；镜头在她身边近处看已有旧照与旧告示，随后回自拍复盘。只呈现几十年前混乱和既有规则，不重新走进档案室、不编精确年份、战争或组织。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。 时间和照明按本镜scene_time/light延续；现实返回不等于白昼。",
+        "camera": "夜间城外手持手机近景接同一位置正常自拍，当前人脸和手机同一夜间路灯照明",
+        "light": "城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "shot_scale": "档案照片全画面短回看接城外自拍，不分屏",
+        "duration_seconds": 9,
+        "sfx": "城外风；档案回看不新增现场对白",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "几十年前，笑之国经历过混乱。他们认为根源是负面情绪传播，于是制定了规则。",
+            "emotion": "逃出后气息平稳，向观众复盘自己见到的材料；前后有自然语气变化，重心在“负面情绪”和“规则”，不是历史朗诵。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "少量钢琴单音接同一主题的柔和弦乐，克制、音符留空；不煽情铺满，重句前收低。",
+          "ducking": true
+        },
+        "purpose": "用已有档案见闻解释制度来源，不造新真相"
+      },
+      {
+        "index": 59,
+        "origin_index": 59,
+        "shot_id": "V59",
+        "label": "V59",
+        "segment_id": "vlog_seg_59",
+        "source_shot": 48,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头48：回到入口同类队伍，装置一一扣上，所有人依指示微笑；知遥已在城外，镜头作为她见闻的回放。\n原文：慢慢地，笑容变成了一种义务。\n新版处理：用一次回看让义务的代价落地；回看入境时其他旅客的装置扣合和被迫微笑；知遥已在城外，不把装置重新戴回知遥脸上。\n新版对白：笑，慢慢成了义务。\n制作分组修正：此入境回看独立一组，4秒用于一次完整扣合和随后的勉强微笑，不重复扣合、不空停。\n本轮时空修正：此前白天入境的见闻回看；不改变知遥当前夜间离城时间；回看同一入境大厅此前白天的窗光与暖白顶灯，画面只拍其他旅客一次扣合和强笑；这是回看，不是知遥又回大厅或再次佩戴。",
+        "location": "入境大厅",
+        "scene_id": "入境大厅",
+        "scene_time": "此前白天入境的见闻回看；不改变知遥当前夜间离城时间",
+        "characters": [],
+        "in_frame": [],
+        "extras": [
+          "入境旅客",
+          "工作人员"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：入境大厅。回看入境时其他旅客的一次完整装置扣合，旅客随后勉强维持笑容；知遥已在城外，不把装置重新戴回知遥脸上。 本镜故事时间：此前白天入境的见闻回看；不改变知遥当前夜间离城时间。本镜实际照明：回看同一入境大厅此前白天的窗光与暖白顶灯，画面只拍其他旅客一次扣合和强笑；这是回看，不是知遥又回大厅或再次佩戴。",
+        "motion_prompt": "回看入境时其他旅客的一次完整装置扣合，旅客随后勉强维持笑容；知遥已在城外，不把装置重新戴回知遥脸上。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "回看其他旅客中近景，单个画面",
+        "light": "回看同一入境大厅此前白天的窗光与暖白顶灯，画面只拍其他旅客一次扣合和强笑；这是回看，不是知遥又回大厅或再次佩戴。",
+        "shot_scale": "回看其他旅客中近景，单个画面",
+        "duration_seconds": 4,
+        "sfx": "回看里的一次低位卡扣声",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "笑，慢慢成了义务。",
+            "emotion": "比上句更轻，“义务”清楚落下；画外复盘而非当前大厅里发言。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "少量钢琴单音接同一主题的柔和弦乐，克制、音符留空；不煽情铺满，重句前收低。",
+          "ducking": true
+        },
+        "purpose": "用完整扣合到强笑的一次回看让义务的代价落地"
+      },
+      {
+        "index": 60,
+        "origin_index": 60,
+        "shot_id": "V60",
+        "label": "V60",
+        "segment_id": "vlog_seg_60",
+        "source_shot": 49,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头49：回放白天广场的僵硬笑脸，最后落到孩子被带走后留下的空位；不重演整段事件。句尾接离城远景。\n原文：但当笑容成为规则时，人们学会了笑，却会忘记快乐。\n新版处理：回看僵硬笑脸后收束已有主题；一次短回看广场僵硬笑脸和孩子离开后的空位，再接城外远景，不重演孩子带离事件。\n新版对白：他们学会了笑，却忘了快乐。\n本轮时空修正：离城后同一夜间；尚未进入下一站；城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。\n本轮画面收敛：白天见闻回看已由V59完整承担；V60只拍当前夜间城外，不混入另一次昼夜切换。",
+        "location": "城外道路",
+        "scene_id": "城外道路",
+        "scene_time": "离城后同一夜间；尚未进入下一站",
+        "characters": [],
+        "in_frame": [],
+        "extras": [
+          "广场居民"
+        ],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "微笑地标雕塑",
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：城外道路。夜间城外第一视角看同一城市和远处微笑雕塑，镜头不再另重演白天孩子事件；当前城市灯光逐渐远，口播收束已发生的见闻。 本镜故事时间：离城后同一夜间；尚未进入下一站。本镜实际照明：城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "motion_prompt": "夜间城外第一视角看同一城市和远处微笑雕塑，镜头不再另重演白天孩子事件；当前城市灯光逐渐远，口播收束已发生的见闻。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "夜间城外第一视角中远景，已给过位置，单个完整画面，不分屏",
+        "light": "城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "shot_scale": "回看中景接城外远景，不分屏",
+        "duration_seconds": 5,
+        "sfx": "自然风",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "他们学会了笑，却忘了快乐。",
+            "emotion": "前半自然，到了“却”收低，“快乐”轻而清楚；不庄严朗诵、不拉长煽情。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "钢琴单音在后半退下，给主题句和城外风留空。",
+          "ducking": true
+        },
+        "purpose": "回看僵硬笑脸后收束已有主题"
+      },
+      {
+        "index": 61,
+        "origin_index": 61,
+        "shot_id": "V61",
+        "label": "V61",
+        "segment_id": "vlog_seg_61",
+        "source_shot": 51,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头51：城外回到自拍，知遥卸下警惕，笑之国建筑在身后远处；原故事最后一句完整说完，再进入新增下一站投票。\n原文：下一个国家，又会是怎样的呢？\n新版处理：观众从这一站结果转向下一站问题；城外知遥回正常自拍，放松一点，城区在远处，设备、手机、钥匙状态都没有改变。\n新版对白：下一个国家，会怎样？\n本轮时空修正：离城后同一夜间；尚未进入下一站；城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "location": "城外道路",
+        "scene_id": "城外道路",
+        "scene_time": "离城后同一夜间；尚未进入下一站",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：城外道路。城外知遥回正常自拍，放松一点，城区在远处，设备、手机、钥匙状态都没有改变。 本镜故事时间：离城后同一夜间；尚未进入下一站。本镜实际照明：城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "motion_prompt": "城外知遥回正常自拍，放松一点，城区在远处，设备、手机、钥匙状态都没有改变。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "普通旅行自拍中近景",
+        "light": "城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "shot_scale": "普通旅行自拍中近景",
+        "duration_seconds": 4,
+        "sfx": "自然风、衣料轻响",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "下一个国家，会怎样？",
+            "emotion": "真实好奇重新出现，音调略抬，疑问留着；不说已经选定去哪里。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "同一个轻巧的拨弦旅行主题，少量木质打击、无歌词；低于人声，脚步清楚，绝不逐镜换歌或盖住口播。",
+          "ducking": true
+        },
+        "purpose": "观众从这一站结果转向下一站问题"
+      },
+      {
+        "index": 62,
+        "origin_index": 62,
+        "shot_id": "V62",
+        "label": "V62",
+        "segment_id": "vlog_seg_62",
+        "source_shot": 52,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头52：城外自拍接原文最后一句，知遥抬起路线卡，画面开始出现A／B／C；不把笑之国逃跑停在这里等待投票。\n原文：下一站去哪，交给你们选。\n新版处理：明确本次是评论决定下一集目的地；知遥直接向观众邀请，空着的脸侧、原服装和背包保持。\n新版对白：下一站，你们选。\n本轮时空修正：离城后同一夜间；尚未进入下一站；城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "location": "城外道路",
+        "scene_id": "城外道路",
+        "scene_time": "离城后同一夜间；尚未进入下一站",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：城外道路。知遥直接向观众邀请，空着的脸侧、原服装和背包保持。 本镜故事时间：离城后同一夜间；尚未进入下一站。本镜实际照明：城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "motion_prompt": "知遥直接向观众邀请，空着的脸侧、原服装和背包保持。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "普通自拍，友好但不夸张招呼",
+        "light": "城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "shot_scale": "普通自拍，友好但不夸张招呼",
+        "duration_seconds": 3,
+        "sfx": "自然风",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "下一站，你们选。",
+            "emotion": "回到有活力的旅行分享，重读“你们”，短而自然，不念广告口号。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "同一个轻巧的拨弦旅行主题，少量木质打击、无歌词；低于人声，脚步清楚，绝不逐镜换歌或盖住口播。",
+          "ducking": true
+        },
+        "purpose": "明确本次是评论决定下一集目的地"
+      },
+      {
+        "index": 63,
+        "origin_index": 63,
+        "shot_id": "V63",
+        "label": "V63",
+        "segment_id": "vlog_seg_63",
+        "source_shot": 53,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头53：选项A全屏预览：巨大蘑菇与树屋，再到幽暗森林边缘；字幕“A 巨人花园｜幽暗森林是禁地”。不展示守护者身份与森林真相。\n原文：A，巨人花园。植物比楼还高，但当地人提醒，幽暗森林是禁地，最好不要靠近。\n新版处理：选项A只承诺素材已有奇观和禁区；全画面目的地预览：巨大蘑菇、比楼高的植物与树屋，远处幽暗森林边缘；用建筑作尺度参照。没有已选择路线，没有守护者、怪物或禁区真相。\n新版对白：A，巨人花园。植物比楼高，但幽暗森林是禁地，最好别靠近。\n本轮时空修正：日间目的地预览；不是知遥当前到访；预览巨人花园日间树林自然光，以建筑作巨型植物尺度参照；不与笑之国当前夜间混在同一画面。",
+        "location": "巨人花园预览",
+        "scene_id": "巨人花园预览",
+        "scene_time": "日间目的地预览；不是知遥当前到访",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：巨人花园预览。全画面目的地预览：巨大蘑菇、比楼高的植物与树屋，远处幽暗森林边缘；用建筑作尺度参照。没有已选择路线，没有守护者、怪物或禁区真相。 本镜故事时间：日间目的地预览；不是知遥当前到访。本镜实际照明：预览巨人花园日间树林自然光，以建筑作巨型植物尺度参照；不与笑之国当前夜间混在同一画面。",
+        "motion_prompt": "全画面目的地预览：巨大蘑菇、比楼高的植物与树屋，远处幽暗森林边缘；用建筑作尺度参照。没有已选择路线，没有守护者、怪物或禁区真相。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "全画面预览，先给植物与建筑同框，再望向森林边缘",
+        "light": "预览巨人花园日间树林自然光，以建筑作巨型植物尺度参照；不与笑之国当前夜间混在同一画面。",
+        "shot_scale": "全画面预览，先给植物与建筑同框，再望向森林边缘",
+        "duration_seconds": 8,
+        "sfx": "巨大叶片轻微风声，无新增角色对白",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "A，巨人花园。植物比楼高，但幽暗森林是禁地，最好别靠近。",
+            "emotion": "前半带新奇兴趣，到了“但”收一点，禁地清楚；原生知遥画外声，同一声线，不说已经进入森林。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "同一个轻巧的拨弦旅行主题，少量木质打击、无歌词；低于人声，脚步清楚，绝不逐镜换歌或盖住口播。",
+          "ducking": true
+        },
+        "purpose": "选项A只承诺素材已有奇观和禁区"
+      },
+      {
+        "index": 64,
+        "origin_index": 64,
+        "shot_id": "V64",
+        "label": "V64",
+        "segment_id": "vlog_seg_64",
+        "source_shot": 54,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头54：选项B全屏预览：身份抽取界面、两种生活环境；字幕“B 交换人生之国｜十年强制轮换／游客24小时试玩”。不提前揭晓作弊系统。\n原文：B，交换人生之国。这里每十年强制更换人生，游客可以领二十四小时试玩。\n新版处理：选项B展示已知人生轮换和游客短期体验；全画面普通登记柜台与身份抽取界面，后方两种生活空间；界面不要提前给已选身份或作弊系统。\n新版对白：B，交换人生之国。每十年强制换人生，游客可以试玩二十四小时。\n本轮时空修正：日间目的地预览；不是知遥当前到访；预览日间登记处柔和窗光与柜台普通室内灯，身份界面低亮可辨；不是实际已办理登记。",
+        "location": "交换人生之国预览",
+        "scene_id": "交换人生之国预览",
+        "scene_time": "日间目的地预览；不是知遥当前到访",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：交换人生之国预览。全画面普通登记柜台与身份抽取界面，后方两种生活空间；界面不要提前给已选身份或作弊系统。 本镜故事时间：日间目的地预览；不是知遥当前到访。本镜实际照明：预览日间登记处柔和窗光与柜台普通室内灯，身份界面低亮可辨；不是实际已办理登记。",
+        "motion_prompt": "全画面普通登记柜台与身份抽取界面，后方两种生活空间；界面不要提前给已选身份或作弊系统。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "全画面预览，由柜台望向两种生活环境",
+        "light": "预览日间登记处柔和窗光与柜台普通室内灯，身份界面低亮可辨；不是实际已办理登记。",
+        "shot_scale": "全画面预览，由柜台望向两种生活环境",
+        "duration_seconds": 9,
+        "sfx": "预览街道低位脚步，无配角说话",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "B，交换人生之国。每十年强制换人生，游客可以试玩二十四小时。",
+            "emotion": "带难以置信的兴趣，“强制”和“二十四小时”分别轻重读；整句自然连贯，不能让配乐抢数字。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "同一个轻巧的拨弦旅行主题，少量木质打击、无歌词；低于人声，脚步清楚，绝不逐镜换歌或盖住口播。",
+          "ducking": true
+        },
+        "purpose": "选项B展示已知人生轮换和游客短期体验"
+      },
+      {
+        "index": 65,
+        "origin_index": 65,
+        "shot_id": "V65",
+        "label": "V65",
+        "segment_id": "vlog_seg_65",
+        "source_shot": 55,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头55：选项C预览梦税局与梦境收集器，字幕“C 梦税国｜每月上交有效梦／游客也登记”；后半句切三项并列总卡，三项地点和规则同时留在画面。\n原文：C，梦税国。每月要交一个有效梦，游客也得登记。评论A、B或C，我们下一站见。\n新版处理：选项C展示有效梦登记的已知义务；全画面梦税局登记处和朴素收集器，只给场所；不展示某个梦、违规处罚或已收税结论。\n新版对白：C，梦税国。每月交一个有效梦，游客也得登记。\n本轮时空修正：日间目的地预览；不是知遥当前到访；预览日间梦税局窗光与普通室内灯，收集器材质真实；不是实际已经收取某个梦。",
+        "location": "梦税国预览",
+        "scene_id": "梦税国预览",
+        "scene_time": "日间目的地预览；不是知遥当前到访",
+        "characters": [],
+        "in_frame": [],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：梦税国预览。全画面梦税局登记处和朴素收集器，只给场所；不展示某个梦、违规处罚或已收税结论。 本镜故事时间：日间目的地预览；不是知遥当前到访。本镜实际照明：预览日间梦税局窗光与普通室内灯，收集器材质真实；不是实际已经收取某个梦。",
+        "motion_prompt": "全画面梦税局登记处和朴素收集器，只给场所；不展示某个梦、违规处罚或已收税结论。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "全画面预览，登记柜台与收集器关系明确",
+        "light": "预览日间梦税局窗光与普通室内灯，收集器材质真实；不是实际已经收取某个梦。",
+        "shot_scale": "全画面预览，登记柜台与收集器关系明确",
+        "duration_seconds": 8,
+        "sfx": "预览室内环境声，无配角对白",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "offscreen_dialogue",
+            "text": "C，梦税国。每月交一个有效梦，游客也得登记。",
+            "emotion": "好奇而有疑问，“有效梦”清楚，后半轻提示游客条件；不广播式照读。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "同一个轻巧的拨弦旅行主题，少量木质打击、无歌词；低于人声，脚步清楚，绝不逐镜换歌或盖住口播。",
+          "ducking": true
+        },
+        "purpose": "选项C展示有效梦登记的已知义务"
+      },
+      {
+        "index": 66,
+        "origin_index": 66,
+        "shot_id": "V66",
+        "label": "V66",
+        "segment_id": "vlog_seg_66",
+        "source_shot": 55,
+        "source_kind": "原素材等义压缩与现场表达",
+        "source_quote": "附件镜头55：选项C预览梦税局与梦境收集器，字幕“C 梦税国｜每月上交有效梦／游客也登记”；后半句切三项并列总卡，三项地点和规则同时留在画面。\n原文：C，梦税国。每月要交一个有效梦，游客也得登记。评论A、B或C，我们下一站见。\n新版处理：最后自然邀请，选择结果留给真实评论；回到城外知遥自拍，结束本次旅行记录；接后期完整三选项卡，不生成浮空A/B/C标签。\n新版对白：评论A、B或C。我们下一站见。\n本轮时空修正：离城后同一夜间；尚未进入下一站；城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "location": "城外道路",
+        "scene_id": "城外道路",
+        "scene_time": "离城后同一夜间；尚未进入下一站",
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {},
+        "props": [
+          "唯一钥匙"
+        ],
+        "visual_prompt": "真人写实9:16，真实手持旅行录像；知遥为原v1.1同一真人年轻成年女性，黑色高马尾、米色户外外套、白色内搭、灰绿色工装裤、灰色徒步鞋、深灰双肩包、左腕深色表。群众相貌各异，不复制知遥。 知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。 当前空间：城外道路。回到城外知遥自拍，结束本次旅行记录；接后期完整三选项卡，不生成浮空A/B/C标签。 本镜故事时间：离城后同一夜间；尚未进入下一站。本镜实际照明：城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "motion_prompt": "回到城外知遥自拍，结束本次旅行记录；接后期完整三选项卡，不生成浮空A/B/C标签。",
+        "start_state": "知遥脸侧无装置；此刻是入境佩戴前或已经摘下，服从本镜时间。 同一把钥匙收在外套口袋；同一手机用于取证。",
+        "end_state": "本镜动作完成一次；沿已建立的空间方向接下一镜，不重复开头动作。",
+        "camera": "普通自拍中近景，最后正常放下手一点",
+        "light": "城外夜间自然暗背景与远处城区灯；知遥站在道路已有暖白路灯照及处，人物面部清楚但不凭空有白昼日照，脸侧无装置。",
+        "shot_scale": "普通自拍中近景，最后正常放下手一点",
+        "duration_seconds": 4,
+        "sfx": "城外风",
+        "avoid": "不生成浮空字幕或水印，不分屏、不拼贴、不生成双视图；不是动画；不新增对白、鬼影、袭击、组织、阈值或调查结论；人物和物件比例自然。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "delivery_mode": "visible_dialogue",
+            "text": "评论A、B或C。我们下一站见。",
+            "emotion": "三字母清楚分开，友好邀请，自然收尾；不提前宣布任何选项获胜。"
+          }
+        ],
+        "device_state": "off",
+        "key_state": "pocket",
+        "audio_plan": {
+          "music_cue": "旅行主题低位延续，最后短淡出；完整选择卡再延续同一个尾音，不另起音乐。",
+          "ducking": true
+        },
+        "purpose": "最后自然邀请，选择结果留给真实评论"
+      }
+    ],
+    "skipped_segments": []
+  },
+  "asset_reuse": {
+    "source": "/mnt/disk1/zengzhitao/worktrees/interactive-adventure-rhythm/outputs/adventure-laughing-country-h3-768/series_assets",
+    "policy": "Reuse original approved character, all location/prop references and existing three voice WAVs with every original sample request and receipt; no asset/voice regeneration.",
+    "voice_sample_requests_preserved": {
+      "知遥": 1,
+      "系统广播": 1,
+      "守卫喊声": 1
+    }
+  },
+  "publication": {
+    "world_card": {
+      "after_clip_id": "clip_01",
+      "seconds": 3,
+      "series_title": "知遥的旅行",
+      "episode": "EP01",
+      "title": "笑之国",
+      "premise": "公共场所必须保持微笑",
+      "time_note": "入境当日 · 稍早"
+    },
+    "watermark": "知遥的旅行 · EP01"
+  },
+  "delivery_policy": {
+    "extra_visual_overlays": false
+  }
+}
