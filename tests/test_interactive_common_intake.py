@@ -73,6 +73,34 @@ def test_chinese_authored_request_uses_same_bounded_repair(monkeypatch,tmp_path)
     assert not (tmp_path/'repair_history').exists()
 
 
+def test_authored_import_uses_supplied_voice_and_performance_in_real_pack(tmp_path,material):
+    import wave
+    supplied=material/'speaker.wav'
+    with wave.open(str(supplied),'wb') as stream:
+        stream.setnchannels(1);stream.setsampwidth(2);stream.setframerate(16000)
+        stream.writeframes(b'\0\0'*1600)
+    data=read_json(material/'material.json')
+    data['reference_audios']=[{'name':'沈序','source':'speaker.wav','path':'series_assets/voices/沈序.wav',
+        'text':'先核对记录。','origin':'supplied-generated-timbre'}]
+    shot=data['script']['shots'][0]
+    shot['characters']=['沈序']
+    shot['turns']=[{'speaker_name':'沈序','delivery_mode':'offscreen_dialogue','text':'先核对记录。','emotion':'自然'}]
+    cues={'自然':'A calm conversational response.'}
+    atomic_write_json(material/'performance_en.json',cues)
+    style={'name':'唯美','visual_style':'美型半写实三维CG','source_en':'Adopted CG style.'}
+    atomic_write_json(material/'style.json',style)
+    atomic_write_json(material/'material.json',data)
+    episode=prepare_authored(material,tmp_path/'supplied-voice',family='romance')
+    assert read_json(episode.parent/'performance_en.json')==cues
+    assert read_json(episode.parent/'style.json')==style
+    bank=read_json(episode.parent/'series_assets/voices/voices.json')
+    assert bank['沈序']['origin']=='supplied-generated-timbre'
+    assert (episode.parent/bank['沈序']['path']).read_bytes()==supplied.read_bytes()
+    plan=pack_authored(episode)
+    ref=next(r for r in plan['clips'][0]['references'] if r['role']=='voice' and r['name']=='沈序')
+    assert (episode.parent/ref['path']).read_bytes()==supplied.read_bytes()
+
+
 @pytest.mark.parametrize('lane',['h3','sd25'])
 def test_common_run_uses_existing_repair_loop_and_restores_scope(monkeypatch,lane):
     import os
@@ -104,3 +132,27 @@ def test_resume_reuses_only_report_matching_current_requests(monkeypatch,tmp_pat
     monkeypatch.setattr('novel_manga.application.rendering.reviewed.run',lambda *a,**k:seen.append(k) or {})
     agent.run(runner,'h3',resume=True)
     assert seen==[{'repair_existing':True} if matches else {}]
+
+
+@pytest.mark.parametrize('lane,native,expected',[('h3',None,'544'),('h3',544,'544'),('h3',768,'768'),('sd25',768,'544')])
+def test_runner_honors_episode_native_h3_sampling_only_on_h3_lane(tmp_path,monkeypatch,lane,native,expected):
+    import os
+    from types import SimpleNamespace
+    from novel_manga.interactive import runtime
+    from novel_manga.config import Settings
+    from novel_manga.application import profiles
+    from novel_manga.application.rendering import flow
+    root=tmp_path/'studio';(root/'configs').mkdir(parents=True)
+    atomic_write_json(root/'configs/interactive.json',{'production':{'workers_by_lane':{'h3':2,'sd25':3}}})
+    novel=root/'outputs/book';novel.mkdir(parents=True)
+    fixture=read_json(ROOT/'tests/fixtures/interactive/minimal-material.json')
+    atomic_write_json(novel/'story_bible.json',fixture['bible'])
+    profile={'frame':'16:9'}
+    if native is not None:profile['native_h3_short_edge']=native
+    monkeypatch.setattr(runtime,'configure',lambda *a,**k:monkeypatch.setenv('NOVEL_H3_SHORT_EDGE','544'))
+    monkeypatch.setattr(profiles,'load_profile',lambda *a,**k:profile)
+    monkeypatch.setattr(Settings,'from_env',staticmethod(lambda **k:SimpleNamespace(native=os.environ['NOVEL_H3_SHORT_EDGE'])))
+    monkeypatch.setattr(flow,'ThinMediaRunner',lambda **k:SimpleNamespace(**k))
+    runner=runtime.runner_for(root,novel,lane,project='romance')
+    assert runner.settings.native==expected
+    assert runner.profile is profile

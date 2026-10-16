@@ -35,7 +35,14 @@ def judge_location_card(location: str, expected_time: str, view: Path, *, locati
     return model_client.ask_json(parts, review_contracts.LOCATION_CARD_SCHEMA, name="location_card", settings=judge_settings())
 
 
-def presentation_check(work_dir):
+def _criteria_text(criteria):
+    if not criteria:
+        return ''
+    return ('\n本次宿主为当前镜头提供的验收标准：\n- ' + '\n- '.join(criteria)
+            + '\n这些标准只调整明确写出的容差；不豁免人物身份、座位绑定或人物/座位/行李/花之间真实混乱的空间关系。')
+
+
+def presentation_check(work_dir, review_criteria=()):
     """Observe actual frame layout/body/space without a request explaining defects away."""
     from novel_manga.util import read_json
     rows=read_json(work_dir/'frame-evidence.json',{}).get('frames',[])
@@ -55,7 +62,8 @@ def presentation_check(work_dir):
         "body_scale：natural=人物比例正常或无人物；obvious_error=明显头身/肢体比例失常；uncertain=证据不足。"
         "space_motion：natural=没有明确异常；obvious_error=明显穿模、断接、尺度/透视拼接或肢体运动异常；uncertain=无法判断。"
         "近大远小、广角透视、裁切、遮挡与小幅动作变化不算异常。不根据抽帧臆测未出现的动作。"
-        "evidence写具体视频帧、分界位置或异常连接，不写修改指令。只输出JSON。"})
+        "evidence写具体视频帧、分界位置或异常连接，不写修改指令。只输出JSON。"
+        + _criteria_text(review_criteria)})
     return model_client.ask_json(parts,review_contracts.PRESENTATION_SCHEMA,name="clip_presentation",max_tokens=500)
 
 
@@ -79,16 +87,24 @@ def merge_presentation(verdict, observed):
 
 
 def judge_clip(clip: dict, video: Path, bible: review_models_StoryBible, location_time: dict, hypothesis: str, work_dir: Path,
-               *, cached_cast: dict | None = None, source_script=None, visor_states=None) -> dict:
+               *, cached_cast: dict | None = None, source_script=None, visor_states=None,
+               review_criteria=()) -> dict:
     from novel_manga.application.packing.visor import recorded_clip_states
     clip = {**clip, 'review_visor_states': recorded_clip_states(work_dir.parents[2], clip, script=source_script, states=visor_states)}
     if review_evidence.review_mode(work_dir) == "verify":
-        verdict = judge_clip_verify(clip, video, bible, location_time, hypothesis, work_dir)
+        if review_criteria:
+            verdict = judge_clip_verify(clip, video, bible, location_time, hypothesis, work_dir,
+                                        review_criteria=review_criteria)
+        else:
+            verdict = judge_clip_verify(clip, video, bible, location_time, hypothesis, work_dir)
     else:
         parts, evidence = review_evidence.collect_clip_evidence(clip, video, bible, work_dir)
-        parts.append({"type": "text", "text": review_prompts.classic_prompt(clip, location_time, hypothesis, evidence)})
+        parts.append({"type": "text", "text": review_prompts.classic_prompt(clip, location_time, hypothesis, evidence)
+                      + _criteria_text(review_criteria)})
         verdict = model_client.ask_json(parts, review_contracts.CLIP_SCHEMA, name="clip_review", max_tokens=1000)
-    verdict=merge_presentation(verdict,presentation_check(work_dir))
+    observed_presentation = (presentation_check(work_dir, review_criteria)
+                             if review_criteria else presentation_check(work_dir))
+    verdict=merge_presentation(verdict, observed_presentation)
     # Frames miss what sits at the edge of the picture or turns up between them: when switched on, the whole take is
     # watched beside the cast's cards as well (cast_video.py).
     if cast_video.enabled():
@@ -142,9 +158,11 @@ def instruction_for(evidence: str, event: str = "", passage: str = "") -> str:
         return ""
 
 
-def judge_clip_verify(clip: dict, video: Path, bible: review_models_StoryBible, location_time: dict, hypothesis: str, work_dir: Path) -> dict:
+def judge_clip_verify(clip: dict, video: Path, bible: review_models_StoryBible, location_time: dict, hypothesis: str, work_dir: Path,
+                      *, review_criteria=()) -> dict:
     parts, evidence = review_evidence.collect_clip_evidence(clip, video, bible, work_dir, verify=True)
-    parts.append({"type": "text", "text": review_prompts.verify_prompt(clip, location_time, evidence)})
+    parts.append({"type": "text", "text": review_prompts.verify_prompt(clip, location_time, evidence)
+                  + _criteria_text(review_criteria)})
     answer = model_client.ask_json(parts, review_contracts.VERIFY_SCHEMA, name="clip_verify", max_tokens=1800)
     counts = review_policy.count_mismatches(answer)
     if counts and (answer.get('verdict') != 'obvious' or not str(answer.get('instruction') or '').strip()):

@@ -26,6 +26,9 @@ def prepare_authored(project: Path, output: Path, *, family: str = 'adventure') 
     (output/'owner').write_text(f'Interactive studio / project={family} / imported screenplay / {project.resolve()}\n')
     for name,key in [('profile','profile'),('story_bible','bible'),('voice_specs','voice_specs')]:
         atomic_write_json(output/(name+'.json'),material[key])
+    for name in ('performance_en.json','style.json'):
+        if (project/name).is_file():
+            shutil.copy2(project/name,output/name)
     segments=[{'segment_id':s['segment_id'],'text':s['source_quote']} for s in shots]
     for name,value in [('chapter_script',script),('segments',segments),('authored_groups',material['groups']),
                        ('interaction',material['interaction']),('overlays',material['overlays']),
@@ -49,6 +52,19 @@ def prepare_authored(project: Path, output: Path, *, family: str = 'adventure') 
         with Image.open(identity) as image:image.convert('RGB').save(card,quality=97)
         atomic_write_json(card.with_suffix('.jpeg.origin.json'),{'kind':'supplied-reference',
             'source':str(identity),'reference_scope':reference.get('scope','supplied-reference'),'redrawn':False})
+    supplied_voices={}
+    for reference in material.get('reference_audios',[]):
+        source=Path(reference['source'])
+        if not source.is_absolute():source=project/source
+        voice=output/reference['path']
+        voice.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copy2(source,voice)
+        supplied_voices[reference['name']]={
+            'path':str(voice.relative_to(output)),'source':str(source),
+            'text':reference.get('text',''),'origin':reference.get('origin','supplied-reference'),
+            'voice_quality':'Supplied timbre reference; episode speech checked separately.'}
+    if supplied_voices:
+        atomic_write_json(output/'series_assets/voices/voices.json',supplied_voices)
     atomic_write_json(output/'production-budget.json',{'source_seconds':material.get('source_seconds'),
         'planned_body_seconds':sum(s['duration_seconds'] for s in shots),'end_card_seconds':3,
         'voice_sources':len(material['voice_specs']),'video_units':len(material['groups']),

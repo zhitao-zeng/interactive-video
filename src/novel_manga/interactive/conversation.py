@@ -13,7 +13,9 @@ from pathlib import Path
 from novel_manga.util import read_json, atomic_write_json
 
 
-def compile_conversation_clip(clip: dict, shot: dict, *, performance: dict) -> dict:
+def compile_conversation_clip(clip: dict, shot: dict, *, performance: dict,
+                             reference_cast: list[str] | None = None,
+                             reference_props: list[str] | None = None) -> dict:
     from novel_manga.story.h3 import compose, request_issues
     from novel_manga.application.profiles import h3_stamp
 
@@ -32,12 +34,27 @@ def compile_conversation_clip(clip: dict, shot: dict, *, performance: dict) -> d
     if slots != [str(i) for i in range(1, len(turns) + 1)]:
         raise ValueError('English dialogue slots must bind every turn once in order')
     result = copy.deepcopy(clip)
+    # The room inventory describes continuity, including things outside this
+    # camera. Only the explicitly selected design images go to the generator.
+    for role, selected, world in [('character', reference_cast, shot['characters']),
+                                  ('prop', reference_props, shot.get('props', []))]:
+        if selected is None:
+            continue
+        if set(selected) - set(world):
+            raise ValueError(f'Unknown {role} reference in camera scope')
+        result['references'] = [r for r in result['references']
+            if r['role'] != role or r['name'] in selected]
+        result['reference_' + ('cast' if role == 'character' else 'props')] = list(selected)
+    if reference_cast is not None or reference_props is not None:
+        for index, ref in enumerate((r for r in result['references'] if r['role'] != 'voice'), 1):
+            ref['tag'] = f'@图片{index}'
     pictured = [r for r in result['references'] if r['role'] != 'voice']
     cast_refs = {r['name'] for r in pictured if r['role'] == 'character'}
     if set(visible) - cast_refs:
         raise ValueError('Visible participant reference is missing')
     prop_refs = {r['name'] for r in pictured if r['role'] == 'prop'}
-    if set(shot.get('props', [])) - prop_refs:
+    required_props = shot.get('props', []) if reference_props is None else reference_props
+    if set(required_props) - prop_refs:
         raise ValueError('Authored persistent prop reference is missing')
     bindings = []
     for i, ref in enumerate(pictured, 1):
@@ -47,7 +64,7 @@ def compile_conversation_clip(clip: dict, shot: dict, *, performance: dict) -> d
         scope = '身份与衣装' if ref['role'] == 'character' else '外观设计'
         bindings.append(f'{ref["name"]}采用@图片{i}的{scope}；参考拼版不作为画面构图')
     lines = [
-        f'真人恋综，同一房间内一段{clip["request_seconds"]:g}秒连续交流。',
+        f'恋综，同一房间内一段{clip["request_seconds"]:g}秒连续交流。',
         '【参考绑定】' + '。'.join(bindings) + '。',
         '【房间在场】' + '、'.join(shot['characters']) + '。画外不等于离场。',
         '【开始状态】' + shot['visual_prompt'],
@@ -60,7 +77,7 @@ def compile_conversation_clip(clip: dict, shot: dict, *, performance: dict) -> d
         lines.append(f'{turn["speaker_name"]}{scope}：{turn["text"]}（{turn.get("emotion", "自然接话")}）')
     lines += ['【结束状态】' + shot['end_state'],
               '声音：' + shot.get('sfx', '安静室内底噪') + '。只说列出的对白；其他人自然静默听。',
-              '保持原参考的真人画风、脸、服装和物品归属；字幕由后期添加，画面不生成文字。']
+              '保持原参考的画风、脸、服装和物品归属；字幕由后期添加，画面不生成文字。']
     result['prompt'] = '\n'.join(lines)
     result['prompt_chars'] = len(result['prompt'])
     # H3 consumes its own field; do not reuse the legacy multi-stage binding
@@ -113,12 +130,18 @@ def pack_conversation(directory: Path) -> dict:
                   'seconds': group['request_seconds'], 'request_seconds': group['request_seconds'],
                   'shot_timing': [{'seconds': shot['duration_seconds']}]}
         clip = clip_entry(packed, f'clip_{number:02d}', context)
+        if group.get('location_reference'):
+            path=group['location_reference']
+            if not (directory.parent/path).is_file():
+                raise FileNotFoundError(directory.parent/path)
+            location=next(r for r in clip['references'] if r['role']=='location' and r['name']==shot['location'])
+            location.update(path=path,reference_scope='location_camera_coverage')
         # The novel packer keeps only one prop picture. Authored conversations
         # may need e.g. the offered card AND the already parked suitcases.
         # Complete only explicitly requested props, through its asset resolver.
         from novel_manga.application.packing.assets import build_references
         present = {r['name'] for r in clip['references'] if r['role'] == 'prop'}
-        for name in shot.get('props', []):
+        for name in group.get('reference_props', shot.get('props', [])):
             if name in present:
                 continue
             refs, _, _ = build_references([], None, context['bible'], context['location_map'],
@@ -135,7 +158,8 @@ def pack_conversation(directory: Path) -> dict:
                 raise FileNotFoundError(directory.parent / path)
             clip['references'].append({'role': 'location', 'name': '空间布局参考',
                 'path': path, 'reference_scope': 'spatial_layout'})
-        clip = compile_conversation_clip(clip, shot, performance=performance)
+        clip = compile_conversation_clip(clip, shot, performance=performance,
+            reference_cast=group.get('reference_cast'), reference_props=group.get('reference_props'))
         clip['source_authored_segment'] = group['source_segment']
         clips.append(clip)
     plan = {'policy': POLICY, 'clips': clips,
