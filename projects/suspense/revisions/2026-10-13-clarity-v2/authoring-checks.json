@@ -1,0 +1,18 @@
+{
+  "body_seconds": 186,
+  "total_seconds": 189,
+  "dialogue_characters": 281,
+  "dialogue_exceeds_175cpm_budget": [],
+  "no_dialogue_inside_801": true,
+  "explicit_enter_and_exit_shots": [
+    "S06",
+    "S10"
+  ],
+  "all_investigation_dialogue_face_to_face_at_802": true,
+  "old_case_reveal_deferred": true,
+  "source_ids_valid": true,
+  "media_generated": false,
+  "note": "字数读速仅为作者预算；未验证新成片。",
+  "screenplay_section_times_match_storyboard": true,
+  "indoor_camera_directions_do_not_reference_802_dialogue_axis": true
+}

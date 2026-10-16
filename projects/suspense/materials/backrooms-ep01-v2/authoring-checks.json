@@ -1,0 +1,40 @@
+{
+  "owner": "/root/backrooms_package_review",
+  "status": "authoring_structures_passed_assets_pending",
+  "shots": 23,
+  "groups": 22,
+  "planned_body_seconds": 185,
+  "end_card_seconds": 3,
+  "planned_total_seconds": 188,
+  "spoken_chinese_characters": 611,
+  "average_characters_per_minute": 198.2,
+  "ambience_shot_index": 19,
+  "ambience_seconds": 3,
+  "validation": [
+    "actual StoryBible model",
+    "actual ScriptTurn model for every line and silent action",
+    "actual prepared_shots with bound offscreen/visible delivery",
+    "all retained source/action text in source.md and storyboard.md",
+    "ordered group coverage and existing 4–15s/6stage bounds",
+    "known location and prop bindings",
+    "existing portrait frame contract and native supported profile resolution",
+    "spoken dialogue time allowance at 4 Chinese characters/second plus 0.5s",
+    "A/B short labels, possible destinations and whole silent ambience shot"
+  ],
+  "pending": [
+    "all location assets must pass artistic review before prepare_authored",
+    "root fills actual image sources, copies own style snapshot, then pack and voices",
+    "actual H3 films, native speech, music mix and final review not yet produced or checked"
+  ],
+  "asset_states_at_check": {
+    "character_001": "accepted",
+    "location_001": "accepted",
+    "location_002": "accepted",
+    "location_003": "accepted",
+    "location_004": "accepted",
+    "prop_001": "accepted",
+    "prop_002": "accepted",
+    "prop_003": "accepted",
+    "location_005": "pending"
+  }
+}

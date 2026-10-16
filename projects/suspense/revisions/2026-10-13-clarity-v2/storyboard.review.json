@@ -1,0 +1,770 @@
+{
+  "title": "凌晨两点，谁进过空房？",
+  "status": "authoring_revision_not_submitted",
+  "created_date": "2026-10-13",
+  "body_seconds": 186,
+  "total_seconds": 189,
+  "final_format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 25
+  },
+  "source": {
+    "script": "inputs/packages/suspense/试播集/EP01-凌晨两点谁进过空房.md",
+    "previous_revision": "projects/suspense/revisions/2026-10-13-investigation",
+    "user_feedback": "调查没跟上；沈序在801内而徐程在802门内，隔空对话及信息来源不合理。"
+  },
+  "shots": [
+    {
+      "id": "S01",
+      "start_seconds": 0,
+      "end_seconds": 4,
+      "duration_seconds": 4,
+      "location": "走廊",
+      "scale": "全景",
+      "action": "同一面墙上的801、802同框，801已由房主预先留门、门扇虚掩。徐程在802门内，沈序站在802门外，侧身可指向相邻801。",
+      "speaker": "",
+      "dialogue": "",
+      "source_shots": [
+        "B01",
+        "B02"
+      ],
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "次日｜调查现场",
+        "801 空房　802 徐程住处"
+      ],
+      "in_frame": [
+        "沈序",
+        "徐程"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "同一面墙上的801、802同框。徐程在802门内，沈序站在802门外，侧身可指向相邻801。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S02",
+      "start_seconds": 4,
+      "end_seconds": 14,
+      "duration_seconds": 10,
+      "location": "走廊",
+      "scale": "徐程近景",
+      "action": "徐程站在802门内，指向相邻801。沈序在他面前听。",
+      "speaker": "徐程",
+      "dialogue": "昨晚两点，我听见801那边有人敲墙。那屋空了半年了。",
+      "source_shots": [
+        "B02"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "in_frame": [
+        "徐程"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "徐程站在802门内，指向相邻801。沈序在他面前听。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S03",
+      "start_seconds": 14,
+      "end_seconds": 23,
+      "duration_seconds": 9,
+      "location": "走廊",
+      "scale": "沈序近景",
+      "action": "沈序站在802门外与徐程面对面；他手持房主提供的打印记录。",
+      "speaker": "沈序",
+      "dialogue": "房主请我来核对情况。你当时看见人了吗？",
+      "source_shots": [
+        "B04",
+        "B09"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [
+        "沈序｜受房主委托调查"
+      ],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "沈序站在802门外与徐程面对面；他手持房主提供的打印记录。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S04",
+      "start_seconds": 23,
+      "end_seconds": 28,
+      "duration_seconds": 5,
+      "location": "走廊",
+      "scale": "徐程近景",
+      "action": "徐程摇头；两人仍在原位，不切到昨夜。",
+      "speaker": "徐程",
+      "dialogue": "没看见。我一直在自己房里。",
+      "source_shots": [
+        "B09"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "in_frame": [
+        "徐程"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "徐程摇头；两人仍在原位，不切到昨夜。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S05",
+      "start_seconds": 28,
+      "end_seconds": 34,
+      "duration_seconds": 6,
+      "location": "走廊",
+      "scale": "沈序中景",
+      "action": "沈序朝801示意，说完才转身。徐程留在802门内。",
+      "speaker": "沈序",
+      "dialogue": "我先进去看看。你在这儿等一下。",
+      "source_shots": [
+        "B04",
+        "B05"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "沈序朝801示意，说完才转身。徐程留在802门内。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S06",
+      "start_seconds": 34,
+      "end_seconds": 42,
+      "duration_seconds": 8,
+      "location": "801门口",
+      "scale": "连续中景",
+      "action": "镜头连续跟着沈序从802门前走到相邻801，推开房主预先留好的虚掩房门，跨过门槛。徐程留在原处；不新增解锁密码或钥匙特写。",
+      "speaker": "",
+      "dialogue": "",
+      "source_shots": [
+        "B04",
+        "B05"
+      ],
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "以当镜景别拍摄；进出801的两镜连续跟随，不省略跨门槛与回到802门前的动作",
+      "start_state": "沈序在802门外，已转向相邻801；801门虚掩，徐程留在802门内。",
+      "end_state": "沈序已进入801；徐程留在802，交谈停止",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S07",
+      "start_seconds": 42,
+      "end_seconds": 48,
+      "duration_seconds": 6,
+      "location": "801室内",
+      "scale": "全景",
+      "action": "镜头从沈序身后建立空房：房内只有沈序。右侧桌上杯子、保温杯、手机和维修纸页保持原有布局。",
+      "speaker": "",
+      "dialogue": "",
+      "source_shots": [
+        "B05"
+      ],
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "801室内按本镜景别拍摄，只有沈序；特写只呈现需要的手与物件，不切到802回应。",
+      "start_state": "沈序在801内、徐程在802门内",
+      "end_state": "镜头从沈序身后建立空房：房内只有沈序。右侧桌上杯子、保温杯、手机和维修纸页保持原有布局。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S08",
+      "start_seconds": 48,
+      "end_seconds": 54,
+      "duration_seconds": 6,
+      "location": "801室内",
+      "scale": "手机与插座近景",
+      "action": "从插在墙上的充电头沿白线看向桌面的手机，让观众看清它确实连着充电线。沈序不拔线、不看消息。",
+      "speaker": "",
+      "dialogue": "",
+      "source_shots": [
+        "B07"
+      ],
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "801室内按本镜景别拍摄，只有沈序；特写只呈现需要的手与物件，不切到802回应。",
+      "start_state": "沈序在801内、徐程在802门内",
+      "end_state": "从插在墙上的充电头沿白线看向桌面的手机，让观众看清它确实连着充电线。沈序不拔线、不看消息。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S09",
+      "start_seconds": 54,
+      "end_seconds": 59,
+      "duration_seconds": 5,
+      "location": "801室内",
+      "scale": "沈序半身",
+      "action": "沈序蹲低看清连接，再起身看一眼桌面，转向房门。杯、纸、工具只是背景；不逐件口述，不碰装订条。",
+      "speaker": "",
+      "dialogue": "",
+      "source_shots": [
+        "B05",
+        "B07",
+        "B08"
+      ],
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "801室内按本镜景别拍摄，只有沈序；特写只呈现需要的手与物件，不切到802回应。",
+      "start_state": "沈序在801内、徐程在802门内",
+      "end_state": "沈序蹲低看清连接，再起身看一眼桌面，转向房门。杯、纸、工具只是背景；不逐件口述，不碰装订条。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S10",
+      "start_seconds": 59,
+      "end_seconds": 67,
+      "duration_seconds": 8,
+      "location": "801门口至走廊",
+      "scale": "连续中景",
+      "action": "镜头明确拍沈序走出801，沿走廊走到相邻802门前，停在徐程正前方。此动作结束后才开始问话。",
+      "speaker": "",
+      "dialogue": "",
+      "source_shots": [
+        "B09"
+      ],
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "以当镜景别拍摄；进出801的两镜连续跟随，不省略跨门槛与回到802门前的动作",
+      "start_state": "沈序在801室内朝出口走；徐程仍在相邻802门内。",
+      "end_state": "沈序已走出801并站到802门外，恢复面对面位置",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S11",
+      "start_seconds": 67,
+      "end_seconds": 79,
+      "duration_seconds": 12,
+      "location": "走廊",
+      "scale": "沈序中景",
+      "action": "沈序在802门外当面说明发现，抬起自己一直带着的打印页；徐程现在才听见关于手机的信息。",
+      "speaker": "沈序",
+      "dialogue": "801里留着一部充电的手机。房主给的开门记录，也有一条异常。",
+      "source_shots": [
+        "B03",
+        "B07",
+        "B09"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "沈序在802门外当面说明发现，抬起自己一直带着的打印页；徐程现在才听见关于手机的信息。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S12",
+      "start_seconds": 79,
+      "end_seconds": 88,
+      "duration_seconds": 9,
+      "location": "走廊",
+      "scale": "记录特写",
+      "action": "打印页在沈序手中，徐程站在纸的另一侧。沈序手指先落在时间，再移到使用密码一栏。只拍手和纸。",
+      "speaker": "沈序",
+      "dialogue": "昨晚一点五十二分，这个密码开过801的门。",
+      "source_shots": [
+        "B03"
+      ],
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "801 开门记录",
+        "昨晚 01:52",
+        "使用的密码：徐程（临时）"
+      ],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "打印页在沈序手中，徐程站在纸的另一侧。沈序手指先落在时间，再移到使用密码一栏。只拍手和纸。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S13",
+      "start_seconds": 88,
+      "end_seconds": 93,
+      "duration_seconds": 5,
+      "location": "走廊",
+      "scale": "沈序近景",
+      "action": "沈序抬眼看面前的徐程，保持打印页朝向对方。",
+      "speaker": "沈序",
+      "dialogue": "这上面的徐程，是你？",
+      "source_shots": [
+        "B03",
+        "B09"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "沈序抬眼看面前的徐程，保持打印页朝向对方。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S14",
+      "start_seconds": 93,
+      "end_seconds": 99,
+      "duration_seconds": 6,
+      "location": "走廊",
+      "scale": "徐程近景",
+      "action": "徐程看清纸上标签后回答。门框在他身边，表明始终在自己家门内。",
+      "speaker": "徐程",
+      "dialogue": "是我。可那是以前的临时密码。",
+      "source_shots": [
+        "B03",
+        "B09",
+        "B15"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "in_frame": [
+        "徐程"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "徐程看清纸上标签后回答。门框在他身边，表明始终在自己家门内。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S15",
+      "start_seconds": 99,
+      "end_seconds": 106,
+      "duration_seconds": 7,
+      "location": "走廊",
+      "scale": "沈序近景",
+      "action": "沈序指回01:52这一行，问题只针对这一次记录。",
+      "speaker": "沈序",
+      "dialogue": "昨晚这次开门，是你用的吗？",
+      "source_shots": [
+        "B03",
+        "B09"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "沈序指回01:52这一行，问题只针对这一次记录。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S16",
+      "start_seconds": 106,
+      "end_seconds": 111,
+      "duration_seconds": 5,
+      "location": "走廊",
+      "scale": "徐程近景",
+      "action": "徐程明确否认；沈序在同一位置听，不切回801。",
+      "speaker": "徐程",
+      "dialogue": "不是。我昨晚没出去。",
+      "source_shots": [
+        "B09"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "in_frame": [
+        "徐程"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "徐程明确否认；沈序在同一位置听，不切回801。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S17",
+      "start_seconds": 111,
+      "end_seconds": 117,
+      "duration_seconds": 6,
+      "location": "走廊",
+      "scale": "记录特写",
+      "action": "沈序手指停在“使用的密码”表头；整行在画面里保持可读。",
+      "speaker": "沈序",
+      "dialogue": "这里记的是用过哪个密码。",
+      "source_shots": [
+        "B03",
+        "B12"
+      ],
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "使用的密码：徐程（临时）"
+      ],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "沈序手指停在“使用的密码”表头；整行在画面里保持可读。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S18",
+      "start_seconds": 117,
+      "end_seconds": 126,
+      "duration_seconds": 9,
+      "location": "走廊",
+      "scale": "沈序近景",
+      "action": "沈序看向徐程，平静解释为什么还不能凭名字认定人，不作已经排除徐程的表情。",
+      "speaker": "沈序",
+      "dialogue": "如果别人知道这个密码，留下的也会是你这个名字。",
+      "source_shots": [
+        "B10",
+        "B12"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "沈序看向徐程，平静解释为什么还不能凭名字认定人，不作已经排除徐程的表情。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S19",
+      "start_seconds": 126,
+      "end_seconds": 132,
+      "duration_seconds": 6,
+      "location": "走廊",
+      "scale": "徐程近景",
+      "action": "徐程低头指向“临时”标签，提出具体疑问，不替他补写历史原因。",
+      "speaker": "徐程",
+      "dialogue": "那为什么还叫我的名字？",
+      "source_shots": [
+        "B15"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "in_frame": [
+        "徐程"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "徐程低头指向“临时”标签，提出具体疑问，不替他补写历史原因。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S20",
+      "start_seconds": 132,
+      "end_seconds": 142,
+      "duration_seconds": 10,
+      "location": "走廊",
+      "scale": "沈序近景",
+      "action": "沈序把待查标签和眼前可问的问题分开，说完看着徐程等回答。",
+      "speaker": "沈序",
+      "dialogue": "旧标签得查门锁后台。这个密码，你有没有告诉过别人？",
+      "source_shots": [
+        "B10",
+        "B15"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "沈序把待查标签和眼前可问的问题分开，说完看着徐程等回答。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S21",
+      "start_seconds": 142,
+      "end_seconds": 146,
+      "duration_seconds": 4,
+      "location": "走廊",
+      "scale": "徐程手部至脸部",
+      "action": "徐程拇指停在自己的手机边缘，移开视线。手机无新消息。他没有回答共享密码的问题。",
+      "speaker": "",
+      "dialogue": "",
+      "source_shots": [
+        "B11",
+        "B14"
+      ],
+      "on_camera_dialogue": false,
+      "on_screen_text": [],
+      "in_frame": [
+        "徐程"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "徐程拇指停在自己的手机边缘，移开视线。手机无新消息。他没有回答共享密码的问题。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S22",
+      "start_seconds": 146,
+      "end_seconds": 156,
+      "duration_seconds": 10,
+      "location": "走廊",
+      "scale": "沈序近景",
+      "action": "沈序不逼近，只把问题再次问清。仍与徐程面对面，没有跨房间喊话。",
+      "speaker": "沈序",
+      "dialogue": "你说没出门，我记下了。我问的是：密码还给过谁？",
+      "source_shots": [
+        "B10",
+        "B11",
+        "B12"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "沈序不逼近，只把问题再次问清。仍与徐程面对面，没有跨房间喊话。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S23",
+      "start_seconds": 156,
+      "end_seconds": 160,
+      "duration_seconds": 4,
+      "location": "走廊",
+      "scale": "徐程近景",
+      "action": "徐程开口又停住，没有承认共享，也没有给出新说法。",
+      "speaker": "徐程",
+      "dialogue": "我……",
+      "source_shots": [
+        "B11"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "in_frame": [
+        "徐程"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "徐程开口又停住，没有承认共享，也没有给出新说法。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S24",
+      "start_seconds": 160,
+      "end_seconds": 168,
+      "duration_seconds": 8,
+      "location": "走廊",
+      "scale": "沈序半身",
+      "action": "沈序收低记录，抬头看到走廊摄像头。调查没有结束，只决定下一步的核验方向。",
+      "speaker": "沈序",
+      "dialogue": "先核对哪一条，才能知道是谁进了801？",
+      "source_shots": [
+        "B12",
+        "B13",
+        "B14",
+        "B15"
+      ],
+      "on_camera_dialogue": true,
+      "on_screen_text": [],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "沈序收低记录，抬头看到走廊摄像头。调查没有结束，只决定下一步的核验方向。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S25",
+      "start_seconds": 168,
+      "end_seconds": 174,
+      "duration_seconds": 6,
+      "location": "走廊",
+      "scale": "摄像头近景",
+      "action": "拍走廊已经存在的摄像头；不出现未经核对的录像。沈序就在同一走廊画外说话。",
+      "speaker": "沈序",
+      "dialogue": "先查监控，看看谁来过。",
+      "source_shots": [
+        "B13"
+      ],
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "A 查监控｜谁来过"
+      ],
+      "in_frame": [],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "拍走廊已经存在的摄像头；不出现未经核对的录像。沈序就在同一走廊画外说话。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S26",
+      "start_seconds": 174,
+      "end_seconds": 180,
+      "duration_seconds": 6,
+      "location": "走廊",
+      "scale": "徐程近景",
+      "action": "徐程仍在802门内闭嘴听，画外为站在他面前的沈序。手机还在徐程手里。",
+      "speaker": "沈序",
+      "dialogue": "继续问徐程，密码给过谁。",
+      "source_shots": [
+        "B10",
+        "B11",
+        "B14"
+      ],
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "B 问徐程｜密码给过谁"
+      ],
+      "in_frame": [
+        "徐程"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "徐程仍在802门内闭嘴听，画外为站在他面前的沈序。手机还在徐程手里。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    },
+    {
+      "id": "S27",
+      "start_seconds": 180,
+      "end_seconds": 186,
+      "duration_seconds": 6,
+      "location": "走廊",
+      "scale": "记录特写",
+      "action": "回到同一份记录的旧临时标签；不新增创建日期、后台操作人或原因。",
+      "speaker": "沈序",
+      "dialogue": "查门锁，旧密码为什么还能用。",
+      "source_shots": [
+        "B15"
+      ],
+      "on_camera_dialogue": false,
+      "on_screen_text": [
+        "C 查门锁｜旧密码为何能用"
+      ],
+      "in_frame": [
+        "沈序"
+      ],
+      "camera": "固定机位，保持802门内外的视线轴；特写只取所述物件或人物",
+      "start_state": "按上一镜末态连续承接；问话位置固定在802门外",
+      "end_state": "回到同一份记录的旧临时标签；不新增创建日期、后台操作人或原因。",
+      "sound_events": "普通公寓连续环境声；脚步、纸响随实际动作出现，无配乐，无重放敲墙声",
+      "voice_delivery": "自然普通话；沈序中低音、清楚克制，徐程紧张但不阴险；画外台词不交给画内人物代说",
+      "purpose": "用明确的空间与问答，让观众跟随本集同一个问题：昨晚是谁进了801。"
+    }
+  ],
+  "interaction": {
+    "status": "authoring_revision",
+    "question": "先查哪一条？",
+    "choices": [
+      {
+        "id": "A",
+        "text": "查监控",
+        "reason": "找实际来访者",
+        "source_shots": [
+          "B13"
+        ]
+      },
+      {
+        "id": "B",
+        "text": "问徐程",
+        "reason": "问密码是否共享",
+        "source_shots": [
+          "B10",
+          "B11",
+          "B14"
+        ]
+      },
+      {
+        "id": "C",
+        "text": "查门锁",
+        "reason": "核对旧临时密码及标签状态",
+        "source_shots": [
+          "B15"
+        ]
+      }
+    ],
+    "planned_start_seconds": 186,
+    "seconds": 3,
+    "frames": 75,
+    "route_selected": null,
+    "truth_revealed": false
+  }
+}

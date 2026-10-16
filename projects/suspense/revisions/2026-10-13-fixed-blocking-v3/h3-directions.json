@@ -1,0 +1,112 @@
+{
+  "shots": [
+    {
+      "id": "S01",
+      "direction": "Locked frontal wide shot matching the setting reference. Exactly the two referenced men are already stationary: {shen} on the left facing {xu} on the right at apartment802 doorstep, on corridor tiles. Apartment801 is the LEFT opening, apartment802 the RIGHT opening, both on the SAME flat wall. Both single door leaves are already fully open and PARKED. Only natural breathing and tiny eye movements. Nobody walks or touches a door."
+    },
+    {
+      "id": "S02",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {xu} is ALREADY standing still at the established conversation position. He faces slightly screen LEFT toward the off-camera investigator; only a narrow door FRAME edge and blurred interior lie behind him, no swinging door leaf. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He calmly reports last night, with a brief sideways glance toward apartment801 outside the crop. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S03",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {shen} is ALREADY standing still at the established conversation position. He faces slightly screen RIGHT toward the off-camera tenant; background is the plain corridor wall, no doorway behind him. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He explains his purpose and asks a neutral question. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S04",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {xu} is ALREADY standing still at the established conversation position. He faces slightly screen LEFT toward the off-camera investigator; only a narrow door FRAME edge and blurred interior lie behind him, no swinging door leaf. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He gives a small head shake while denying seeing anyone. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S05",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {shen} is ALREADY standing still at the established conversation position. He faces slightly screen RIGHT toward the off-camera tenant; background is the plain corridor wall, no doorway behind him. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He finishes the sentence with a small glance toward apartment801; he does NOT turn his torso or start walking. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S06",
+      "direction": "Locked frontal wide shot matching the ENTRY setting reference. Start with {shen} already ONE step OUTSIDE the LEFT doorway, facing into apartment801. {xu} remains stationary at the RIGHT doorway on corridor tiles. {shen} takes exactly ONE forward step across the LEFT threshold and stops just INSIDE, still visible in the opening. Both single door leaves stay fully open and motionless. The camera never moves. No cross-corridor walk and no handle action."
+    },
+    {
+      "id": "S07",
+      "direction": "Locked table-side medium shot matching the INTERIOR setting reference. {shen} is ALREADY standing still beside the table, not near a doorway. He only lowers his gaze to the phone. His feet remain planted and both hands remain away from the table. The phone stays connected and motionless; the paper in his lowered hand shows only its blank reverse. No entrance or door is visible."
+    },
+    {
+      "id": "S08",
+      "direction": "Locked close-up matching the PHONE setting reference. Only one black phone lies flat on the table, its white cable continuously connected to the already plugged-in charger. Absolutely no person, hand, sleeve, face or doorway is visible. The phone and cable do not move. No plugging, unplugging, picking up or screen browsing."
+    },
+    {
+      "id": "S09",
+      "direction": "Locked table-side medium shot identical to the INTERIOR reference. {shen} has remained in the same standing position beside the table. He only raises his eyes toward the exit outside the crop. His body and feet stay still; his hands stay away from the phone. No door or doorway enters the shot and all tabletop objects remain where they were."
+    },
+    {
+      "id": "S10",
+      "direction": "Locked frontal wide shot matching the EXIT setting reference. {shen} begins ONE step INSIDE the LEFT doorway facing the corridor. {xu} stays stationary at the RIGHT doorway on corridor tiles. {shen} takes exactly ONE forward step over the LEFT threshold onto the gray corridor tiles, stops and looks toward the tenant. Both doors remain fully open and PARKED. No handle action, stairway, corner, corridor journey or camera motion."
+    },
+    {
+      "id": "S11",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {shen} is ALREADY standing still at the established conversation position. He faces slightly screen RIGHT toward the off-camera tenant; background is the plain corridor wall, no doorway behind him. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He reports the phone and then introduces the access record, keeping the sheet below the crop. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S12",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {shen} is ALREADY standing still at the established conversation position. He faces slightly screen RIGHT toward the off-camera tenant; background is the plain corridor wall, no doorway behind him. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He briefly looks down at the record below the crop, then explains the single entry to the tenant. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S13",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {shen} is ALREADY standing still at the established conversation position. He faces slightly screen RIGHT toward the off-camera tenant; background is the plain corridor wall, no doorway behind him. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He asks for a short confirmation without moving forward. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S14",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {xu} is ALREADY standing still at the established conversation position. He faces slightly screen LEFT toward the off-camera investigator; only a narrow door FRAME edge and blurred interior lie behind him, no swinging door leaf. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He confirms the name, then explains it was an old temporary code. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S15",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {shen} is ALREADY standing still at the established conversation position. He faces slightly screen RIGHT toward the off-camera tenant; background is the plain corridor wall, no doorway behind him. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He asks specifically about last night, calmly and directly. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S16",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {xu} is ALREADY standing still at the established conversation position. He faces slightly screen LEFT toward the off-camera investigator; only a narrow door FRAME edge and blurred interior lie behind him, no swinging door leaf. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He denies going out, firm but not threatening. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S17",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {shen} is ALREADY standing still at the established conversation position. He faces slightly screen RIGHT toward the off-camera tenant; background is the plain corridor wall, no doorway behind him. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He clearly distinguishes the password field from a person identification. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S18",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {shen} is ALREADY standing still at the established conversation position. He faces slightly screen RIGHT toward the off-camera tenant; background is the plain corridor wall, no doorway behind him. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He explains the conditional possibility, without claiming guilt or innocence. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S19",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {xu} is ALREADY standing still at the established conversation position. He faces slightly screen LEFT toward the off-camera investigator; only a narrow door FRAME edge and blurred interior lie behind him, no swinging door leaf. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He briefly glances down toward the sheet held off camera by the investigator, then asks about its label. He never holds paper. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S20",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {shen} is ALREADY standing still at the established conversation position. He faces slightly screen RIGHT toward the off-camera tenant; background is the plain corridor wall, no doorway behind him. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He separates the backend question from the question about sharing the code, then waits. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S21",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {xu} is ALREADY standing still at the established conversation position. He faces slightly screen LEFT toward the off-camera investigator; only a narrow door FRAME edge and blurred interior lie behind him, no swinging door leaf. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He takes one brief audible breath, slightly averts his eyes and remains silent, with a little natural collar movement. No words."
+    },
+    {
+      "id": "S22",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {shen} is ALREADY standing still at the established conversation position. He faces slightly screen RIGHT toward the off-camera tenant; background is the plain corridor wall, no doorway behind him. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He acknowledges the earlier answer and repeats the exact unanswered question without advancing. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S23",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {xu} is ALREADY standing still at the established conversation position. He faces slightly screen LEFT toward the off-camera investigator; only a narrow door FRAME edge and blurred interior lie behind him, no swinging door leaf. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He starts a reply and stops, without adding an admission. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S24",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {shen} is ALREADY standing still at the established conversation position. He faces slightly screen RIGHT toward the off-camera tenant; background is the plain corridor wall, no doorway behind him. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He considers the next investigative step with a slight upward eye movement, no body turn. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S25",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {shen} is ALREADY standing still at the established conversation position. He faces slightly screen RIGHT toward the off-camera tenant; background is the plain corridor wall, no doorway behind him. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He personally states the first possible next step, as the same established investigator. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S26",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {shen} is ALREADY standing still at the established conversation position. He faces slightly screen RIGHT toward the off-camera tenant; background is the plain corridor wall, no doorway behind him. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He personally states the second possible next step, looking toward the tenant off camera. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    },
+    {
+      "id": "S27",
+      "direction": "Locked tight chest-up portrait matching the DIALOGUE setting reference. {shen} is ALREADY standing still at the established conversation position. He faces slightly screen RIGHT toward the off-camera tenant; background is the plain corridor wall, no doorway behind him. Keep identical framing and body position from first frame to last. Hands, phones and ALL paper stay BELOW the crop. No walking, entrance, handover or camera move. He personally states the third possible next step. All paper remains below the crop. Natural restrained Mandarin, no performance to an audience. <DIALOGUE_1>"
+    }
+  ]
+}
