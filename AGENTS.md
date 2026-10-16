@@ -1,13 +1,26 @@
-# Interactive video studio: shared pipeline
+# Interactive video studio: unified mainline
 
 This is the independent interactive-video-studio repository, not the parent novel production project.
-Read `docs/branch-workflow.md` before changing common code. `main` owns the tested shared pipeline;
-`codex/feat/shared-pipeline` is its integration worktree. The romance, adventure and suspense branches
-own their approved material, experimental scripts and per-content runtime configuration.
+Read `docs/branch-workflow.md` before changing common code. `main` is the sole maintained source
+for adventure, romance and suspense; `codex/feat/shared-pipeline` is its integration worktree.
+Use temporary development branches from main. Project source files live together under `projects/`,
+with project production/service overrides in `configs/interactive.json`. Old content worktrees retain
+historical data and already-running jobs; they are no longer separate production-code authorities.
+
+The default creation path is a complete material package or original brief → one creative Agent →
+screenplay, storyboard, interaction and spatial design. Use `scripts/interactive_video.py create`;
+do not prepend the novel reading/planning workflow or have the coordinating session write the story.
+Host workflows validate and execute; content decisions and corrections belong to the Agent.
+Approved structured material can enter preparation directly without rewriting it.
 
 The current user explicitly authorized local snapshots, integration into main after tests, and merging
 those shared fixes back into all three content branches (2026-10-14). Preserve later edits made by
 other conversations. This authorization does not request a remote push, deployment or new generation.
+
+On 2026-10-16 the user authorized consolidation into a single mainline. Preserve immutable input
+snapshots and original worktrees, input packages, media, takes, sessions and counts. Resolve historical
+edition links to their original directory before running. New development and new task entry use main;
+do not switch a live job's code or merge over another conversation's uncommitted files.
 
 Review images/films and propose their artistic repairs through Agents. The coordinating session owns
 code integration, execution status and delivery, not manual frame-by-frame review. Keep measured

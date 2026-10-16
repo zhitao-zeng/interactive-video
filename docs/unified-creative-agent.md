@@ -2,7 +2,10 @@
 
 一个持续会话负责从完整素材包或原创意图写到剧本、分镜、互动选择和空间设计。
 本入口只创作，不调用普通source流程先买一份初稿，也不启动图像、视频、配音、
-素材生成、生产采用或发布。当前版本在荒野独立分支中实施。
+素材生成、生产采用或发布。该实现现已归入统一 main，探险、恋综、悬疑共用入口。
+
+统一入口为 `scripts/interactive_video.py create --task /path/to/task.json --output-dir /path/to/run`，
+直接调用下述创作 Agent。读书/分章工作流不是素材包创作的前置步骤。
 
 ## 输入与执行
 
@@ -30,7 +33,7 @@ PYTHONPATH=src .venv/bin/python scripts/creative_agent.py run \
 
 默认使用现有配置；显式`--config`可选择任务级配置。本轮默认文字接口在产生任何
 创作前返回402，随后复用了项目已存在的Codex登录态执行方式。该适配保存在
-`interactive/creative_codex.py`，没有修改其他内容工作树或全局模型配置。
+`application/agents/episode/codex_session.py`，没有修改其他内容工作树或全局模型配置。
 初始失败会话归档保留，真正的作者会话建立后持续续接，不能把不同SDK的UUID混用。
 
 Codex创作容器使用已有运行方式和登录，不复制认证文件。它只有独立输入、输出与

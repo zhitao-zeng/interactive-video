@@ -131,3 +131,13 @@ def test_resuming_custom_delivery_keeps_original_export_versions(tmp_path,monkey
     monkeypatch.setattr('novel_manga.interactive.delivery.finish_reviewed_delivery',lambda runner,report,destination:seen.append(destination) or {'status':'candidate'})
     production.run_episode(tmp_path/'studio','sd25',project='suspense',edition=name)
     assert seen==[base] and history.generation_counts(ep)=={'a':3}
+
+
+def test_unreviewed_legacy_edition_does_not_report_zero_final_findings(tmp_path):
+    name,book,ep=historical(tmp_path)
+    (ep/'final_cut_review.json').unlink()
+    report=read_json(ep/'thin_media_report.json');report.pop('final_cut_review')
+    atomic_write_json(ep/'thin_media_report.json',report)
+    result=production.edition_status(tmp_path/'studio','suspense',name)
+    assert result['final_review_complete'] is None and result['remaining_findings'] is None
+    assert result['generation_counts']=={'a':3} and result['status']=='candidate'

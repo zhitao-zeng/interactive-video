@@ -1,51 +1,49 @@
-# Shared pipeline and content branches
+# One maintained studio mainline
 
-The user approved local integration and synchronization to all three content branches on 2026-10-14.
+The user authorized the 2026-10-16 consolidation of adventure, romance and suspense.
+The maintained checkout is `/mnt/disk1/zengzhitao/interactive-video-worktrees/main`.
+`codex/feat/shared-pipeline` integrates tested changes. New development uses temporary branches
+from main; a genre does not need a permanent copy of the program.
 
-| Owner | Branch | Files |
-|---|---|---|
-| Stable shared pipeline | main | src/, common tests, provider and Agent configuration, reusable CLI and adapters |
-| Integration | codex/feat/shared-pipeline | Changes intended for all content branches; test before merging |
-| Romance | codex/romance-sd25-continuity | projects/romance, romance experiments and content-specific regressions |
-| Adventure | codex/adventure-rhythm-20261013 | projects/adventure, adventure/travel experiments and regressions |
-| Suspense | codex/suspense-reference-study-20261013 | projects/suspense, research and suspense content regressions |
+## Shared code and project content
 
-All three use the same versioned implementation. Topic adapters are common code, not independent copies
-of the whole pipeline. Explicit `--project` and `--material` choose the content. Outputs and generation
-histories stay in the original owning worktrees.
+Main owns src/, scripts/, tests/, reusable skills and all three `projects/` directories.
+`configs/interactive.json` holds common production/services plus explicit project overrides.
+Episode profile overrides for native resolution, workers and repair choices remain effective.
+Project secrets remain in the existing private environment, not tracked configuration.
 
-The common repair principles in `skills/episode-production/SKILL.md`, the shared
-`references/case-lessons.md`, and the common principles/stability examples in
-`skills/video-repair/SKILL.md` are shared guidance. Publish their changes through
-`shared-pipeline` and `main`, then synchronize the same guidance into all three
-content branches and the independent novel repository. Preserve local tool
-contracts and in-progress planning/camera guidance; they follow the code that
-actually implements them. Genre creation skills remain separate.
+The default creative entry accepts a complete package or original brief and invokes one persistent
+creative Agent. It does not run the novel reading/planning workflow first. The creator owns script,
+storyboard, interactions and spatial choices; host code validates and executes. Approved structured
+material can enter preparation without rewriting. Creation and production share one Codex login
+adapter while retaining their phase-specific tools, images, sessions and time budgets.
 
-Check the installed Skill as well as the repository source when resuming an
-Agent. A code checkout, an installed workspace copy and an earlier conversation
-are different states. Preserve old attempt snapshots and running jobs; refreshed
-guidance must be read on the next authorized invocation before claiming it was
-used. Synchronizing a Skill does not authorize generation or renew a budget.
+Genre instructions are loaded from the same Skill package as needed. Shared repair logic includes
+source/ref/audio corrections, scoped prop/wearing bindings, final movie review feedback and bounded
+independent adjudication; a host format check alone is not content acceptance.
 
-## Routine work
+## Retained data
 
-1. Work in the existing topic worktree and keep its branch. Commit topic material independently.
-2. For a common fix, bring the minimal source/test change to the integration branch, run applicable tests,
-   and merge tested work into main. Do not copy whole worktrees or runtime reports.
-3. Merge main into each topic branch. Preserve that branch's `projects/`, authored experiments,
-   content-only tests and `configs/interactive.json` runtime choices. Reconcile genuine source conflicts
-   rather than accepting all of one side.
-4. Never merge over uncommitted work from another conversation. Capture an agreed snapshot or retain
-   the newly edited files and complete synchronization when their owner has settled them.
+Original content worktrees and prototype directories remain available for their original data and
+already-started jobs. Their branches and uncommitted files were not reset, switched or overwritten.
+Authorized immutable snapshot refs record the imported source inputs. Later edits still made in an
+old checkout must be reconciled into a new main-based branch; do not maintain a second release there.
 
-`configs/interactive.json` is deliberately branch-owned: resolution, service selection and local asset
-publication paths can differ. Shared main ships a portable default. `configs/agent_sandbox.json` and
-Agent implementation carry the validated common context window, bounded tools and repair protocol.
-Episode QC exceptions live with that episode; none are inherited from an exported film into main.
+Main's local input, reference, output and delivery bindings point to existing data. No large media is
+copied or moved. A historical edition is resolved to the original directory before constructing its
+runner, preserving source paths, session state, take identity, budgets and repair history. Saved custom
+delivery receipts retain their original export/version directory. Read-only status never samples video,
+reruns review, creates a missing stage or grants retries.
 
-The old `codex/adventure-demo` worktree is retained as the original studio snapshot, not a fourth production
-content branch. Main has its own worktree so no active conversation is switched underneath its work.
+## Changes and handoff
 
-No remote repository or push is needed for this local workflow. Synchronization is a Git merge with
-preserved history, not a reset or destructive folder copy.
+1. Read the current `docs/active-sessions.md`, create a temporary worktree and record ownership there.
+2. Implement and verify against the common mainline, retaining current input and repair contracts.
+3. Integrate locally through shared-pipeline/main after tests and review. Preserve other sessions' WIP.
+4. Keep local data bindings out of Git and leave old tasks frozen. Do not hot-replace a running worker.
+5. Report source validation separately from live provider/media acceptance. Generation, deployments and
+   remote pushes require their own task authorization; code consolidation does not authorize a new film.
+
+The independent novel repository retains its own reading/long-form entry and data. This consolidation
+does not merge that repository or modify its existing jobs. The workspace parent remains local-only;
+no remote or push is needed for this workflow.

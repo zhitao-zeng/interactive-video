@@ -36,7 +36,8 @@ def edition_status(root: Path, project: str, edition: str) -> dict:
     return {'project':project,'edition':edition,'episode_dir':str(directory),'status':status,
             'source_status':report.get('status'),'generation_counts':counts,
             'generation_total':sum(counts.values()),'final_review_complete':final.get('complete'),
-            'final_review_passed':final.get('passed'),'remaining_findings':len(final.get('issues',[])),
+            'final_review_passed':final.get('passed'),
+            'remaining_findings':len(final.get('issues',[])) if final.get('complete') is True else None,
             'final_video':final.get('movie') or (report.get('assembly') or {}).get('final_video')}
 
 
