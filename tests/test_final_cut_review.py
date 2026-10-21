@@ -122,6 +122,12 @@ def test_delivery_reuses_reviewed_movie_and_refuses_changed_export(tmp_path,monk
                 'issues':[],'errors':[],'frames':[],
                 'context':final_cut.context(directory,media,receipt['final_video'])}
     monkeypatch.setattr(final_cut,'review_assembly',review)
+    # reviewed_delivery runs the final audio review inline; a passing review bound
+    # to this movie keeps the delivery gate exercised without a real audio model.
+    def audio_review(root, episode_dir, movie, *, runtime=None):
+        return {'movie': str(movie), 'complete': True, 'passed': True,
+                'issues': [], 'errors': [], 'coverage': []}
+    monkeypatch.setattr('novel_manga.application.review.final_audio.review_audio', audio_review)
     final=delivery.reviewed_delivery(runner,media,destination)
     media['final_cut_review']=final
     native=read_json(directory/'episode_review.json')

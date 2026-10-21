@@ -213,7 +213,9 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
         config = load_config()
     else:
         config = dict(config)
-        explicit_config = bool(config.pop('_agent_config_explicit', explicit_config))
+        # A caller-passed config is a base like load_config(): profile repair_agent_model/endpoint
+        # overrides still apply unless the caller marks _agent_config_explicit=True.
+        explicit_config = bool(config.pop('_agent_config_explicit', False))
     profile = read_json(directory.parent/'profile.json', {})
     if not explicit_config and (endpoint := profile.get('repair_agent_endpoint')):
         from novel_manga.llm.config import ENDPOINTS

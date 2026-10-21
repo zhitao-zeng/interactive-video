@@ -17,9 +17,10 @@ def test_suspense_edition_dispatches_to_agent_and_preserves_project_scope(tmp_pa
     def runner_for(root, novel, lane, **kwargs):
         calls.append(('runner', lane, kwargs))
         return runner
-    def run(actual, lane, *, resume=False, destination=None):
+    def run(actual, lane, *, resume=False, destination=None, config=None):
         assert actual is runner
         assert destination==tmp_path/'delivery/suspense/trial'
+        assert config is None  # no task-level agent config in this dispatch
         calls.append(('agent', lane, resume))
         return {'status':'candidate'}
     monkeypatch.setattr(production, 'runner_for', runner_for)

@@ -224,10 +224,10 @@ def run_episode(root: Path, lane: str, *, project: str = 'adventure', resume_uns
             failed=[c['clip_id'] for c in plan['clips'] if c['kind']=='video' and not c.get('prompt_h3')]
             if failed:raise RuntimeError(f'H3 translation not ready: {failed}')
             runner=runner_for(root,novel,lane,project=project)
-    from novel_manga.interactive.agent import run
-    selected_agent_config = None if agent_config is None else {
-        **agent_config, '_agent_config_explicit': True}
-    report=run(runner,lane,resume=resume,destination=destination,config=selected_agent_config)
+        from novel_manga.interactive.agent import run
+        selected_agent_config = None if agent_config is None else {
+            **agent_config, '_agent_config_explicit': True}
+        report=run(runner,lane,resume=resume,destination=destination,config=selected_agent_config)
     from novel_manga.interactive.delivery import deliver, finish_reviewed_delivery
     receipt=(finish_reviewed_delivery(runner,report,destination)
              if report.get('final_cut_review') else deliver(runner,report,destination))

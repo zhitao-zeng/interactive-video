@@ -48,7 +48,9 @@ def test_source_judge_fix_reopens_only_old_rejection_once_with_remaining_time(tm
 @pytest.mark.parametrize('status,remaining,step,policy,later_prepared', [
     ('finished', 333, 'source', 1, False), ('paused', 333, 'source', 1, False),
     ('blocked', 0, 'source', 1, False), ('blocked', 333, 'compile', 1, False),
-    ('blocked', 333, 'source', 2, False), ('blocked', 333, 'source', 1, True)])
+    # policy boundary follows SOURCE_REVIEW_POLICY (now 3): records saved under the
+    # current judge version are not recoverable; older ones are.
+    ('blocked', 333, 'source', 3, False), ('blocked', 333, 'source', 1, True)])
 def test_source_recovery_leaves_other_stops_and_newer_repairs_untouched(tmp_path, status, remaining, step, policy, later_prepared):
     ctx = context(tmp_path)
     folder = ctx.episode_dir/'work/input_repairs'

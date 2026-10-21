@@ -38,7 +38,10 @@ def compose_opening_image_prompt(authored,style,image_references,references=(),*
 
 
 def enabled(ctx):
-    profile=read_json(ctx.novel_dir/'profile.json',{})
+    novel_dir=getattr(ctx,'novel_dir',None)
+    if novel_dir is None:
+        return False
+    profile=read_json(novel_dir/'profile.json',{})
     return profile.get('h3_input_mode')=='first-frame' or profile.get('sd_input_mode')=='first-frame'
 
 

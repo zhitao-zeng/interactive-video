@@ -191,7 +191,7 @@ def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_facto
     recorded = saved.get('agent_route') or {}
     if saved and recorded.get('agent') and not explicit_config:
         config = apply_agent_route(runtime, config, recorded)
-    config = {**config, 'base_url': config['base_url'].rstrip('/')}
+    config = {**config, 'base_url': (config.get('base_url') or '').rstrip('/')}
     route = agent_route(runtime, config)
     recorded_route = route
     runtime['NOVEL_RESOURCE_WAIT_FILE']=str(ctx.run_dir/'resource-waits.jsonl')
