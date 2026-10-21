@@ -62,6 +62,8 @@ def input_state(directory: Path, clip: dict, verdict: dict, takes: dict, *, inpu
     runtime=load_config() if enabled(directory) else None
     profile = read(directory.parent/'profile.json', {})
     execution = {}
+    if profile.get('sd_input_mode')=='first-frame':
+        execution['input_compilation_policy']='fast-native-source-repair-v1'
     if runtime is not None:
         options = {**(runtime.get('extra_body') or {}), **(runtime.get('repair_extra_body') or {})}
         execution['repair_agent_max_output_tokens'] = options.get('max_tokens')

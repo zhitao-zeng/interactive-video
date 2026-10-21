@@ -121,8 +121,11 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
     environment = {**os.environ, "ANTHROPIC_AUTH_TOKEN": key}
     command = [
         "docker", "run", "--rm", "--name", f"episode-agent-{session_id}",
-        "--user", "1001:1001", "-e", "HOME=/work/.agent-home",
+        "--user", "1001:1001", "-e", "HOME=/agent-home",
         "-v", f"{work_dir}:/work", "-w", "/work",
+        "--mount", f"type=bind,src={work_dir}/.agent-home,dst=/agent-home",
+        "--tmpfs", "/work/attempts:ro,mode=755",
+        "--tmpfs", "/work/.agent-home:ro,mode=755",
         "-e", f"ANTHROPIC_BASE_URL={config['base_url']}", "-e", "ANTHROPIC_AUTH_TOKEN",
         *provider_container_args(config),
     ]
@@ -138,7 +141,19 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
             'the host already supplies fixed H3 syntax, bindings and timing.' if direct_draft else
             'Read /work/.claude/skills/episode-production/SKILL.md '
             'and its output contract before authoring this episode.')
-    if read_json(work_dir/'input/manifest.json',{}).get('production_mode') in {'pipeline_review','batch_review'}:
+    manifest=read_json(work_dir/'input/manifest.json',{})
+    if manifest.get('phase')=='creation_only':
+        role=('You are the single creative author. Read input/manifest.json, the episode-production Skill '
+              'and references/creative-authoring.md inside that Skill. Follow its required sources and '
+              'sound/style/camera guidance. Write the complete creative episode.json; production requests '
+              'and media execution belong to later phases. The storyboard is chapter_script.shots; '
+              'the creator contract is its schema. SDK logs and attempt history are host bookkeeping, '
+              'not source material or a schema to discover. Use supplied file tools only.')
+    elif manifest.get('phase')=='script_preparation':
+        role=('Compile the approved screenplay using the episode-production output contract. '
+              'Write output/requests.json with its protected words, timing, references and camera. '
+              'This phase has file tools only; do not generate media or rewrite the screenplay.')
+    elif manifest.get('production_mode') in {'pipeline_review','batch_review'}:
         role = ('Repair the confirmed input defect or review the existing film, as specified by the current phase. '
                 'Reuse completed production stages. '
                 'Consult only relevant episode-production skill sections and shared repair cases; '

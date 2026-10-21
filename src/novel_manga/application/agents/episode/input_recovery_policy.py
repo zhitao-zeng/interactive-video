@@ -50,3 +50,28 @@ def posture_protocol_recoverable(record):
             and bool(record.get('decision')) and (record.get('source') or {}).get('consistent') is True
             and '姿态台账镜' in error and '入镜名单不符' in error)
 
+
+
+def first_frame_recoverable(ctx,record):
+    """Continue once when the old host translated an opening awaiting replacement."""
+    from novel_manga.media.first_frames import enabled, OPENING_FIELDS
+    from novel_manga.util import read_json
+    if (record.get('status')!='incomplete' or record.get('published')
+            or record.get('first_frame_recovery')
+            or (record.get('source')or{}).get('consistent')is not True
+            or (record.get('source')or{}).get('problems')
+            or not enabled(ctx)):
+        return False
+    opening_compile=(record.get('step')=='compile' and
+        'input correction did not reach the compiled request'in str(record.get('error','')))
+    translation=(str(record.get('step','')).startswith('translate:') and
+        'input repair H3 translation rejected'in str(record.get('error','')))
+    if not (opening_compile or translation):return False
+    cid=record.get('clip_id')
+    clip=next((c for c in read_json(ctx.episode_dir/'clip_plan.json',{}).get('clips',[])if c['clip_id']==cid),{})
+    if not opening_compile and not clip.get('first_frame'):return False
+    shots={s['index']:s for s in read_json(ctx.episode_dir/'chapter_script.json',{}).get('shots',[])}
+    opening=(clip.get('shot_indexes')or[None])[0]
+    fields=('opening_frame',)if opening_compile else OPENING_FIELDS
+    return any(p.get('index')==opening and any(k in p and p[k]!=shots.get(opening,{}).get(k)
+        for k in fields) for p in (record.get('decision')or{}).get('shots',[]))

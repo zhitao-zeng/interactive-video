@@ -24,6 +24,16 @@ def current(directory, final):
                 and independent.get('context') == final.get('context'))
 
 
+def confirmed_failure(directory,final):
+    """A complete current independent failure can guide repair, never fill missing acceptance."""
+    row=read_json(Path(directory)/'independent_review.json',{})
+    if (required(directory) and row.get('policy')==POLICY and row.get('context')==final.get('context')
+            and row.get('complete')is True and row.get('passed')is False
+            and row.get('issues') and not row.get('errors')):
+        return row
+    return None
+
+
 def validate(answer, frames, *, previous=()):
     if (not isinstance(answer.get('passed'), bool) or answer.get('complete') is not True
             or not isinstance(answer.get('observations'), list) or not answer['observations']
@@ -114,7 +124,7 @@ def register(directory, media, report):
     final = read_json(directory/'final_cut_review.json', {})
     if (final.get('policy') != FINAL_POLICY
             or final.get('context') != context(directory, media, final.get('movie', ''))
-            or final.get('automatic_review', final).get('complete') is not True
+            or (final.get('automatic_review', final).get('complete') is not True and raw.get('passed')is not False)
             or raw.get('movie') != final.get('movie')):
         raise ValueError('independent report must identify the current reviewed movie')
     known = {f['path']: f for f in final.get('frames', [])}
@@ -133,6 +143,14 @@ def register(directory, media, report):
     atomic_write_json(root/'registration.json', {'report': str(target/'report.json'), 'policy': POLICY})
     atomic_write_json(directory/'independent_review.json', result)
     return result
+
+
+def primary_frames(frames, originals, dispute=None):
+    if dispute is None:
+        return [f for f in frames if f['label']=='middle'or'card'in f['label']]
+    paths={p for issue in dispute['findings']for p in issue.get('frame_paths',[])}
+    clips={f['clip_id']for f in frames if originals[f['path']]in paths}
+    return [f for f in frames if originals[f['path']]in paths or(f['clip_id']in clips and f['label']=='middle')]
 
 
 def observe(directory, final, *, config=None, dispute=None):
@@ -162,10 +180,7 @@ def observe(directory, final, *, config=None, dispute=None):
         relative = str(target.relative_to(work))
         originals[relative] = frame['path']
         frames.append({**frame, 'path': relative})
-    primary = [f for f in frames if f['label'] == 'middle' or 'card' in f['label']]
-    if dispute is not None:
-        disputed_paths = {p for issue in dispute['findings'] for p in issue.get('frame_paths', [])}
-        primary = [f for f in frames if f in primary or originals[f['path']] in disputed_paths]
+    primary = primary_frames(frames, originals, dispute)
     source = {k: final['context'].get(k) for k in ('script', 'bible', 'layout')}
     if 'publication' in final['context']:
         source['publication']=final['context']['publication']
@@ -308,6 +323,14 @@ def combine(directory, final):
     result.pop('dispute_reviews', None)
     result['automatic_review'] = copy.deepcopy(automatic)
     if automatic['complete'] is not True:
+        known=confirmed_failure(directory,result)
+        if known:
+            result['independent_review']=copy.deepcopy(known)
+            result['issues']=[*automatic['issues'],*known['issues']]
+            frames={f['path']:f for f in result['frames']}
+            frames.update({f['path']:f for f in known['frames']})
+            result['frames']=list(frames.values())
+            result['passed']=False
         return result
     try:
         independent = observe(directory, result)

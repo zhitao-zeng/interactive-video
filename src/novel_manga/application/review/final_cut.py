@@ -37,9 +37,14 @@ def apply_feedback(directory, review, final):
     review['final_cut_feedback']={}
     if not final:return review
     review['final_cut_review']={k:final.get(k) for k in ('movie','context','complete','passed','errors')}
-    if final.get('complete') is not True:return review
+    issues=final.get('issues',[])
+    if final.get('complete') is not True:
+        from . import independent
+        known=independent.confirmed_failure(directory,final)
+        if not known or final.get('independent_review')!=known:return review
+        issues=known['issues']
     grouped={}
-    for issue in final.get('issues',[]):
+    for issue in issues:
         for cid in issue['clip_ids']:grouped.setdefault(cid,[]).append(issue)
     for cid,issues in grouped.items():
         if cid not in review.get('clips',{}):continue

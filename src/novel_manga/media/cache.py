@@ -81,6 +81,8 @@ def request_matches(ctx, clip: dict, saved: dict, references, digests: list[str]
         accepted wordings missed softened-then-compliance, and that take was set aside and paid for again on every
         re-entry.  An English (H3) prompt is never softened: a take made from softened wording, or carrying a
         Chinese note H3 reads out, is not this clip."""
+        expected_frame=str(ctx.novel_dir/clip['first_frame']['path']) if clip.get('first_frame') else None
+        if saved.get('first_frame') != expected_frame:return False
         if int(saved.get('repair_take',0)) != int(clip.get('repair_take',0)):
             return False
         if not (references_match(saved, references, digests) and int(saved.get("duration", 0)) == int(clip["request_seconds"])):
@@ -109,7 +111,8 @@ def cached_take(ctx, clip: dict, attempt: int) -> bool:
             saved = json.loads((directory / "request.json").read_text(encoding="utf-8"))
         except (OSError, ValueError):
             return False
-        references = tuple(ctx.novel_dir / ref["path"] for ref in clip.get("references", []) if ref.get("role") != "voice")
+        from .generation import image_paths
+        references = image_paths(ctx, clip)
         return request_matches(ctx, clip, saved, references, reference_digests(references), video=video)
 
 
