@@ -47,10 +47,17 @@ def prepare(task_path, run_dir):
     if task['mode'] == 'adaptation':
         archive = Path(task['source_archive']).expanduser()
         if not archive.is_absolute():
-            archive = task_path.parent / archive
+            # Task-relative first; a fresh worktree often means the project root instead.
+            candidate = (task_path.parent / archive).resolve()
+            archive = candidate if candidate.is_file() else (Path.cwd() / archive).resolve()
         archive = archive.resolve()
         shutil.copy2(archive, run_dir / 'original-package.zip')
-        index = import_package(archive, work / 'input/package')
+        package_dir = work / 'input/package'
+        if package_dir.exists():
+            # A previous failed start left its import behind; re-binding the same
+            # archive must be retryable instead of dying on the existing directory.
+            shutil.rmtree(package_dir)
+        index = import_package(archive, package_dir)
         atomic_write_json(run_dir / 'package-index.json', index)
         for entry in index['files']:
             path = Path('input/package') / entry['path']
@@ -259,11 +266,18 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
         atomic_write_json(work / 'input/creative-validation.json', report)
         atomic_write_json(run_dir / 'skill-read-evidence.json', report)
         stalled = bool(issues) and issues == previous_issues
-        state = {'status': 'revision_stalled' if stalled else 'agent_failed' if not attempt.ok else 'draft_invalid' if issues else 'creative_candidate',
+        # A FIRST-PASS draft that passes every structural/read check is a candidate even
+        # when the sandbox process was killed at its slice edge: the validator already
+        # judged the artifact. Revision turns keep the stricter contract: a timed-out
+        # correction leaves the previous draft unconfirmed and stays agent_failed.
+        accepted_despite_exit = (not revision and bool(candidate) and not issues
+                                 and attempt.exit_code in {0, 124})
+        state = {'status': 'revision_stalled' if stalled else 'agent_failed' if not attempt.ok and not accepted_despite_exit else 'draft_invalid' if issues else 'creative_candidate',
             'run_dir': str(run_dir), 'session_id': attempt.record.get('session_id'),
             'seconds_used': round(used, 3), 'allowance_seconds': allowance,
             'slice_seconds': slice_seconds,
             'last_attempt': str(attempt.directory), 'agent_exit': attempt.exit_code,
+            'accepted_despite_agent_exit': accepted_despite_exit,
             'model': attempt.record.get('model'), 'issues': issues,
             'new_video_generations': 0, 'new_image_generations': 0, 'new_tts_generations': 0,
             'production_adopted': False, 'read_evidence': str(run_dir / 'skill-read-evidence.json')}

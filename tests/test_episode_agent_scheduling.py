@@ -505,6 +505,31 @@ def test_configured_started_repair_can_finish_after_agent_window_without_new_tur
     assert read_json(ctx.work_dir/'episode-session.json')['session_id']=='same-session'
 
 
+def test_completed_repair_counts_as_progress_without_the_config_flag(ctx, config, monkeypatch):
+    """Zero-intervention diagnostic 2026-10-22: a finished apply job must reset the
+    no-progress watchdog even under the default config (the flag used to gate this)."""
+    calls=install_fake_runtime(monkeypatch, ctx)
+    bridges=capture_bridge(monkeypatch)
+    original=flow.EpisodeTools
+    class Tools(original):
+        def dispatch(self, action, payload):
+            result=super().dispatch(action,payload)
+            if action=='apply':result['changed']=['clip_01']
+            if action=='render':result['quality_passed']=True
+            return result
+    monkeypatch.setattr(flow,'EpisodeTools',Tools)
+    monkeypatch.setattr('novel_manga.application.agents.episode.readiness.next_action',
+                        lambda *_:{'action':'render','reason':'current authorized repair requires a render'})
+    def run(work,prompt,**kwargs):
+        atomic_write_json(work/'episode-session.json',{'session_id':'same-session'})
+        bridges[-1].handle('apply',{})
+        return fake_attempt(ctx,1)
+    monkeypatch.setattr(episode_turns,'run_session',run)
+    result=flow.run_episode(ctx,config={**config})
+    assert 'no_progress' not in result or result['no_progress']==0, result
+    assert result.get('reason')!='episode agent ended twice without operation or output progress'
+
+
 @pytest.mark.parametrize('source_passed,resumes,expected', [(True,0,True),(True,1,False),(False,0,False)])
 def test_pending_asset_tool_resumes_saved_source_checked_work_once(ctx, source_passed, resumes, expected):
     row={'clip_id':'clip_01','action':'input','reason':'source clothing','source_quote':'original words',
