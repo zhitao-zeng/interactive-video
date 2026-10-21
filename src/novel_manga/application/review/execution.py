@@ -21,10 +21,10 @@ def media_matches(plan, media, *, notes=None):
                 and (notes is None or (media.get('review_feedback') or {}) == notes))
 
 
-def review_saved(directory: Path, *, fresh=None, video_name='clip.mp4', backend=None):
+def review_saved(directory: Path, *, fresh=None, video_name='clip.mp4'):
     if video_name == 'clip.mp4':
         refresh_speech_evidence(directory)
-    review = review_episode(directory, video_name=video_name, fresh=fresh, **({'backend': backend} if backend else {}))
+    review = review_episode(directory, video_name=video_name, fresh=fresh)
     if video_name == 'clip.mp4':
         plan = read_json(directory / 'clip_plan.json', {})
         history.observe(directory, review, current_takes(directory, plan, review))
@@ -412,11 +412,11 @@ def save_result(directory, media, review, *, plan=None, rounds=(), corrections=(
     return media
 
 
-def review_only(directory: Path, *, fresh=None, video_name='clip.mp4', backend=None):
+def review_only(directory: Path, *, fresh=None, video_name='clip.mp4'):
     """Audit material already on disk; no renderer, preparation, trial or retake is started."""
     if video_name == 'clip.mp4':
         history.adopt_reviewed_run(directory)
-    review = review_saved(directory, fresh=fresh, video_name=video_name, **({'backend': backend} if backend else {}))
+    review = review_saved(directory, fresh=fresh, video_name=video_name)
     if video_name == 'clip.mp4':
         path = directory / 'thin_media_report.json'
         media = read_json(path, {})

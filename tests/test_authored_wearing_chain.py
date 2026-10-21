@@ -80,10 +80,8 @@ def test_authored_wearing_reaches_real_pack_and_translation(tmp_path, monkeypatc
     card = next(r for r in clip['references'] if r['role'] == 'character')
     assert card['asset_id'] == ('character_001' if wearing is None else 'character_001-p1')
     assert not any(r['role'] == 'prop' for r in clip['references'])
-    expected = f'{NAME}未佩戴独立穿戴物，原有服装保持不变' if wearing is None else f'{NAME}穿着{ARMOR}'
+    expected = f'{NAME}脱下穿戴物' if wearing is None else f'{NAME}穿着{ARMOR}'
     assert '穿戴状态：' + expected in clip['prompt']
-    if wearing is None:
-        assert '脱下穿戴物' not in clip['prompt']
     seen = []
     def translate(parts, schema, **kwargs):
         seen.append(parts[0]['text'])

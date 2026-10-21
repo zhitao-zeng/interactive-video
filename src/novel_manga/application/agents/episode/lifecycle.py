@@ -217,8 +217,7 @@ def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_facto
     if not paused():
         saved = recovery.resume_source_review(ctx.run_dir, ctx.episode_dir, saved) or saved
         from .input_repair import repair as validate_input
-        saved = recovery.resume_protocol(ctx.run_dir,ctx.episode_dir,saved,validate_input=validate_input,
-            allow_timed_out_idle=bool(config.get('refusal_fallback'))) or saved
+        saved = recovery.resume_protocol(ctx.run_dir,ctx.episode_dir,saved,validate_input=validate_input) or saved
         config,saved=recovery.protocol_fallback(ctx,config,saved)
     if saved.get('model_switch') and config.get('refusal_fallback'):
         config = {**config, 'model_slots_reserved_for_tools': 0, **config['refusal_fallback']}

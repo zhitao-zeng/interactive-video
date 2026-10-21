@@ -18,23 +18,6 @@ from novel_manga.util import atomic_write_json, read_json
 from support.episode_runtime import episode_context as ctx, sandbox_config as config, fake_attempt, install_fake_runtime
 
 
-def test_denied_model_route_stops_before_fallback_or_content_repair(ctx, config, monkeypatch):
-    calls = install_fake_runtime(monkeypatch, ctx)
-    attempts = []
-    def denied(work, prompt, **kwargs):
-        attempts.append(kwargs)
-        attempt = fake_attempt(ctx, 1, exit_code=1)
-        attempt.record.update(api_error_status=403, sdk_error=True)
-        return attempt
-    monkeypatch.setattr(episode_turns, 'run_session', denied)
-    result = flow.run_episode(ctx, config={**config, 'refusal_fallback': {
-        'model':'unavailable-fallback', 'base_url':'http://model', 'key_var':'KEY'}})
-    assert len(attempts) == 1
-    assert result['provider_error'] == {'status':403, 'model':'configured-agent'}
-    assert 'HTTP 403' in result['reason'] and not result.get('model_switch')
-    assert 'apply' not in calls
-
-
 @pytest.mark.parametrize('production_only',[False,True])
 def test_pipeline_review_invokes_agent_only_after_native_generation(ctx,config,monkeypatch,production_only):
     from novel_manga.application.agents.episode import pipeline_preparation as native_episode

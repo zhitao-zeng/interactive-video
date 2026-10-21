@@ -239,12 +239,17 @@ def conversation_deferred(saved):
 
 
 @lru_cache(maxsize=256)
-def completed_idle(directory):
-    """Observed output/handoff facts, not the wording of the final answer."""
+def completed_idle(directory, allow_timed_out=True, *, no_activity=False):
+    """Observed output/handoff facts, not the wording of the final answer.
+
+    Two levels: a turn with no produced output and no handoff is idle for the
+    configured fallback even if it made reads; a turn with zero observed tool
+    activity at all may also resume through the protocol path."""
     folder=Path(directory);record=read_json(folder/'attempt.json',{})
-    if record.get('exit')not in {0,124} or record.get('produced')!=[]:return False
+    if record.get('exit') not in ((0,124) if allow_timed_out else (0,)) or record.get('produced')!=[]:return False
     path=folder/'session.jsonl'
     if not path.is_file():return False
+    activity=False
     for line in path.open():
         try:event=json.loads(line)
         except ValueError:continue
@@ -253,15 +258,16 @@ def completed_idle(directory):
             if not isinstance(item,dict) or item.get('type')!='tool_result':continue
             content=item.get('content')
             if not isinstance(content,str):continue
+            if content.strip():activity=True
             for part in content.splitlines():
                 try:value=json.loads(part)
                 except ValueError:continue
                 if isinstance(value,dict) and value.get('yield') and value.get('job_id'):
                     return False
-    return True
+    return not (no_activity and activity)
 
 
-def resume_protocol(run_dir,episode_dir,saved, *, validate_input=None):
+def resume_protocol(run_dir,episode_dir,saved, *, validate_input=None, allow_timed_out_idle=False):
     """One continuation after a diagnosed interface fix, using unspent time only."""
     if (saved.get('status')!='blocked' or saved.get('passed') or saved.get('protocol_recovery')
             or remaining_at_stop(saved)<=0 or (saved.get('job') or {}).get('status') in {'accepted','running'}):
@@ -319,7 +325,7 @@ def resume_protocol(run_dir,episode_dir,saved, *, validate_input=None):
     if (kind is None and not failures and not saved.get('model_switch') and len(attempts)>=2
             and saved.get('reason') in {'episode agent ended twice without operation or output progress',
                                        'episode agent reached the bounded operation continuation limit'}
-            and all(completed_idle(str(p)) for p in attempts[-2:])):
+            and all(completed_idle(str(p),True,no_activity=not allow_timed_out_idle) for p in attempts[-2:])):
         kind='idle_turns'
     if kind is None:return None
     remaining=remaining_at_stop(saved)
@@ -369,6 +375,18 @@ def resume_source_review(run_dir, episode_dir, saved):
     atomic_write_json(run_dir/'source-review-recovery.json', {**marker, 'previous': saved})
     atomic_write_json(run_dir/'agent-run.json', resumed)
     return resumed
+
+
+def idle_fallback_available(saved, config):
+    """An already configured fallback may take over two observed idle turns once."""
+    fallback=config.get('refusal_fallback') or {}
+    attempts=saved.get('attempts') or []
+    return bool(saved.get('status')=='blocked' and not saved.get('model_switch')
+        and not saved.get('protocol_recovery') and remaining_at_stop(saved)>0
+        and saved.get('reason')=='episode agent ended twice without operation or output progress'
+        and (saved.get('job')or{}).get('status') not in {'accepted','running'}
+        and all(fallback.get(k) for k in ('model','base_url','key_var'))
+        and len(attempts)>=2 and all(completed_idle(str(p),True) for p in attempts[-2:]))
 
 
 def blocked_summary_loop(run):

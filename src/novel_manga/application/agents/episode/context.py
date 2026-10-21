@@ -38,8 +38,7 @@ def _target(value):
     return tuple(float(v) for v in values)
 
 
-def create_context(novel_dir, episode, *, output_root=None, input_mode='auto', target_seconds=None,
-                   existing_production=False):
+def create_context(novel_dir, episode, *, output_root=None, input_mode='auto', target_seconds=None):
     source = Path(novel_dir).expanduser().resolve()
     if not source.is_dir():
         raise ValueError(f'novel directory is missing: {source}')
@@ -60,9 +59,6 @@ def create_context(novel_dir, episode, *, output_root=None, input_mode='auto', t
     mode = ('script' if script is not None else 'source') if input_mode == 'auto' else input_mode
     if mode == 'script' and script is None:
         raise ValueError('script mode requires an existing chapter_script.json')
-    if existing_production and (mode != 'script' or not
-            read_json(source_episode / 'clip_plan.json', {}).get('clips')):
-        raise ValueError('existing production requires an approved script and prepared clip plan')
     target = _target(target_seconds)
     plan = read_json(source_episode / 'clip_plan.json', {}) if mode == 'script' else {}
     profile = read_json(source / 'profile.json', {})
@@ -76,8 +72,7 @@ def create_context(novel_dir, episode, *, output_root=None, input_mode='auto', t
     output = Path(output_root).expanduser().resolve() if output_root else root / 'outputs/episode-agent'
     if output.is_relative_to(source):
         raise ValueError('Agent output_root must be outside the source novel directory')
-    suffix = '-existing' if existing_production else ''
-    run = output / source.name / f'{source_episode.name}-{mode}{suffix}'
-    book = source if existing_production else run / source.name
+    run = output / source.name / f'{source_episode.name}-{mode}'
+    book = run / source.name
     return EpisodeContext(root, source, source_episode, run, book,
                           book / source_episode.name, run / 'sandbox', mode, target)

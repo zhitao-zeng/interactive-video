@@ -532,9 +532,7 @@ class ClipCompiler:
             extras_note = f"本阶段无参考图的配角：{'、'.join(shot['extras'])}（按描述画）。" if shot.get("extras") else ""
             props_note = f"本阶段物件：{'、'.join(shot['props'])}（物件不是人物）。" if shot.get("props") else ""
             local_objects = f"本阶段临时物件：{'、'.join(shot['scene_objects'])}（物件不是人物）。" if shot.get('scene_objects') else ''
-            # An explicit bare state must not replay an earlier removal in
-            # every following shot. Any removal action belongs to the event.
-            wears_note = "".join(f"{name}{'未佩戴独立穿戴物，原有服装保持不变' if item is None else '穿着' + str(item)}；"
+            wears_note = "".join(f"{name}{'脱下穿戴物' if item is None else '穿着' + str(item)}；"
                                   for name, item in (shot.get("wears") or {}).items() if name in cast)
             if wears_note:
                 wears_note = "穿戴状态：" + wears_note

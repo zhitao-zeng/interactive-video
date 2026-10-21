@@ -239,12 +239,6 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                 if lifecycle.paused():
                     result.update(status='paused', phase='paused', reason='production dispatch paused', exit_code=0)
                     break
-                if attempt.record.get('api_error_status') in {401, 403, 404}:
-                    result.update(reason=f"Agent model route unavailable: HTTP {attempt.record['api_error_status']} "
-                                         f"for {config['model']}; Agent continuation stopped",
-                                  provider_error={'status': attempt.record['api_error_status'], 'model': config['model']},
-                                  session_exit=attempt.exit_code)
-                    break
                 replacement = recovery.switch_for_refusal(ctx, config, result, attempt, before_status, status)
                 if replacement is not None:
                     config = replacement

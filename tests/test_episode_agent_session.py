@@ -40,34 +40,6 @@ def fake_cli(monkeypatch, work_dir, *, outputs=None, code=0, result=None):
     return calls
 
 
-def test_episode_tool_session_installs_progress_hooks_inside_original_slice(tmp_path, monkeypatch, config):
-    work = tmp_path / 'episode'
-    calls = fake_cli(monkeypatch, work)
-    monkeypatch.setattr(session.time, 'time', lambda: 1000)
-    result = session.run_session(work, 'Review current target', config=config,
-                                 enable_tools=True, timeout=600)
-    command, _ = calls[0]
-    settings = work / command[command.index('--settings') + 1].removeprefix('/work/')
-    hooks = json.loads(settings.read_text())['hooks']
-    assert hooks['PostToolUse'][0]['matcher'] == 'Read|Bash|Write'
-    assert command[command.index('timeout') + 1] == '600'
-    assert json.loads((result.directory / 'execution-deadline.json').read_text()) == {
-        'deadline_at': 1600, 'phase': 'episode'}
-    assert (work / 'tools/_sandbox_image_read_progress.py').is_file()
-    assert result.record['image_read_settings'] == str(settings.relative_to(work))
-
-
-def test_provider_permission_error_is_not_an_idle_or_content_refusal(tmp_path, monkeypatch, config):
-    work = tmp_path / 'episode'
-    fake_cli(monkeypatch, work, code=1, result={
-        'type': 'result', 'is_error': True, 'api_error_status': 403,
-        'result': 'Failed to authenticate. API Error: 403 Model is not allowed for this plan.'})
-    result = session.run_session(work, 'Review', config=config, enable_tools=True)
-    assert result.record['api_error_status'] == 403 and result.record['sdk_error']
-    assert not result.ok and result.produced == []
-    assert not result.record['refusal']
-
-
 def test_cli_turn_limit_is_recorded_as_resumable_without_claiming_success(tmp_path, monkeypatch, config):
     work = tmp_path/'episode'
     calls = fake_cli(monkeypatch, work, code=1, result={
@@ -92,16 +64,6 @@ def test_loopback_provider_network_and_extra_body_reach_real_container_arguments
     body=next(v for v in command if v.startswith('CLAUDE_CODE_EXTRA_BODY='))
     assert json.loads(body.split('=',1)[1])=={'reasoning_effort':'low','max_tokens':1024}
     assert 'private-test-token' not in ' '.join(command)
-
-
-def test_provider_can_disable_hidden_nonstreaming_fallback_without_changing_budget(tmp_path,monkeypatch,config):
-    calls=fake_cli(monkeypatch,tmp_path/'work')
-    session.run_session(tmp_path/'work','Review',config={**config,
-        'disable_nonstreaming_fallback':True,'max_retries':1,'extra_body':{'max_tokens':65536}},timeout=600)
-    command,_=calls[0]
-    assert 'CLAUDE_CODE_DISABLE_NONSTREAMING_FALLBACK=1' in command
-    assert 'CLAUDE_CODE_MAX_RETRIES=1' in command
-    assert command[command.index('timeout')+1]=='600'
 
 
 def test_summary_completion_is_recorded_without_treating_it_as_work(tmp_path,monkeypatch,config):

@@ -119,10 +119,6 @@ def provider_container_args(config: dict) -> list[str]:
         args.extend(['--network', str(config['docker_network'])])
     if config.get('context_window'):
         args.extend(['-e', f"CLAUDE_CODE_MAX_CONTEXT_TOKENS={int(config['context_window'])}"])
-    if config.get('max_retries') is not None:
-        args.extend(['-e', f"CLAUDE_CODE_MAX_RETRIES={int(config['max_retries'])}"])
-    if config.get('disable_nonstreaming_fallback'):
-        args.extend(['-e', 'CLAUDE_CODE_DISABLE_NONSTREAMING_FALLBACK=1'])
     body = dict(config.get('extra_body') or {})
     if config.get('chat_template_kwargs') is not None:
         body['chat_template_kwargs'] = config['chat_template_kwargs']

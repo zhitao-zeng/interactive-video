@@ -17,10 +17,8 @@ def finalize(directory: Path, project: str, *, documents=()) -> dict:
     read_json(directory.parent/'story_bible.json')
     read_json(directory.parent/'profile.json')
     ids = {s['segment_id'] for s in segments}
-    for shot in script['shots']:
-        retained = shot.get('segment_ids') or ([shot['segment_id']] if shot.get('segment_id') else [])
-        if not retained or not set(retained) <= ids:
-            raise ValueError('Every shot needs its retained source segment')
+    if any(s['segment_id'] not in ids for s in script['shots']):
+        raise ValueError('Every shot needs its retained source segment')
     groups = read_json(directory/'authored_groups.json', None)
     if groups is not None and [i for g in groups for i in g['shot_indexes']] != [s['index'] for s in script['shots']]:
         raise ValueError('Authored groups must retain every shot exactly once in order')
