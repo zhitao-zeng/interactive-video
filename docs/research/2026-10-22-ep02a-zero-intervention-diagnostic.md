@@ -53,3 +53,18 @@
 - 创作候选(已验证):`.runtime/ep02a-diagnostic/creator/sandbox/output/episode.json`
 - agent 运行区:`outputs/episode-agent-firstframes/suspense-backrooms55-ep02a-20261022/`
 - 本诊断不占用生产预算修复任何画面;未提交推送。
+
+
+## 修复状态(2026-10-22,main 88704d7,全量 4039 过/exit=0)
+
+| 堵点 | 修复 | 方式 |
+|---|---|---|
+| #10 no-progress 误杀 | ✅ | `complete_started_repairs` 默认开启;已完成的 apply 修复计入进展;新增不带开关的回归测试 |
+| #8 改编无自动桥 | ✅ | 新 `write_adaptation_material`(系列基座合并+候选归一),`produce` 放行带 `series_material`+`source_script` 的改编任务;7 处手工断缝全部产品化 |
+| #4/#6 首轮超时弃稿 | ✅ | 首轮完整过验候选容忍沙箱 exit 124;修订轮维持"超时≠改完"严契约(现有契约测试保留) |
+| #2 重跑不幂等 | ✅ | create 重跑自动清残留 package 导入 |
+| #0 路径解析 | ✅ | source_archive 任务目录→项目根双解析 |
+| #1 画风库自举 | ✅ | 库目录整体缺失时容错(文字规则仍绑定);库在样例丢仍按原契约硬失败 |
+| #5 模型名不识别 | ⚠️ 配置层 | 代码不改;官方路由需配沙箱 CLI 认识的模型名(agent_phanthy.json 已是可用样例) |
+| #7 后端切换死锁 | ⚠️ 未修 | 依赖"普通重试归档旧会话";#4/#6 修复后首轮不再进入该死锁,修订轮场景罕见,暂不动 |
+| #3/#9 | 已闭环 | #3 诊断者操作失误(已入档);#9 荒野采纳错配(已在 074f9aa 修) |
