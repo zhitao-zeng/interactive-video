@@ -263,3 +263,5 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 
 | ZCode 荒野对账会话 | 荒野worktree(/mnt/disk1/zengzhitao/worktrees/interactive-adventure-rhythm,最后写入10-20 01:45,无进程)WIP对账收尾:三方对比(e435b57基线)后采纳自洽增量入main;未采纳部分书面留档 | main | 16文件并集/纯增量+9新路径(含2生产目录);不动荒野worktree本身 | 2026-10-22 | 已提交:采纳image_read_guard/video_frames增强/creative_codex/agent_contract/生产数据/3段经验;放弃25个冲突文件荒野版(repair v5支线已被main v10取代,抽样核过FRAME_HANDOFF_POLICY v5vs v10)、review-agent实验主体(依赖旧repair.agent符号,未晋升默认)、6个支线行为测试;全量exit=0。荒野worktree原样保留未动,合并方案阶段4完成,阶段2(其余worktree)已在此前各轮覆盖。 |
 | ZCode 后室EP02诊断 | 零介入诊断跑:当前main全链(create→prepare→run h3)跑后室55包EP02,只记录停点/放行/误判,不中途修、不加预算;产出堵点清单 | codex/backrooms55-ep02-diagnostic-20261022(新worktree自main a5ae114) | 新worktree;不动backrooms55原树 | 2026-10-22 | 进行中 |
+
+| ZCode 更正 | 3eb81bd提交信息与销账中"全量pytest exit=0"为误报:实际把后台bash包装退出码当pytest码,真实exit=1,采纳引入的红测试漏检,并由诊断跑首撞(resume_protocol kwarg错配)。本轮已修:并集文件回退+recovery语义移植+hook重放,全量4035过/exit=0(pytest直读);教训入档:全量结论只认pytest自身退出码与汇总行 | main | recovery.py、sandbox.py、16文件回退、2测试删改 | 2026-10-22 | 已提交更正;诊断跑(worktree backrooms55-ep02-diagnostic)待同步main后恢复阶段2 |
