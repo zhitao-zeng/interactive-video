@@ -8,6 +8,33 @@ from novel_manga.util import atomic_write_json, read_json
 from novel_manga.interactive.intake import PROJECTS
 
 
+def _agent_task_config(episode: Path, requested: dict | None) -> dict | None:
+    """Persist the selected non-secret task route so an ordinary resume reuses it."""
+    path = episode/'work/interactive-agent-config.json'
+    receipt = read_json(path, {})
+    if requested is not None:
+        selected = {**requested, '_agent_config_explicit': True}
+
+        def safe(value):
+            if isinstance(value, dict):
+                return {key:safe(item) for key,item in value.items()
+                        if key.lower() not in {'key','api_key','token','access_token','secret','password'}
+                        and not key.lower().endswith('_secret')}
+            if isinstance(value, list):
+                return [safe(item) for item in value]
+            return value
+
+        stored = safe(selected)
+        previous = receipt.get('history') or []
+        if receipt.get('selected') != stored:
+            previous = [*previous, stored]
+        atomic_write_json(path, {'schema':'interactive-agent-task-config-v1',
+            'selected':stored, 'history':previous})
+        return selected
+    saved = receipt.get('selected')
+    return ({**saved, '_agent_config_explicit':True} if isinstance(saved,dict) else None)
+
+
 def edition_directory(root: Path, project: str, edition: str) -> Path:
     if Path(edition).name!=edition:
         raise ValueError('Edition must be an output directory name')
@@ -25,15 +52,30 @@ def edition_directory(root: Path, project: str, edition: str) -> Path:
 def edition_status(root: Path, project: str, edition: str) -> dict:
     """Read retained state without instantiating a renderer or accepting old verdicts."""
     from novel_manga.application.repair.history import generation_counts
-    novel=edition_directory(root,project,edition);directory=novel/(novel.name+'_1')
+    novel=edition_directory(root,project,edition);source_directory=novel/(novel.name+'_1')
+    directory=source_directory;active_run=None
+    for name in ('first-frame-agent-run.json','music-agent-run.json'):
+        marker=read_json(novel/name,{})
+        selected_path=marker.get('active_episode_dir')
+        selected=Path(selected_path) if selected_path else None
+        if selected and selected.is_dir():
+            directory=selected.resolve()
+            run_path=marker.get('run_dir')
+            active_run=Path(run_path) if run_path else None
+            break
     report=read_json(directory/'thin_media_report.json',{})
     final=read_json(directory/'final_cut_review.json',{})
+    run_state=read_json(active_run/'agent-run.json',{}) if active_run and active_run.is_dir() else {}
     quality=report.get('quality_review') or {}
     status=report.get('status','not_completed')
     if quality.get('passed') is False or final.get('passed') is False:
         status='candidate'
     counts=generation_counts(directory)
-    return {'project':project,'edition':edition,'episode_dir':str(directory),'status':status,
+    return {'project':project,'edition':edition,'episode_dir':str(directory),
+            'source_episode_dir':str(source_directory),'active_episode_dir':str(directory),
+            'active_run_dir':str(active_run) if active_run else None,
+            'active_agent_status':run_state.get('status'),'active_phase':run_state.get('phase'),
+            'status':status,
             'source_status':report.get('status'),'generation_counts':counts,
             'generation_total':sum(counts.values()),'final_review_complete':final.get('complete'),
             'final_review_passed':final.get('passed'),
@@ -113,12 +155,18 @@ def can_resume_unsubmitted(episode: Path, report: dict) -> bool:
 
 def run_episode(root: Path, lane: str, *, project: str = 'adventure', resume_unsubmitted: bool = False, resume: bool = False,
                 edition: str | None = None, h3_input_mode: str | None = None,
-                sd_input_mode: str | None = None, agent_config: dict | None = None) -> dict:
+                sd_input_mode: str | None = None, agent_config: dict | None = None,
+                postproduction_plan: Path | None = None) -> dict:
     if sd_input_mode is not None and lane!='sd20-fast':raise ValueError('SD first-frame entry requires sd20-fast')
     if edition:
         novel=edition_directory(root,project,edition)
     else:
         novel=lane_workspace(root,lane,project)
+    episode=novel/(novel.name+'_1')
+    agent_config = _agent_task_config(episode, agent_config)
+    if postproduction_plan is not None:
+        from novel_manga.application.agents.episode.postproduction import authorize_cutaway
+        authorize_cutaway(episode,read_json(postproduction_plan,{}))
     if h3_input_mode is not None and lane!='h3':raise ValueError('first-frame mode requires H3')
     if lane!='h3' and read_json(novel/'profile.json',{}).get('h3_input_mode')=='first-frame':
         raise ValueError('first-frame mode requires H3; prepare a separate SD edition instead of switching this task')
@@ -133,7 +181,6 @@ def run_episode(root: Path, lane: str, *, project: str = 'adventure', resume_uns
         configure(root,lane,project=project)
         from .sd_first_frames import prepare as prepare_sd_frames
         prepare_sd_frames(root,novel)
-    episode=novel/(novel.name+'_1')
     runner=runner_for(root,novel,lane,project=project)
     report_path=episode/'thin_media_report.json'
     label=edition.removeprefix(project+'-') if edition else lane
@@ -177,8 +224,10 @@ def run_episode(root: Path, lane: str, *, project: str = 'adventure', resume_uns
             failed=[c['clip_id'] for c in plan['clips'] if c['kind']=='video' and not c.get('prompt_h3')]
             if failed:raise RuntimeError(f'H3 translation not ready: {failed}')
             runner=runner_for(root,novel,lane,project=project)
-        from novel_manga.interactive.agent import run
-        report=run(runner,lane,resume=resume,destination=destination)
+    from novel_manga.interactive.agent import run
+    selected_agent_config = None if agent_config is None else {
+        **agent_config, '_agent_config_explicit': True}
+    report=run(runner,lane,resume=resume,destination=destination,config=selected_agent_config)
     from novel_manga.interactive.delivery import deliver, finish_reviewed_delivery
     receipt=(finish_reviewed_delivery(runner,report,destination)
              if report.get('final_cut_review') else deliver(runner,report,destination))

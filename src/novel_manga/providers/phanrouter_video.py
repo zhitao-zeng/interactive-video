@@ -28,13 +28,21 @@ def video_payload(
     additional_image_urls: tuple[str, ...] = (),
     reference_audio_urls: tuple[str, ...] = (),
     *, ratio: str = "9:16", resolution: str = "720p", first_frame: bool = False,
+    duration_cap: float | None = None,
 ) -> dict:
     if first_frame and (settings.video_model not in {"sd2.0-fast", "sd2.0-mini"}
                         or image_url is None or additional_image_urls or reference_audio_urls):
         raise ValueError("SD first-frame requests require Fast/Mini, one opening image and native audio")
     limits = VIDEO_MODEL_LIMITS.get(settings.video_model, {})
-    if settings.video_model in {"sd2.0-fast", "sd2.0-mini"} and duration > limits["max_duration"]:
-        raise ValueError("Fast/Mini currently require clips of at most 15 seconds; retain the source and prepare shorter groups")
+    # SD2.5 durations come from the lane's own configuration; only the
+    # conservative Fast/Mini project cap applies when the caller sets no
+    # explicit cap of its own.
+    cap = duration_cap if duration_cap is not None else (
+        limits.get("max_duration") if settings.video_model in {"sd2.0-fast", "sd2.0-mini"} else None)
+    if cap is not None and duration > cap:
+        if duration_cap is None:
+            raise ValueError("Fast/Mini currently require clips of at most 15 seconds; retain the source and prepare shorter groups")
+        raise ValueError(f"{settings.video_model} request exceeds its configured {cap:g}s clip limit")
     content = [{"type": "text", "text": prompt}]
     if image_url is not None:
         content.append(
@@ -68,7 +76,7 @@ def video_payload(
         "content": content,
         "ratio": ratio,
         "resolution": limits.get("resolution", resolution),
-        "duration": max(4, min(int(limits.get("max_duration", 30)), math.ceil(duration))),
+        "duration": max(4, min(int(cap if cap is not None else limits.get("max_duration", 30)), math.ceil(duration))),
         "generate_audio": True,
         "watermark": False,
         "output_format": "mp4",

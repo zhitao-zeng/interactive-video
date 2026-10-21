@@ -86,6 +86,13 @@ def stop_details(status):
     outcome = job.get('result') or {}
     repairs = status.get('input_repairs') or {}
     states = {r.get('status') for r in repairs.values()}
+    from .input_records import service_blocker
+    if blocker := service_blocker(status):
+        return {'kind': 'service_interrupted', 'service': blocker,
+                'last_operation': job.get('action'),
+                'blocked': outcome.get('blocked') or {}, 'input_repairs': repairs,
+                'remaining_takes': status.get('remaining_takes') or {},
+                'remaining_rechecks': status.get('remaining_rechecks') or {}}
     kind = ('argument_error' if outcome.get('argument_errors') else
             'tool_error' if 'tool_error' in states else
             'source_rejected' if 'rejected' in states else

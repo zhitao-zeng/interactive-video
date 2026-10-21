@@ -86,7 +86,9 @@ def run(runner, *, repair_existing=False, final_review=None):
         if report.get('blocked_clips') and not ctx.options.cache_only:
             pending_report = {**report, 'blocked_clips':{cid: value for cid, value in report['blocked_clips'].items()
                                                        if cid not in deferred_services}}
-            prepared_input = managed.prepare_request_conflicts(directory, pending_report)
+            selected_agent_config = getattr(ctx, 'repair_agent_config', None)
+            config_option = {'agent_config':selected_agent_config} if selected_agent_config is not None else {}
+            prepared_input = managed.prepare_request_conflicts(directory, pending_report, **config_option)
             deferred_services.update(prepared_input.get('service_failures') or {})
             input_blocked = prepared_input.get('blocked') or {}
             blocked = input_blocked
@@ -102,7 +104,9 @@ def run(runner, *, repair_existing=False, final_review=None):
         blocked = {**input_blocked, **blocked, **deferred_services}
         if ctx.options.cache_only or not eligible:
             break
-        prepared = managed.prepare(directory, eligible)
+        selected_agent_config = getattr(ctx, 'repair_agent_config', None)
+        config_option = {'agent_config':selected_agent_config} if selected_agent_config is not None else {}
+        prepared = managed.prepare(directory, eligible, **config_option)
         deferred_services.update(prepared.get('service_failures') or {})
         rounds.append(prepared); blocked.update(prepared.get('blocked') or {})
         corrected.extend(prepared.get('changed') or [])

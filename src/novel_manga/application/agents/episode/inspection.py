@@ -103,11 +103,22 @@ class EpisodeInspection:
             and (manifest.get('production_mode')=='pipeline_review' or bool(plan.get('clips'))))
         from .first_frames import status as first_frame_status
         frames=first_frame_status(self.ctx,plan)
+        from .readiness import next_action
+        ready=next_action(self.ctx,{'job':read_json(self.ctx.run_dir/'agent-run.json',{}).get('job'),
+                                    'input_repairs':input_states})
         from .audio_mix import status as audio_mix_status
         audio=audio_mix_status(self.ctx)
         from .music import status as music_status
         music=music_status(self.ctx)
-        return {'ok': True, 'audio_mix':audio,'music_selection':music, **({'first_frames':frames} if frames is not None else {}), 'execution': read_json(self.ctx.run_dir / 'execution.json', {}),
+        final_audio=(media.get('final_audio_review')
+                     or read_json(self.ctx.episode_dir/'final_audio_review.json', {}))
+        from .postproduction import current_task_summary
+        postproduction=current_task_summary(self.ctx.episode_dir)
+        return {'ok': True, 'audio_mix':audio,'music_selection':music,
+                **({'postproduction':postproduction} if postproduction else {}),
+                **({'final_audio_review':final_audio} if final_audio else {}),
+                **({'first_frames':frames} if frames is not None else {}), 'execution': read_json(self.ctx.run_dir / 'execution.json', {}),
+                'next_action':ready,
                 **({'first_pass_remaining': sorted(first_pending)} if first_pending is not None else {}),
                 'repair_capabilities': {'adopted_input': {
                     'characters': 'missing source actor cards', 'shot_fields': sorted(SHOT_FIELDS),

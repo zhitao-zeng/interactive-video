@@ -65,11 +65,18 @@ def compile_input(case: InputCompilation, receipt, record, progress) -> Compiled
     candidate, changed = rebuild_clips(directory, ctx.novel_dir/'story_bible.json', candidate_script, plan, targets,
                                       repack_report=structural, preserve_timing=True,
                                       **({'source_checked_turns':source_checked_turns} if source_checked_turns else {}))
-    from novel_manga.media.first_frames import enabled, opening_contract
+    from novel_manga.media.first_frames import enabled, matches_current_contract
     frame_mode=enabled(ctx)
     if frame_mode:
         old_shots={s.get('index',i):s for i,s in enumerate(script['shots'],1)}
         new_shots={s.get('index',i):s for i,s in enumerate(candidate_script['shots'],1)}
+        for clip in candidate['clips']:
+            if clip['clip_id']not in targets or not clip.get('first_frame')or not clip.get('shot_indexes'):continue
+            index=clip['shot_indexes'][0]
+            if (old_shots[index].get('shot_scale')!=new_shots[index].get('shot_scale')
+                    and not clip.get('first_frame_opening')):
+                # Keep the pre-edit source when an older selection lacks this snapshot.
+                clip['first_frame_opening']=[copy.deepcopy(old_shots[index])]
         opening_changed={c['clip_id'] for c in plan['clips'] if c['clip_id'] in targets
             and c.get('shot_indexes') and
             old_shots[c['shot_indexes'][0]].get('opening_frame')!=new_shots[c['shot_indexes'][0]].get('opening_frame')}
@@ -161,11 +168,7 @@ def compile_input(case: InputCompilation, receipt, record, progress) -> Compiled
         frame=clip.get('first_frame')
         opening=[s for s in candidate_script['shots'] if s.get('index') in clip['shot_indexes']]
         expected=(frame or{}).get('source_contract',{})
-        contract=opening_contract(clip,expected.get('image_references',[]),shots=opening)
-        if 'style'in expected:
-            from novel_manga.style_packs import frame_style
-            contract['style']=frame_style(ctx.novel_dir)
-        if frame_mode and (not frame or contract!=expected):
+        if frame_mode and (not frame or not matches_current_contract(ctx,clip,expected,shots=opening)):
             # Source is checked, but the old pixels cannot certify the new opening.
             # first_frames will supply the Agent's complete new image/request pair.
             clip.pop('prompt_h3',None)

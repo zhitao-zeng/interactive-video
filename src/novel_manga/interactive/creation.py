@@ -186,7 +186,14 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
     design_task=''
     if any(manifest['task'].get(key)=='first-frame'or manifest['task'].get('profile',{}).get(key)=='first-frame'
            for key in ('h3_input_mode','sd_input_mode')):
-        design_task+=' Author every shot opening_frame.image_prompt and visible_characters now, along with its storyboard; specify one static time-zero composition and logical reference_subjects. Production binds cards and executes this source prompt. Keep later action/arrivals out of the opening. '
+        design_task+=(' Author every shot opening_frame.image_prompt and visible_characters now, along with its storyboard; '
+            'specify one static time-zero composition and logical reference_subjects. '
+            'Describe scene, actually visible subjects, current state, framing and essential continuity facts in short labeled sections. '
+            'Keep full cast/seat maps in spatial_plan; do not enumerate offscreen guests or future exchanges in this image prompt. '
+            'Preserve current clothing, object ownership, fixed attachments, repaired/damaged state and other source-backed continuity details; '
+            'do not shorten by deleting them or force cropped-out details into view. '
+            'Production binds each uploaded card by actual image number and appends appearance-only style cues without rewriting your facts. '
+            'Keep later action/arrivals and camera movement in event/video direction. ')
     if manifest['task'].get('music_mode')=='timeline':
         design_task+=' Author chapter_script.music_plan cues and silences with stable shot start/end anchors, musical query, reason and verbatim source_quote. Plan entries/withdrawals/fades/listening gaps now; actual track selection and mixing happen in production. '
     if manifest.get('profile'):

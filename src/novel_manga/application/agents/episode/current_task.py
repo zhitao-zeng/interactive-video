@@ -49,6 +49,15 @@ def prepare(ctx,status,diagnosis,memories):
         'preparation/exception.json','source-draft-check.json','request-draft.json','manifest.json',
         'reading/identity_binding_review.json')
         if (ctx.work_dir/'input'/name).is_file()]
+    from .postproduction import current_task_summary
+    postproduction=current_task_summary(ctx.episode_dir)
+    if postproduction:
+        source=ctx.episode_dir/'work/postproduction/cutaway.json'
+        atomic_write_json(ctx.work_dir/postproduction['plan_file'],read_json(source,{}))
+        status['postproduction']=postproduction
+        files.append(postproduction['plan_file'])
+    else:
+        status.pop('postproduction',None)
     if not adopted and (ctx.work_dir/'output/episode.json').is_file():files.append('output/episode.json')
     recent=[summarize_case(memory) for memory in memories[:2]]
     job=status.get('job') or {}
@@ -67,11 +76,13 @@ def prepare(ctx,status,diagnosis,memories):
             for cid,row in (outcome.get('video_stream')or{}).items()if cid in selected and row.get('error')}
     brief={'phase':read_json(ctx.work_dir/'input/manifest.json',{}).get('agent_phase'),
         'mode':'adopted_repair' if adopted else 'provisional_draft',
+        'next_action':status.get('next_action'),
         'author_session':read_json(ctx.work_dir/'episode-session.json',{}).get('session_id'),
         'upstream_route':status.get('upstream_route'),
         **({'first_frames':status['first_frames']} if status.get('first_frames') else {}),
         **({'music_selection':status['music_selection']} if status.get('music_selection') else {}),
         **({'audio_mix':status['audio_mix']} if status.get('audio_mix') else {}),
+        **({'postproduction':postproduction} if postproduction else {}),
         'targets':targets,'issues':issues,'last_operation':last,'evidence_files':files,
         'full_status':'input/current-status.json','reference_catalog':'input/catalog.json','related_history':recent,
         'tool_source':'/opt/novel-code/novel_manga/application/agents/episode',
@@ -94,6 +105,9 @@ def prepare(ctx,status,diagnosis,memories):
             'An accepted episode does not prove every attempted remedy worked. Match the concrete issue to current evidence; '
             'not_recorded means no repair recipe was retained, and unresolved cases are not verified recipes.',
             'repair_assets/repack are separate upstream operations; source/image candidates do not grant video or certify acceptance.',
+            *(['A user-authorized cutaway is already registered. Read input/postproduction-plan.json; do not edit or replace this plan. '
+               'Continue the current review and call finish; the host applies the cutaway during normal assembly.']
+              if postproduction else []),
             'Only a target with host-provided review_criteria may use review_file on keep. The current production session authors one output/scoped-review-<clip_id>.json per clip with schema scoped-agent-review-v1, exact author_session from episode-session.json, clip_id, current selected video path/take, selected raw task_id, exact source_segment_ids and source_evidence [{segment_id,text}] copied from current segments.json, exact review_criteria, assessment pass/minor/fail, judgment, observations [{kind:video_frame|reference,file,times or time_seconds,observation}], and reviewed_findings [{finding,disposition:resolved|not_demonstrated|upheld}] addressing every current automated blocker. Optionally include independent_review_file pointing to the supplied independent reviewer JSON in this work directory. Set review_file to this path on that clip keep decision, then call check and apply. This does not skip speech or media gates and is unavailable for clips without host criteria.',
             'For deterministic tool bugs, inspect the read-only source and report the concrete failing field; do not repeat the same rejected operation.']}
     playbook=read_json(ctx.work_dir/'input/manifest.json',{}).get('skill_references',{}).get('repair_playbook')
@@ -101,6 +115,11 @@ def prepare(ctx,status,diagnosis,memories):
         brief['repair_playbook']=playbook
         brief['execution_rules'].append('For review/input repair, read repair_playbook if it is new to this session; '
             'then use the section matching current evidence and capabilities. A resumed old conversation also receives this route.')
+    if not isinstance(brief.get('next_action'),dict):
+        from .readiness import next_action
+        brief['next_action']=next_action(ctx,status)
+    if not isinstance(status.get('next_action'),dict):
+        status['next_action']=brief['next_action']
     atomic_write_json(ctx.work_dir/'input/current-status.json',status)
     atomic_write_json(ctx.work_dir/'input/current-task.json',brief)
     return brief

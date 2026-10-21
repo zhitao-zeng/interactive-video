@@ -20,7 +20,7 @@ def repair_lane(lane):
             os.environ[key] = previous
 
 
-def run(runner, lane, *, resume=False, destination=None, independent_report=None):
+def run(runner, lane, *, resume=False, destination=None, independent_report=None, config=None):
     from novel_manga.application.rendering.reviewed import run as reviewed_run
     from novel_manga.application.review.execution import media_matches
     from novel_manga.util import read_json
@@ -33,6 +33,8 @@ def run(runner, lane, *, resume=False, destination=None, independent_report=None
         runner.context.clip_plan, media, notes=runner.context.feedback)
     previous = runner.context.profile
     runner.context.profile = {**previous, 'repair_backend': 'sandbox_agent'}
+    previous_agent_config = getattr(runner.context, 'repair_agent_config', None)
+    runner.context.repair_agent_config = (dict(config) if config is not None else None)
     final_review=None
     if destination is not None:
         from novel_manga.interactive.delivery import reviewed_delivery
@@ -43,3 +45,7 @@ def run(runner, lane, *, resume=False, destination=None, independent_report=None
             return reviewed_run(runner,repair_existing=True,**options) if reuse else reviewed_run(runner,**options)
     finally:
         runner.context.profile = previous
+        if previous_agent_config is None:
+            runner.context.__dict__.pop('repair_agent_config', None)
+        else:
+            runner.context.repair_agent_config = previous_agent_config

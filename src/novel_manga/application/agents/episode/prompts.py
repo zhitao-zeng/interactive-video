@@ -1,6 +1,7 @@
 """Run one episode agent while its existing host tools execute media operations."""
 from __future__ import annotations
 
+import json
 
 from novel_manga.util import read_json
 
@@ -33,6 +34,9 @@ def initial_prompt(ctx):
         'copies the video stream and reruns media QC. This is an acoustic design decision, not permission to add arbitrary noise just to pass a meter. '
         'Use supported audio assembly for genuine ambience gaps; preserve passed native takes. '
         'check/render take an optional file; apply defaults to output/repair.json. '
+        'A user-authorized picture cutaway is one apply action=cutaway with source_clip_id, target_clip_id, '
+        'exact 25 fps source/target frame-aligned intervals, and reason. The host derives only the target clip picture, '
+        'copies its selected audio, and passes that ephemeral row into the ordinary assembly; native selected takes and counts remain recorded. '
         'Use doctor to request host service diagnostics when an endpoint fails; '
         'yield for its result like other host jobs. Diagnostics do not prove content acceptance. '
         'Use these commands to check, render, review, apply supported repairs, '
@@ -49,7 +53,10 @@ def initial_prompt(ctx):
         'and all-clip summary for adjacent context; explicit review exports all clips. '
         'When render returns clips_ready with assembly_pending=true, use its clip evidence '
         'to repair or finish; whole-episode encoding waits for repairs, so a missing movie '
-        'alone is not a reason to render again. Finish assembles the final candidate and '
+        'alone is not a reason to render again. Batch known supported repairs before finish; '
+        'do not finish between independent clip patches just to request another whole-film review. '
+        'A deliberate stopped candidate remains allowed without spending every remaining take. '
+        'Finish assembles the final candidate and '
         'runs technical QC; content_passed alone does not mean final acceptance. '
         'If a prepared plan or previous takes exist, reuse that plan and media; '
         'Follow status.retry_policy and remaining_takes: once an allowed correction or recheck '
@@ -183,7 +190,10 @@ def continuation_prompt():
         'retained_clips need no decision or repeated inspection. '
         'For episode_technical_issues, use the inspection targets to locate and repair only responsible clips; '
         'do not submit keep decisions merely to cover all technical inspection targets. '
-        'Batch independent decisions in one apply. A clip with no remaining take allowance '
+        'Batch independent decisions in one apply, then render/review the changed clips before finish. '
+        'Complete known supported repairs together instead of finishing after each patch; '
+        'finish still reports a deliberate stopped candidate without requiring all allowances to be spent. '
+        'A clip with no remaining take allowance '
         'does not cancel eligible repairs for other clips. '
         'Current remaining_input_attempts, remaining_rechecks, conditional_extra_takes and input_repairs override historical blocked messages. '
         'repair_actions lists apply operations permitted NOW, including edit/retake/input preparation for a pending extra. '
@@ -221,6 +231,57 @@ def continuation_prompt():
         'and input authority. Run finish when accepted or when the episode must stop, and '
         'end this turn after its acceptance; the host will complete it.\n'
     )
+
+
+def resume_prompt(task, *, agent_instructions=None):
+    """Resume with current executable state, not another full serialization of it."""
+    targets = task.get('targets') or []
+    target_ids = {row.get('clip_id') for row in targets if row.get('clip_id')}
+    next_action = task.get('next_action') or {}
+    action = next_action.get('action')
+    next_state = {key:next_action[key] for key in
+                  ('action','reason','blocked','service_interrupted','audio_review')
+                  if key in next_action}
+    state = {key:task[key] for key in
+             ('phase','mode','upstream_route','repair_capabilities','targets','issues',
+              'last_operation','related_history','evidence_files','full_status','reference_catalog')
+             if key in task}
+    if task.get('postproduction'):
+        state['postproduction'] = task['postproduction']
+    if next_state:
+        state['next_action'] = next_state
+    if action == 'first_frames':
+        frames = task.get('first_frames') or {}
+        blocked = next_action.get('blocked') or {}
+        blocked_ids = (set(blocked) if isinstance(blocked,dict) else
+                       set(blocked) if isinstance(blocked,(list,tuple,set)) else set())
+        relevant = target_ids | blocked_ids
+        state['first_frames'] = {
+            **{key:frames[key] for key in ('mode','extra_reference_policy','command','schema') if key in frames},
+            'clips':{cid:row for cid,row in (frames.get('clips') or {}).items() if cid in relevant},
+        }
+    elif action == 'select_music' and task.get('music_selection'):
+        state['music_selection'] = task['music_selection']
+    elif action == 'mix_audio' and task.get('audio_mix'):
+        state['audio_mix'] = task['audio_mix']
+
+    prompt = (
+        'Continue this same saved episode session. The first turn already established the user task and workflow rules; '
+        'keep them in force. This message carries only the current actionable state. Use the exact actions, counters, '
+        'input permissions, and blockers below; consult /work/input/current-task.json or '
+        '/work/input/current-status.json only when a needed detail is absent here. Those full files remain current and intact. '
+        'Successful reads and assessments from earlier turns remain in this saved session. Check the current task and last operation first, '
+        'then take one legal next action or report the concrete blocker; do not rescan all prior images, requests, and budgets. '
+        'Do not repeat a rejected/no-op action. If a host command returns yield=true, end this CLI turn '
+        'so the host can finish it. When accepted or deliberately blocked, call finish and end the turn.\n'
+    )
+    if agent_instructions:
+        prompt += '\nCurrent task-specific user instructions (preserve exactly):\n' + str(agent_instructions) + '\n'
+    if task.get('postproduction'):
+        prompt += ('A user-authorized cutaway plan is already registered. Read the published '
+                   'input/postproduction-plan.json; do not change or re-authorize it. Continue review, '
+                   'then call finish so the host performs normal assembly with this plan.\n')
+    return prompt + '\nCurrent actionable state:\n' + json.dumps(state, ensure_ascii=False)
 
 
 def task_instructions(ctx):

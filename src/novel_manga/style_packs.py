@@ -40,14 +40,24 @@ def frame_style(novel_dir: Path) -> dict:
     return result
 
 
+def opening_appearance(style: dict) -> dict:
+    # The full pack remains available to the author/reviewer. The image request
+    # gets appearance cues, not episode-wide staging, future shots or asset tasks.
+    appearance={k:copy.deepcopy(style[k]) for k in
+                ('render_family','visual_style','h3_style_line') if style.get(k)}
+    palette=(style.get('art_direction')or{}).get('palette')
+    if palette:appearance['palette']=copy.deepcopy(palette)
+    return appearance
+
+
 def first_frame_prompt(authored: str, style: dict) -> str:
-    if not style:
+    appearance=opening_appearance(style)
+    if not appearance:
         return authored
     return (authored+'\n\nSelected visual style (appearance only):\n'
-            +json.dumps(style,ensure_ascii=False)
-            +'\nApply these materials, palette, lighting and composition rules to this opening. '
-            'Preserve its authored identity, wardrobe, explicit material facts, space, time and camera. '
-            'Reference cards supply identity and design; their photographic medium does not override this selected style.')
+            +json.dumps(appearance,ensure_ascii=False)
+            +'\nApply relevant appearance cues only. Preserve the authored current state, '
+            'identity, wardrobe, material facts, geometry, light and framing.')
 
 
 def freeze_selected_style(key: str, work: Path) -> tuple[dict, list[dict]]:

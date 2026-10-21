@@ -10,10 +10,11 @@ from novel_manga.application.repair import history
 from novel_manga.util import atomic_write_json, read_json
 
 INPUT_LIMIT = 2
-SOURCE_REVIEW_POLICY = 2
 
 
-from .input_recovery_policy import asset_configuration_recoverable, source_review_recoverable, posture_protocol_recoverable, first_frame_recoverable
+from .input_recovery_policy import (SOURCE_REVIEW_POLICY, asset_configuration_recoverable,
+                                    source_review_recoverable, posture_protocol_recoverable,
+                                    first_frame_recoverable)
 
 
 def latest_input_records(episode_dir):
@@ -64,6 +65,14 @@ def _standard_input_route(ctx, cid, row=None, *, records=None, image_review_poli
     Both status and input_receipt use this same allowance decision.
     """
     records = input_records(ctx) if records is None else records
+    latest = [(p, r) for p, r in records if r.get('clip_id') == cid and r.get('decision')]
+    if latest:
+        path, record = latest[-1]
+        # An unchanged candidate interrupted by the shared service keeps every
+        # count; only the service state changed, not this content.
+        if (record.get('status') == 'tool_error' and record.get('error_kind') == 'service_interrupted'
+                and (row is None or effects(record['decision']) == effects(row))):
+            return 'service_resume', path, record
     matches = [(p, r) for p, r in records if row is not None and r.get('decision')
                and r.get('status') != 'tool_error' and effects(r['decision']) == effects(row)]
     for path, record in reversed(matches):
@@ -128,19 +137,39 @@ def input_route(ctx,cid,row=None,*,records=None,image_review_policy=None):
         raise
 
 
+def service_blocker(status):
+    """Known unusable shared service: stop the batch instead of five equal calls."""
+    repairs = status.get('input_repairs') or {}
+    for cid, row in repairs.items():
+        if row.get('error_kind') == 'service_interrupted':
+            return {'clip_id': cid, 'error': row.get('error'),
+                    'next': 'Resume the same candidates after the service/credential is fixed; '
+                            'content revisions, takes and input attempts are unchanged.'}
+    return None
+
+
 def input_operations(ctx, cid, *, records=None):
     records = input_records(ctx) if records is None else records
     result = {mode: {'allowed': False} for mode in ('new', 'revise', 'resume')}
     try:
         route, _, _ = input_route(ctx, cid, records=records)
         result[route] = {'allowed': True}
+        if route == 'service_resume':
+            result['resume'] = {'allowed': True}
     except ValueError as error:
         for mode in ('new', 'revise'):
             result[mode]['reason'] = str(error)
     own = [r for _, r in records if r.get('clip_id') == cid]
     latest = own[-1] if own else {}
+    if latest.get('error_kind') == 'service_interrupted':
+        # Stop-the-batch boundary: resume the same candidate, never open a
+        # content revision or spend the remaining attempts against a dead service.
+        result['resume'] = {'allowed': True,
+            'reason': 'The shared service interrupted this candidate; resume it unchanged after the service is fixed.'}
+        return result
     if latest.get('decision') and (latest.get('status') in {'checking', 'incomplete', 'published'}
-                                   or source_review_recoverable(latest)):
+                                   or source_review_recoverable(latest)
+                                   or latest.get('error_kind') == 'service_interrupted'):
         try:
             input_route(ctx, cid, latest['decision'], records=records)
             result['resume'] = {'allowed': True}
@@ -160,9 +189,22 @@ def input_receipt(ctx, cid, row, *, image_review_policy=None, check_only=False):
     record = copy.deepcopy(record)
     if route == 'reuse':
         return path, record
-    if route == 'source_recovery':
+    if route == 'service_resume':
+        record['service_resume'] = {'at': time.strftime('%F %T'),
+            'previous_error': record.get('error'),
+            'reason': 'The shared service interrupted this candidate; content and all counts are unchanged.'}
+        record['status'] = 'checking'
+        record['resume_count'] = int(record.get('resume_count', 0))
+        record.pop('error_kind', None)
+        record.pop('service_interruption', None)
+    elif route == 'source_recovery':
+        # The judge's actual report lives in ``source``; ``source_review`` only
+        # holds the confirmation payload of a semantic rejection.  Keep both,
+        # and retain the previously submitted decision as raw evidence.
         record['previous_source_review'] = {'policy': record.get('source_review_policy', 1),
-            'error': record.get('error'), 'review': record.get('source_review')}
+            'error': record.get('error'), 'review': record.get('source'),
+            'confirmation': record.get('source_review'),
+            'decision': copy.deepcopy(record.get('decision'))}
         record.pop('source', None)
         record.update(status='checking', source_review_policy=SOURCE_REVIEW_POLICY)
     elif route == 'image_recovery':

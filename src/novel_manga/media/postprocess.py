@@ -222,7 +222,7 @@ def story_segments(ctx, results: list[dict]) -> list[dict]:
             continue
         selected = record["selected"]
         clip_video = Path(selected.get('postmix_video') or selected["video"])
-        wav = inner_voice_audio(ctx, clip, clip_video.parent / "native.wav")
+        wav = inner_voice_audio(ctx, clip, Path(selected.get('native_audio_path') or clip_video.parent / "native.wav"))
         options={}
         from .retained import silent_insert_seconds
         source_seconds=silent_insert_seconds(clip,getattr(ctx,'profile',None)or{},getattr(ctx,'script',None)or{})

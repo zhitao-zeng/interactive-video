@@ -217,7 +217,11 @@ class ThinMediaRunner:
         from novel_manga.application.repair.delivery import assembly_directory
         output_dir = assembly_directory(self.context.episode_dir)
         started = time.monotonic()
-        assembly = postprocess.assemble(self.context, results, output_dir)
+        from novel_manga.application.agents.episode.postproduction import assembly_inputs
+        assembly_rows, visual_inserts = assembly_inputs(self.context, {'clips': results})
+        assembly = postprocess.assemble(self.context, assembly_rows, output_dir)
+        if visual_inserts:
+            assembly['postproduction'] = {'visual_inserts': visual_inserts}
         encoded = time.monotonic()
         needs_subtitles = any(c.get('spoken_text') or c.get('lines') for c in self.context.clip_plan.get('clips', []))
         needs_subtitles |= any(t.get('text') and t.get('delivery_mode') in {'visible_dialogue', 'offscreen_dialogue', 'singing'}

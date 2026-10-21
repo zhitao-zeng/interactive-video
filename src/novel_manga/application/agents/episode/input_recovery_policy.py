@@ -2,7 +2,7 @@
 import json,os
 from .input_effects import _phase_groups
 
-SOURCE_REVIEW_POLICY=2
+SOURCE_REVIEW_POLICY=3
 
 def asset_configuration_recoverable(ctx, record):
     """One unchanged continuation for the observed pre-request image-port failure."""

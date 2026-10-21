@@ -44,11 +44,13 @@ class EpisodeCompletion:
         content_pending = bool(review.get('feedback') or report.get('failed_clips')
             or report.get('gate_failed_clips') or any(row.get('severity') in {'fail','review_error'}
                 for row in (review.get('clips') or {}).values()))
-        if ((report.get('status') == 'clips_ready' or (report.get('assembly')or{}).get('needs_subtitle_refresh'))
-                and not (batch_review and content_pending)):
-            if not media_matches(plan, report, notes=read_json(self.ctx.episode_dir/'review_feedback.json', {})):
-                return {'ok': False, 'error': 'stale_media', 'required_action': 'render',
-                        'message': 'Current requests need render before existing takes can be assembled.'}
+        assembly_pending = ((report.get('status') == 'clips_ready' or (report.get('assembly')or{}).get('needs_subtitle_refresh'))
+                            and not (batch_review and content_pending))
+        if (assembly_pending or (report.get('assembly')or{}).get('final_video')) and not media_matches(
+                plan, report, notes=read_json(self.ctx.episode_dir/'review_feedback.json', {})):
+            return {'ok': False, 'error': 'stale_media', 'required_action': 'render',
+                    'message': 'Current requests need render before existing takes can be assembled or delivered.'}
+        if assembly_pending:
             report = self.media.assemble(report)
         report = self.media.refresh_technical_policy(report, plan)
         from novel_manga.application.music_selection import episode_music_errors
@@ -76,6 +78,11 @@ class EpisodeCompletion:
             review=apply_feedback(self.ctx.episode_dir,review,final)
             atomic_write_json(self.ctx.episode_dir/'episode_review.json',review)
             atomic_write_json(self.ctx.episode_dir/'final_cut_review.json',final)
+            report['final_audio_review_required'] = final.get('final_audio_review_required') is True
+            if report['final_audio_review_required']:
+                report['final_audio_review'] = final.get('audio_review') or {}
+            if final.get('passed') is True:
+                report.pop('final_audio_review_status', None)
             report=save_result(self.ctx.episode_dir,report,review,plan=plan,rounds=rounds,
                 corrections=[cid for row in rounds for cid in row.get('changed',[])],blocked=blocked)
             if final.get('passed') is not True:
@@ -86,6 +93,19 @@ class EpisodeCompletion:
                     return {'ok':False,'passed':False,'error':'final_movie_review_requires_repair',
                             'final_cut_review':final,'review_evidence':evidence,
                             'next':'Repair the current full-movie findings with the existing tools, then render and finish; retain all counts.'}
+            if report.get('final_audio_review_required') and final.get('passed') is True:
+                audio_review = report.get('final_audio_review') or {}
+                final_movie = Path(final.get('movie') or '')
+                audio_current = (audio_review.get('movie') == str(final_movie.resolve())
+                    and audio_review.get('complete') is True and audio_review.get('passed') is True
+                    and not audio_review.get('issues') and not audio_review.get('errors'))
+                if not audio_current:
+                    return {'ok': False, 'passed': False, 'error': 'final_audio_review_requires_repair',
+                        'required_action': 'apply', 'movie': str(final_movie),
+                        'final_audio_review': audio_review,
+                        'next': 'Use the audio findings returned by final review with the existing repair tools; finish again after the current export passes audio review.'}
+            elif report.get('final_audio_review_required'):
+                report['final_audio_review_status'] = 'not_run_visual_gate'
         quality = report.get('quality_review') or {}
         episode_state.record(self.ctx.run_dir, 'acceptance_saved',
                              result='passed' if quality.get('passed') else 'needs_review',
@@ -137,9 +157,23 @@ class EpisodeCompletion:
                   for path in (self.ctx.episode_dir / 'work/inner_voice').glob('*/voice.json')}
         quality = report.get('quality_review') or {}
         author_session = read_json(self.ctx.work_dir / 'episode-session.json', {})
+        audio_required = report.get('final_audio_review_required') is True
+        audio_review = report.get('final_audio_review') or {}
+        reviewed_movie = Path((report.get('final_cut_review') or {}).get('movie') or '')
+        final_visual = report.get('final_cut_review') or {}
+        final_visual_passed = not final_visual or final_visual.get('passed') is True
+        audio_passed = (not audio_required or
+            (reviewed_movie.is_file() and audio_review.get('movie') == str(reviewed_movie.resolve())
+             and audio_review.get('complete') is True and audio_review.get('passed') is True
+             and not audio_review.get('issues') and not audio_review.get('errors')))
         manifest = {'method': ('one persistent sandbox agent owns authoring and host tool calls' if author_session
                               else 'existing requests executed by host with independent acceptance'),
-            'passed': quality.get('passed') is True, 'quality_review': quality,
+            'passed': quality.get('passed') is True and final_visual_passed and audio_passed,
+            'final_audio_review_required': audio_required,
+            **({'final_audio_review_status': report['final_audio_review_status']}
+               if report.get('final_audio_review_status') else {}),
+            **({'final_audio_review': audio_review} if audio_required else {}),
+            'quality_review': quality,
             'technical_passed': (report.get('assembly') or {}).get('thin_passed') is True,
             'actual_video_counts': history.generation_counts(self.ctx.episode_dir),
             'voice_recording_counts': voices, 'voice_recording_blocked': self.evidence.voice_recording_blocks(plan),

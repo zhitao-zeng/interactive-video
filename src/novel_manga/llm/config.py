@@ -58,6 +58,12 @@ ENDPOINTS = {
                      "QWEN38_LOCAL_MODEL": "deepseek-v4.1-flash-1017",
                      "QWEN38_LOCAL_API_KEY_VAR": "PHANTHY_API_KEY", "QWEN38_LOCAL_STREAM": "1",
                      "QWEN38_LOCAL_MIN_MAX_TOKENS": "16000"},
+    # The same DS41 release through the official PhanRouter cloud gateway.
+    # Selected per task; it does not replace the default preset above.
+    "official-ds41": {"QWEN38_LOCAL_BASE_URL": "https://cloud.phanthy.com/phanrouter/v1",
+                      "QWEN38_LOCAL_MODEL": "deepseek-v4.1-flash-1017",
+                      "QWEN38_LOCAL_API_KEY_VAR": "PHANROUTER_IMAGE_API_KEY",
+                      "QWEN38_LOCAL_STREAM": "1", "QWEN38_LOCAL_MIN_MAX_TOKENS": "0"},
     # 规划轮换备选（导演稿级实测 2/3 成功、75-287s）；短输出同样胜任
     "phanthy-luna": {"QWEN38_LOCAL_BASE_URL": "http://127.0.0.1:8789/v1",
                      "QWEN38_LOCAL_MODEL": "gpt-5.6-luna",

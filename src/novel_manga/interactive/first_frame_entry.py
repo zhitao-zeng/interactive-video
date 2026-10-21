@@ -50,23 +50,30 @@ def run(root,novel,*,project,destination,resume=False,config=None):
     import os
     if profile.get('native_h3_short_edge'):os.environ['NOVEL_H3_SHORT_EDGE']=str(profile['native_h3_short_edge'])
     ctx=create_context(novel,novel.name+'_1',output_root=root/('outputs/episode-agent-firstframes'if first_frame else'outputs/episode-agent-music'),input_mode='script')
+    from novel_manga.application.agents.episode.postproduction import transfer_cutaway
+    transfer_cutaway(novel/(novel.name+'_1'),ctx.episode_dir)
     from novel_manga.story.voice_delivery import NATIVE_SPEECH_POLICY
     if not (ctx.run_dir/'frozen.json').is_file()and profile.get('h3_speech_policy')not in {'reference',NATIVE_SPEECH_POLICY}:
         raise ValueError('Select the H3 speech policy before starting a new H3 Agent task')
     ctx.run_dir.mkdir(parents=True,exist_ok=True)
     (ctx.run_dir/'owner').write_text('Interactive '+('first-frame'if first_frame else'story-music')+' edition / existing persistent Agent / '+str(novel)+'\n')
     atomic_write_json(ctx.run_dir/'interactive-delivery.json',{'destination':str(destination),'project':project})
+    explicit_agent_config = config is not None
     config=load_config(root/'configs/agent_sandbox.json') if config is None else dict(config)
     # This is the existing Agent creation/production entry, with host media tools.
     # The separate fixed novel pipeline mode would run video before the Agent can supply openings.
-    config={**config,'production_mode':'agent'}
+    config={**config,'production_mode':'agent','_agent_config_explicit':explicit_agent_config}
     options={}
     if resume:
-        import time
-        saved=read_json(ctx.run_dir/'agent-run.json',{})
         config['resume_session_on_retry']=True
-        if saved.get('deadline') and saved.get('status')!='deferred':
-            remaining=int(saved['deadline']-time.time())
+        # An explicit resume authorization is the existing bounded retry path:
+        # lifecycle.start_run archives the stopped run and establishes a current
+        # repair window while keeping cumulative agent_seconds and attempts.
+        # Do not intercept it here with the old (already spent) deadline; only a
+        # scheduler continuation of a deferred slice keeps its saved remainder.
+        saved=read_json(ctx.run_dir/'agent-run.json',{})
+        if saved.get('status')=='deferred':
+            remaining=int(saved.get('remaining_seconds') or 0)
             if remaining<=0:return {'status':'blocked','reason':'original Agent operation time budget exhausted','run_dir':str(ctx.run_dir)}
             options['timeout']=remaining
     result=run_episode(ctx,config=config,retry_issues=resume,**options)

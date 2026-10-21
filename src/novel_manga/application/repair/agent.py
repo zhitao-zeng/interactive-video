@@ -208,9 +208,14 @@ def export_final_cut(directory, inputs, clip, verdict):
 
 def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejections=None):
     """No production writes. Container sees evidence copies, never the production directory."""
-    config = config or load_config()
+    explicit_config = config is not None
+    if config is None:
+        config = load_config()
+    else:
+        config = dict(config)
+        explicit_config = bool(config.pop('_agent_config_explicit', explicit_config))
     profile = read_json(directory.parent/'profile.json', {})
-    if endpoint := profile.get('repair_agent_endpoint'):
+    if not explicit_config and (endpoint := profile.get('repair_agent_endpoint')):
         from novel_manga.llm.config import ENDPOINTS
         selected = ENDPOINTS[endpoint]
         base = selected['QWEN38_LOCAL_BASE_URL']
@@ -219,7 +224,7 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
         config = {**config, 'base_url':base.removesuffix('/v1'),
                   'model':selected['QWEN38_LOCAL_MODEL'],
                   'key_var':selected['QWEN38_LOCAL_API_KEY_VAR']}
-    model = profile.get('repair_agent_model')
+    model = None if explicit_config else profile.get('repair_agent_model')
     if model:
         config = {**config, 'model': str(model)}
     if config.get('repair_extra_body'):

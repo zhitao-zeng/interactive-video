@@ -559,10 +559,11 @@ def first_frame_prompt(clip,prompt):
         own=[r for r in originals if r.get('role')=='character' and r.get('name')==name]
         if name not in visible and not any(r['path'] in extras for r in own):
             prompt=re.sub(r'(?m)^<Subject '+str(number)+r'>[^\n]*',
-                '<Subject '+str(number)+'> is the source-identified offscreen speaker; voice only.',prompt,count=1)
+                '<Subject '+str(number)+'> is the source-identified speaker; preserve any body and clothing '
+                'only as actually visible in the opening frame.',prompt,count=1)
             prompt=re.sub(r'(?m)^<Subject '+str(number)+r'>:[^\n]*',
                 '<Subject '+str(number)+'>: fully_preserved - source speaker identity only; '
-                'the speaker remains offscreen, with no visual appearance bound to a picture.',prompt,count=1)
+                'retain the opening frame\'s actual visible portions, without introducing an unseen person or face.',prompt,count=1)
     chunks=re.split(r'(<d>.*?</d>)',prompt,flags=re.S)
     remapped=''.join(chunk if i%2 else re.sub(r'<Picture (\d+)>',
         lambda m:f'<Picture {mapping[int(m[1])]}>' ,chunk) for i,chunk in enumerate(chunks))

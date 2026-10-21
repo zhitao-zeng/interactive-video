@@ -6,7 +6,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor,wait,FIRST_COMPLETED
 
 from novel_manga.util import read_json, atomic_write_json
-from novel_manga.media.first_frames import current_contract, source_asset_state, require_current
+from novel_manga.media.first_frames import current_contract, source_asset_state, require_current, review_problems, unchanged_opening_scale
 
 
 def select_mode(novel, mode):
@@ -24,10 +24,10 @@ def select_mode(novel, mode):
 
 
 def prepare(root, novel, *, builder=None, checker=None):
-    from novel_manga.application.agents.episode.first_frames import build, check, source_opening
+    from novel_manga.application.agents.episode.first_frames import (build, check, source_opening,
+        review_candidate, request_prompt, opening_state)
     from novel_manga.story.voice_delivery import native_speech_selected
     from novel_manga.story.fields import opening_frame_error
-    from novel_manga.style_packs import first_frame_prompt
     if read_json(novel/'profile.json',{}).get('sd_input_mode')!='first-frame':
         raise ValueError('Select SD first-frame mode before preparing openings')
     episode=novel/(novel.name+'_1');plan=read_json(episode/'clip_plan.json')
@@ -43,7 +43,9 @@ def prepare(root, novel, *, builder=None, checker=None):
             raise ValueError('Fast first-frame mode requires the selected native speech policy')
         if clip.get('first_frame',{}).get('extra_references'):
             raise ValueError('Fast first-frame video sends only its complete opening image')
-        try:require_current(ctx,clip);continue
+        try:
+            require_current(ctx,clip)
+            if (clip.get('first_frame')or{}).get('review_record'):continue
         except (ValueError,OSError):pass
         opening=source_opening(ctx,clip)
         if issue:=opening_frame_error(opening):
@@ -59,7 +61,7 @@ def prepare(root, novel, *, builder=None, checker=None):
         contract=current_contract(ctx,clip,paths,include_style=True)
         row={'image_prompt':opening['image_prompt'],'visible_characters':opening['visible_characters'],
              'image_references':paths,'extra_references':[],
-             'request_prompt':first_frame_prompt(opening['image_prompt'],contract['style'])}
+             'request_prompt':request_prompt(ctx,{'image_prompt':opening['image_prompt']},contract,references=refs)}
         identity={'row':row,'source_contract':contract,'source_assets':source_asset_state(ctx,paths)}
         pending.append((clip,row,contract,identity))
     runtime.mkdir(parents=True,exist_ok=True)
@@ -68,24 +70,53 @@ def prepare(root, novel, *, builder=None, checker=None):
         clip,row,contract,identity=item
         folder=novel/'first_frames'/episode.name/clip['clip_id'];folder.mkdir(parents=True,exist_ok=True)
         candidates=sorted(folder.glob('candidate_*'))
-        candidate=next((p for p in candidates if read_json(p/'sd-input.json',{})==identity
-            and read_json(p/'retake-decision.json',{}).get('approved')is not True),None)
+        def generation_input(value):
+            value=copy.deepcopy(value)
+            value.get('source_contract',{}).pop('character_facts',None)
+            # This is derived from the authored prompt/style and review facts.
+            # Additional review facts require rechecking retained pixels, not
+            # another paid image solely because their compiled text changed.
+            value.get('row',{}).pop('request_prompt',None)
+            return value
+        candidate=None
+        generation_row,generation_contract=row,contract
+        for directory in candidates:
+            if read_json(directory/'retake-decision.json',{}).get('approved')is True:continue
+            saved=read_json(directory/'sd-input.json',{})
+            expected=copy.deepcopy(identity);saved_contract=saved.get('source_contract',{})
+            if 'shot_scale'not in saved_contract.get('opening',{}) and unchanged_opening_scale(clip,contract):
+                expected['source_contract']['opening'].pop('shot_scale',None)
+            if 'character_facts'not in saved_contract and 'device_state'not in saved_contract.get('opening',{}):
+                expected['source_contract']['opening'].pop('device_state',None)
+            if generation_input(saved)==generation_input(expected):
+                candidate=directory
+                generation_row=saved['row'];generation_contract=saved['source_contract']
+                break
         if candidate is None:
             if len(candidates)>=3:raise ValueError(f"{clip['clip_id']}: first-frame image candidate budget used")
             candidate=folder/f'candidate_{len(candidates)+1:02d}';candidate.mkdir()
             atomic_write_json(candidate/'sd-input.json',identity)
         path=candidate/'opening.png'
-        if not path.is_file():(builder or build)(ctx,row,path)
-        review=read_json(candidate/'review.json',{})
-        if not review:
-            review=(checker or check)(ctx,path,row,contract)
-            atomic_write_json(candidate/'review.json',review)
-        if review.get('consistent') is not True or review.get('problems'):
-            raise ValueError(f"{clip['clip_id']}: first-frame review rejected; inspect {candidate}")
+        if not path.is_file():(builder or build)(ctx,generation_row,path)
+        if not (candidate/'image-request.json').is_file():
+            from novel_manga.application.profiles import frame_spec, load_profile
+            atomic_write_json(candidate/'image-request.json',{
+                'authored_prompt':generation_row['image_prompt'],'request_prompt':generation_row['request_prompt'],
+                'image_references':list(generation_row['image_references']),'extra_references':[],
+                'visible_characters':list(generation_row['visible_characters']),
+                'ratio':frame_spec(load_profile(novel))['video_ratio'],
+                'opening_state':opening_state(generation_row,generation_contract)})
+        review,_,record=review_candidate(ctx,path,row,contract,identity['source_assets'],checker or check)
+        if review.get('consistent') is not True or review_problems(review):
+            error=ValueError(f"{clip['clip_id']}: first-frame review rejected; inspect {candidate}")
+            error.frame_path=str(path.relative_to(novel))
+            error.frame_update={'review':review,'review_record':str(record.relative_to(novel))}
+            raise error
         return {'path':str(path.relative_to(novel)),'extra_references':[],
             'visible_characters':copy.deepcopy(row['visible_characters']),'source_contract':contract,
             'source_assets':identity['source_assets'],'prompt':row['image_prompt'],
-            'request_prompt':row['request_prompt'],'review':review,'candidate':candidate.name}
+            'request_prompt':row['request_prompt'],'review':review,'review_record':str(record.relative_to(novel)),
+            'candidate':candidate.name}
     from novel_manga.media.resources import acquire_inflight_slot,release_inflight_slot
     workers=max(1,min(8,int(read_json(novel/'profile.json',{}).get('inflight',1))))
     shared=os.environ.get('NOVEL_INFLIGHT_DIR')
