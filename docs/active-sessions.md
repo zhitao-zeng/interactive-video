@@ -267,3 +267,5 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | ZCode 更正 | 3eb81bd提交信息与销账中"全量pytest exit=0"为误报:实际把后台bash包装退出码当pytest码,真实exit=1,采纳引入的红测试漏检,并由诊断跑首撞(resume_protocol kwarg错配)。本轮已修:并集文件回退+recovery语义移植+hook重放,全量4035过/exit=0(pytest直读);教训入档:全量结论只认pytest自身退出码与汇总行 | main | recovery.py、sandbox.py、16文件回退、2测试删改 | 2026-10-22 | 已提交更正;诊断跑(worktree backrooms55-ep02-diagnostic)待同步main后恢复阶段2 |
 
 | ZCode 后室EP02诊断收工 | 零介入诊断完成:创作端official路由无法收尾(超时/模型不识别/已验证候选被丢/路由死锁),改编接驳为手工7断缝,生产段实测8/18视频+agent自主修复后被no-progress误杀(剩余1985s作废);报告在诊断树docs/research/2026-10-22-ep02a-zero-intervention-diagnostic.md,台账45行逐时戳 | codex/backrooms55-ep02-diagnostic-20261022 | 诊断树独立;生产预算仅诊断消耗,不清不重置;心动会话并行未受扰 | 2026-10-22 | 已收工:报告已提交诊断分支;建议排序=修no-progress→补改编自动桥→创作端收尾→幂等/自举小修;main无代码改动,未推送 |
+
+| ZCode 堵点简化修复收工 | 诊断报告8真缺陷修6:no-progress默认计入已完成修复、改编自动桥(produce+系列material合并)、首轮过验候选容忍exit124(修订轮严契约保留)、create幂等/路径双解析/画风库自举容错;#5留配置层(需配CLI认识的路由名)、#7暂缓(修复③后首轮不再触发该死锁)。全量4039过/exit=0(pytest汇总行直读),4个新回归测试;报告修复状态已更新(诊断树18d9c1c) | main(88704d7) | flow.py/creation.py/creative_material.py/film.py/style_packs.py+4测试文件 | 2026-10-22 | 已提交未推送;下一整集零介入跑待用户决定(现有修复可直接复验) |
