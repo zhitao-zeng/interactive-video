@@ -67,17 +67,29 @@ Write `output/episode.json` as one object with:
   consecutive `index`, `scene_id`, `location`, `duration_seconds`, `purpose`,
   `characters`, `in_frame`, `start_state`, `event`, `end_state`, `camera`, `turns`,
   `sfx`, `audio_plan.music_cue`, and the adaptation's `source_quote`.
-- For a task selecting `h3_input_mode: first-frame`, author each shot's
+- For a task selecting `h3_input_mode: first-frame` or `sd_input_mode: first-frame`, author each shot's
   `opening_frame: {image_prompt, visible_characters, reference_subjects}` now.
   Describe one static composition at time zero: camera position, visible stable
   identity/clothing, spatial anchors, light and the exact opening prop state.
   Keep subsequent movement and arrivals in the shot's event/video direction.
   POV can have `visible_characters: []`. Name the logical scene/character sources;
   apply the selected style to the composition, materials and light. Production
-  binds actual card paths and appends the same frozen style rules to the image API
-  request and image review, without rewriting your opening prompt. Do not
+  binds actual card paths in upload order and labels each image's name and scope.
+  Its image API suffix contains appearance cues; the complete frozen style remains
+  available to the author and review. The compiler does not rewrite your facts. Do not
   defer this creative prompt to production. Opening repairs update this source
   field through the existing repair tool; their previous images/history remain.
+  Follow the [official GPT Image prompting principles](https://developers.openai.com/cookbook/examples/multimodal/image-gen-models-prompting-guide#2-prompting-fundamentals):
+  use short sections for the scene, visible subjects/current state, camera and
+  essential constraints. Keep whole-cast seating maps in `spatial_plan`, not in
+  a two-person image description; keep later events and camera movement in video
+  direction. Before simplifying, identify the existing static continuity facts:
+  clothing, ownership, object positions, fixed attachments, repaired/damaged states
+  and established geometry. Carry every relevant fact into the revised prompt;
+  avoid inventing a new layout or deleting a cloth, fastener or support merely to
+  save words. Details outside the crop retain their state without needing to be
+  forced into view. Name logical `reference_subjects`; production supplies final
+  image numbers, so do not guess numbering from a book-wide asset list.
 - Each turn has `speaker_name`, exact `text`, `delivery_mode` (`visible_dialogue`
   or `offscreen_dialogue`) and a specific `emotion`/delivery description, in
   English for `no_reference_performance_first`. Use

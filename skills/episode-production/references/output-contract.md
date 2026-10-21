@@ -316,5 +316,14 @@ returns `accepted` or `yield`, end the turn with its job ID and pending operatio
 the host waits and resumes this same session with the result. Continue from that
 result without a polling loop or duplicate submission. For repairs, write `output/repair.json` and use
 `apply`, following the client's command help. Then render/review the affected clips
-and call `finish` with the actual accepted or stopped outcome. Host results and saved
-evidence determine completion; writing a JSON file alone does not complete this mode.
+and call `finish` with the actual accepted or stopped outcome. Batch known supported
+repairs before finish; do not request whole-film processing after every clip patch.
+A deliberate stopped candidate does not require spending every remaining allowance.
+Host results and saved evidence determine completion; writing a JSON file alone
+does not complete this mode.
+
+Source notes delegating work to postproduction are obligations, not executable
+commands. Bind supported work to the existing host inputs and report unsupported
+editing work explicitly; no general footage-cutaway interface is implied. Verify
+that the edit is present in the actual delivered version and has passed its final
+review. Passing an unchanged native take does not fulfill that separate obligation.

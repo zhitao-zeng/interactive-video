@@ -25,10 +25,10 @@ def main():
             if output.exists():continue
             started=time.monotonic()
             response=model.generate([{'role':'user','content':[{'type':'audio_url','audio_url':{'url':row['audio']}},
-                {'type':'text','text':row['question']}]}],max_new_tokens=240,do_sample=False)
+                {'type':'text','text':row['question']}]}],max_new_tokens=row.get('max_new_tokens',240),do_sample=False)
             temporary=output.with_suffix('.partial.json')
             temporary.write_text(json.dumps({'model':'Eureka-Audio-Instruct','device':'cpu','actual_audio':row['audio'],
-                'source_windows':row['source_windows'],'scope':'three6second samples; not full-song or film acceptance',
+                'source_windows':row['source_windows'],'scope':row.get('scope','three6second samples; not full-song or film acceptance'),
                 'inference_seconds':round(time.monotonic()-started,3),'response':response},ensure_ascii=False,indent=2)+'\n')
             temporary.replace(output)
             print(row['id'],flush=True)

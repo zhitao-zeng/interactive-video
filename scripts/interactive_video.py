@@ -47,12 +47,19 @@ def main():
     production.add_argument('--sd-input-mode',choices=['first-frame'],help='New Fast edition: API openings from creator opening_frame, image review, then normal Fast production')
     production.add_argument('--resume-unsubmitted',action='store_true',help='Retry infrastructure failure only when no video task or take exists')
     production.add_argument('--resume',action='store_true',help='Resume original task receipts, takes and bounded review history; never clear them')
+    production.add_argument('--config',type=Path,help='Agent task config; the same file create/produce accept')
+    production.add_argument('--project-root',type=Path,default=ROOT,
+                             help='Existing project data root; source code stays in this checkout')
+    production.add_argument('--postproduction-plan',type=Path,
+                             help='User-authorized picture-only cutaway input consumed in the ordinary assembly')
     card=commands.add_parser('interaction-card',help='Generate and review API interaction artwork once; movie exports reuse it')
     card.add_argument('--project',choices=['adventure','romance','suspense'],default='romance')
     card.add_argument('--edition',required=True)
     card.add_argument('--prompt-file',type=Path,required=True,help='Agent-authored visual design; approved question and options are appended automatically')
     status=commands.add_parser('status');status.add_argument('--project',choices=['adventure','romance','suspense'],default='adventure')
     status.add_argument('--edition',help='Read one retained edition and its real generation history')
+    status.add_argument('--project-root',type=Path,default=ROOT,
+                        help='Existing project data root; source code stays in this checkout')
     args=parser.parse_args()
     if args.command=='produce':
         from novel_manga.interactive.film import run
@@ -129,7 +136,8 @@ def main():
             if args.kind in ('all',kind):fn(ROOT,ROOT/'outputs/adventure-master')
     elif args.command=='run':
         from novel_manga.interactive.production import run_episode
-        result=run_episode(ROOT,args.lane,project=args.project,resume_unsubmitted=args.resume_unsubmitted,resume=args.resume,edition=args.edition,h3_input_mode=args.h3_input_mode,sd_input_mode=args.sd_input_mode)
+        from novel_manga.application.agents.sandbox import load_config
+        result=run_episode(args.project_root.resolve(),args.lane,project=args.project,resume_unsubmitted=args.resume_unsubmitted,resume=args.resume,edition=args.edition,h3_input_mode=args.h3_input_mode,sd_input_mode=args.sd_input_mode,agent_config=load_config(args.config) if args.config else None,postproduction_plan=args.postproduction_plan)
         return 0 if result['status']=='accepted' else 2
     elif args.command=='interaction-card':
         from novel_manga.interactive.runtime import configure
@@ -142,15 +150,15 @@ def main():
     else:
         if args.edition:
             from novel_manga.interactive.production import edition_status
-            print(json.dumps(edition_status(ROOT,args.project,args.edition),ensure_ascii=False))
+            print(json.dumps(edition_status(args.project_root.resolve(),args.project,args.edition),ensure_ascii=False))
             return 0
         from novel_manga.util import read_json
         from novel_manga.interactive.production import active_runner
         for lane in VIDEO_LANES:
-            directory=ROOT/f'outputs/{args.project}-{lane}/{args.project}-{lane}_1'
+            directory=args.project_root.resolve()/f'outputs/{args.project}-{lane}/{args.project}-{lane}_1'
             report=read_json(directory/'thin_media_report.json',{})
-            delivered=read_json(ROOT/f'delivery/{args.project}/{lane}/delivery.json',{})
-            pid=active_runner(ROOT,lane,args.project)
+            delivered=read_json(args.project_root.resolve()/f'delivery/{args.project}/{lane}/delivery.json',{})
+            pid=active_runner(args.project_root.resolve(),lane,args.project)
             print(json.dumps({'lane':lane,'status':'running' if pid else delivered.get('status') or report.get('status') or 'not_completed',
                               'pid':pid,'last_report_failed_clips':report.get('failed_clips',[]),
                               'delivery':delivered.get('final_video')},ensure_ascii=False))

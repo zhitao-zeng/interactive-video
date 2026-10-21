@@ -118,6 +118,15 @@ exactly inside its language-tagged `<d>` marker and preserve the supplied refere
 and speaker bindings. Use `None.` for an empty audio section. The supplied pictures
 are references; concrete first-frame/keyframe use requires explicit host support.
 
+In optional H3 `first_frames`, an unchanged request reuses its saved candidate.
+After image review rejects visible pixels while the source opening and selected
+references remain correct, a row may request one bounded replacement with
+`retake_candidate: {candidate: "candidate_NN", reason: "specific visible pixel defect"}`.
+This names the rejected candidate, requires remaining image-candidate capacity,
+and still sends the replacement through the normal image review. Resume the same
+row after a supplier interruption; its saved replacement and task are reused.
+`retake_candidate` cannot be combined with `reuse_candidate`.
+
 Use `/work/tools/episode.py` to submit your authored output through `render`.
 It validates the draft before generating, and returns independent review evidence
 with the render result. Automatic evidence expands `attention_clips`; the current
@@ -132,10 +141,36 @@ Inspect actual frames, ASR, submitted requests and current verdicts before `appl
 Use the reported remaining budget, explain each keep/edit/retake/stop from current
 evidence, and keep edits coherent with adjacent clips. Tool errors and incomplete
 reviews remain unresolved; use `finish` to report an accepted or stopped outcome.
+Batch independent, already-known supported repairs in one `apply`, then render and
+review the changed clips before `finish`. Do not finish after each patch merely
+to obtain another whole-film review. A deliberate stopped candidate remains valid;
+there is no requirement to spend every remaining take or repair allowance. New
+movies still require their own full final review; earlier acceptance cannot certify
+changed takes, captions, audio, source or ending cards.
 Assess the assembled story and the available audio evidence as well as individual
 clips. Record whether evidence is ASR, a library sample or actual listening;
 picture review cannot establish full-film sound quality.
 
+A note such as “handled in postproduction” still needs an executed edit and
+acceptance of the actual delivered movie. Before generation, identify which
+existing host operation will perform each promised postproduction step. The host
+supports its configured captions, labels, evidence surfaces, publication cards
+and audio layers; it does not infer or automatically execute arbitrary footage
+cutaways from screenplay prose. If a required edit has no supported operation,
+report the execution gap instead of silently dropping the approved intent.
+An authorized local edit must retain the original takes and evidence, record the
+source/target footage and actual edit, preserve agreed audio and timing, and return
+through the existing delivery, technical QC and actual full-movie review. A native
+clothing or camera recheck does not accept an outstanding postproduction edit.
+
 The host owns checks, generation, extraction, independent acceptance, caches,
 budgets and publication. Keep work and helper scripts in this episode workspace.
 With file tools alone, return the requested JSON for the host to execute.
+
+For implementation and independent-review handoffs, save the concrete result,
+owned changes, test evidence and blockers before notifying the coordinator once
+with the artifact paths; stop product writes when reporting ready for review.
+Report a real blocker immediately with the smallest input and observed failure,
+without waiting for a long report. Recheck the corrected diff and affected checks;
+retain genuine independent review, and do not repeatedly wait for another status
+or closeout record on work whose result and review are already saved.
