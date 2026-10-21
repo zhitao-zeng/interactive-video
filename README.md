@@ -34,6 +34,20 @@ PYTHONPATH=src .venv/bin/python scripts/interactive_video.py create \
 
 ## 制作已批准的素材
 
+原创任务可直接进入完整试制，创作 Agent 同时提供人物、场景与道具设计：
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/interactive_video.py produce \
+  --task /path/to/original-task.json \
+  --output-dir .runtime/original-film --edition suspense-original-film
+```
+
+任务使用 `mode: original`、`project`、`brief`、`target_seconds` 和可选 `style`。
+这个入口授权媒体制作：自动衔接创作、素材、首帧、H3、配乐及现有审片返修。
+默认每镜新首帧、无音色参考、分段后期配乐，保留原生对白和环境音。
+失败后在同一命令追加 `--resume`，保留原作者、已生成素材、候选及拍摄额度。
+`create` 仍只交创作稿；改编、世界介绍卡或显式锁定音色继续使用已批准素材入口。
+
 ```bash
 PYTHONPATH=src .venv/bin/python scripts/interactive_video.py prepare \
   --project romance --material /path/to/approved-material --edition romance-demo
@@ -48,6 +62,12 @@ PYTHONPATH=src .venv/bin/python scripts/interactive_video.py run \
 准备接口保留批准的镜头、对白、人物归属、时间和互动选择，不另写一份剧情。
 图片、视频与配音只在相应制作动作获得授权后执行。`sd25` 选择另一视频路线。
 旧任务续跑保留原回执、take 与次数，不自动增加重拍额度；候选、审片完整和影片通过是不同状态。
+
+视频通道还可显式选择 `--lane sd20-fast` 或 `--lane sd20-mini`，分别发送
+`sd2.0-fast` / `sd2.0-mini`，使用现有 `PHANROUTER_IMAGE_API_KEY` 和素材库通道。
+两者暂按项目保守上限 15 秒、单路并发接入，共用该凭据的 `sd20-quota.stop`；
+默认通道、旧任务和重拍额度保持。它们目前仅完成离线接口接线，尚未进行真实采样，
+30 秒、各分辨率、音画效果及实际结算均待验证；不会自动切换过去。
 
 ## 查询历史任务
 

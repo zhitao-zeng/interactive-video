@@ -12,8 +12,40 @@
 入口是`scripts/creative_agent.py`，使用现有episode Agent SDK和素材ZIP导入器。
 任务JSON提供`mode`（adaptation或original）、`project`、完整`brief`、目标时长范围，
 改编另提供`source_archive`。可指定世界卡、片尾卡时长和必须保留的互动目的地。
+要求逐字保留已标注对白的素材包时，指定 `dialogue_source` 为导入后的原文路径，
+例如 `input/package/第02集/EP02-B.md`。宿主从该文档每行 `**说话人：** 原话`
+提取全部说话者并保存 `input/protected-dialogue.json`，不按角色卡名单过滤。
+创作每次返回时直接对照原文核对字词、说话人和顺序；允许一句拆到多个镜头。
+未选择该约束的自由改编、原创及旧冻结任务保留各自原有规则。
 角色图和原始文本完整复制到独立输入，原ZIP另行保留。原创模式明确使用用户意图，
 不伪造外部素材来源。不同任务版本使用不同输出目录，已有候选和会话保留。
+
+### 选择画风包（2026-10-19）
+
+任务可增加 `"style": "modern-live"`。新任务只复制这一包到 `input/style.json`，
+将其规则列为必读；已审可用的原创样图或明确标注的历史例图作为 `style-reference`
+提供给主创。样图只指导色光、材质和构图，不提供新故事的人物身份、衣装、剧情、
+空间布局或机位。主创在各镜 `visual_prompt`、`light` 和 `camera` 落实具体选择。
+
+目前升级7包：`weimei` 唯美CG、`modern-live` 自然写实、`travel-live` 旅行探险、
+`poolrooms-live` 明亮池室、`institutional-sci-fi` 制度科幻、`paper-folklore` 纸艺民俗、
+`graphic-animation` 图形动画。每包包含用途、色板、光线、构图、母题、人物/地点/道具
+规则、禁忌、实际看片依据和图像/视频验证状态。原有其他预设继续可选。
+
+`pending`、`blocked_quota`、`needs_revision` 样图保留在图库作为记录，不自动传给主创。
+可用图片被声明却缺失时直接提示缺图；未出图的草案仍可用文字规则创作。
+导出包含冻结的 `style.json` 与实际采用的样图。相同输出目录续跑保持已选版本；
+图库更新不改已有任务、项目 `style.json`、素材、旧片或拍摄次数。
+
+运行 `python scripts/style_library.py --output-dir delivery/style-library-20261019`
+可从当前配置重建离线画风册与ZIP，查看样图、历史例图、局限及选择用的代号。
+图片生成继续使用既有图片API，画风册本身不调用媒体模型。
+
+维护时修改同一画风的规则并递增 `pack_version`；例图写明种类、状态和来源/图审记录。
+图片存于忽略Git的 `assets/style-library/日期/代号/`，随离线包分发。
+新样图经实际审看后才标为 `reviewed`；未拍视频保持 `video: not_tested`。
+已有短小样用 `video: short_sample_reviewed` 和 `validation.video_sample` 记录文件、模式与审阅范围；
+离线画风册可直接播放这些样片。单种子5秒取样审图不等于完整动作、整集或声音验收。
 
 ```bash
 PYTHONPATH=src .venv/bin/python scripts/creative_agent.py prepare \
@@ -27,6 +59,13 @@ PYTHONPATH=src .venv/bin/python scripts/creative_agent.py run \
 不会启动生产工具服务。沿用已选沙箱配置的每次创作时限和总执行时限；本轮分别为
 1200秒和5400秒，未增大配置。修订与续跑累计已用时间，不重置预算。
 需要继续失败任务时使用`--resume`，保留实际会话和预算。`status`只读取当前状态。
+
+已有稿的纠错只处理当前校验和明确编辑意见，复用已读资料，不再自动追加整套镜头
+设计和全稿润色指令。Claude 创作者纠错每次最多16轮（原配置更小时沿用），仍受原
+每次/累计时限约束；两次返回的校验问题完全相同时返回 `revision_stalled`，批量调度
+应停下自动重试并保留原稿、会话及剩余时限。超时或轮数到限仍不冒充创作成功。
+无人空镜和尾卡可有空 `placed`；有可见身体的镜头仍需站位。空间错误明确标出
+scene_id、镜号和实际缺失字段，避免把同一句无定位报错重复交给作者。
 
 完整稿经通读发现问题时，用`run --resume --feedback /path/to/review.md`交回同一个
 作者修订。反馈另存、原始任务不变，每次调用前后的候选和验证结果保留；宿主不代写剧情。
