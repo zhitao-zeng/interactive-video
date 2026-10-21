@@ -265,6 +265,44 @@ def test_old_summary_then_json_recovers_directly_to_fallback_with_unspent_time(t
     assert continued['deadline']==resumed['deadline']
 
 
+def test_two_timedout_idle_turns_use_only_configured_fallback_and_unspent_time(tmp_path):
+    ctx=context(tmp_path);attempts=[]
+    for n in range(2):
+        p=tmp_path/f'timeout{n}';attempts.append(str(p))
+        atomic_write_json(p/'attempt.json',{'exit':124,'produced':[]})
+        (p/'session.jsonl').write_text(json.dumps({'type':'user','message':{'content':[
+            {'type':'tool_result','content':'read current frame'}]}})+'\n')
+    saved={'status':'blocked','remaining_seconds':321,'attempts':attempts,'agent_seconds':1200,
+        'reason':'episode agent ended twice without operation or output progress'}
+    config={'model':'primary','refusal_fallback':{'model':'fallback','base_url':'http://existing','key_var':'KEY'}}
+    atomic_write_json(ctx.episode_dir/'repair_budget_grants.json',{'clip_01':{'limit':3,'reason':'original'}})
+    budget=(ctx.episode_dir/'repair_budget_grants.json').read_bytes()
+    assert recovery.resume_protocol(ctx.run_dir,ctx.episode_dir,saved) is None
+    assert recovery.idle_fallback_available(saved,config)
+    assert not recovery.idle_fallback_available(saved,{})
+    resumed=recovery.resume_protocol(ctx.run_dir,ctx.episode_dir,saved,allow_timed_out_idle=True)
+    atomic_write_json(ctx.work_dir/'episode-session.json',{'session_id':'original-session'})
+    replacement,continued=recovery.protocol_fallback(ctx,config,resumed)
+    assert replacement['model']=='fallback'
+    assert continued['remaining_seconds']==321 and continued['agent_seconds']==1200
+    assert continued['attempts']==attempts and continued['deadline']==resumed['deadline']
+    assert read_json(ctx.run_dir/'model-switch/episode-session.json')['session_id']=='original-session'
+    assert (ctx.episode_dir/'repair_budget_grants.json').read_bytes()==budget
+    assert not recovery.idle_fallback_available(continued,config)
+
+
+@pytest.mark.parametrize('produced,handed_off', [(['repair.json'],False), ([],True)])
+def test_timeout_with_saved_output_or_host_handoff_does_not_trigger_idle_fallback(tmp_path,produced,handed_off):
+    p=tmp_path/'attempt';atomic_write_json(p/'attempt.json',{'exit':124,'produced':produced})
+    value={'yield':True,'job_id':'existing-job'} if handed_off else {'ok':True}
+    (p/'session.jsonl').write_text(json.dumps({'type':'user','message':{'content':[
+        {'type':'tool_result','content':json.dumps(value)}]}})+'\n')
+    saved={'status':'blocked','remaining_seconds':321,'attempts':[str(p),str(p)],
+        'reason':'episode agent ended twice without operation or output progress'}
+    config={'refusal_fallback':{'model':'fallback','base_url':'http://existing','key_var':'KEY'}}
+    assert not recovery.idle_fallback_available(saved,config)
+
+
 def summary_block(ctx):
     attempts=[]
     for i in range(2):

@@ -6,6 +6,29 @@ from pathlib import Path
 from novel_manga.util import atomic_write_json,read_json
 
 
+def test_current_target_preserves_whole_request_and_context_but_requires_save_before_next(tmp_path):
+    from novel_manga.application.agents.episode.current_task import prepare
+    ctx = SimpleNamespace(work_dir=tmp_path/'sandbox', episode_dir=tmp_path/'book/book_1', run_dir=tmp_path)
+    clips = [{'clip_id':f'clip_{i:02}', 'shot_indexes':[i], 'prompt_h3':f'unchanged request {i}'} for i in range(1, 5)]
+    atomic_write_json(ctx.episode_dir/'clip_plan.json', {'clips':clips})
+    atomic_write_json(ctx.episode_dir/'chapter_script.json', {'shots':[{'index':i, 'event':f'action {i}'} for i in range(1,5)]})
+    evidence = {'clip':clips[1], 'frames':['input/latest-review/clip_02/frame_1.jpg']}
+    atomic_write_json(ctx.work_dir/'input/latest-review.json', {'targets':[evidence, {'clip':clips[2]}]})
+    atomic_write_json(ctx.work_dir/'input/spatial_plan.json', {'scenes':[
+        {'scene_id':'focus-room','shot_indexes':[2]}, {'scene_id':'unrelated-room','shot_indexes':[4]}]})
+    task = prepare(ctx, {'adopted':True, 'repair_actions':{'clip_02':['edit'], 'clip_03':['retake']}}, {'issues':[]}, [])
+    assert [r['clip_id'] for r in task['targets']] == ['clip_02','clip_03']
+    assert task['focus']['clip_id'] == 'clip_02'
+    focused = read_json(ctx.work_dir/task['focus']['evidence_file'])
+    assert focused['clip'] == clips[1] and focused['current_evidence'] == evidence
+    assert [s['index'] for s in focused['adjacent_shots']] == [1,2,3]
+    assert focused['spatial_scenes'] == [{'scene_id':'focus-room','shot_indexes':[2]}]
+    assert 'input/spatial_plan.json' in task['evidence_files']
+    assert any('save output/repair.json' in rule for rule in task['execution_rules'])
+    next_task = prepare(ctx, {'adopted':True, 'repair_actions':{'clip_02':[], 'clip_03':['retake']}}, {'issues':[]}, [])
+    assert next_task['focus']['clip_id'] == 'clip_03'
+
+
 def test_completed_old_pending_receipt_is_presented_as_remaining_work(tmp_path):
     from novel_manga.application.agents.episode.current_task import prepare
     ctx=SimpleNamespace(work_dir=tmp_path/'sandbox',episode_dir=tmp_path/'book/book_1',run_dir=tmp_path)

@@ -1,0 +1,2974 @@
+{
+  "total_approved_shots": 39,
+  "total_video_shots": 37,
+  "body_seconds": 253,
+  "total_seconds": 259,
+  "map": [
+    {
+      "approved_index": 1,
+      "production_index": 1,
+      "kind": "video",
+      "seconds": 7
+    },
+    {
+      "approved_index": 2,
+      "production_index": null,
+      "kind": "world_card",
+      "seconds": 3
+    },
+    {
+      "approved_index": 3,
+      "production_index": 2,
+      "kind": "video",
+      "seconds": 7
+    },
+    {
+      "approved_index": 4,
+      "production_index": 3,
+      "kind": "video",
+      "seconds": 7
+    },
+    {
+      "approved_index": 5,
+      "production_index": 4,
+      "kind": "video",
+      "seconds": 5
+    },
+    {
+      "approved_index": 6,
+      "production_index": 5,
+      "kind": "video",
+      "seconds": 5
+    },
+    {
+      "approved_index": 7,
+      "production_index": 6,
+      "kind": "video",
+      "seconds": 8
+    },
+    {
+      "approved_index": 8,
+      "production_index": 7,
+      "kind": "video",
+      "seconds": 11
+    },
+    {
+      "approved_index": 9,
+      "production_index": 8,
+      "kind": "video",
+      "seconds": 5
+    },
+    {
+      "approved_index": 10,
+      "production_index": 9,
+      "kind": "video",
+      "seconds": 4
+    },
+    {
+      "approved_index": 11,
+      "production_index": 10,
+      "kind": "video",
+      "seconds": 8
+    },
+    {
+      "approved_index": 12,
+      "production_index": 11,
+      "kind": "video",
+      "seconds": 7
+    },
+    {
+      "approved_index": 13,
+      "production_index": 12,
+      "kind": "video",
+      "seconds": 6
+    },
+    {
+      "approved_index": 14,
+      "production_index": 13,
+      "kind": "video",
+      "seconds": 8
+    },
+    {
+      "approved_index": 15,
+      "production_index": 14,
+      "kind": "video",
+      "seconds": 7
+    },
+    {
+      "approved_index": 16,
+      "production_index": 15,
+      "kind": "video",
+      "seconds": 9
+    },
+    {
+      "approved_index": 17,
+      "production_index": 16,
+      "kind": "video",
+      "seconds": 6
+    },
+    {
+      "approved_index": 18,
+      "production_index": 17,
+      "kind": "video",
+      "seconds": 4
+    },
+    {
+      "approved_index": 19,
+      "production_index": 18,
+      "kind": "video",
+      "seconds": 6
+    },
+    {
+      "approved_index": 20,
+      "production_index": 19,
+      "kind": "video",
+      "seconds": 8
+    },
+    {
+      "approved_index": 21,
+      "production_index": 20,
+      "kind": "video",
+      "seconds": 5
+    },
+    {
+      "approved_index": 22,
+      "production_index": 21,
+      "kind": "video",
+      "seconds": 7
+    },
+    {
+      "approved_index": 23,
+      "production_index": 22,
+      "kind": "video",
+      "seconds": 8
+    },
+    {
+      "approved_index": 24,
+      "production_index": 23,
+      "kind": "video",
+      "seconds": 7
+    },
+    {
+      "approved_index": 25,
+      "production_index": 24,
+      "kind": "video",
+      "seconds": 5
+    },
+    {
+      "approved_index": 26,
+      "production_index": 25,
+      "kind": "video",
+      "seconds": 8
+    },
+    {
+      "approved_index": 27,
+      "production_index": 26,
+      "kind": "video",
+      "seconds": 4
+    },
+    {
+      "approved_index": 28,
+      "production_index": 27,
+      "kind": "video",
+      "seconds": 3
+    },
+    {
+      "approved_index": 29,
+      "production_index": 28,
+      "kind": "video",
+      "seconds": 5
+    },
+    {
+      "approved_index": 30,
+      "production_index": 29,
+      "kind": "video",
+      "seconds": 5
+    },
+    {
+      "approved_index": 31,
+      "production_index": 30,
+      "kind": "video",
+      "seconds": 4
+    },
+    {
+      "approved_index": 32,
+      "production_index": 31,
+      "kind": "video",
+      "seconds": 8
+    },
+    {
+      "approved_index": 33,
+      "production_index": 32,
+      "kind": "video",
+      "seconds": 8
+    },
+    {
+      "approved_index": 34,
+      "production_index": 33,
+      "kind": "video",
+      "seconds": 9
+    },
+    {
+      "approved_index": 35,
+      "production_index": 34,
+      "kind": "video",
+      "seconds": 6
+    },
+    {
+      "approved_index": 36,
+      "production_index": 35,
+      "kind": "video",
+      "seconds": 11
+    },
+    {
+      "approved_index": 37,
+      "production_index": 36,
+      "kind": "video",
+      "seconds": 11
+    },
+    {
+      "approved_index": 38,
+      "production_index": 37,
+      "kind": "video",
+      "seconds": 11
+    },
+    {
+      "approved_index": 39,
+      "production_index": null,
+      "kind": "end_card",
+      "seconds": 3
+    }
+  ],
+  "production_chapter_script": {
+    "shots": [
+      {
+        "index": 1,
+        "scene_id": "S01",
+        "shot_id": "VIS01",
+        "segment_id": "visual_approved_shot_01",
+        "segment_ids": [
+          "visual_approved_shot_01"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "白天，雕塑广场。一个男孩的右膝擦破，灰短裤膝口蹭着伤处。他被守卫牵着向中心正门走，回身要找母亲。母亲伸出双手，嘴角却一直向上；她的手只碰到孩子的指尖就被隔开。知遥的米色袖口从拍摄画面下沿伸进来，又因为守卫横过来的身体停住。哭声持续，画面没有把孩子带离的全过程拍完。",
+        "location": "中心正门广场·白天",
+        "duration_seconds": 7,
+        "characters": [
+          "知遥",
+          "母亲",
+          "男孩",
+          "守卫"
+        ],
+        "in_frame": [
+          "知遥",
+          "母亲",
+          "男孩",
+          "守卫"
+        ],
+        "start_state": "白天；孩子右膝擦破，灰短裤裤边碰伤处；母亲笑着伸手，知遥手机已后置记录。",
+        "event": "白天，雕塑广场。一个男孩的右膝擦破，灰短裤膝口蹭着伤处。他被守卫牵着向中心正门走，回身要找母亲。母亲伸出双手，嘴角却一直向上；她的手只碰到孩子的指尖就被隔开。知遥的米色袖口从拍摄画面下沿伸进来，又因为守卫横过来的身体停住。哭声持续，画面没有把孩子带离的全过程拍完。",
+        "end_state": "母子指尖分开、哭声仍在；未拍完带离全过程。",
+        "camera": "旅行手机后置视角，腰胸之间高度，先容纳孩子与母亲伸来的手。孩子回身时抬至双人中近景，让观众同时读到母亲的笑嘴和发红的眼；守卫身体进入前景时停住，知遥袖口仍留在下沿。",
+        "turns": [
+          {
+            "speaker_name": "母亲",
+            "text": "他只是摔疼了。别让他笑。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "她跟着孩子迈一步，声音急，却把尾音压住；重音只落在‘疼’，说完仍咬着维持笑容。"
+          }
+        ],
+        "purpose": "建立具体矛盾：母亲要抱孩子，身体与笑容却不一致。观众先见到母亲忍耐，知遥此时只顾伸手。",
+        "sfx": "孩子自然哭声从第一帧开始；母亲衣袖摩擦、鞋底拖地。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "白天自然光/大厅现有灯",
+        "props": [
+          "手机"
+        ],
+        "scene_objects": [
+          "雕塑"
+        ],
+        "wears": {
+          "知遥": "快乐监控装置"
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "在母子指尖分开、哭声未止时硬切卡；不靠警报制造开场。",
+        "origin_index": 1,
+        "source_shot": 1,
+        "label": "VIS01",
+        "authored_location": "中心正门广场·白天",
+        "scene_time": "白天自然光/大厅现有灯",
+        "visual_prompt": "白天；孩子右膝擦破，灰短裤裤边碰伤处；母亲笑着伸手，知遥手机已后置记录。 白天，雕塑广场。一个男孩的右膝擦破，灰短裤膝口蹭着伤处。他被守卫牵着向中心正门走，回身要找母亲。母亲伸出双手，嘴角却一直向上；她的手只碰到孩子的指尖就被隔开。知遥的米色袖口从拍摄画面下沿伸进来，又因为守卫横过来的身体停住。哭声持续，画面没有把孩子带离的全过程拍完。 母子指尖分开、哭声仍在；未拍完带离全过程。",
+        "motion_prompt": "白天，雕塑广场。一个男孩的右膝擦破，灰短裤膝口蹭着伤处。他被守卫牵着向中心正门走，回身要找母亲。母亲伸出双手，嘴角却一直向上；她的手只碰到孩子的指尖就被隔开。知遥的米色袖口从拍摄画面下沿伸进来，又因为守卫横过来的身体停住。哭声持续，画面没有把孩子带离的全过程拍完。",
+        "shot_scale": "旅行手机后置视角，腰胸之间高度，先容纳孩子与母亲伸来的手。孩子回身时抬至双人中近景，让观众同时读到母亲的笑嘴和发红的眼；守卫身体进入前景时停住，知遥袖口仍留在下沿。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 2,
+        "scene_id": "S02",
+        "shot_id": "VIS03",
+        "segment_id": "visual_approved_shot_03",
+        "segment_ids": [
+          "visual_approved_shot_03"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "入境柜台前，知遥高马尾、米色外套、白内搭、灰绿工装裤与黑背包均与角色图一致。她拿手机自拍，柜台工作人员把一个脸侧装置推过来。知遥先看镜头，装置滑到手边时把目光移过去，接住它。",
+        "location": "入境大厅",
+        "duration_seconds": 7,
+        "characters": [
+          "知遥",
+          "入境工作人员"
+        ],
+        "in_frame": [
+          "知遥",
+          "入境工作人员"
+        ],
+        "start_state": "稍早入境；知遥尚未佩戴监控装置，自拍办手续。",
+        "event": "入境柜台前，知遥高马尾、米色外套、白内搭、灰绿工装裤与黑背包均与角色图一致。她拿手机自拍，柜台工作人员把一个脸侧装置推过来。知遥先看镜头，装置滑到手边时把目光移过去，接住它。",
+        "end_state": "知遥接住装置，目光移到柜台规则牌。",
+        "camera": "自拍中近景，保持脸与柜台边缘的装置同时可见；装置滑来触发轻微下俯，终点是她手指捏住装置，脸仍在上半画面。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "text": "我是知遥。今天这站，笑之国，先办入境。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "语气轻松，先向观众打招呼；装置递来后把后一句顺着接物动作说完，末尾不补感叹。"
+          }
+        ],
+        "purpose": "把知遥建立为正在旅行的人，并让手续打断自我介绍。",
+        "sfx": "大厅交谈底噪；塑料底托擦柜台。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "白天自然光/大厅现有灯",
+        "props": [
+          "手机",
+          "快乐监控装置"
+        ],
+        "scene_objects": [],
+        "wears": {},
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "她目光越过装置看见柜台侧牌，切所看内容。",
+        "origin_index": 3,
+        "source_shot": 3,
+        "label": "VIS03",
+        "authored_location": "入境大厅",
+        "scene_time": "白天自然光/大厅现有灯",
+        "visual_prompt": "稍早入境；知遥尚未佩戴监控装置，自拍办手续。 入境柜台前，知遥高马尾、米色外套、白内搭、灰绿工装裤与黑背包均与角色图一致。她拿手机自拍，柜台工作人员把一个脸侧装置推过来。知遥先看镜头，装置滑到手边时把目光移过去，接住它。 知遥接住装置，目光移到柜台规则牌。",
+        "motion_prompt": "入境柜台前，知遥高马尾、米色外套、白内搭、灰绿工装裤与黑背包均与角色图一致。她拿手机自拍，柜台工作人员把一个脸侧装置推过来。知遥先看镜头，装置滑到手边时把目光移过去，接住它。",
+        "shot_scale": "自拍中近景，保持脸与柜台边缘的装置同时可见；装置滑来触发轻微下俯，终点是她手指捏住装置，脸仍在上半画面。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 3,
+        "scene_id": "S02",
+        "shot_id": "VIS04",
+        "segment_id": "visual_approved_shot_04",
+        "segment_ids": [
+          "visual_approved_shot_04"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "柜台侧的原生规则牌显示三条既有事实：『必须佩戴快乐监控装置』『公共场所保持微笑』『传播悲伤情绪者送往快乐矫正中心』。工作人员在牌旁给知遥扣上同款脸侧装置，扣好后用手示意她微笑。她看到第三条，原本点头的动作停了一下。",
+        "location": "入境大厅",
+        "duration_seconds": 7,
+        "characters": [
+          "知遥",
+          "入境工作人员"
+        ],
+        "in_frame": [
+          "知遥",
+          "入境工作人员"
+        ],
+        "start_state": "工作人员递来装置后，知遥在柜台侧规则牌旁等扣合。",
+        "event": "柜台侧的原生规则牌显示三条既有事实：『必须佩戴快乐监控装置』『公共场所保持微笑』『传播悲伤情绪者送往快乐矫正中心』。工作人员在牌旁给知遥扣上同款脸侧装置，扣好后用手示意她微笑。她看到第三条，原本点头的动作停了一下。",
+        "end_state": "装置已经扣合；知遥读到第三条，点头停住。",
+        "camera": "知遥肩侧的中近景，牌占画面上部、她脸侧与工作人员手占下部；固定观察，保持到扣合、她读完第三条并停顿。不是脱离当下的整屏读牌。",
+        "turns": [
+          {
+            "speaker_name": "入境工作人员",
+            "text": "戴好。看前面，微笑。",
+            "delivery_mode": "offscreen_dialogue",
+            "emotion": "公事口气，语速平常，不带威胁腔；手势与‘微笑’同步。"
+          }
+        ],
+        "purpose": "让规则可读，并把‘强制’落实到一次身体配合，而非知遥逐条复述。",
+        "sfx": "装置卡扣响；大厅环境连续。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "白天自然光/大厅现有灯",
+        "props": [
+          "快乐监控装置"
+        ],
+        "scene_objects": [
+          "规则牌"
+        ],
+        "wears": {
+          "知遥": "快乐监控装置"
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "工作人员示意笑的手势停在她眼前，切到她实际完成这个要求。",
+        "origin_index": 4,
+        "source_shot": 4,
+        "label": "VIS04",
+        "authored_location": "入境大厅",
+        "scene_time": "白天自然光/大厅现有灯",
+        "visual_prompt": "工作人员递来装置后，知遥在柜台侧规则牌旁等扣合。 柜台侧的原生规则牌显示三条既有事实：『必须佩戴快乐监控装置』『公共场所保持微笑』『传播悲伤情绪者送往快乐矫正中心』。工作人员在牌旁给知遥扣上同款脸侧装置，扣好后用手示意她微笑。她看到第三条，原本点头的动作停了一下。 装置已经扣合；知遥读到第三条，点头停住。",
+        "motion_prompt": "柜台侧的原生规则牌显示三条既有事实：『必须佩戴快乐监控装置』『公共场所保持微笑』『传播悲伤情绪者送往快乐矫正中心』。工作人员在牌旁给知遥扣上同款脸侧装置，扣好后用手示意她微笑。她看到第三条，原本点头的动作停了一下。",
+        "shot_scale": "知遥肩侧的中近景，牌占画面上部、她脸侧与工作人员手占下部；固定观察，保持到扣合、她读完第三条并停顿。不是脱离当下的整屏读牌。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 4,
+        "scene_id": "S02",
+        "shot_id": "VIS05",
+        "segment_id": "visual_approved_shot_05",
+        "segment_ids": [
+          "visual_approved_shot_05"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥先给出一个小笑，目光移向大厅快乐程度大屏。屏上与她对应的头像和表情有变化，但不编合格阈值。她抬起手指想碰装置，又被工作人员下一位的动作催着离开。",
+        "location": "入境大厅",
+        "duration_seconds": 5,
+        "characters": [
+          "知遥",
+          "入境工作人员"
+        ],
+        "in_frame": [
+          "知遥",
+          "入境工作人员"
+        ],
+        "start_state": "脸侧装置刚扣好，工作人员示意知遥微笑。",
+        "event": "知遥先给出一个小笑，目光移向大厅快乐程度大屏。屏上与她对应的头像和表情有变化，但不编合格阈值。她抬起手指想碰装置，又被工作人员下一位的动作催着离开。",
+        "end_state": "知遥笑后紧咬肌，被下一位手续催离柜台。",
+        "camera": "从她的侧前方脸部近景开始，沿她视线小幅转向后景大屏，终点仍保留她脸侧和屏幕对应头像；她被催走才切。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "text": "要一直这样吗？",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "小声问向工作人员，疑惑落在‘一直’，说完看对方是否回应；对方已招呼下一人。"
+          }
+        ],
+        "purpose": "让她成为规则作用下的一个人，完成开场因果所需的制度信息。",
+        "sfx": "队伍前移脚步；下一只底托擦柜台。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "白天自然光/大厅现有灯",
+        "props": [
+          "快乐监控装置"
+        ],
+        "scene_objects": [
+          "大屏"
+        ],
+        "wears": {
+          "知遥": "快乐监控装置"
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "下一只底托擦来的声音切到广场正门正在关闭的门。",
+        "origin_index": 5,
+        "source_shot": 5,
+        "label": "VIS05",
+        "authored_location": "入境大厅",
+        "scene_time": "白天自然光/大厅现有灯",
+        "visual_prompt": "脸侧装置刚扣好，工作人员示意知遥微笑。 知遥先给出一个小笑，目光移向大厅快乐程度大屏。屏上与她对应的头像和表情有变化，但不编合格阈值。她抬起手指想碰装置，又被工作人员下一位的动作催着离开。 知遥笑后紧咬肌，被下一位手续催离柜台。",
+        "motion_prompt": "知遥先给出一个小笑，目光移向大厅快乐程度大屏。屏上与她对应的头像和表情有变化，但不编合格阈值。她抬起手指想碰装置，又被工作人员下一位的动作催着离开。",
+        "shot_scale": "从她的侧前方脸部近景开始，沿她视线小幅转向后景大屏，终点仍保留她脸侧和屏幕对应头像；她被催走才切。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 5,
+        "scene_id": "S03",
+        "shot_id": "VIS06",
+        "segment_id": "visual_approved_shot_06",
+        "segment_ids": [
+          "visual_approved_shot_06"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "回到开场事件结束后的同一广场。中心正门在孩子身后合上；母亲伸着的两只手还留在门外。知遥从后面赶到，脸侧装置仍在。母亲缓缓把手收向自己腹前，嘴角保持着。这里不再重演孩子被带走。",
+        "location": "中心正门广场·白天",
+        "duration_seconds": 5,
+        "characters": [
+          "母亲",
+          "知遥"
+        ],
+        "in_frame": [
+          "母亲",
+          "知遥"
+        ],
+        "start_state": "回到冷开之后；孩子已经进入中心，正门将合，母亲双手仍伸在门外。",
+        "event": "回到开场事件结束后的同一广场。中心正门在孩子身后合上；母亲伸着的两只手还留在门外。知遥从后面赶到，脸侧装置仍在。母亲缓缓把手收向自己腹前，嘴角保持着。这里不再重演孩子被带走。",
+        "end_state": "正门合锁，母亲抓袖口，孩子哭声隔远到听不见。",
+        "camera": "门外侧固定中景，母亲双手在近处，门缝最后的亮线在后景；门合上后保持到她手收回。知遥只在边缘进入。",
+        "turns": [],
+        "purpose": "将时间接回冷开之后，把受害后果留给具体母亲。",
+        "sfx": "门锁落下；孩子哭声被门隔远后听不见；广场人声稀薄。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "白天自然光/大厅现有灯",
+        "props": [],
+        "scene_objects": [],
+        "wears": {
+          "知遥": "快乐监控装置"
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "抓袖口的手停稳，切两人第一次真正交谈。",
+        "origin_index": 6,
+        "source_shot": 6,
+        "label": "VIS06",
+        "authored_location": "中心正门广场·白天",
+        "scene_time": "白天自然光/大厅现有灯",
+        "visual_prompt": "回到冷开之后；孩子已经进入中心，正门将合，母亲双手仍伸在门外。 回到开场事件结束后的同一广场。中心正门在孩子身后合上；母亲伸着的两只手还留在门外。知遥从后面赶到，脸侧装置仍在。母亲缓缓把手收向自己腹前，嘴角保持着。这里不再重演孩子被带走。 正门合锁，母亲抓袖口，孩子哭声隔远到听不见。",
+        "motion_prompt": "回到开场事件结束后的同一广场。中心正门在孩子身后合上；母亲伸着的两只手还留在门外。知遥从后面赶到，脸侧装置仍在。母亲缓缓把手收向自己腹前，嘴角保持着。这里不再重演孩子被带走。",
+        "shot_scale": "门外侧固定中景，母亲双手在近处，门缝最后的亮线在后景；门合上后保持到她手收回。知遥只在边缘进入。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 6,
+        "scene_id": "S03",
+        "shot_id": "VIS07",
+        "segment_id": "visual_approved_shot_07",
+        "segment_ids": [
+          "visual_approved_shot_07"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "母亲盯着门，知遥停在她侧后方，没有把手机重新举到脸前。知遥问完，看门再看母亲。母亲轻摇头，不敢把笑收掉；她用掌根压住另一只手的颤动。",
+        "location": "中心正门广场·白天",
+        "duration_seconds": 8,
+        "characters": [
+          "母亲",
+          "知遥"
+        ],
+        "in_frame": [
+          "母亲",
+          "知遥"
+        ],
+        "start_state": "母亲把手收回抓袖口，知遥停在她侧后方，正门紧闭。",
+        "event": "母亲盯着门，知遥停在她侧后方，没有把手机重新举到脸前。知遥问完，看门再看母亲。母亲轻摇头，不敢把笑收掉；她用掌根压住另一只手的颤动。",
+        "end_state": "母亲第一次转向知遥，准备拿纸。",
+        "camera": "两人胸像同框，母亲占前侧、知遥稍后；固定机位容纳双方视线，正门始终在一侧，不逐句切脸。末尾停在母亲终于转向知遥。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "text": "你能进去吗？",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "刚赶到，气尚未匀，但问题清楚短促；问完闭嘴等待。"
+          },
+          {
+            "speaker_name": "母亲",
+            "text": "不让。我得在这儿等他。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "很轻地回答，不笑着讨好对方，嘴角是硬撑住的；后半句带着仍要等的坚持。"
+          }
+        ],
+        "purpose": "把抽象恐惧变成一个尚未完成的目标：家长进不去，孩子仍在里面。",
+        "sfx": "远处广场扬声器循环轻快器乐，属现场有源音乐。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "白天自然光/大厅现有灯",
+        "props": [],
+        "scene_objects": [],
+        "wears": {
+          "知遥": "快乐监控装置"
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "她第一次转眼看知遥，下一镜接她从袖内取纸条的动作。",
+        "origin_index": 7,
+        "source_shot": 7,
+        "label": "VIS07",
+        "authored_location": "中心正门广场·白天",
+        "scene_time": "白天自然光/大厅现有灯",
+        "visual_prompt": "母亲把手收回抓袖口，知遥停在她侧后方，正门紧闭。 母亲盯着门，知遥停在她侧后方，没有把手机重新举到脸前。知遥问完，看门再看母亲。母亲轻摇头，不敢把笑收掉；她用掌根压住另一只手的颤动。 母亲第一次转向知遥，准备拿纸。",
+        "motion_prompt": "母亲盯着门，知遥停在她侧后方，没有把手机重新举到脸前。知遥问完，看门再看母亲。母亲轻摇头，不敢把笑收掉；她用掌根压住另一只手的颤动。",
+        "shot_scale": "两人胸像同框，母亲占前侧、知遥稍后；固定机位容纳双方视线，正门始终在一侧，不逐句切脸。末尾停在母亲终于转向知遥。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 7,
+        "scene_id": "S03",
+        "shot_id": "VIS08",
+        "segment_id": "visual_approved_shot_08",
+        "segment_ids": [
+          "visual_approved_shot_08"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "母亲从袖内取出一张折纸，交到知遥空着的左手。纸正面是原有的『今晚十二点，第七井』，背面多一个本版新增的简笔路线箭头与『后门』两字。母亲指向中心侧后方，再指纸条。知遥翻过来确认，没立刻承诺救人。",
+        "location": "中心正门广场·白天",
+        "duration_seconds": 11,
+        "characters": [
+          "母亲",
+          "知遥"
+        ],
+        "in_frame": [
+          "母亲",
+          "知遥"
+        ],
+        "start_state": "母亲转眼看向知遥，折纸仍在自己袖内。",
+        "event": "母亲从袖内取出一张折纸，交到知遥空着的左手。纸正面是原有的『今晚十二点，第七井』，背面多一个本版新增的简笔路线箭头与『后门』两字。母亲指向中心侧后方，再指纸条。知遥翻过来确认，没立刻承诺救人。",
+        "end_state": "知遥翻看纸后抬头望门，尚未承诺救人。",
+        "camera": "从两人腰部与纸的近景开始，母亲点纸后小幅上仰至双人中近景；终点看清知遥在听，而非给纸条独占11秒。",
+        "turns": [
+          {
+            "speaker_name": "母亲",
+            "text": "有人塞给我的，说能从后门进去。你要是去了……替我看看他。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "把能说的赶快说完，‘说能’保留不确定；最后一句放慢，望着知遥等回答。"
+          }
+        ],
+        "purpose": "给出有明确受益者的行动起因及有限路线信息；纸条不证明危险已解除。",
+        "sfx": "纸纤维展开；远处广场扬声器器乐。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "白天自然光/大厅现有灯",
+        "props": [
+          "纸条",
+          "手机"
+        ],
+        "scene_objects": [
+          "纸条",
+          "后门"
+        ],
+        "wears": {
+          "知遥": "快乐监控装置"
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "知遥抬头从纸转向门，切她作出的有限承诺。",
+        "origin_index": 8,
+        "source_shot": 8,
+        "label": "VIS08",
+        "authored_location": "中心正门广场·白天",
+        "scene_time": "白天自然光/大厅现有灯",
+        "visual_prompt": "母亲转眼看向知遥，折纸仍在自己袖内。 母亲从袖内取出一张折纸，交到知遥空着的左手。纸正面是原有的『今晚十二点，第七井』，背面多一个本版新增的简笔路线箭头与『后门』两字。母亲指向中心侧后方，再指纸条。知遥翻过来确认，没立刻承诺救人。 知遥翻看纸后抬头望门，尚未承诺救人。",
+        "motion_prompt": "母亲从袖内取出一张折纸，交到知遥空着的左手。纸正面是原有的『今晚十二点，第七井』，背面多一个本版新增的简笔路线箭头与『后门』两字。母亲指向中心侧后方，再指纸条。知遥翻过来确认，没立刻承诺救人。",
+        "shot_scale": "从两人腰部与纸的近景开始，母亲点纸后小幅上仰至双人中近景；终点看清知遥在听，而非给纸条独占11秒。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 8,
+        "scene_id": "S03",
+        "shot_id": "VIS09",
+        "segment_id": "visual_approved_shot_09",
+        "segment_ids": [
+          "visual_approved_shot_09"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥把纸条折回，放进外套左胸内袋。她把手机收低，转向井所在的侧街；母亲仍站在门外。转身前，她又回看母亲一次，母亲只点头。",
+        "location": "中心正门广场·白天",
+        "duration_seconds": 5,
+        "characters": [
+          "母亲",
+          "知遥"
+        ],
+        "in_frame": [
+          "母亲",
+          "知遥"
+        ],
+        "start_state": "纸已交到知遥左手，她刚看过正反方向。",
+        "event": "知遥把纸条折回，放进外套左胸内袋。她把手机收低，转向井所在的侧街；母亲仍站在门外。转身前，她又回看母亲一次，母亲只点头。",
+        "end_state": "纸入左胸内袋，知遥向井方向走；母亲留正门点头。",
+        "camera": "知遥侧前方中近景，母亲与门在后景；跟知遥转半步后停，让两人距离在画面里被拉开。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "text": "我去看看。你在这儿等我。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "语速放稳，目光对母亲而非镜头；不把‘看看’说成豪言。"
+          }
+        ],
+        "purpose": "将旅行动机改为具体承诺，同时限定承诺仅是确认情况。",
+        "sfx": "外套内袋摩擦；知遥迈步；远处广场器乐。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "白天自然光/大厅现有灯",
+        "props": [
+          "纸条",
+          "手机"
+        ],
+        "scene_objects": [
+          "纸条"
+        ],
+        "wears": {
+          "知遥": "快乐监控装置"
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "她走向已指明的侧街，切同一街角的夜间状态，以环境完成等到午夜。",
+        "origin_index": 9,
+        "source_shot": 9,
+        "label": "VIS09",
+        "authored_location": "中心正门广场·白天",
+        "scene_time": "白天自然光/大厅现有灯",
+        "visual_prompt": "纸已交到知遥左手，她刚看过正反方向。 知遥把纸条折回，放进外套左胸内袋。她把手机收低，转向井所在的侧街；母亲仍站在门外。转身前，她又回看母亲一次，母亲只点头。 纸入左胸内袋，知遥向井方向走；母亲留正门点头。",
+        "motion_prompt": "知遥把纸条折回，放进外套左胸内袋。她把手机收低，转向井所在的侧街；母亲仍站在门外。转身前，她又回看母亲一次，母亲只点头。",
+        "shot_scale": "知遥侧前方中近景，母亲与门在后景；跟知遥转半步后停，让两人距离在画面里被拉开。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 9,
+        "scene_id": "S04",
+        "shot_id": "VIS10",
+        "segment_id": "visual_approved_shot_10",
+        "segment_ids": [
+          "visual_approved_shot_10"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "夜间同一侧街，白天构图中的摊位已关。第七井在近处，中心后墙仍在街尽头；知遥从原来的广场方向进入，停到井边。画面角落只给允许的换时字幕『当晚·临近零点』。",
+        "location": "第七井夜街",
+        "duration_seconds": 4,
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "start_state": "同侧街临近零点，井盖未被推开，知遥从广场方向来。",
+        "event": "夜间同一侧街，白天构图中的摊位已关。第七井在近处，中心后墙仍在街尽头；知遥从原来的广场方向进入，停到井边。画面角落只给允许的换时字幕『当晚·临近零点』。",
+        "end_state": "知遥在井边停下，低头拿纸。",
+        "camera": "沿白天去向的固定街道全景，地面井盖、中心后墙与来路同框；让知遥实际走入并停住，不用与前镜无关的夜城空镜。",
+        "turns": [],
+        "purpose": "完成明确换时，并使井不是突然出现的新站点。",
+        "sfx": "夜风掠过关摊帘布；知遥脚步走近。",
+        "audio_plan": {
+          "music_cue": "两音符低音弦乐主题在知遥停步时极轻进入。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [],
+        "scene_objects": [],
+        "wears": {
+          "知遥": "快乐监控装置"
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "她低头比对井盖，切纸上‘第七井’与井盖旁既有数字7同框。",
+        "origin_index": 10,
+        "source_shot": 10,
+        "label": "VIS10",
+        "authored_location": "第七井夜街",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "同侧街临近零点，井盖未被推开，知遥从广场方向来。 夜间同一侧街，白天构图中的摊位已关。第七井在近处，中心后墙仍在街尽头；知遥从原来的广场方向进入，停到井边。画面角落只给允许的换时字幕『当晚·临近零点』。 知遥在井边停下，低头拿纸。",
+        "motion_prompt": "夜间同一侧街，白天构图中的摊位已关。第七井在近处，中心后墙仍在街尽头；知遥从原来的广场方向进入，停到井边。画面角落只给允许的换时字幕『当晚·临近零点』。",
+        "shot_scale": "沿白天去向的固定街道全景，地面井盖、中心后墙与来路同框；让知遥实际走入并停住，不用与前镜无关的夜城空镜。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 10,
+        "scene_id": "S04",
+        "shot_id": "VIS11",
+        "segment_id": "visual_approved_shot_11",
+        "segment_ids": [
+          "visual_approved_shot_11"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥左手把纸与井旁数字7比对，右手手机短暂转为自拍，脸侧装置清楚在。她说出当前目的，将纸放回同一内袋，把手机收低后抽出手电。她不读纸条，也不把井下面说成已知的安全通路。",
+        "location": "第七井夜街",
+        "duration_seconds": 8,
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "start_state": "知遥在井旁，装置仍戴，左手拿纸，右手手机。",
+        "event": "知遥左手把纸与井旁数字7比对，右手手机短暂转为自拍，脸侧装置清楚在。她说出当前目的，将纸放回同一内袋，把手机收低后抽出手电。她不读纸条，也不把井下面说成已知的安全通路。",
+        "end_state": "纸回同一内袋，知遥蹲下，左手压井边，右手拿电。",
+        "camera": "低位纸与井号近景起，随手机举起到自拍胸像；她开始收手机时画面回井盖边。终点是她的左手压到井盖边缘、右手已拿手电。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "text": "正门等不到消息。我从这儿试试，能不能看见那个孩子。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "边确认数字边低声说，语气是向观众报一个决定；‘能不能’是当下疑问，句后收口做事。"
+          }
+        ],
+        "purpose": "使观众记住受托目标，给实际下井动作分配手与设备。",
+        "sfx": "纸折回；内袋布料；手电开关。",
+        "audio_plan": {
+          "music_cue": "延续上一镜极轻两音低弦。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "纸条",
+          "手机",
+          "手电"
+        ],
+        "scene_objects": [
+          "纸条"
+        ],
+        "wears": {
+          "知遥": "快乐监控装置"
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "井盖被试出一条缝，切她真正用力推开的动作。",
+        "origin_index": 11,
+        "source_shot": 11,
+        "label": "VIS11",
+        "authored_location": "第七井夜街",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥在井旁，装置仍戴，左手拿纸，右手手机。 知遥左手把纸与井旁数字7比对，右手手机短暂转为自拍，脸侧装置清楚在。她说出当前目的，将纸放回同一内袋，把手机收低后抽出手电。她不读纸条，也不把井下面说成已知的安全通路。 纸回同一内袋，知遥蹲下，左手压井边，右手拿电。",
+        "motion_prompt": "知遥左手把纸与井旁数字7比对，右手手机短暂转为自拍，脸侧装置清楚在。她说出当前目的，将纸放回同一内袋，把手机收低后抽出手电。她不读纸条，也不把井下面说成已知的安全通路。",
+        "shot_scale": "低位纸与井号近景起，随手机举起到自拍胸像；她开始收手机时画面回井盖边。终点是她的左手压到井盖边缘、右手已拿手电。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 11,
+        "scene_id": "S04",
+        "shot_id": "VIS12",
+        "segment_id": "visual_approved_shot_12",
+        "segment_ids": [
+          "visual_approved_shot_12"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥把手机放入可向前记录的外套胸前固定夹，右手电暂夹在井沿。她双手推开已松动的井盖，只推到够下人的宽度；再拿回手电，先用光确认梯级，握住第一根梯级向下。井盖保持半开。",
+        "location": "第七井井口与梯",
+        "duration_seconds": 7,
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "start_state": "知遥蹲在井口，左手压井盖边，右手拿电，手机尚需入胸夹。",
+        "event": "知遥把手机放入可向前记录的外套胸前固定夹，右手电暂夹在井沿。她双手推开已松动的井盖，只推到够下人的宽度；再拿回手电，先用光确认梯级，握住第一根梯级向下。井盖保持半开。",
+        "end_state": "井盖半开；知遥头肩入井、双脚踩稳梯级，手机在胸夹，手电取回。",
+        "camera": "井沿斜侧近中景，动作完整连续；跟随她身体降低轻微俯拍，终点是头肩进入井内、双脚踩稳梯级，不跳过第一步。",
+        "turns": [],
+        "purpose": "将冒险落实为需要腾手、探路、承重的身体过程。",
+        "sfx": "金属井盖擦石；首次踩梯实响。",
+        "audio_plan": {
+          "music_cue": "低弦暂停，让井盖和踩梯声先决定重量。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机",
+          "手电",
+          "胸前固定夹"
+        ],
+        "scene_objects": [
+          "井盖",
+          "梯"
+        ],
+        "wears": {
+          "知遥": "快乐监控装置"
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "她第二脚踩梯的声音接到下一镜同一次下降的末段。",
+        "origin_index": 12,
+        "source_shot": 12,
+        "label": "VIS12",
+        "authored_location": "第七井井口与梯",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥蹲在井口，左手压井盖边，右手拿电，手机尚需入胸夹。 知遥把手机放入可向前记录的外套胸前固定夹，右手电暂夹在井沿。她双手推开已松动的井盖，只推到够下人的宽度；再拿回手电，先用光确认梯级，握住第一根梯级向下。井盖保持半开。 井盖半开；知遥头肩入井、双脚踩稳梯级，手机在胸夹，手电取回。",
+        "motion_prompt": "知遥把手机放入可向前记录的外套胸前固定夹，右手电暂夹在井沿。她双手推开已松动的井盖，只推到够下人的宽度；再拿回手电，先用光确认梯级，握住第一根梯级向下。井盖保持半开。",
+        "shot_scale": "井沿斜侧近中景，动作完整连续；跟随她身体降低轻微俯拍，终点是头肩进入井内、双脚踩稳梯级，不跳过第一步。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 12,
+        "scene_id": "S04",
+        "shot_id": "VIS13",
+        "segment_id": "visual_approved_shot_13",
+        "segment_ids": [
+          "visual_approved_shot_13"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥到井底，先用手电照梯子、来路，再照横向通道。远处传来一声没有被及时压住的哭，随后有人吸气；她停下，循声转入左侧开口。此时没有警报，也没有新追兵。",
+        "location": "井底通道",
+        "duration_seconds": 6,
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "start_state": "沿同一梯下降末段，井盖半开；知遥装置仍在、胸夹手机记录、手电在手。",
+        "event": "知遥到井底，先用手电照梯子、来路，再照横向通道。远处传来一声没有被及时压住的哭，随后有人吸气；她停下，循声转入左侧开口。此时没有警报，也没有新追兵。",
+        "end_state": "脚已落井底，袖口沾潮痕；手电指进左侧开口。",
+        "camera": "胸前记录视角，下梯最后一级起，脚落地后抬向通道；哭声触发向左缓慢摇看，终点是左侧开口边缘和知遥照进去的手电光。",
+        "turns": [],
+        "purpose": "以有来源的真实情绪声引向里世界，而不是口播宣布有新发现。",
+        "sfx": "鞋落湿地；梯子余响；左侧成人抽泣及吸气。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机",
+          "手电",
+          "胸前固定夹"
+        ],
+        "scene_objects": [
+          "梯"
+        ],
+        "wears": {
+          "知遥": "快乐监控装置"
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "左侧开口被手电光照亮时切宽景，接住她和观众的注意。",
+        "origin_index": 13,
+        "source_shot": 13,
+        "label": "VIS13",
+        "authored_location": "井底通道",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "沿同一梯下降末段，井盖半开；知遥装置仍在、胸夹手机记录、手电在手。 知遥到井底，先用手电照梯子、来路，再照横向通道。远处传来一声没有被及时压住的哭，随后有人吸气；她停下，循声转入左侧开口。此时没有警报，也没有新追兵。 脚已落井底，袖口沾潮痕；手电指进左侧开口。",
+        "motion_prompt": "知遥到井底，先用手电照梯子、来路，再照横向通道。远处传来一声没有被及时压住的哭，随后有人吸气；她停下，循声转入左侧开口。此时没有警报，也没有新追兵。",
+        "shot_scale": "胸前记录视角，下梯最后一级起，脚落地后抬向通道；哭声触发向左缓慢摇看，终点是左侧开口边缘和知遥照进去的手电光。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 13,
+        "scene_id": "S05",
+        "shot_id": "VIS14",
+        "segment_id": "visual_approved_shot_14",
+        "segment_ids": [
+          "visual_approved_shot_14"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "井下开口通向灰暗的对应广场。知遥停在边缘，手电只能照到巨大雕塑的底座；上方同样上翘的石质嘴角被街区残留的固定灯照出。雕塑与白天广场同构，但表面开裂、没有明亮漆色。底座边一个成年居民坐着哭，另一个沉默捏着衣角；都是普通人。",
+        "location": "里世界对应广场",
+        "duration_seconds": 8,
+        "characters": [
+          "知遥",
+          "哭泣居民"
+        ],
+        "in_frame": [
+          "知遥",
+          "哭泣居民"
+        ],
+        "start_state": "知遥循井下左侧哭声到开口，面对灰暗的对应广场。",
+        "event": "井下开口通向灰暗的对应广场。知遥停在边缘，手电只能照到巨大雕塑的底座；上方同样上翘的石质嘴角被街区残留的固定灯照出。雕塑与白天广场同构，但表面开裂、没有明亮漆色。底座边一个成年居民坐着哭，另一个沉默捏着衣角；都是普通人。",
+        "end_state": "石笑嘴体量已见，知遥放低手电，注意落在哭者湿袖。",
+        "camera": "从知遥背侧腰高的中景起，她停步抬头时缓慢上仰，先让她与底座同框作尺度，再露出高处的笑嘴；最后轻下仰停回底座边的两个人。不是8秒盘旋奇观。",
+        "turns": [],
+        "purpose": "保留世界奇观，并把尺度对比转向具体的人：上方的笑固定，下面的脸可以变化。",
+        "sfx": "开阔空间风声；同一居民哭声；另一居民衣料声。",
+        "audio_plan": {
+          "music_cue": "低弦两音主题在石嘴完整露出时返回，注意转到哭者时退出。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机",
+          "手电"
+        ],
+        "scene_objects": [
+          "雕塑"
+        ],
+        "wears": {
+          "知遥": "快乐监控装置"
+        },
+        "extras": [
+          "另一位匿名成年居民坐在雕塑底座旁沉默捏衣角；独立长相与衣着，真实在场，不是哭泣指路居民的副本。"
+        ],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "光束从雕塑回到居民手上的湿袖口，切她正在听而不解释的反应。",
+        "origin_index": 14,
+        "source_shot": 14,
+        "label": "VIS14",
+        "authored_location": "里世界对应广场",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥循井下左侧哭声到开口，面对灰暗的对应广场。 井下开口通向灰暗的对应广场。知遥停在边缘，手电只能照到巨大雕塑的底座；上方同样上翘的石质嘴角被街区残留的固定灯照出。雕塑与白天广场同构，但表面开裂、没有明亮漆色。底座边一个成年居民坐着哭，另一个沉默捏着衣角；都是普通人。 石笑嘴体量已见，知遥放低手电，注意落在哭者湿袖。",
+        "motion_prompt": "井下开口通向灰暗的对应广场。知遥停在边缘，手电只能照到巨大雕塑的底座；上方同样上翘的石质嘴角被街区残留的固定灯照出。雕塑与白天广场同构，但表面开裂、没有明亮漆色。底座边一个成年居民坐着哭，另一个沉默捏着衣角；都是普通人。",
+        "shot_scale": "从知遥背侧腰高的中景起，她停步抬头时缓慢上仰，先让她与底座同框作尺度，再露出高处的笑嘴；最后轻下仰停回底座边的两个人。不是8秒盘旋奇观。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 14,
+        "scene_id": "S05",
+        "shot_id": "VIS15",
+        "segment_id": "visual_approved_shot_15",
+        "segment_ids": [
+          "visual_approved_shot_15"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥看着居民擦眼，脸上的笑已不在。她的脸侧装置发出原有快乐指数报警。哭者被声音惊得缩起肩；知遥立刻按住装置，退回入口旁。她在摘扣前先把手电放上墙边平面，空出双手。",
+        "location": "里世界对应广场",
+        "duration_seconds": 7,
+        "characters": [
+          "知遥",
+          "哭泣居民",
+          "系统广播"
+        ],
+        "in_frame": [
+          "知遥",
+          "哭泣居民"
+        ],
+        "start_state": "知遥在里世界入口看居民擦眼，已收起笑，装置仍贴脸。",
+        "event": "知遥看着居民擦眼，脸上的笑已不在。她的脸侧装置发出原有快乐指数报警。哭者被声音惊得缩起肩；知遥立刻按住装置，退回入口旁。她在摘扣前先把手电放上墙边平面，空出双手。",
+        "end_state": "手电放妥，双手已到装置扣位；居民从报警处转开视线。",
+        "camera": "脸侧与居民的中近景分层，知遥在前，居民局部留后景；报警一出跟她退半步，终点是她双手到扣位，居民已从声音处转开视线。",
+        "turns": [
+          {
+            "speaker_name": "系统广播",
+            "text": "快乐指数过低。请保持微笑。",
+            "delivery_mode": "offscreen_dialogue",
+            "emotion": "稳定机械音量，无情绪递进；播报不盖住第一下报警与居民吸气。"
+          }
+        ],
+        "purpose": "增加具体压力：她的监控声会侵入他人的释放空间；摘除是对当前事件的处理。",
+        "sfx": "脸侧装置报警起，按住后变闷；居民倒吸气。系统播报由turns给出。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机",
+          "手电",
+          "快乐监控装置"
+        ],
+        "scene_objects": [],
+        "wears": {
+          "知遥": "快乐监控装置"
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "手指找到扣位，切近景完成同一次解扣。",
+        "origin_index": 15,
+        "source_shot": 15,
+        "label": "VIS15",
+        "authored_location": "里世界对应广场",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥在里世界入口看居民擦眼，已收起笑，装置仍贴脸。 知遥看着居民擦眼，脸上的笑已不在。她的脸侧装置发出原有快乐指数报警。哭者被声音惊得缩起肩；知遥立刻按住装置，退回入口旁。她在摘扣前先把手电放上墙边平面，空出双手。 手电放妥，双手已到装置扣位；居民从报警处转开视线。",
+        "motion_prompt": "知遥看着居民擦眼，脸上的笑已不在。她的脸侧装置发出原有快乐指数报警。哭者被声音惊得缩起肩；知遥立刻按住装置，退回入口旁。她在摘扣前先把手电放上墙边平面，空出双手。",
+        "shot_scale": "脸侧与居民的中近景分层，知遥在前，居民局部留后景；报警一出跟她退半步，终点是她双手到扣位，居民已从声音处转开视线。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 15,
+        "scene_id": "S05",
+        "shot_id": "VIS16",
+        "segment_id": "visual_approved_shot_16",
+        "segment_ids": [
+          "visual_approved_shot_16"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥解下装置，放在井下入口墙根，拿回手电；警报随实物远离而变小，没有魔法熄灭。她取下胸前手机，右手持手机低位记录，左手持电光朝地。她回到刚才那名坐着的居民侧面，保持距离，问路。居民先擦完眼，再抬手指向雕塑右后方的一道上行阶梯。",
+        "location": "里世界对应广场",
+        "duration_seconds": 9,
+        "characters": [
+          "知遥",
+          "哭泣居民"
+        ],
+        "in_frame": [
+          "知遥",
+          "哭泣居民"
+        ],
+        "start_state": "报警被按住，手电已经搁墙边；知遥双手找到脸侧扣位。",
+        "event": "知遥解下装置，放在井下入口墙根，拿回手电；警报随实物远离而变小，没有魔法熄灭。她取下胸前手机，右手持手机低位记录，左手持电光朝地。她回到刚才那名坐着的居民侧面，保持距离，问路。居民先擦完眼，再抬手指向雕塑右后方的一道上行阶梯。",
+        "end_state": "脸侧裸露，装置在入口墙根远响；手机右持、手电左持；居民指向阶梯。",
+        "camera": "脸侧解扣近景接一个小幅后退，镜头停在知遥与坐者的双人中景；终点包含指向的阶梯起点，远处普通后门上方有可见灯。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "text": "矫正中心，怎么走？",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "等对方一次抽气结束才问，轻但正常说话，不替他解释世界。"
+          },
+          {
+            "speaker_name": "哭泣居民",
+            "text": "上去，右手边。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "擦过眼睛后声音有一点鼻音，平常指路；句后手仍指着，等她看清。"
+          }
+        ],
+        "purpose": "摘装置的结果是听清人声。居民作为人提供方向，取代搜物过关。",
+        "sfx": "解扣；装置放石边轻碰；远处装置报警；居民抽气。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机",
+          "手电",
+          "快乐监控装置"
+        ],
+        "scene_objects": [
+          "梯",
+          "雕塑"
+        ],
+        "wears": {
+          "知遥": "快乐监控装置"
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "居民的指尖停向阶梯，切阶梯全貌承接方向。",
+        "end_wears": {
+          "知遥": null
+        },
+        "origin_index": 16,
+        "source_shot": 16,
+        "label": "VIS16",
+        "authored_location": "里世界对应广场",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "报警被按住，手电已经搁墙边；知遥双手找到脸侧扣位。 知遥解下装置，放在井下入口墙根，拿回手电；警报随实物远离而变小，没有魔法熄灭。她取下胸前手机，右手持手机低位记录，左手持电光朝地。她回到刚才那名坐着的居民侧面，保持距离，问路。居民先擦完眼，再抬手指向雕塑右后方的一道上行阶梯。 脸侧裸露，装置在入口墙根远响；手机右持、手电左持；居民指向阶梯。",
+        "motion_prompt": "知遥解下装置，放在井下入口墙根，拿回手电；警报随实物远离而变小，没有魔法熄灭。她取下胸前手机，右手持手机低位记录，左手持电光朝地。她回到刚才那名坐着的居民侧面，保持距离，问路。居民先擦完眼，再抬手指向雕塑右后方的一道上行阶梯。",
+        "shot_scale": "脸侧解扣近景接一个小幅后退，镜头停在知遥与坐者的双人中景；终点包含指向的阶梯起点，远处普通后门上方有可见灯。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 16,
+        "scene_id": "S05",
+        "shot_id": "VIS17",
+        "segment_id": "visual_approved_shot_17",
+        "segment_ids": [
+          "visual_approved_shot_17"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥沿居民指的阶梯上行。镜样雕塑留在她身后，阶梯出口是现实中心后院的低门廊。她到顶后先看右侧，看到中心后门的同一微笑标志，再回看下方；没有裂地、传送或世界坍塌。",
+        "location": "里世界阶梯至中心后门",
+        "duration_seconds": 6,
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "start_state": "装置已留井下入口墙根；知遥右手手机、左手手电，居民刚指向雕塑右后方阶梯。",
+        "event": "知遥沿居民指的阶梯上行。镜样雕塑留在她身后，阶梯出口是现实中心后院的低门廊。她到顶后先看右侧，看到中心后门的同一微笑标志，再回看下方；没有裂地、传送或世界坍塌。",
+        "end_state": "知遥到门廊，看过下方来路，再转看右侧后门。",
+        "camera": "侧后方跟拍，从阶梯下三阶开始随她向上；她停在门廊时相机也停，终点同框保留下方雕塑上半部、阶梯来路及右侧中心后门。",
+        "turns": [],
+        "purpose": "把两个空间真实连起来；改变原有坍塌返回，减少无因果换站。",
+        "sfx": "脚步混响逐渐变干；后门内通风机渐清。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机",
+          "手电"
+        ],
+        "scene_objects": [
+          "梯",
+          "雕塑",
+          "后门"
+        ],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "她从下方转眼到右侧门，切到门把手的实际试探。",
+        "origin_index": 17,
+        "source_shot": 17,
+        "label": "VIS17",
+        "authored_location": "里世界阶梯至中心后门",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "装置已留井下入口墙根；知遥右手手机、左手手电，居民刚指向雕塑右后方阶梯。 知遥沿居民指的阶梯上行。镜样雕塑留在她身后，阶梯出口是现实中心后院的低门廊。她到顶后先看右侧，看到中心后门的同一微笑标志，再回看下方；没有裂地、传送或世界坍塌。 知遥到门廊，看过下方来路，再转看右侧后门。",
+        "motion_prompt": "知遥沿居民指的阶梯上行。镜样雕塑留在她身后，阶梯出口是现实中心后院的低门廊。她到顶后先看右侧，看到中心后门的同一微笑标志，再回看下方；没有裂地、传送或世界坍塌。",
+        "shot_scale": "侧后方跟拍，从阶梯下三阶开始随她向上；她停在门廊时相机也停，终点同框保留下方雕塑上半部、阶梯来路及右侧中心后门。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 17,
+        "scene_id": "S05",
+        "shot_id": "VIS18",
+        "segment_id": "visual_approved_shot_18",
+        "segment_ids": [
+          "visual_approved_shot_18"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "后门留着细小通风缝。知遥用拿手电那只手的小指勾住把手，轻推一下；门未锁，缝变宽。她先向里面听，才把手机向前、侧身进去。脸侧已空，此后不再出现装置。",
+        "location": "中心后门",
+        "duration_seconds": 4,
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "start_state": "知遥到阶梯顶端门廊，后门右侧留一条缝，裸颊。",
+        "event": "后门留着细小通风缝。知遥用拿手电那只手的小指勾住把手，轻推一下；门未锁，缝变宽。她先向里面听，才把手机向前、侧身进去。脸侧已空，此后不再出现装置。",
+        "end_state": "未锁后门已轻推开，知遥侧身到门内，裸颊不再重戴。",
+        "camera": "门把与她手部近景，固定至门打开，随后只向门缝内移半步，停在能看见走廊地面的终点。",
+        "turns": [],
+        "purpose": "完成一次可见进入；不再安排钥匙成为第二个任务。",
+        "sfx": "把手轻碰；门轴响；通风声由窄变宽。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机",
+          "手电"
+        ],
+        "scene_objects": [
+          "后门"
+        ],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "门缝内一条走廊线展开，下一镜给完整路线与观察窗。",
+        "origin_index": 18,
+        "source_shot": 18,
+        "label": "VIS18",
+        "authored_location": "中心后门",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥到阶梯顶端门廊，后门右侧留一条缝，裸颊。 后门留着细小通风缝。知遥用拿手电那只手的小指勾住把手，轻推一下；门未锁，缝变宽。她先向里面听，才把手机向前、侧身进去。脸侧已空，此后不再出现装置。 未锁后门已轻推开，知遥侧身到门内，裸颊不再重戴。",
+        "motion_prompt": "后门留着细小通风缝。知遥用拿手电那只手的小指勾住把手，轻推一下；门未锁，缝变宽。她先向里面听，才把手机向前、侧身进去。脸侧已空，此后不再出现装置。",
+        "shot_scale": "门把与她手部近景，固定至门打开，随后只向门缝内移半步，停在能看见走廊地面的终点。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 18,
+        "scene_id": "S06",
+        "shot_id": "VIS19",
+        "segment_id": "visual_approved_shot_19",
+        "segment_ids": [
+          "visual_approved_shot_19"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "中心走廊。知遥由近处后门进入；左前方是治疗室观察窗，窗下带一个可开合的窄传声小窗；走廊更远处是工作人员通行门。窗内男孩坐着，右膝的擦伤和灰短裤仍在。他把腿缩向椅下。知遥停在窗边，先确认身后后门没自动关死，再抬手机。",
+        "location": "中心观察走廊与矫正室",
+        "duration_seconds": 6,
+        "characters": [
+          "知遥",
+          "男孩"
+        ],
+        "in_frame": [
+          "知遥",
+          "男孩"
+        ],
+        "start_state": "后门刚被推开；知遥手机右持、手电左持，进入原后门内侧。",
+        "event": "中心走廊。知遥由近处后门进入；左前方是治疗室观察窗，窗下带一个可开合的窄传声小窗；走廊更远处是工作人员通行门。窗内男孩坐着，右膝的擦伤和灰短裤仍在。他把腿缩向椅下。知遥停在窗边，先确认身后后门没自动关死，再抬手机。",
+        "end_state": "知遥在观察窗前略踮脚，确认退路后抬手机；小窗仍关闭。",
+        "camera": "后门内侧斜向走廊的固定中全景，后门近框、观察窗中段、通行门远端分层；知遥沿这条线走到窗前才停。终点仍能读到原路退回的方向。",
+        "turns": [],
+        "purpose": "同时提供她想看的对象、藏身边界与可能来人的位置。",
+        "sfx": "通风机；治疗室椅脚刮地。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机",
+          "手电"
+        ],
+        "scene_objects": [
+          "观察窗",
+          "传声",
+          "后门",
+          "通行门"
+        ],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "男孩缩膝带动椅脚声，切到她具体看见的身体原因。",
+        "origin_index": 19,
+        "source_shot": 19,
+        "label": "VIS19",
+        "authored_location": "中心观察走廊与矫正室",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "后门刚被推开；知遥手机右持、手电左持，进入原后门内侧。 中心走廊。知遥由近处后门进入；左前方是治疗室观察窗，窗下带一个可开合的窄传声小窗；走廊更远处是工作人员通行门。窗内男孩坐着，右膝的擦伤和灰短裤仍在。他把腿缩向椅下。知遥停在窗边，先确认身后后门没自动关死，再抬手机。 知遥在观察窗前略踮脚，确认退路后抬手机；小窗仍关闭。",
+        "motion_prompt": "中心走廊。知遥由近处后门进入；左前方是治疗室观察窗，窗下带一个可开合的窄传声小窗；走廊更远处是工作人员通行门。窗内男孩坐着，右膝的擦伤和灰短裤仍在。他把腿缩向椅下。知遥停在窗边，先确认身后后门没自动关死，再抬手机。",
+        "shot_scale": "后门内侧斜向走廊的固定中全景，后门近框、观察窗中段、通行门远端分层；知遥沿这条线走到窗前才停。终点仍能读到原路退回的方向。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 19,
+        "scene_id": "S06",
+        "shot_id": "VIS20",
+        "segment_id": "visual_approved_shot_20",
+        "segment_ids": [
+          "visual_approved_shot_20"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "通过观察窗，男孩捂着右膝，短裤边蹭过伤处时猛缩一下。治疗室工作人员把他双手从膝上轻移到扶手，指向正前方的表情检测屏。屏上原生字『快乐检测 10%』与数字可读；男孩抬头，嘴角试着往上。他没有被电击或新增器械伤害。",
+        "location": "中心观察走廊与矫正室",
+        "duration_seconds": 8,
+        "characters": [
+          "男孩",
+          "治疗室工作人员",
+          "系统广播"
+        ],
+        "in_frame": [
+          "男孩",
+          "治疗室工作人员"
+        ],
+        "start_state": "男孩已在观察窗内坐着，灰短裤、右膝擦伤仍同冷开；传声小窗关闭。",
+        "event": "通过观察窗，男孩捂着右膝，短裤边蹭过伤处时猛缩一下。治疗室工作人员把他双手从膝上轻移到扶手，指向正前方的表情检测屏。屏上原生字『快乐检测 10%』与数字可读；男孩抬头，嘴角试着往上。他没有被电击或新增器械伤害。",
+        "end_state": "男孩双手离膝到扶手、双脚并紧，尝试微笑并望窗外。",
+        "camera": "窗外POV中景，先容纳膝与上身；缩腿触发向上小幅摇看，终点同时有孩子脸、工作人员指向和屏上10%，保持到孩子尝试笑。",
+        "turns": [
+          {
+            "speaker_name": "系统广播",
+            "text": "快乐检测，百分之十。保持微笑，保持微笑。",
+            "delivery_mode": "offscreen_dialogue",
+            "emotion": "机械、平稳，两个‘保持微笑’同速；不是恐怖低语。"
+          }
+        ],
+        "purpose": "回答母亲最关心的问题：孩子仍然疼；机器的测量却指向另一个目标。",
+        "sfx": "裤料擦膝；扶手轻碰；孩子憋住的抽气；系统播报由turns给出。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [],
+        "scene_objects": [
+          "观察窗",
+          "检测屏",
+          "扶手"
+        ],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "他的眼睛从屏幕移向窗外，切知遥认出他后的动作。",
+        "origin_index": 20,
+        "source_shot": 20,
+        "label": "VIS20",
+        "authored_location": "中心观察走廊与矫正室",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "男孩已在观察窗内坐着，灰短裤、右膝擦伤仍同冷开；传声小窗关闭。 通过观察窗，男孩捂着右膝，短裤边蹭过伤处时猛缩一下。治疗室工作人员把他双手从膝上轻移到扶手，指向正前方的表情检测屏。屏上原生字『快乐检测 10%』与数字可读；男孩抬头，嘴角试着往上。他没有被电击或新增器械伤害。 男孩双手离膝到扶手、双脚并紧，尝试微笑并望窗外。",
+        "motion_prompt": "通过观察窗，男孩捂着右膝，短裤边蹭过伤处时猛缩一下。治疗室工作人员把他双手从膝上轻移到扶手，指向正前方的表情检测屏。屏上原生字『快乐检测 10%』与数字可读；男孩抬头，嘴角试着往上。他没有被电击或新增器械伤害。",
+        "shot_scale": "窗外POV中景，先容纳膝与上身；缩腿触发向上小幅摇看，终点同时有孩子脸、工作人员指向和屏上10%，保持到孩子尝试笑。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 20,
+        "scene_id": "S06",
+        "shot_id": "VIS21",
+        "segment_id": "visual_approved_shot_21",
+        "segment_ids": [
+          "visual_approved_shot_21"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥在窗外看到同一块擦伤，轻点一下头。她把手机移近玻璃，画面清楚录到孩子上身与膝；左手手电已经关掉并插回背包外侧套，不在治疗室投光。她的指节贴住冷窗沿。",
+        "location": "中心观察走廊与矫正室",
+        "duration_seconds": 5,
+        "characters": [
+          "知遥",
+          "男孩"
+        ],
+        "in_frame": [
+          "知遥",
+          "男孩"
+        ],
+        "start_state": "知遥已确认男孩右膝伤，手机开始记录窗内；脸侧裸露，传声窗仍闭。",
+        "event": "知遥在窗外看到同一块擦伤，轻点一下头。她把手机移近玻璃，画面清楚录到孩子上身与膝；左手手电已经关掉并插回背包外侧套，不在治疗室投光。她的指节贴住冷窗沿。",
+        "end_state": "手机稳定贴近玻璃，手电已关入背包外侧套。",
+        "camera": "知遥侧脸近景，手机边缘留在近处，窗内孩子只占后景一小块；固定看她把镜头稳定下来，终点是她目光越过手机盯孩子。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "text": "是他。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "几乎只给自己听的确认，不带胜利或惊呼；说完嘴合拢。"
+          }
+        ],
+        "purpose": "她完成受托的第一个答案，但还没有替孩子做决定。",
+        "sfx": "手电入套布料声。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机",
+          "手电"
+        ],
+        "scene_objects": [],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "她手机稳住，切入录下的连续现场，而非另开设定说明。",
+        "origin_index": 21,
+        "source_shot": 21,
+        "label": "VIS21",
+        "authored_location": "中心观察走廊与矫正室",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥已确认男孩右膝伤，手机开始记录窗内；脸侧裸露，传声窗仍闭。 知遥在窗外看到同一块擦伤，轻点一下头。她把手机移近玻璃，画面清楚录到孩子上身与膝；左手手电已经关掉并插回背包外侧套，不在治疗室投光。她的指节贴住冷窗沿。 手机稳定贴近玻璃，手电已关入背包外侧套。",
+        "motion_prompt": "知遥在窗外看到同一块擦伤，轻点一下头。她把手机移近玻璃，画面清楚录到孩子上身与膝；左手手电已经关掉并插回背包外侧套，不在治疗室投光。她的指节贴住冷窗沿。",
+        "shot_scale": "知遥侧脸近景，手机边缘留在近处，窗内孩子只占后景一小块；固定看她把镜头稳定下来，终点是她目光越过手机盯孩子。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 21,
+        "scene_id": "S06",
+        "shot_id": "VIS22",
+        "segment_id": "visual_approved_shot_22",
+        "segment_ids": [
+          "visual_approved_shot_22"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "窗内工作人员把检测屏转到孩子面前，使他能照见自己的脸，再以自己的手指示意嘴角抬高。孩子照做，右脚却一直悬着，不肯把膝放松。检测没有宣布治愈，也没有新增阈值。",
+        "location": "中心观察走廊与矫正室",
+        "duration_seconds": 7,
+        "characters": [
+          "男孩",
+          "治疗室工作人员"
+        ],
+        "in_frame": [
+          "男孩",
+          "治疗室工作人员"
+        ],
+        "start_state": "手机已稳定；男孩双手在扶手，面前是检测屏，工作人员在侧。",
+        "event": "窗内工作人员把检测屏转到孩子面前，使他能照见自己的脸，再以自己的手指示意嘴角抬高。孩子照做，右脚却一直悬着，不肯把膝放松。检测没有宣布治愈，也没有新增阈值。",
+        "end_state": "男孩完成一次挤笑，右脚仍悬着，注意到窗外手机。",
+        "camera": "手机正在记录的稳定中景，孩子胸膝皆在，工作人员只留指示的手与侧身，屏幕边缘在画面侧面；固定到孩子完成一次挤笑，悬脚仍可见。",
+        "turns": [
+          {
+            "speaker_name": "治疗室工作人员",
+            "text": "看这里。笑一笑。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "像纠正姿势一样平静，不咆哮；指尖抬起时说后两字。"
+          }
+        ],
+        "purpose": "把快乐矫正的动作具体化；让表情和身体的不一致可以被独立读懂。",
+        "sfx": "影片客观声为屏幕支架转轴；手机实录仅窗外通风声。清晰工作人员指令由turns给出，只属影片客观声。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [],
+        "scene_objects": [
+          "检测屏"
+        ],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "孩子忽然注意到玻璃后的手机，下一镜接他改变笑的对象。",
+        "origin_index": 22,
+        "source_shot": 22,
+        "label": "VIS22",
+        "authored_location": "中心观察走廊与矫正室",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "手机已稳定；男孩双手在扶手，面前是检测屏，工作人员在侧。 窗内工作人员把检测屏转到孩子面前，使他能照见自己的脸，再以自己的手指示意嘴角抬高。孩子照做，右脚却一直悬着，不肯把膝放松。检测没有宣布治愈，也没有新增阈值。 男孩完成一次挤笑，右脚仍悬着，注意到窗外手机。",
+        "motion_prompt": "窗内工作人员把检测屏转到孩子面前，使他能照见自己的脸，再以自己的手指示意嘴角抬高。孩子照做，右脚却一直悬着，不肯把膝放松。检测没有宣布治愈，也没有新增阈值。",
+        "shot_scale": "手机正在记录的稳定中景，孩子胸膝皆在，工作人员只留指示的手与侧身，屏幕边缘在画面侧面；固定到孩子完成一次挤笑，悬脚仍可见。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 22,
+        "scene_id": "S06",
+        "shot_id": "VIS23",
+        "segment_id": "visual_approved_shot_23",
+        "segment_ids": [
+          "visual_approved_shot_23"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "孩子看见观察窗外的知遥与手机，眼睛亮了一瞬。他把刚学着抬起的嘴角转向她，仿佛这也是一个需要检查他的成年人；可右手指尖又偷偷往膝盖伸。知遥一时反射性地回了半个安抚的笑，随后看到他的手停在伤处。",
+        "location": "中心观察走廊与矫正室",
+        "duration_seconds": 8,
+        "characters": [
+          "男孩",
+          "知遥"
+        ],
+        "in_frame": [
+          "男孩",
+          "知遥"
+        ],
+        "start_state": "男孩刚按工作人员示意抬起嘴角，右脚仍悬着；知遥手机在玻璃外记录。",
+        "event": "孩子看见观察窗外的知遥与手机，眼睛亮了一瞬。他把刚学着抬起的嘴角转向她，仿佛这也是一个需要检查他的成年人；可右手指尖又偷偷往膝盖伸。知遥一时反射性地回了半个安抚的笑，随后看到他的手停在伤处。",
+        "end_state": "孩子笑着，玻璃里同一知遥的淡反射收笑；无额外身体。",
+        "camera": "窗外手机旁的近景取孩子，玻璃窄边留在画面中；孩子转眼触发小幅横移让他与知遥玻璃中的淡反射同框。终点是孩子笑着、反射里的知遥笑收住。反射是同一个知遥，非第二具身体。",
+        "turns": [],
+        "purpose": "改变情绪与行动方向：藏着拍摄不再是中性的，她也被孩子当成需要取悦的人。",
+        "sfx": "通风声；孩子憋住的吸气。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机"
+        ],
+        "scene_objects": [
+          "观察窗"
+        ],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "知遥嘴角收回，切到她手指真正停止拍摄的动作。",
+        "origin_index": 23,
+        "source_shot": 23,
+        "label": "VIS23",
+        "authored_location": "中心观察走廊与矫正室",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "男孩刚按工作人员示意抬起嘴角，右脚仍悬着；知遥手机在玻璃外记录。 孩子看见观察窗外的知遥与手机，眼睛亮了一瞬。他把刚学着抬起的嘴角转向她，仿佛这也是一个需要检查他的成年人；可右手指尖又偷偷往膝盖伸。知遥一时反射性地回了半个安抚的笑，随后看到他的手停在伤处。 孩子笑着，玻璃里同一知遥的淡反射收笑；无额外身体。",
+        "motion_prompt": "孩子看见观察窗外的知遥与手机，眼睛亮了一瞬。他把刚学着抬起的嘴角转向她，仿佛这也是一个需要检查他的成年人；可右手指尖又偷偷往膝盖伸。知遥一时反射性地回了半个安抚的笑，随后看到他的手停在伤处。",
+        "shot_scale": "窗外手机旁的近景取孩子，玻璃窄边留在画面中；孩子转眼触发小幅横移让他与知遥玻璃中的淡反射同框。终点是孩子笑着、反射里的知遥笑收住。反射是同一个知遥，非第二具身体。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 23,
+        "scene_id": "S06",
+        "shot_id": "VIS24",
+        "segment_id": "visual_approved_shot_24",
+        "segment_ids": [
+          "visual_approved_shot_24"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥看一眼手机仍在录的画面，按下停止，屏幕回到刚才视频的缩略图。她把手机压低到腰侧，手掌不再举在孩子脸前；腾出的左手摸向窗下窄小传声窗的扣。她做这些时没有再开自拍解释。",
+        "location": "中心观察走廊与矫正室",
+        "duration_seconds": 7,
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "start_state": "男孩向手机挤笑，知遥刚收回半个安抚的笑，手机仍在录。",
+        "event": "知遥看一眼手机仍在录的画面，按下停止，屏幕回到刚才视频的缩略图。她把手机压低到腰侧，手掌不再举在孩子脸前；腾出的左手摸向窗下窄小传声窗的扣。她做这些时没有再开自拍解释。",
+        "end_state": "录制已停止、缩略图在屏上；手机低位右持、左手在窗扣。",
+        "camera": "窗外腰胸高近景，手机与窗扣同框；固定看停止、放低、摸扣三步，终点是她手指停在窗扣上，而手机在右侧低位。",
+        "turns": [],
+        "purpose": "把高潮的选择从口头态度变成损失：她放弃继续隐蔽取得完整矫正录像，准备让孩子听见自己。",
+        "sfx": "指腹按屏；手机碰外套；窗扣轻响。",
+        "audio_plan": {
+          "music_cue": "停录后两音低弦轻入一次，手碰窗扣时退出。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机"
+        ],
+        "scene_objects": [
+          "传声"
+        ],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "手指开始掀扣时切紧一点，下一镜完成打开与说话，不重复停录。",
+        "origin_index": 24,
+        "source_shot": 24,
+        "label": "VIS24",
+        "authored_location": "中心观察走廊与矫正室",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "男孩向手机挤笑，知遥刚收回半个安抚的笑，手机仍在录。 知遥看一眼手机仍在录的画面，按下停止，屏幕回到刚才视频的缩略图。她把手机压低到腰侧，手掌不再举在孩子脸前；腾出的左手摸向窗下窄小传声窗的扣。她做这些时没有再开自拍解释。 录制已停止、缩略图在屏上；手机低位右持、左手在窗扣。",
+        "motion_prompt": "知遥看一眼手机仍在录的画面，按下停止，屏幕回到刚才视频的缩略图。她把手机压低到腰侧，手掌不再举在孩子脸前；腾出的左手摸向窗下窄小传声窗的扣。她做这些时没有再开自拍解释。",
+        "shot_scale": "窗外腰胸高近景，手机与窗扣同框；固定看停止、放低、摸扣三步，终点是她手指停在窗扣上，而手机在右侧低位。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 24,
+        "scene_id": "S06",
+        "shot_id": "VIS25",
+        "segment_id": "visual_approved_shot_25",
+        "segment_ids": [
+          "visual_approved_shot_25"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥掀开窄传声窗，只开一掌宽。扣舌轻响，她看着孩子，脸上不再挤笑。男孩保持笑一瞬，听完她的话后嘴角松开，手终于按回疼的膝盖；这个放松只持续到下一镜被工作人员打断。",
+        "location": "中心观察走廊与矫正室",
+        "duration_seconds": 5,
+        "characters": [
+          "知遥",
+          "男孩"
+        ],
+        "in_frame": [
+          "知遥",
+          "男孩"
+        ],
+        "start_state": "手机已经停录并压在右侧腰位，知遥左手摸到低传声窗扣。",
+        "event": "知遥掀开窄传声窗，只开一掌宽。扣舌轻响，她看着孩子，脸上不再挤笑。男孩保持笑一瞬，听完她的话后嘴角松开，手终于按回疼的膝盖；这个放松只持续到下一镜被工作人员打断。",
+        "end_state": "传声窗开一掌宽；男孩嘴角松、手按膝，手机持续停录。",
+        "camera": "低传声窗旁的知遥近侧脸与窗内孩子中近景分层；相机固定，让打开的缝成为两人之间可见通路。终点保持在孩子按住膝、嘴角放下的结果。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "text": "疼就按着。不用冲我笑。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "声音正常可听，柔和但不哄他高兴；重音落在‘不用’，说完留给孩子回应，不加大道理。"
+          }
+        ],
+        "purpose": "让她的选择给孩子带来一个短而真实的结果；不是隔着密闭玻璃喊一段主题。",
+        "sfx": "扣舌响；开小窗后治疗室声变清。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机"
+        ],
+        "scene_objects": [
+          "传声"
+        ],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "孩子的手真的落到膝上，再切工作人员对这一变化的回应。",
+        "origin_index": 25,
+        "source_shot": 25,
+        "label": "VIS25",
+        "authored_location": "中心观察走廊与矫正室",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "手机已经停录并压在右侧腰位，知遥左手摸到低传声窗扣。 知遥掀开窄传声窗，只开一掌宽。扣舌轻响，她看着孩子，脸上不再挤笑。男孩保持笑一瞬，听完她的话后嘴角松开，手终于按回疼的膝盖；这个放松只持续到下一镜被工作人员打断。 传声窗开一掌宽；男孩嘴角松、手按膝，手机持续停录。",
+        "motion_prompt": "知遥掀开窄传声窗，只开一掌宽。扣舌轻响，她看着孩子，脸上不再挤笑。男孩保持笑一瞬，听完她的话后嘴角松开，手终于按回疼的膝盖；这个放松只持续到下一镜被工作人员打断。",
+        "shot_scale": "低传声窗旁的知遥近侧脸与窗内孩子中近景分层；相机固定，让打开的缝成为两人之间可见通路。终点保持在孩子按住膝、嘴角放下的结果。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 25,
+        "scene_id": "S06",
+        "shot_id": "VIS26",
+        "segment_id": "visual_approved_shot_26",
+        "segment_ids": [
+          "visual_approved_shot_26"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "工作人员看见孩子嘴角松开，先叫他看回屏幕，再循孩子视线发现打开的小窗。工作人员伸手关小窗；知遥没有拉扯，马上后退，右手仍握着手机。远端通行门被打开，门内守卫看向她。孩子最后一次看向窗的位置已被工作人员身体遮住。",
+        "location": "中心观察走廊与矫正室",
+        "duration_seconds": 8,
+        "characters": [
+          "知遥",
+          "男孩",
+          "治疗室工作人员",
+          "守卫"
+        ],
+        "in_frame": [
+          "知遥",
+          "男孩",
+          "治疗室工作人员",
+          "守卫"
+        ],
+        "start_state": "知遥打开一掌宽小窗并说完话；男孩嘴角松开，手按疼的膝。",
+        "event": "工作人员看见孩子嘴角松开，先叫他看回屏幕，再循孩子视线发现打开的小窗。工作人员伸手关小窗；知遥没有拉扯，马上后退，右手仍握着手机。远端通行门被打开，门内守卫看向她。孩子最后一次看向窗的位置已被工作人员身体遮住。",
+        "end_state": "小窗已关闭，孩子被工作人员挡住；守卫远端现身，知遥后退转向后门。",
+        "camera": "窗外中景起，工作人员遮住孩子触发相机后移半步，把后门退路重新放进画面边；通行门打开时略摇向远端，终点是守卫与已经转向后门的知遥在同一走廊关系里。",
+        "turns": [
+          {
+            "speaker_name": "治疗室工作人员",
+            "text": "看屏幕。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "先对孩子说，平常指令，末尾目光移向窗；不提前知道知遥在那里。"
+          }
+        ],
+        "purpose": "让高潮选择产生代价：她不能再待在这里，孩子也没有因此脱离矫正。",
+        "sfx": "小窗合上；远端门把转动、门开；知遥短呼吸。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机"
+        ],
+        "scene_objects": [
+          "通行门"
+        ],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "守卫看清她，下一镜短促喊声开始追逐。",
+        "origin_index": 26,
+        "source_shot": 26,
+        "label": "VIS26",
+        "authored_location": "中心观察走廊与矫正室",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥打开一掌宽小窗并说完话；男孩嘴角松开，手按疼的膝。 工作人员看见孩子嘴角松开，先叫他看回屏幕，再循孩子视线发现打开的小窗。工作人员伸手关小窗；知遥没有拉扯，马上后退，右手仍握着手机。远端通行门被打开，门内守卫看向她。孩子最后一次看向窗的位置已被工作人员身体遮住。 小窗已关闭，孩子被工作人员挡住；守卫远端现身，知遥后退转向后门。",
+        "motion_prompt": "工作人员看见孩子嘴角松开，先叫他看回屏幕，再循孩子视线发现打开的小窗。工作人员伸手关小窗；知遥没有拉扯，马上后退，右手仍握着手机。远端通行门被打开，门内守卫看向她。孩子最后一次看向窗的位置已被工作人员身体遮住。",
+        "shot_scale": "窗外中景起，工作人员遮住孩子触发相机后移半步，把后门退路重新放进画面边；通行门打开时略摇向远端，终点是守卫与已经转向后门的知遥在同一走廊关系里。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 26,
+        "scene_id": "S06",
+        "shot_id": "VIS27",
+        "segment_id": "visual_approved_shot_27",
+        "segment_ids": [
+          "visual_approved_shot_27"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "守卫从远端通行门跨进走廊，知遥已转身向近处后门。她没有把手机举起来拍自己，左手推后门，右手把手机贴住身体。两人的距离在同一走廊里缩短。",
+        "location": "中心观察走廊与矫正室",
+        "duration_seconds": 4,
+        "characters": [
+          "知遥",
+          "守卫"
+        ],
+        "in_frame": [
+          "知遥",
+          "守卫"
+        ],
+        "start_state": "小窗已被工作人员关闭；远端通行门开，守卫看见知遥转向近处后门。",
+        "event": "守卫从远端通行门跨进走廊，知遥已转身向近处后门。她没有把手机举起来拍自己，左手推后门，右手把手机贴住身体。两人的距离在同一走廊里缩短。",
+        "end_state": "后门被知遥推出一半，她侧肩退出；守卫追近但未抓住。",
+        "camera": "沿走廊侧墙的中全景，守卫远、知遥近；固定到知遥把后门推开一半，不新增岔路或出口。",
+        "turns": [
+          {
+            "speaker_name": "守卫",
+            "text": "站住！",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "发现后的实声短喊，声源在走廊远端，词不拖长。"
+          }
+        ],
+        "purpose": "把既有守卫压力变成明确追赶结果，承接她主动暴露。",
+        "sfx": "鞋底急响；知遥推门。",
+        "audio_plan": {
+          "music_cue": "低弦两音加快一次，随后让脚步占前景。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机"
+        ],
+        "scene_objects": [
+          "后门",
+          "通行门"
+        ],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "她左掌把门继续推出的动作切到门外同一次跨步。",
+        "origin_index": 27,
+        "source_shot": 27,
+        "label": "VIS27",
+        "authored_location": "中心观察走廊与矫正室",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "小窗已被工作人员关闭；远端通行门开，守卫看见知遥转向近处后门。 守卫从远端通行门跨进走廊，知遥已转身向近处后门。她没有把手机举起来拍自己，左手推后门，右手把手机贴住身体。两人的距离在同一走廊里缩短。 后门被知遥推出一半，她侧肩退出；守卫追近但未抓住。",
+        "motion_prompt": "守卫从远端通行门跨进走廊，知遥已转身向近处后门。她没有把手机举起来拍自己，左手推后门，右手把手机贴住身体。两人的距离在同一走廊里缩短。",
+        "shot_scale": "沿走廊侧墙的中全景，守卫远、知遥近；固定到知遥把后门推开一半，不新增岔路或出口。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 27,
+        "scene_id": "S07",
+        "shot_id": "VIS28",
+        "segment_id": "visual_approved_shot_28",
+        "segment_ids": [
+          "visual_approved_shot_28"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥跨出后门，左转回刚才上来的阶梯。脚尖在第一阶顿一下，她扶墙稳住，再向下。后门仍在上方，守卫脚步到门内，没有一跃飞追或新封锁。",
+        "location": "中心后门至下行阶梯",
+        "duration_seconds": 3,
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "start_state": "知遥左手刚推后门、右手手机贴身，正跨出。",
+        "event": "知遥跨出后门，左转回刚才上来的阶梯。脚尖在第一阶顿一下，她扶墙稳住，再向下。后门仍在上方，守卫脚步到门内，没有一跃飞追或新封锁。",
+        "end_state": "知遥扶墙稳住，下阶；后门及追脚声在上方。",
+        "camera": "门外侧跟住她同一次出门动作，转向阶梯两级后停在半身与来路同框的终点。",
+        "turns": [],
+        "purpose": "落实逃离方向，追逐沿已见路线发生。",
+        "sfx": "推门余响；鞋底擦阶边；上方追来脚步。",
+        "audio_plan": {
+          "music_cue": "低弦停止。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机"
+        ],
+        "scene_objects": [
+          "梯",
+          "后门"
+        ],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "扶墙站稳后下一步落下，切到地下对应广场同方向的落脚。",
+        "origin_index": 28,
+        "source_shot": 28,
+        "label": "VIS28",
+        "authored_location": "中心后门至下行阶梯",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥左手刚推后门、右手手机贴身，正跨出。 知遥跨出后门，左转回刚才上来的阶梯。脚尖在第一阶顿一下，她扶墙稳住，再向下。后门仍在上方，守卫脚步到门内，没有一跃飞追或新封锁。 知遥扶墙稳住，下阶；后门及追脚声在上方。",
+        "motion_prompt": "知遥跨出后门，左转回刚才上来的阶梯。脚尖在第一阶顿一下，她扶墙稳住，再向下。后门仍在上方，守卫脚步到门内，没有一跃飞追或新封锁。",
+        "shot_scale": "门外侧跟住她同一次出门动作，转向阶梯两级后停在半身与来路同框的终点。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 28,
+        "scene_id": "S07",
+        "shot_id": "VIS29",
+        "segment_id": "visual_approved_shot_29",
+        "segment_ids": [
+          "visual_approved_shot_29"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥下到地下对应广场，经过同一雕塑底座。刚才指路的居民抬头，她只做一个简短点头就向井底通道走；居民没有变成救援队，也没有拦追兵。石头笑嘴仍悬在上方，底下的人仍在各自承受情绪。",
+        "location": "里世界对应广场",
+        "duration_seconds": 5,
+        "characters": [
+          "知遥",
+          "哭泣居民"
+        ],
+        "in_frame": [
+          "知遥",
+          "哭泣居民"
+        ],
+        "start_state": "知遥已扶墙稳住下行步子，回到对应广场阶梯底。",
+        "event": "知遥下到地下对应广场，经过同一雕塑底座。刚才指路的居民抬头，她只做一个简短点头就向井底通道走；居民没有变成救援队，也没有拦追兵。石头笑嘴仍悬在上方，底下的人仍在各自承受情绪。",
+        "end_state": "知遥经同一雕塑点头，退入井底通道；居民仍留下。",
+        "camera": "雕塑侧底座固定中全景，知遥从阶梯方向穿过，到井底通道口退出；镜头不跟着回头看守卫，终点留居民看向她离开的方向。",
+        "turns": [],
+        "purpose": "完成里世界的回收：她离开了，那些人和世界还在，不用坍塌替她抹去后果。",
+        "sfx": "知遥脚步穿过；居民吸气；远端脚步受空间阻隔。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机"
+        ],
+        "scene_objects": [
+          "雕塑"
+        ],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [
+          "另一位匿名成年居民坐在雕塑底座旁沉默捏衣角；独立长相与衣着，真实在场，不是哭泣指路居民的副本。"
+        ],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "她退出井道开口，切到井梯上行的末段，省略重复长跑。",
+        "origin_index": 29,
+        "source_shot": 29,
+        "label": "VIS29",
+        "authored_location": "里世界对应广场",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥已扶墙稳住下行步子，回到对应广场阶梯底。 知遥下到地下对应广场，经过同一雕塑底座。刚才指路的居民抬头，她只做一个简短点头就向井底通道走；居民没有变成救援队，也没有拦追兵。石头笑嘴仍悬在上方，底下的人仍在各自承受情绪。 知遥经同一雕塑点头，退入井底通道；居民仍留下。",
+        "motion_prompt": "知遥下到地下对应广场，经过同一雕塑底座。刚才指路的居民抬头，她只做一个简短点头就向井底通道走；居民没有变成救援队，也没有拦追兵。石头笑嘴仍悬在上方，底下的人仍在各自承受情绪。",
+        "shot_scale": "雕塑侧底座固定中全景，知遥从阶梯方向穿过，到井底通道口退出；镜头不跟着回头看守卫，终点留居民看向她离开的方向。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 29,
+        "scene_id": "S07",
+        "shot_id": "VIS30",
+        "segment_id": "visual_approved_shot_30",
+        "segment_ids": [
+          "visual_approved_shot_30"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥从仍半开的第七井爬出。手机已塞回外套胸前夹，两手抓井沿，右脚踩实地面后才拿出手机。广场与中心正门的方向跟夜街建立镜一致；上方没有新增追兵。她确认手机里的两段录像缩略图都在，立即朝正门走。",
+        "location": "第七井夜街",
+        "duration_seconds": 5,
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "start_state": "知遥沿井底通道回井梯，手机回胸夹，井盖仍半开。",
+        "event": "知遥从仍半开的第七井爬出。手机已塞回外套胸前夹，两手抓井沿，右脚踩实地面后才拿出手机。广场与中心正门的方向跟夜街建立镜一致；上方没有新增追兵。她确认手机里的两段录像缩略图都在，立即朝正门走。",
+        "end_state": "知遥踏稳街面取手机、确认两段都在，向中心正门走。",
+        "camera": "井口侧中景，完整看她出井、站稳、取手机；终点沿她视线带到中心正门方向，不突然来到城外。",
+        "turns": [],
+        "purpose": "明确记录仍在、身体已离开追赶空间；保留回去交代的行动。",
+        "sfx": "井梯金属响；鞋踏街面；知遥短喘两次。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机",
+          "胸前固定夹"
+        ],
+        "scene_objects": [],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "她抬眼寻找正门，切母亲仍在那里而不是松快的旅游自拍。",
+        "origin_index": 30,
+        "source_shot": 30,
+        "label": "VIS30",
+        "authored_location": "第七井夜街",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥沿井底通道回井梯，手机回胸夹，井盖仍半开。 知遥从仍半开的第七井爬出。手机已塞回外套胸前夹，两手抓井沿，右脚踩实地面后才拿出手机。广场与中心正门的方向跟夜街建立镜一致；上方没有新增追兵。她确认手机里的两段录像缩略图都在，立即朝正门走。 知遥踏稳街面取手机、确认两段都在，向中心正门走。",
+        "motion_prompt": "知遥从仍半开的第七井爬出。手机已塞回外套胸前夹，两手抓井沿，右脚踩实地面后才拿出手机。广场与中心正门的方向跟夜街建立镜一致；上方没有新增追兵。她确认手机里的两段录像缩略图都在，立即朝正门走。",
+        "shot_scale": "井口侧中景，完整看她出井、站稳、取手机；终点沿她视线带到中心正门方向，不突然来到城外。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 30,
+        "scene_id": "S07",
+        "shot_id": "VIS31",
+        "segment_id": "visual_approved_shot_31",
+        "segment_ids": [
+          "visual_approved_shot_31"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "中心正门外，母亲仍站在原来位置，身旁的路灯已亮。知遥从井那一侧的广场回来，在她两步外停下。母亲立即看她身后，没见到孩子，伸来的手缓缓改为去接近手机。知遥没有先开口安慰。",
+        "location": "中心正门广场·夜间",
+        "duration_seconds": 4,
+        "characters": [
+          "母亲",
+          "知遥"
+        ],
+        "in_frame": [
+          "母亲",
+          "知遥"
+        ],
+        "start_state": "知遥从同一井口出到夜街，拿回手机并确认两段都在；母亲仍守正门。",
+        "event": "中心正门外，母亲仍站在原来位置，身旁的路灯已亮。知遥从井那一侧的广场回来，在她两步外停下。母亲立即看她身后，没见到孩子，伸来的手缓缓改为去接近手机。知遥没有先开口安慰。",
+        "end_state": "母亲未见孩子，伸手从后景收向手机；知遥停在两步外。",
+        "camera": "母亲侧前固定中景，知遥从已建立的侧街方向进入；母亲先越过她看后景，终点才把视线落在知遥手中手机。",
+        "turns": [],
+        "purpose": "让逃离的后果在两人之间成立：归来的是知遥，孩子没有一起出来。",
+        "sfx": "远处广场扬声器器乐；知遥脚步停下、呼吸缓下。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机"
+        ],
+        "scene_objects": [],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "母亲伸向手机的手停住，切手机与双方手的近景。",
+        "origin_index": 31,
+        "source_shot": 31,
+        "label": "VIS31",
+        "authored_location": "中心正门广场·夜间",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥从同一井口出到夜街，拿回手机并确认两段都在；母亲仍守正门。 中心正门外，母亲仍站在原来位置，身旁的路灯已亮。知遥从井那一侧的广场回来，在她两步外停下。母亲立即看她身后，没见到孩子，伸来的手缓缓改为去接近手机。知遥没有先开口安慰。 母亲未见孩子，伸手从后景收向手机；知遥停在两步外。",
+        "motion_prompt": "中心正门外，母亲仍站在原来位置，身旁的路灯已亮。知遥从井那一侧的广场回来，在她两步外停下。母亲立即看她身后，没见到孩子，伸来的手缓缓改为去接近手机。知遥没有先开口安慰。",
+        "shot_scale": "母亲侧前固定中景，知遥从已建立的侧街方向进入；母亲先越过她看后景，终点才把视线落在知遥手中手机。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 31,
+        "scene_id": "S08",
+        "shot_id": "VIS32",
+        "segment_id": "visual_approved_shot_32",
+        "segment_ids": [
+          "visual_approved_shot_32"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥把手机转给母亲，播放中心窗外已录到的那段。男孩向手机挤笑、右脚悬着；在知遥停录的位置画面自然结束。母亲用拇指悬在画面上方，没有碰到屏幕里的脸。她问的是膝盖，不是指数。",
+        "location": "中心正门广场·夜间",
+        "duration_seconds": 8,
+        "characters": [
+          "母亲",
+          "知遥",
+          "男孩"
+        ],
+        "in_frame": [
+          "母亲",
+          "知遥",
+          "男孩"
+        ],
+        "start_state": "知遥回到母亲面前，没有带出孩子，手机在手。",
+        "event": "知遥把手机转给母亲，播放中心窗外已录到的那段。男孩向手机挤笑、右脚悬着；在知遥停录的位置画面自然结束。母亲用拇指悬在画面上方，没有碰到屏幕里的脸。她问的是膝盖，不是指数。",
+        "end_state": "挤笑录像到停录处结束，母亲拇指悬在屏上，等回答。",
+        "camera": "两人手部与手机近景，屏内男孩从胸到膝清楚；固定到母亲的拇指停住。手机亮光照到两人的指尖，不用另叠假档案或后期伪造证据字。",
+        "turns": [
+          {
+            "speaker_name": "母亲",
+            "text": "他还疼吗？",
+            "delivery_mode": "offscreen_dialogue",
+            "emotion": "看着孩子的脚问，声音尽量平，不作抽泣表演；句后等知遥给真实答案。"
+          }
+        ],
+        "purpose": "把记录的接收者具体化，让同一笑脸因母亲的关注落在疼痛上。",
+        "sfx": "手机外放仅实录窗外通风底声；远处广场扬声器器乐。没有工作人员清晰回放指令。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机"
+        ],
+        "scene_objects": [],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "手机播放停在她停录的位置，切知遥对有限结果的诚实回答。",
+        "origin_index": 32,
+        "source_shot": 32,
+        "label": "VIS32",
+        "authored_location": "中心正门广场·夜间",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥回到母亲面前，没有带出孩子，手机在手。 知遥把手机转给母亲，播放中心窗外已录到的那段。男孩向手机挤笑、右脚悬着；在知遥停录的位置画面自然结束。母亲用拇指悬在画面上方，没有碰到屏幕里的脸。她问的是膝盖，不是指数。 挤笑录像到停录处结束，母亲拇指悬在屏上，等回答。",
+        "motion_prompt": "知遥把手机转给母亲，播放中心窗外已录到的那段。男孩向手机挤笑、右脚悬着；在知遥停录的位置画面自然结束。母亲用拇指悬在画面上方，没有碰到屏幕里的脸。她问的是膝盖，不是指数。",
+        "shot_scale": "两人手部与手机近景，屏内男孩从胸到膝清楚；固定到母亲的拇指停住。手机亮光照到两人的指尖，不用另叠假档案或后期伪造证据字。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 32,
+        "scene_id": "S08",
+        "shot_id": "VIS33",
+        "segment_id": "visual_approved_shot_33",
+        "segment_ids": [
+          "visual_approved_shot_33"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥看着母亲，不看自己的镜头。她点头，左手比了一下孩子缩腿的动作，随后停下；母亲看门，知遥也跟着看了一眼。两人都知道孩子还在门后。知遥把手机重新转回两人之间，打开白天最早那段。",
+        "location": "中心正门广场·夜间",
+        "duration_seconds": 8,
+        "characters": [
+          "母亲",
+          "知遥"
+        ],
+        "in_frame": [
+          "母亲",
+          "知遥"
+        ],
+        "start_state": "母亲看完孩子挤笑、脚悬的手机片段，刚问他是否仍疼。",
+        "event": "知遥看着母亲，不看自己的镜头。她点头，左手比了一下孩子缩腿的动作，随后停下；母亲看门，知遥也跟着看了一眼。两人都知道孩子还在门后。知遥把手机重新转回两人之间，打开白天最早那段。",
+        "end_state": "知遥交代有限所见，打开白天那段，母亲仍看正门。",
+        "camera": "两人胸像同框，正门后景占一侧，手机在两人腰间；固定到知遥低头打开第一段，母亲仍看门。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "text": "嗯。他还在里面。我只拍到了这些。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "回答先干脆承认，不拖着制造悬念；后一句停一下才说‘还在’，看着母亲承担结果。"
+          }
+        ],
+        "purpose": "清楚给出人物所知边界和未解决的后果，避免‘救不了’被讲成一条未经建立的旅行规则。",
+        "sfx": "远处广场器乐；知遥尚未平稳的呼吸。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机"
+        ],
+        "scene_objects": [],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "第一段被点开，开场的哭声在下一镜真实回放。",
+        "origin_index": 33,
+        "source_shot": 33,
+        "label": "VIS33",
+        "authored_location": "中心正门广场·夜间",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "母亲看完孩子挤笑、脚悬的手机片段，刚问他是否仍疼。 知遥看着母亲，不看自己的镜头。她点头，左手比了一下孩子缩腿的动作，随后停下；母亲看门，知遥也跟着看了一眼。两人都知道孩子还在门后。知遥把手机重新转回两人之间，打开白天最早那段。 知遥交代有限所见，打开白天那段，母亲仍看正门。",
+        "motion_prompt": "知遥看着母亲，不看自己的镜头。她点头，左手比了一下孩子缩腿的动作，随后停下；母亲看门，知遥也跟着看了一眼。两人都知道孩子还在门后。知遥把手机重新转回两人之间，打开白天最早那段。",
+        "shot_scale": "两人胸像同框，正门后景占一侧，手机在两人腰间；固定到知遥低头打开第一段，母亲仍看门。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 33,
+        "scene_id": "S08",
+        "shot_id": "VIS34",
+        "segment_id": "visual_approved_shot_34",
+        "segment_ids": [
+          "visual_approved_shot_34"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "白天开场那段在手机里重新播放，只给母亲看。孩子哭着找她的声音传出来。母亲用一只手盖住自己嘴角，另一只手按住知遥握手机的手腕，先不让她收走。母亲低下头，知遥没有追问；她把仍在回放的手机顺着母亲按腕的动作收低到两人手之间，屏幕仍朝母亲。影片观察机位随两只手的实际移动下俯，停到相叠的手、手机与门槛。母亲说完才松手，知遥点头；手机回放继续两秒后由知遥按停。",
+        "location": "中心正门广场·夜间",
+        "duration_seconds": 9,
+        "characters": [
+          "母亲",
+          "知遥"
+        ],
+        "in_frame": [
+          "母亲",
+          "知遥"
+        ],
+        "start_state": "知遥已向母亲交代孩子还在里面，并打开白天第一段。",
+        "event": "白天开场那段在手机里重新播放，只给母亲看。孩子哭着找她的声音传出来。母亲用一只手盖住自己嘴角，另一只手按住知遥握手机的手腕，先不让她收走。母亲低下头，知遥没有追问；她把仍在回放的手机顺着母亲按腕的动作收低到两人手之间，屏幕仍朝母亲。影片观察机位随两只手的实际移动下俯，停到相叠的手、手机与门槛。母亲说完才松手，知遥点头；手机回放继续两秒后由知遥按停。",
+        "end_state": "母亲松开手腕；知遥答应不删，旧回放再两秒后被按停，孩子未获释。",
+        "camera": "起于两人侧面半身；母亲按腕、知遥实际收低回放手机触发影片观察机位缓慢下俯，终点只有两人的手、手机背面与正门门槛。知遥操控的只有自己的回放手机，不操控影片观察机位；该镜不引入另一部剧情手机、同行摄影师或新相机。她说完也不上摇索取泪脸。",
+        "turns": [
+          {
+            "speaker_name": "母亲",
+            "text": "他只是摔疼了。",
+            "delivery_mode": "offscreen_dialogue",
+            "emotion": "这是第1镜已录母亲原句的手机外放片段，先于母亲现场新对白播放；窄频手机音质、远于现场人声，保持原录音急而压住尾音的表演。此时画内母亲嘴闭着听自己旧录音，不重新说或对口型。回放只截这一句，不重演整段冷开。"
+          },
+          {
+            "speaker_name": "母亲",
+            "text": "前面那段……别删。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "被熟悉的哭声打断呼吸后再说，话只针对这段视频；‘别删’清楚，不讲主题。"
+          },
+          {
+            "speaker_name": "知遥",
+            "text": "不删。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "很轻而明确地答应，不带笑音；说完点一次头。"
+          }
+        ],
+        "purpose": "回收开场哭声：它从违规证据变成母亲要求保留的真实记录；不给她再加一个镜头前的笑。",
+        "sfx": "手机外放第1镜已录孩子哭声；旧母亲语句由第一条turns准确绑定。新对白后回放再两秒停，剩广场器乐与衣料声。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机"
+        ],
+        "scene_objects": [],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "母亲松手、手机按停，切到已带走这段记录的知遥离城；不暗示孩子获释。",
+        "origin_index": 34,
+        "source_shot": 34,
+        "label": "VIS34",
+        "authored_location": "中心正门广场·夜间",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥已向母亲交代孩子还在里面，并打开白天第一段。 白天开场那段在手机里重新播放，只给母亲看。孩子哭着找她的声音传出来。母亲用一只手盖住自己嘴角，另一只手按住知遥握手机的手腕，先不让她收走。母亲低下头，知遥没有追问；她把仍在回放的手机顺着母亲按腕的动作收低到两人手之间，屏幕仍朝母亲。影片观察机位随两只手的实际移动下俯，停到相叠的手、手机与门槛。母亲说完才松手，知遥点头；手机回放继续两秒后由知遥按停。 母亲松开手腕；知遥答应不删，旧回放再两秒后被按停，孩子未获释。",
+        "motion_prompt": "白天开场那段在手机里重新播放，只给母亲看。孩子哭着找她的声音传出来。母亲用一只手盖住自己嘴角，另一只手按住知遥握手机的手腕，先不让她收走。母亲低下头，知遥没有追问；她把仍在回放的手机顺着母亲按腕的动作收低到两人手之间，屏幕仍朝母亲。影片观察机位随两只手的实际移动下俯，停到相叠的手、手机与门槛。母亲说完才松手，知遥点头；手机回放继续两秒后由知遥按停。",
+        "shot_scale": "起于两人侧面半身；母亲按腕、知遥实际收低回放手机触发影片观察机位缓慢下俯，终点只有两人的手、手机背面与正门门槛。知遥操控的只有自己的回放手机，不操控影片观察机位；该镜不引入另一部剧情手机、同行摄影师或新相机。她说完也不上摇索取泪脸。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 34,
+        "scene_id": "S09",
+        "shot_id": "VIS35",
+        "segment_id": "visual_approved_shot_35",
+        "segment_ids": [
+          "visual_approved_shot_35"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "城外路上。知遥停下，在手机相册中把两段录像并排留着：白天哭泣与中心挤笑的缩略画面，她没有删除任何一段。她将手机锁屏放入外套左侧口袋，望回城中远处的巨大笑嘴，然后继续走。脸侧裸露，装置留在井下，没有回归。",
+        "location": "城外道路·夜间",
+        "duration_seconds": 6,
+        "characters": [
+          "知遥",
+          "男孩"
+        ],
+        "in_frame": [
+          "知遥",
+          "男孩"
+        ],
+        "start_state": "知遥离开中心正门，与母亲告别的细节不新增；城外夜路，手机仍有两段记录。",
+        "event": "城外路上。知遥停下，在手机相册中把两段录像并排留着：白天哭泣与中心挤笑的缩略画面，她没有删除任何一段。她将手机锁屏放入外套左侧口袋，望回城中远处的巨大笑嘴，然后继续走。脸侧裸露，装置留在井下，没有回归。",
+        "end_state": "两段都留下；手机锁屏入左侧口袋，裸颊知遥继续走。",
+        "camera": "从手中两段缩略画面近景起，随手机放入口袋缓慢上仰到知遥侧脸与远处雕塑同框；她转回路上时停，终点是她迈出的下一步。",
+        "turns": [],
+        "purpose": "末尾留下已成立的结果：两段真实表情都在她手里，孩子的下落并未因此被解决。",
+        "sfx": "指腹操作相册；锁屏轻声；城外风。",
+        "audio_plan": {
+          "music_cue": "两音弦乐主题低声返回，在知遥看过雕塑后收束；不作胜利音型。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机"
+        ],
+        "scene_objects": [],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "迈步接下一镜路边停步自拍，音乐在介绍前已经收好。",
+        "origin_index": 35,
+        "source_shot": 35,
+        "label": "VIS35",
+        "authored_location": "城外道路·夜间",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥离开中心正门，与母亲告别的细节不新增；城外夜路，手机仍有两段记录。 城外路上。知遥停下，在手机相册中把两段录像并排留着：白天哭泣与中心挤笑的缩略画面，她没有删除任何一段。她将手机锁屏放入外套左侧口袋，望回城中远处的巨大笑嘴，然后继续走。脸侧裸露，装置留在井下，没有回归。 两段都留下；手机锁屏入左侧口袋，裸颊知遥继续走。",
+        "motion_prompt": "城外路上。知遥停下，在手机相册中把两段录像并排留着：白天哭泣与中心挤笑的缩略画面，她没有删除任何一段。她将手机锁屏放入外套左侧口袋，望回城中远处的巨大笑嘴，然后继续走。脸侧裸露，装置留在井下，没有回归。",
+        "shot_scale": "从手中两段缩略画面近景起，随手机放入口袋缓慢上仰到知遥侧脸与远处雕塑同框；她转回路上时停，终点是她迈出的下一步。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 35,
+        "scene_id": "S09",
+        "shot_id": "VIS36",
+        "segment_id": "visual_approved_shot_36",
+        "segment_ids": [
+          "visual_approved_shot_36"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "路边知遥停步自拍，先把笑之国留在远处，再从背包侧袋拿出下一站的三折路线卡。路线卡内为未去过目的地的资料图：A页巨大植物以楼房为尺度，幽暗森林边缘仅作资料预览。先显示A页，随她说话保持。",
+        "location": "城外道路·夜间",
+        "duration_seconds": 11,
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "start_state": "知遥锁屏收手机、看回雕塑并迈步后，在路边停下。",
+        "event": "路边知遥停步自拍，先把笑之国留在远处，再从背包侧袋拿出下一站的三折路线卡。路线卡内为未去过目的地的资料图：A页巨大植物以楼房为尺度，幽暗森林边缘仅作资料预览。先显示A页，随她说话保持。",
+        "end_state": "A页讲完，知遥翻向B页，三地均仍只是资料。",
+        "camera": "自拍胸像起，路线卡举起后俯向A页，终点保留知遥一小块侧脸和完整A资料页；资料页明确小字『下一站资料预览』，不伪装亲历。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "text": "下一站你们选。A，巨人花园，植物比楼高，幽暗森林是禁地。想看看人怎么在里面生活。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "声音恢复平常分享，仍有一点疲惫；先说邀请，再按纸卡读资料，最后一句带好奇而非挑战禁令。"
+          }
+        ],
+        "purpose": "接回旅行身份；A保留所有既定事实，并给出与本集眼见为实相关的观看理由。",
+        "sfx": "城外风；纸卡翻页。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机",
+          "三折路线资料卡"
+        ],
+        "scene_objects": [
+          "三折"
+        ],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "她翻到B页的动作切下一镜，保持一段介绍的连续性。",
+        "origin_index": 36,
+        "source_shot": 36,
+        "label": "VIS36",
+        "authored_location": "城外道路·夜间",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥锁屏收手机、看回雕塑并迈步后，在路边停下。 路边知遥停步自拍，先把笑之国留在远处，再从背包侧袋拿出下一站的三折路线卡。路线卡内为未去过目的地的资料图：A页巨大植物以楼房为尺度，幽暗森林边缘仅作资料预览。先显示A页，随她说话保持。 A页讲完，知遥翻向B页，三地均仍只是资料。",
+        "motion_prompt": "路边知遥停步自拍，先把笑之国留在远处，再从背包侧袋拿出下一站的三折路线卡。路线卡内为未去过目的地的资料图：A页巨大植物以楼房为尺度，幽暗森林边缘仅作资料预览。先显示A页，随她说话保持。",
+        "shot_scale": "自拍胸像起，路线卡举起后俯向A页，终点保留知遥一小块侧脸和完整A资料页；资料页明确小字『下一站资料预览』，不伪装亲历。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 36,
+        "scene_id": "S09",
+        "shot_id": "VIS37",
+        "segment_id": "visual_approved_shot_37",
+        "segment_ids": [
+          "visual_approved_shot_37"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥将卡翻到B页。资料图只显示两种不同生活环境与游客试玩票样，不把交换事实演成已经发生在知遥身上。她看完页面，抬眼向观众问。 问完后，她用末尾闭嘴的一秒把手机扣入胸前固定夹的正向自拍位，卡保持在左手；下一镜从这个已经固定的位置拍。",
+        "location": "城外道路·夜间",
+        "duration_seconds": 11,
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "start_state": "知遥仍在同一城外路边，A页介绍完，手里持三折卡。",
+        "event": "知遥将卡翻到B页。资料图只显示两种不同生活环境与游客试玩票样，不把交换事实演成已经发生在知遥身上。她看完页面，抬眼向观众问。 问完后，她用末尾闭嘴的一秒把手机扣入胸前固定夹的正向自拍位，卡保持在左手；下一镜从这个已经固定的位置拍。",
+        "end_state": "B页讲完，末一秒手机扣进胸夹正向自拍位，卡在左手。",
+        "camera": "承上镜同一地点，路线卡B页近景起；‘我想’时缓慢抬到自拍中近景，终点是她确实在等观众想这一个问题。 末尾一秒完成手机入夹，画面稳定后切。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "text": "B，交换人生之国，每十年强制换人生，游客能试玩二十四小时。我想试试，一天够不够适应。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "按资料陈述前半，‘二十四小时’清楚而不广告化；最后一句是自己的疑问，稍放慢。"
+          }
+        ],
+        "purpose": "B完整保留十年强制轮换及游客24小时试玩，并明确可体验的问题。",
+        "sfx": "纸页转动；城外风。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机",
+          "三折路线资料卡",
+          "胸前固定夹"
+        ],
+        "scene_objects": [],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "她目光下落准备看C页，下一镜承接同一次翻页。",
+        "origin_index": 37,
+        "source_shot": 37,
+        "label": "VIS37",
+        "authored_location": "城外道路·夜间",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "知遥仍在同一城外路边，A页介绍完，手里持三折卡。 知遥将卡翻到B页。资料图只显示两种不同生活环境与游客试玩票样，不把交换事实演成已经发生在知遥身上。她看完页面，抬眼向观众问。 问完后，她用末尾闭嘴的一秒把手机扣入胸前固定夹的正向自拍位，卡保持在左手；下一镜从这个已经固定的位置拍。 B页讲完，末一秒手机扣进胸夹正向自拍位，卡在左手。",
+        "motion_prompt": "知遥将卡翻到B页。资料图只显示两种不同生活环境与游客试玩票样，不把交换事实演成已经发生在知遥身上。她看完页面，抬眼向观众问。 问完后，她用末尾闭嘴的一秒把手机扣入胸前固定夹的正向自拍位，卡保持在左手；下一镜从这个已经固定的位置拍。",
+        "shot_scale": "承上镜同一地点，路线卡B页近景起；‘我想’时缓慢抬到自拍中近景，终点是她确实在等观众想这一个问题。 末尾一秒完成手机入夹，画面稳定后切。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      },
+      {
+        "index": 37,
+        "scene_id": "S09",
+        "shot_id": "VIS38",
+        "segment_id": "visual_approved_shot_38",
+        "segment_ids": [
+          "visual_approved_shot_38"
+        ],
+        "source_kind": "用户批准Visual改编稿",
+        "source_quote": "知遥翻到C页，资料图为梦税登记处的外观与登记表样式，不出现已征收知遥梦境的画面。她把三折卡完全展开，让A、B、C都露出，最后将卡放低看向镜头。",
+        "location": "城外道路·夜间",
+        "duration_seconds": 11,
+        "characters": [
+          "知遥"
+        ],
+        "in_frame": [
+          "知遥"
+        ],
+        "start_state": "B页介绍完，手机已在胸前夹正向自拍位，卡在左手。",
+        "event": "知遥翻到C页，资料图为梦税登记处的外观与登记表样式，不出现已征收知遥梦境的画面。她把三折卡完全展开，让A、B、C都露出，最后将卡放低看向镜头。",
+        "end_state": "C页讲完、三折卡全展开，知遥合嘴看镜头，未预选。",
+        "camera": "自拍胸像与C页同框起，资料说完后卡展开，相机固定到三页同时可见、知遥抬眼；不在这镜提前做投票结果。",
+        "turns": [
+          {
+            "speaker_name": "知遥",
+            "text": "C，梦税国，每月交一个有效梦，游客也得登记。我想问问，什么梦才算数。选A、B或C。",
+            "delivery_mode": "visible_dialogue",
+            "emotion": "陈述规则时清楚平实，‘有效’轻加重；邀请投票时直接自然，不抬成广告结尾。"
+          }
+        ],
+        "purpose": "C完整保留每月一个有效梦和游客登记，给出观看理由并把选择交还观众。",
+        "sfx": "纸卡展开；城外风。",
+        "audio_plan": {
+          "music_cue": "无非叙事音乐。",
+          "reference_audio": [],
+          "reference_audio_count": 0
+        },
+        "light": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "props": [
+          "手机",
+          "三折路线资料卡",
+          "胸前固定夹"
+        ],
+        "scene_objects": [
+          "三折"
+        ],
+        "wears": {
+          "知遥": null
+        },
+        "extras": [],
+        "listeners": [],
+        "independent_props": [],
+        "cut": "她说完‘A、B或C’并停住后，硬切最终完整同屏卡。",
+        "origin_index": 38,
+        "source_shot": 38,
+        "label": "VIS38",
+        "authored_location": "城外道路·夜间",
+        "scene_time": "当晚夜间；仅路灯、场内固定灯、手电和设备发光按批准镜头出现",
+        "visual_prompt": "B页介绍完，手机已在胸前夹正向自拍位，卡在左手。 知遥翻到C页，资料图为梦税登记处的外观与登记表样式，不出现已征收知遥梦境的画面。她把三折卡完全展开，让A、B、C都露出，最后将卡放低看向镜头。 C页讲完、三折卡全展开，知遥合嘴看镜头，未预选。",
+        "motion_prompt": "知遥翻到C页，资料图为梦税登记处的外观与登记表样式，不出现已征收知遥梦境的画面。她把三折卡完全展开，让A、B、C都露出，最后将卡放低看向镜头。",
+        "shot_scale": "自拍胸像与C页同框起，资料说完后卡展开，相机固定到三页同时可见、知遥抬眼；不在这镜提前做投票结果。",
+        "avoid": "真人写实；单一连续全画面；一个角色一个真实身体，玻璃反射仅同一人的反射；自然人体比例；对白字幕后期生成。"
+      }
+    ]
+  },
+  "production_groups": [
+    {
+      "shot_indexes": [
+        1
+      ],
+      "source_segment": "Visual批准组01"
+    },
+    {
+      "shot_indexes": [
+        2,
+        3
+      ],
+      "source_segment": "Visual批准组02"
+    },
+    {
+      "shot_indexes": [
+        4
+      ],
+      "source_segment": "Visual批准组03"
+    },
+    {
+      "shot_indexes": [
+        5,
+        6
+      ],
+      "source_segment": "Visual批准组04"
+    },
+    {
+      "shot_indexes": [
+        7
+      ],
+      "source_segment": "Visual批准组05"
+    },
+    {
+      "shot_indexes": [
+        8
+      ],
+      "source_segment": "Visual批准组06"
+    },
+    {
+      "shot_indexes": [
+        9,
+        10
+      ],
+      "source_segment": "Visual批准组07"
+    },
+    {
+      "shot_indexes": [
+        11,
+        12
+      ],
+      "source_segment": "Visual批准组08"
+    },
+    {
+      "shot_indexes": [
+        13,
+        14
+      ],
+      "source_segment": "Visual批准组09"
+    },
+    {
+      "shot_indexes": [
+        15
+      ],
+      "source_segment": "Visual批准组10"
+    },
+    {
+      "shot_indexes": [
+        16,
+        17
+      ],
+      "source_segment": "Visual批准组11"
+    },
+    {
+      "shot_indexes": [
+        18,
+        19
+      ],
+      "source_segment": "Visual批准组12"
+    },
+    {
+      "shot_indexes": [
+        20,
+        21
+      ],
+      "source_segment": "Visual批准组13"
+    },
+    {
+      "shot_indexes": [
+        22,
+        23
+      ],
+      "source_segment": "Visual批准组14"
+    },
+    {
+      "shot_indexes": [
+        24,
+        25
+      ],
+      "source_segment": "Visual批准组15"
+    },
+    {
+      "shot_indexes": [
+        26
+      ],
+      "source_segment": "Visual批准组16"
+    },
+    {
+      "shot_indexes": [
+        27,
+        28,
+        29
+      ],
+      "source_segment": "Visual批准组17"
+    },
+    {
+      "shot_indexes": [
+        30
+      ],
+      "source_segment": "Visual批准组18"
+    },
+    {
+      "shot_indexes": [
+        31
+      ],
+      "source_segment": "Visual批准组19"
+    },
+    {
+      "shot_indexes": [
+        32
+      ],
+      "source_segment": "Visual批准组20"
+    },
+    {
+      "shot_indexes": [
+        33
+      ],
+      "source_segment": "Visual批准组21"
+    },
+    {
+      "shot_indexes": [
+        34
+      ],
+      "source_segment": "Visual批准组22"
+    },
+    {
+      "shot_indexes": [
+        35
+      ],
+      "source_segment": "Visual批准组23"
+    },
+    {
+      "shot_indexes": [
+        36
+      ],
+      "source_segment": "Visual批准组24"
+    },
+    {
+      "shot_indexes": [
+        37
+      ],
+      "source_segment": "Visual批准组25"
+    }
+  ],
+  "approved_group_to_production": [
+    {
+      "clip_id": "clip_01",
+      "approved_shot_indexes": [
+        1
+      ],
+      "production_shot_indexes": [
+        1
+      ],
+      "seconds": 7
+    },
+    {
+      "clip_id": "clip_02",
+      "approved_shot_indexes": [
+        3,
+        4
+      ],
+      "production_shot_indexes": [
+        2,
+        3
+      ],
+      "seconds": 14
+    },
+    {
+      "clip_id": "clip_03",
+      "approved_shot_indexes": [
+        5
+      ],
+      "production_shot_indexes": [
+        4
+      ],
+      "seconds": 5
+    },
+    {
+      "clip_id": "clip_04",
+      "approved_shot_indexes": [
+        6,
+        7
+      ],
+      "production_shot_indexes": [
+        5,
+        6
+      ],
+      "seconds": 13
+    },
+    {
+      "clip_id": "clip_05",
+      "approved_shot_indexes": [
+        8
+      ],
+      "production_shot_indexes": [
+        7
+      ],
+      "seconds": 11
+    },
+    {
+      "clip_id": "clip_06",
+      "approved_shot_indexes": [
+        9
+      ],
+      "production_shot_indexes": [
+        8
+      ],
+      "seconds": 5
+    },
+    {
+      "clip_id": "clip_07",
+      "approved_shot_indexes": [
+        10,
+        11
+      ],
+      "production_shot_indexes": [
+        9,
+        10
+      ],
+      "seconds": 12
+    },
+    {
+      "clip_id": "clip_08",
+      "approved_shot_indexes": [
+        12,
+        13
+      ],
+      "production_shot_indexes": [
+        11,
+        12
+      ],
+      "seconds": 13
+    },
+    {
+      "clip_id": "clip_09",
+      "approved_shot_indexes": [
+        14,
+        15
+      ],
+      "production_shot_indexes": [
+        13,
+        14
+      ],
+      "seconds": 15
+    },
+    {
+      "clip_id": "clip_10",
+      "approved_shot_indexes": [
+        16
+      ],
+      "production_shot_indexes": [
+        15
+      ],
+      "seconds": 9
+    },
+    {
+      "clip_id": "clip_11",
+      "approved_shot_indexes": [
+        17,
+        18
+      ],
+      "production_shot_indexes": [
+        16,
+        17
+      ],
+      "seconds": 10
+    },
+    {
+      "clip_id": "clip_12",
+      "approved_shot_indexes": [
+        19,
+        20
+      ],
+      "production_shot_indexes": [
+        18,
+        19
+      ],
+      "seconds": 14
+    },
+    {
+      "clip_id": "clip_13",
+      "approved_shot_indexes": [
+        21,
+        22
+      ],
+      "production_shot_indexes": [
+        20,
+        21
+      ],
+      "seconds": 12
+    },
+    {
+      "clip_id": "clip_14",
+      "approved_shot_indexes": [
+        23,
+        24
+      ],
+      "production_shot_indexes": [
+        22,
+        23
+      ],
+      "seconds": 15
+    },
+    {
+      "clip_id": "clip_15",
+      "approved_shot_indexes": [
+        25,
+        26
+      ],
+      "production_shot_indexes": [
+        24,
+        25
+      ],
+      "seconds": 13
+    },
+    {
+      "clip_id": "clip_16",
+      "approved_shot_indexes": [
+        27
+      ],
+      "production_shot_indexes": [
+        26
+      ],
+      "seconds": 4
+    },
+    {
+      "clip_id": "clip_17",
+      "approved_shot_indexes": [
+        28,
+        29,
+        30
+      ],
+      "production_shot_indexes": [
+        27,
+        28,
+        29
+      ],
+      "seconds": 13
+    },
+    {
+      "clip_id": "clip_18",
+      "approved_shot_indexes": [
+        31
+      ],
+      "production_shot_indexes": [
+        30
+      ],
+      "seconds": 4
+    },
+    {
+      "clip_id": "clip_19",
+      "approved_shot_indexes": [
+        32
+      ],
+      "production_shot_indexes": [
+        31
+      ],
+      "seconds": 8
+    },
+    {
+      "clip_id": "clip_20",
+      "approved_shot_indexes": [
+        33
+      ],
+      "production_shot_indexes": [
+        32
+      ],
+      "seconds": 8
+    },
+    {
+      "clip_id": "clip_21",
+      "approved_shot_indexes": [
+        34
+      ],
+      "production_shot_indexes": [
+        33
+      ],
+      "seconds": 9
+    },
+    {
+      "clip_id": "clip_22",
+      "approved_shot_indexes": [
+        35
+      ],
+      "production_shot_indexes": [
+        34
+      ],
+      "seconds": 6
+    },
+    {
+      "clip_id": "clip_23",
+      "approved_shot_indexes": [
+        36
+      ],
+      "production_shot_indexes": [
+        35
+      ],
+      "seconds": 11
+    },
+    {
+      "clip_id": "clip_24",
+      "approved_shot_indexes": [
+        37
+      ],
+      "production_shot_indexes": [
+        36
+      ],
+      "seconds": 11
+    },
+    {
+      "clip_id": "clip_25",
+      "approved_shot_indexes": [
+        38
+      ],
+      "production_shot_indexes": [
+        37
+      ],
+      "seconds": 11
+    }
+  ],
+  "publication": {
+    "world_card": {
+      "after_clip_id": "clip_01",
+      "seconds": 3,
+      "series_title": "知遥的旅行",
+      "episode": "EP01",
+      "title": "笑之国",
+      "premise": "公共场所必须保持微笑",
+      "time_note": "稍早·入境"
+    },
+    "watermark": "知遥的旅行 · EP01"
+  },
+  "interaction": {
+    "question": "下一站去哪？评论A、B或C。",
+    "options": [
+      {
+        "id": "A",
+        "label": "巨人花园",
+        "reason": "植物比楼高；幽暗森林是禁地",
+        "rationale": "知遥想亲眼看看，普通人怎样生活在比楼更高的植物之间；森林边界尚未探明。",
+        "next": "仅获选后，下一集才前往巨人花园；本集尚未到访。"
+      },
+      {
+        "id": "B",
+        "label": "交换人生之国",
+        "reason": "每十年强制换人生；游客可24小时试玩",
+        "rationale": "可以把规则落到一次明确的游客体验，看看一天是否足够适应另一种生活。",
+        "next": "仅获选后，下一集才前往交换人生之国；本集尚未到访。"
+      },
+      {
+        "id": "C",
+        "label": "梦税国",
+        "reason": "每月一个有效梦；游客也须登记",
+        "rationale": "知遥想去登记处确认‘有效梦’怎样认定，而不是预告一个已经查明的秘密。",
+        "next": "仅获选后，下一集才前往梦税国；本集尚未到访。"
+      }
+    ],
+    "selected": null,
+    "seconds": 3,
+    "id": "laughing-country-visual-EP01-END",
+    "series_title": "知遥的旅行",
+    "type": "next_episode_comment_vote",
+    "publishing_status": "not_published"
+  },
+  "known_assembly_difference": "现世界卡3秒静音；批准稿哭声0.5秒后接大厅声桥未由现卡软件实现。"
+}
