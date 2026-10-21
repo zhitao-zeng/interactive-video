@@ -8,7 +8,7 @@ from types import SimpleNamespace
 import pytest
 from PIL import Image
 
-from test_interactive_delivery import labelled_delivery
+from support.delivery_cases import labelled_delivery
 from novel_manga.interactive import delivery
 
 

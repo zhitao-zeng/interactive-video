@@ -9,7 +9,7 @@ import subprocess
 import time
 import uuid
 
-from novel_manga.application.agents.sandbox import Attempt, SandboxRefused, unique_attempt
+from novel_manga.application.agents.attempt import Attempt, SandboxRefused, unique_attempt
 from novel_manga.util import atomic_write_json, read_json
 
 SKILL_SOURCE = Path(__file__).resolve().parents[5] / 'skills/episode-production'

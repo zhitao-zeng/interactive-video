@@ -3,7 +3,7 @@ from PIL import Image
 import pytest
 from novel_manga.util import atomic_write_json,read_json
 from novel_manga.interactive.interaction_card import prepare,render
-from test_interactive_delivery import labelled_delivery
+from support.delivery_cases import labelled_delivery
 
 
 def test_episode_label_is_part_of_the_reviewed_card_content():

@@ -10,20 +10,9 @@ from novel_manga.util import atomic_write_json, read_json
 from support.repair_history import episode as publication_episode, candidate_episode
 
 
-def episode(tmp_path):
-    directory=tmp_path/'book'/'book_1';directory.mkdir(parents=True)
-    movie=directory/'movie.mp4';movie.write_bytes(b'movie')
-    clip={'clip_id':'a','kind':'video','shot_indexes':[1],'references':[]}
-    plan={'clips':[clip]}
-    atomic_write_json(directory/'clip_plan.json',plan)
-    atomic_write_json(directory/'chapter_script.json',{'shots':[]})
-    atomic_write_json(directory/'episode_review.json',{'clips':{'a':{'severity':'pass'}},'feedback':{}})
-    media={'clips':[{'clip_id':'a','selected':{'video':str(movie),'chunks':[]}}],
-           'assembly':{'final_video':str(movie),'thin_passed':True,
-                       'timeline':[{'unit_id':'a','start':0,'end':9}]}}
-    ctx=SimpleNamespace(episode_dir=directory,clip_plan=plan,script={'shots':[]},bible=None,
-                        settings=SimpleNamespace(width=1080,height=1920,font_path='/font'))
-    return SimpleNamespace(context=ctx),media,movie
+from support.delivery_cases import episode
+
+
 
 
 def test_real_extractor_cache_and_incomplete_retry(tmp_path,monkeypatch):

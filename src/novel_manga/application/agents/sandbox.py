@@ -27,31 +27,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from novel_manga.application.configuration import project_root
+from novel_manga.application.agents.attempt import Attempt, SandboxRefused, unique_attempt  # re-exported shared primitives
 
 ROOT = project_root()
 DEFAULT_CONFIG = ROOT / "configs" / "agent_sandbox.json"
-
-
-class SandboxRefused(ValueError):
-    """The run cannot start as asked - a missing prompt, an unknown skill, no credential."""
-
-
-@dataclass
-class Attempt:
-    """One execution of a run: where its record is, and what it actually produced."""
-    run: str
-    directory: Path
-    exit_code: int
-    seconds: int
-    produced: list[str] = field(default_factory=list)
-    kept: int = 0
-    record: dict = field(default_factory=dict)
-
-    @property
-    def ok(self) -> bool:
-        """The process finished cleanly.  Whether what it wrote is usable is a separate question, and
-        the caller has to ask it: exit=0 does not mean there is a storyboard worth binding."""
-        return self.exit_code == 0
 
 
 def load_config(path: Path | None = None) -> dict:
@@ -113,20 +92,6 @@ def install_skills(run_dir: Path, template: Path, *, replace: bool) -> str:
     if not installed.exists():
         shutil.copytree(template, installed)
     return wanted
-
-
-def unique_attempt(attempts: Path, name: str) -> Path:
-    """A directory no attempt has had before.  The stamp is to the second, and two attempts inside one
-    second sharing a directory is the very thing an attempt id exists to prevent."""
-    attempts.mkdir(parents=True, exist_ok=True)
-    for suffix in ("", *(f"-{n}" for n in range(2, 100))):
-        attempt = attempts / (name + suffix)
-        try:
-            attempt.mkdir()
-            return attempt
-        except FileExistsError:
-            continue
-    raise SandboxRefused(f"attempts/{name} 这一秒里已经有 99 次尝试了")
 
 
 def container_running(name: str) -> bool:

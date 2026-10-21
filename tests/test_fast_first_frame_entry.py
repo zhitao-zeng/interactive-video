@@ -52,18 +52,7 @@ def test_unsupported_first_frame_mixes_fail_before_submission(model,image,extras
         video_payload(NS(video_model=model),'dialogue',image,12,extras,audios,first_frame=True)
 
 
-def fixture_book(tmp_path):
-    book=tmp_path/'romance-fast';episode=book/(book.name+'_1');episode.mkdir(parents=True)
-    Image.new('RGB',(18,32)).save(book/'actor.png')
-    atomic_write_json(book/'profile.json',{'sd_input_mode':'first-frame','aspect_ratio':'9:16'})
-    opening={'image_prompt':'One actor standing by the table.','visible_characters':['A'],'reference_subjects':['A']}
-    shot={'index':1,'camera':'wide','in_frame':['A'],'opening_frame':opening}
-    clip={'clip_id':'clip_01','kind':'video','request_seconds':12,'shot_indexes':[1],'shots':[shot],
-          'h3_speech_policy':'no_reference_performance_first',
-          'references':[{'role':'character','name':'A','path':'actor.png'}]}
-    atomic_write_json(episode/'chapter_script.json',{'shots':[shot]})
-    atomic_write_json(episode/'clip_plan.json',{'clips':[clip]})
-    return book,episode
+from support.first_frame_cases import fixture_book
 
 
 def test_api_opening_is_reviewed_once_and_resume_reuses_it(tmp_path,monkeypatch):

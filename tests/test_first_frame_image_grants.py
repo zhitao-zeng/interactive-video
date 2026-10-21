@@ -8,7 +8,7 @@ from novel_manga.application.agents.episode import first_frames as first_frame_m
 from novel_manga.application.agents.episode.first_frames import FirstFrameOperations, status
 from novel_manga.application.repair import history
 from novel_manga.util import atomic_write_json, read_json
-from test_first_take_stream import case
+from support.first_frame_cases import case
 
 
 @pytest.fixture

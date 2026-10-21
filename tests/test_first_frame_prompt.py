@@ -57,7 +57,7 @@ def test_review_uses_same_appearance_scope_and_keeps_current_continuity(tmp_path
 
 
 def test_fast_preparation_compiles_bindings_and_keeps_authored_current_state(tmp_path,monkeypatch):
-    from test_fast_first_frame_entry import fixture_book
+    from support.first_frame_cases import fixture_book
     from novel_manga.interactive.sd_first_frames import prepare
     book,episode=fixture_book(tmp_path)
     Image.new('RGB',(8,16)).save(book/'room.png')
@@ -82,7 +82,7 @@ def test_fast_preparation_compiles_bindings_and_keeps_authored_current_state(tmp
 
 
 def test_h3_preparation_binds_reordered_registered_references(tmp_path,monkeypatch):
-    from test_first_frame_production import clip_case
+    from support.first_frame_cases import clip_case
     from novel_manga.application.agents.episode.first_frames import FirstFrameOperations
     ctx,clip=clip_case(tmp_path);clip.pop('first_frame')
     clip['shots'][0]['light']='Warm practical light at dusk; same day.'

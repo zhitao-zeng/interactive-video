@@ -24,18 +24,7 @@ def test_first_frame_is_raw_keyframe_zero_and_first_reference(tmp_path):
     assert payload['conditions'][0]['uri']==payload['conditions'][1]['uri']
 
 
-def clip_case(tmp_path):
-    original=[{'role':'location','path':'scene.png','name':'pool'},
-              {'role':'character','path':'actor.png','name':'A'},
-              {'role':'character','path':'new.png','name':'B'},
-              {'role':'voice','path':'voice.wav','name':'A'}]
-    clip={'clip_id':'clip_01','references':original,'shots':[{'start_state':'A alone','camera':'front','location':'pool','in_frame':['A'],'event':'B enters','turns':[]} ]}
-    for name in ['scene.png','actor.png','new.png','frame.png']:Image.new('RGB',(4,8)).save(tmp_path/name)
-    ctx=NS(novel_dir=tmp_path,profile={'h3_input_mode':'first-frame'})
-    from novel_manga.util import atomic_write_json
-    atomic_write_json(tmp_path/'profile.json',ctx.profile)
-    clip['first_frame']={'path':'frame.png','extra_references':['new.png'],'visible_characters':['A'],'review':{'consistent':True,'problems':[]},'source_contract':opening_contract(clip,['scene.png','actor.png'])}
-    return ctx,clip
+from support.first_frame_cases import clip_case
 
 
 def test_actual_images_select_frame_and_only_supplement_without_changing_sources(tmp_path):

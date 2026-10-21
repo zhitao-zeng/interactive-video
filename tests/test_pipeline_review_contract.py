@@ -9,7 +9,7 @@ import pytest
 from novel_manga.application.review import confirmed, final_cut
 from novel_manga.story.h3 import first_frame_prompt
 from novel_manga.util import atomic_write_json, read_json
-from test_final_cut_review import episode
+from support.delivery_cases import episode
 
 
 @pytest.mark.parametrize('opening', ['Seated POV with her grey trouser legs and boots.',

@@ -46,6 +46,8 @@ class MediaOperations:
         runner.context.asr_helper = self.ctx.project_root / 'scripts/thin_asr_segments.py'
         runner.context.source_novel_dir = getattr(self.ctx, 'source_novel_dir', None) or self.ctx.novel_dir
         runner.context.options.first_pass_only = os.environ.get('NOVEL_FIRST_PASS_ONLY') == '1'
+        from novel_manga.application.agents.episode.postproduction import assembly_inputs
+        runner.assembly_preparer = assembly_inputs
         return runner
 
 

@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 from PIL import Image
 
-from test_first_take_stream import case
+from support.first_frame_cases import case
 from novel_manga.application.agents.episode.first_frames import FirstFrameOperations
 from novel_manga.util import atomic_write_json, read_json
 

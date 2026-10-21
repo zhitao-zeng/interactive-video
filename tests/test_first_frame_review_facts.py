@@ -7,27 +7,7 @@ import pytest
 from novel_manga.application.agents.episode.first_frames import FirstFrameOperations, check
 from novel_manga.media.first_frames import current_contract, require_current, source_asset_state
 from novel_manga.util import atomic_write_json, read_json
-from test_first_take_stream import case
-
-
-def character_case(tmp_path, monkeypatch):
-    ctx, clips = case(tmp_path, monkeypatch)
-    ref = {'role': 'character', 'name': 'A', 'path': 'actor.png'}
-    Image.new('RGB', (8, 16)).save(ctx.novel_dir/'actor.png')
-    bible = {'characters': [{'name': 'A', 'appearance': 'black hair',
-                            'wardrobe': 'grey long trousers and grey hiking shoes'},
-                           {'name': 'unselected', 'wardrobe': 'red dress'}]}
-    atomic_write_json(ctx.novel_dir/'story_bible.json', bible)
-    clip = clips[0]
-    clip['references'].append(ref)
-    clip['shots'][0].update(in_frame=[], start_state='A films the pool; headlamp is inside the closed backpack.',
-                            device_state='headlamp stays inside the backpack', wears={'A': 'backpack'})
-    atomic_write_json(ctx.episode_dir/'clip_plan.json', {'clips': [clip]})
-    atomic_write_json(ctx.run_dir/'catalog.json', clip['references'])
-    row = read_json(ctx.work_dir/'output/first-frames.json')['frames'][0]
-    row['image_references'].append('actor.png')
-    atomic_write_json(ctx.work_dir/'output/first-frames.json', {'frames': [row]})
-    return ctx, clip, row, bible
+from support.first_frame_cases import case, character_case, fixture_book
 
 
 def finding(relation='contradiction'):
@@ -174,7 +154,7 @@ def test_saved_image_is_reviewed_with_new_facts_without_rebilling_or_destroying_
 
 
 def test_fast_uses_same_rejection_and_rechecks_retained_pixels_after_fact_change(tmp_path, monkeypatch):
-    from test_fast_first_frame_entry import fixture_book
+    
     from novel_manga.interactive.sd_first_frames import prepare
     book,episode=fixture_book(tmp_path)
     monkeypatch.setattr('novel_manga.style_packs.frame_style',lambda novel:{})
@@ -231,7 +211,7 @@ def test_rejected_alternative_preserves_a_different_current_selection(tmp_path,m
 
 
 def test_fast_pending_image_keeps_original_request_when_review_facts_are_added(tmp_path, monkeypatch):
-    from test_fast_first_frame_entry import fixture_book
+    
     from novel_manga.interactive.sd_first_frames import prepare
     book, episode = fixture_book(tmp_path)
     monkeypatch.setattr('novel_manga.style_packs.frame_style', lambda novel: {})

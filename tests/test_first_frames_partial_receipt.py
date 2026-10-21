@@ -37,7 +37,7 @@ def test_service_error_returns_completed_work_and_settled_video_progress(tmp_pat
 
 
 def test_real_image_loop_preserves_completed_candidate_before_later_service_error(tmp_path,monkeypatch):
-    from test_first_take_stream import case
+    from support.first_frame_cases import case
     from PIL import Image
     from novel_manga.application.agents.episode.first_frames import FirstFrameOperations
     import pytest
@@ -54,7 +54,7 @@ def test_real_image_loop_preserves_completed_candidate_before_later_service_erro
 
 
 def test_rejected_candidate_is_an_actionable_repair_not_only_missing_image(tmp_path,monkeypatch):
-    from test_first_take_stream import case
+    from support.first_frame_cases import case
     from PIL import Image
     from novel_manga.application.agents.episode.first_frames import FirstFrameOperations,status
     ctx,_=case(tmp_path,monkeypatch)
@@ -64,13 +64,18 @@ def test_rejected_candidate_is_an_actionable_repair_not_only_missing_image(tmp_p
     row=status(ctx,read_json(ctx.episode_dir/'clip_plan.json'))['clips']['clip_01']
     assert row['last_rejection']['problems']==['headlamp appears too early']
     assert row['last_rejection']['evidence']=='input/first_frames/clip_01/candidate_01'
-    assert 'unchanged image request returns this cached rejection' in row['next_action']
+    # Cached rejections live in the per-candidate review input cache now: an unchanged
+    # review input returns the saved rejection without a new image (see current_review);
+    # the actionable path is source input repair or one bounded retake_candidate.
+    assert 'input repair' in row['next_action'] and 'retake_candidate' in row['next_action']
     assert row['remaining_image_candidates']==2
 
 
 def test_current_task_includes_current_frame_and_video_failures_and_evidence(tmp_path):
     from novel_manga.application.agents.episode.current_task import prepare
-    ctx=NS(work_dir=tmp_path/'sandbox',episode_dir=tmp_path/'book/book_1',run_dir=tmp_path)
+    ctx=NS(work_dir=tmp_path/'sandbox',episode_dir=tmp_path/'book/book_1',run_dir=tmp_path,
+           novel_dir=tmp_path/'book')
+    atomic_write_json(ctx.novel_dir/'profile.json',{'h3_input_mode':'first-frame'})
     atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':[{'clip_id':'clip_01','shot_indexes':[1]}]})
     atomic_write_json(ctx.episode_dir/'thin_media_report.json',{'clips':[{'clip_id':'clip_01','error':'lamp timing conflict'}]})
     atomic_write_json(ctx.work_dir/'input/latest-first-frames.json',{})

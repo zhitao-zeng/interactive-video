@@ -10,24 +10,7 @@ from novel_manga.application.agents.episode.first_take_stream import FirstTakeSt
 from novel_manga.util import atomic_write_json,read_json
 
 
-def case(tmp_path,monkeypatch):
-    ctx=NS(novel_dir=tmp_path/'book',episode_dir=tmp_path/'book/book_1',
-           run_dir=tmp_path/'run',work_dir=tmp_path/'run/sandbox')
-    ctx.episode_dir.mkdir(parents=True);(ctx.work_dir/'output').mkdir(parents=True)
-    Image.new('RGB',(8,16)).save(ctx.novel_dir/'scene.png')
-    ref={'role':'location','path':'scene.png','name':'pool'}
-    clips=[{'clip_id':f'clip_{i:02d}','kind':'video','shot_indexes':[i],
-            'segment_ids':[str(i)],'references':[ref],
-            'shots':[{'index':i,'start_state':'empty pool','turns':[]}]}for i in (1,2)]
-    atomic_write_json(ctx.novel_dir/'profile.json',{'h3_input_mode':'first-frame'})
-    atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':clips})
-    atomic_write_json(ctx.episode_dir/'segments.json',[{'segment_id':str(i),'text':'empty pool'}for i in (1,2)])
-    atomic_write_json(ctx.run_dir/'catalog.json',[ref])
-    rows=[{'clip_id':c['clip_id'],'image_prompt':'empty pool','image_references':['scene.png'],
-           'visible_characters':[],'extra_references':[],'prompt_h3':'English request','source_quote':'empty pool'}for c in clips]
-    atomic_write_json(ctx.work_dir/'output/first-frames.json',{'frames':rows})
-    monkeypatch.setattr('novel_manga.application.agents.episode.first_frames.validate_existing_request',lambda *a:None)
-    return ctx,clips
+from support.first_frame_cases import case
 
 
 def test_video_starts_before_next_image_finishes_and_resume_never_repeats(tmp_path,monkeypatch):

@@ -1661,7 +1661,7 @@ def test_source_opening_change_waits_for_agent_frame_before_any_translation(setu
 @pytest.mark.parametrize('legacy',[False,True])
 def test_source_shot_scale_change_invalidates_current_and_legacy_accepted_frame(tmp_path,monkeypatch,legacy):
     from PIL import Image
-    from test_first_frame_review_facts import character_case
+    from support.first_frame_cases import character_case
     from novel_manga.media.first_frames import current_contract,require_current
     ctx,clip,row,_=character_case(tmp_path,monkeypatch)
     shot=copy.deepcopy(clip['shots'][0]);shot['shot_scale']='wide shot'
@@ -1679,7 +1679,7 @@ def test_source_shot_scale_change_invalidates_current_and_legacy_accepted_frame(
 
 def test_legacy_scale_cache_reuses_only_unchanged_opening_then_explicitly_reviews_changed_framing(tmp_path,monkeypatch):
     from PIL import Image
-    from test_first_frame_review_facts import character_case
+    from support.first_frame_cases import character_case
     from novel_manga.application.agents.episode.first_frames import FirstFrameOperations
     from novel_manga.media.first_frames import require_current
     ctx,clip,row,_=character_case(tmp_path,monkeypatch)

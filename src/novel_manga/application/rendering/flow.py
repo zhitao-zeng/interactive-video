@@ -217,8 +217,11 @@ class ThinMediaRunner:
         from novel_manga.application.repair.delivery import assembly_directory
         output_dir = assembly_directory(self.context.episode_dir)
         started = time.monotonic()
-        from novel_manga.application.agents.episode.postproduction import assembly_inputs
-        assembly_rows, visual_inserts = assembly_inputs(self.context, {'clips': results})
+        preparer = getattr(self, 'assembly_preparer', None)
+        if preparer is not None:
+            assembly_rows, visual_inserts = preparer(self.context, {'clips': results})
+        else:
+            assembly_rows, visual_inserts = results, []
         assembly = postprocess.assemble(self.context, assembly_rows, output_dir)
         if visual_inserts:
             assembly['postproduction'] = {'visual_inserts': visual_inserts}
