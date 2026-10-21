@@ -111,7 +111,7 @@ def test_user_can_cancel_scene_overlays_without_removing_dialogue_or_choices(tmp
     streams={'streams':[{'codec_type':'video','codec_name':'h264','width':1080,'height':1920,'r_frame_rate':'25/1','nb_frames':'7500'}, {'codec_type':'audio','codec_name':'aac'}]}
     def probe(command,**kwargs):
         data=json.loads(json.dumps(streams))
-        data['streams'][0]['nb_frames']='7425' if str(command[-1]).endswith('body.mp4') else '7500'
+        data['streams'][0]['nb_frames']='7500' if str(command[-1]).endswith('/episode01.mp4') else '7425'
         return json.dumps(data)
     monkeypatch.setattr(delivery.subprocess,'check_output',probe)
     measured=[]
@@ -124,12 +124,13 @@ def test_user_can_cancel_scene_overlays_without_removing_dialogue_or_choices(tmp
             'quality_review':{'passed':False,'content_passed':content_ok}}
     if audio_edit:report['assembly'][audio_edit]={'source':'pre-mix.mp4'}
     receipt=delivery.deliver(SimpleNamespace(context=ctx),report,tmp_path/'delivery')
-    first=commands[0]
+    first=next(c for c in commands if '-filter_complex' in c)
     assert first[first.index('-i')+1]==str(work/'joined.mp4')
-    assert first[first.index('-vf')+1]=='ass=subtitles.ass'
+    graph=first[first.index('-filter_complex')+1]
+    assert 'ass=subtitles.ass[body_video]' in graph
     if audio_edit:
         assert first[first.index('-i',first.index('-i')+1)+1]==str(assembled)
-        assert first[first.index('-map')+1]=='0:v:0' and '1:a:0' in first
+        assert '[0:v]' in graph and '[1:a]aresample=' in graph
     assert receipt['evidence_events']==[]
     assert receipt['delivery_policy']=={'extra_visual_overlays':False,'dialogue_subtitles':True,'interaction_card':True}
     assert any('anullsrc=r=48000:cl=stereo' in command for command in commands)
@@ -174,7 +175,7 @@ def labelled_delivery(tmp_path,monkeypatch):
     monkeypatch.setattr(delivery,'run',lambda command:commands.append(command))
     monkeypatch.setattr(delivery.subprocess,'run',lambda command,**kw:commands.append(command) or SimpleNamespace(returncode=0,stderr=''))
     def probe(command,**kw):
-        frames='4630' if command[-1].endswith('/body.mp4') else '4705'
+        frames='4705' if command[-1].endswith('/episode01.mp4') else '4630'
         return json.dumps({'streams':[
             {'codec_type':'video','codec_name':'h264','width':1080,'height':1920,'r_frame_rate':'25/1','nb_frames':frames},
             {'codec_type':'audio','codec_name':'aac'}]})
@@ -214,7 +215,7 @@ def test_approved_short_screenplay_keeps_media_and_exact_card_gates(labelled_del
     groups.write_text(json.dumps([{'shot_indexes':[1,2]}]))
     final_frames=1257
     def probe(command,**kwargs):
-        frames=1182 if command[-1].endswith('/body.mp4') else final_frames
+        frames=final_frames if command[-1].endswith('/episode01.mp4') else 1182
         return json.dumps({'streams':[
             {'codec_type':'video','codec_name':'h264','width':1080,'height':1920,
              'r_frame_rate':'25/1','nb_frames':str(frames)},
@@ -241,7 +242,7 @@ def test_cached_short_delivery_rechecks_old_technical_failure_without_encoding(l
     def probe(command,**kwargs):
         return json.dumps({'streams':[
             {'codec_type':'video','codec_name':'h264','width':1080,'height':1920,
-             'r_frame_rate':'25/1','nb_frames':'1182' if command[-1].endswith('/body.mp4') else '1257'},
+             'r_frame_rate':'25/1','nb_frames':'1257' if command[-1].endswith('/episode01.mp4') else '1182'},
             {'codec_type':'audio','codec_name':'aac'}]})
     monkeypatch.setattr(delivery.subprocess,'check_output',probe)
     runner=SimpleNamespace(context=case.ctx)
@@ -274,9 +275,9 @@ def test_empty_evidence_surfaces_keep_authored_labels_and_actual_clip_timing(lab
     assert receipt['overlay_timing']=='authored timing scaled to actual compiled clip spans'
     assert 'final_evidence_review_pending' not in receipt
     assert 'postproduction' not in receipt
-    first=case.commands[0]
+    first=next(c for c in case.commands if '-filter_complex' in c)
     assert first[first.index('-i')+1]==case.report['assembly']['final_video']
-    assert first[first.index('-vf')+1]=='ass=evidence.ass'
+    assert 'ass=evidence.ass[body_video]' in first[first.index('-filter_complex')+1]
     assert '仍在池室' in (case.destination/'evidence.ass').read_text()
 
 
@@ -301,9 +302,9 @@ def test_nonempty_evidence_keeps_observed_timing_and_final_review(labelled_deliv
     assert receipt['postproduction']==postproduction
     assert receipt['final_evidence_review_pending'] is True
     assert receipt['status']=='candidate'
-    first=case.commands[0]
+    first=next(c for c in case.commands if '-filter_complex' in c)
     assert first[first.index('-i')+1]==str(composited)
-    assert first[first.index('-vf')+1]=='ass=evidence.ass,ass=subtitles.ass'
+    assert 'ass=evidence.ass,ass=subtitles.ass[body_video]' in first[first.index('-filter_complex')+1]
 
 
 def test_nonempty_evidence_composite_error_cannot_be_accepted(labelled_delivery,monkeypatch):

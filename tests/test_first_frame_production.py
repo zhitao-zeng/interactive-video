@@ -293,9 +293,9 @@ def test_first_frame_provider_receives_selected_style_without_rewriting_authored
     before = copy.deepcopy(row)
     build(NS(novel_dir=tmp_path,run_dir=tmp_path), row, tmp_path/'opening.png')
     assert row == before
-    assert captured['prompt'].startswith(row['image_prompt'])
+    assert row['image_prompt'] in captured['prompt']
     assert 'Dimensional paper-crafted cinema.' in captured['prompt']
-    assert 'Readable layers.' in captured['prompt']
+    assert 'Readable layers.' not in captured['prompt'] # episode composition is not an image-wide override
 
 
 def test_first_frame_review_has_style_constraints_from_same_contract(tmp_path, monkeypatch):

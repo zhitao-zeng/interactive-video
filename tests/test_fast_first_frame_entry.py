@@ -79,35 +79,6 @@ def test_api_opening_is_reviewed_once_and_resume_reuses_it(tmp_path,monkeypatch)
     assert 'h3_input_mode' not in read_json(book/'profile.json')
 
 
-@pytest.mark.parametrize('last_passes',[True,False])
-def test_source_correct_retake_requires_approval_and_preserves_original_three_image_cap(tmp_path,monkeypatch,last_passes):
-    book,episode=fixture_book(tmp_path);calls=[]
-    monkeypatch.setattr('novel_manga.style_packs.frame_style',lambda novel:{})
-    monkeypatch.setattr('novel_manga.style_packs.first_frame_prompt',lambda text,style:text)
-    def build(ctx,row,path):
-        calls.append(path);Image.new('RGB',(18,32)).save(path)
-        atomic_write_json(path.with_suffix('.png.task.json'),{'task_id':path.parent.name})
-    def check(ctx,path,*args):
-        good=last_passes and len(calls)==3
-        return {'consistent':good,'problems':[]if good else['Generated hand contradicts correct source']}
-    folder=book/'first_frames'/episode.name/'clip_01'
-    for number in range(1,4):
-        if number<3 or not last_passes:
-            with pytest.raises(ValueError,match='review rejected'):prepare(tmp_path,book,builder=build,checker=check)
-        else:prepare(tmp_path,book,builder=build,checker=check)
-        assert len(calls)==number
-        if number==3 and last_passes:break
-        with pytest.raises(ValueError,match='review rejected'):prepare(tmp_path,book,builder=build,checker=check)
-        assert len(calls)==number
-        atomic_write_json(folder/f'candidate_{number:02d}'/'retake-decision.json',{'approved':True,'evidence':'independent actual image review'})
-    if last_passes:
-        prepare(tmp_path,book,builder=build,checker=check)
-    else:
-        with pytest.raises(ValueError,match='candidate budget used'):prepare(tmp_path,book,builder=build,checker=check)
-    assert len(calls)==3
-    assert [read_json(p.with_suffix('.png.task.json'))['task_id']for p in calls]==['candidate_01','candidate_02','candidate_03']
-
-
 def parallel_book(tmp_path,monkeypatch,count):
     book,episode=fixture_book(tmp_path)
     profile=read_json(book/'profile.json');profile['inflight']=2;atomic_write_json(book/'profile.json',profile)
@@ -204,3 +175,33 @@ def test_fast_entry_stays_in_normal_sd_production(tmp_path,monkeypatch):
     monkeypatch.setattr('novel_manga.interactive.delivery.deliver',lambda *args:{'status':'candidate'})
     production.run_episode(tmp_path,'sd20-fast',project='romance',edition=book.name,sd_input_mode='first-frame')
     assert ('review-loop','sd20-fast') in seen
+
+
+@pytest.mark.parametrize('last_passes',[True,False])
+def test_source_correct_retake_requires_approval_and_preserves_original_three_image_cap(tmp_path,monkeypatch,last_passes):
+    book,episode=fixture_book(tmp_path);calls=[]
+    monkeypatch.setattr('novel_manga.style_packs.frame_style',lambda novel:{})
+    monkeypatch.setattr('novel_manga.style_packs.first_frame_prompt',lambda text,style:text)
+    def build(ctx,row,path):
+        calls.append(path);Image.new('RGB',(18,32)).save(path)
+        atomic_write_json(path.with_suffix('.png.task.json'),{'task_id':path.parent.name})
+    def check(ctx,path,*args):
+        good=last_passes and len(calls)==3
+        return {'consistent':good,'problems':[]if good else['Generated hand contradicts correct source']}
+    folder=book/'first_frames'/episode.name/'clip_01'
+    for number in range(1,4):
+        if number<3 or not last_passes:
+            with pytest.raises(ValueError,match='review rejected'):prepare(tmp_path,book,builder=build,checker=check)
+        else:prepare(tmp_path,book,builder=build,checker=check)
+        assert len(calls)==number
+        if number==3 and last_passes:break
+        with pytest.raises(ValueError,match='review rejected'):prepare(tmp_path,book,builder=build,checker=check)
+        assert len(calls)==number
+        atomic_write_json(folder/f'candidate_{number:02d}'/'retake-decision.json',{'approved':True,'evidence':'independent actual image review'})
+    if last_passes:
+        prepare(tmp_path,book,builder=build,checker=check)
+    else:
+        with pytest.raises(ValueError,match='candidate budget used'):prepare(tmp_path,book,builder=build,checker=check)
+    assert len(calls)==3
+    assert [read_json(p.with_suffix('.png.task.json'))['task_id']for p in calls]==['candidate_01','candidate_02','candidate_03']
+

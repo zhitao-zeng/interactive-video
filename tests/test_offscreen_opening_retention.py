@@ -19,7 +19,9 @@ def test_retention_matches_actual_offscreen_or_supplied_character(visible,extras
     retention=result.split('retention_analysis:\n')[1].split('\n\n')[0].splitlines()[0]
     if picture is None:
         assert 'source speaker identity only' in retention and '<Picture' not in retention
-        assert 'source-identified offscreen speaker; voice only.' in result
+        assert 'source-identified speaker' in result
+        assert 'only as actually visible in the opening frame' in result
+        assert 'without introducing an unseen person or face' in retention
     else:
         assert f'<Picture {picture}>' in retention and 'identity and outfit' in retention
     assert '<Subject 2>: fully_preserved - the setting from <Picture 1>.' in result

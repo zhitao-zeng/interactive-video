@@ -99,6 +99,58 @@ def test_recovery_prompt_exposes_current_binding_repairs_after_a_stopped_turn(ct
     assert 'missing capability' in prompt
 
 
+def test_resume_prompt_filters_completed_episode_state_but_preserves_live_authority():
+    targets=[]
+    frames={}
+    blockers={}
+    for index in range(1,46):
+        cid=f'clip_{index:02d}'
+        frames[cid]={'current':index>6,'issue':None if index>6 else 'opening needs correction',
+            'image_candidates':2,'image_candidate_limit':3,'remaining_image_candidates':1,
+            'authored_opening_frame':{'image_prompt':'A character before the event.','visible_characters':['A']},
+            'last_rejection':{'candidate':'candidate_002','error':'stale source opening',
+                              'evidence':'input/first_frames/'+cid+'/reviews/review_001.json'}}
+        if index<=6:
+            blockers[cid]='current opening must be regenerated after source repair'
+            targets.append({'clip_id':cid,'actions':['input','first_frames'],'remaining_takes':2,
+                'input':{'remaining_attempts':1,'operations':{'shots':{'allowed':True}}},
+                'risk_choices':{},'last_media_error':'opening stale'})
+    user_instruction='Keep the approved source opening and exact dialogue; correct only the six listed openings.'
+    task={'phase':'review','mode':'adopted_repair','upstream_route':{'provider':'official'},
+        'repair_capabilities':{'source_review_required':True},'targets':targets,
+        'issues':[{'clips':list(blockers),'problem':'stale opening','evidence':'current source'}],
+        'last_operation':{'action':'apply','status':'completed','result':{'changed':list(blockers),
+            'input_repaired':list(blockers),'error':None}},
+        'next_action':{'action':'first_frames','reason':'source repair invalidated these openings','blocked':blockers},
+        'first_frames':{'mode':'first-frame','extra_reference_policy':'needed',
+            'command':'python3 /work/tools/episode.py first_frames output/first-frames.json',
+            'schema':{'frames':[{'clip_id':'active id','image_prompt':'single opening'}]},'clips':frames},
+        'music_selection':{'large_optional_schema':'m'*14000},'audio_mix':{'candidates':[]},
+        'related_history':[{'category':'opening','status':'previously reviewed'}],
+        'evidence_files':['input/latest-first-frames.json'],'full_status':'input/current-status.json',
+        'reference_catalog':'input/catalog.json'}
+
+    prompt=episode_prompts.resume_prompt(task,agent_instructions=user_instruction)
+    size=len(prompt.encode('utf-8'))
+    assert size < 25_000 and size < 118_285
+    assert user_instruction in prompt
+    assert 'remaining_takes' in prompt and 'remaining_attempts' in prompt
+    assert 'stale opening' in prompt and 'current opening must be regenerated' in prompt
+    assert 'clip_06' in prompt and 'clip_45' not in prompt
+    assert 'm'*100 not in prompt
+    assert '/work/input/current-task.json' in prompt and '/work/input/current-status.json' in prompt
+
+
+def test_current_task_fills_missing_next_action_from_existing_readiness(ctx):
+    from novel_manga.application.agents.episode.current_task import prepare
+    from novel_manga.util import read_json
+
+    current=prepare(ctx,{'job':None},{'issues':[]},[])
+    assert current['next_action']['action'] == 'agent'
+    assert read_json(ctx.work_dir/'input/current-task.json')['next_action'] == current['next_action']
+    assert read_json(ctx.work_dir/'input/current-status.json')['next_action'] == current['next_action']
+
+
 def test_batch_is_sequential_and_uses_existing_chapter_parser(ctx, monkeypatch, capsys):
     calls = []
     monkeypatch.setattr(cli, 'create_context', lambda novel, episode, **kw: calls.append(episode) or ctx)
@@ -193,7 +245,12 @@ def test_explicit_issue_retry_archives_old_session_and_preserves_media_budget(ct
     monkeypatch.setattr(flow, 'EpisodeBridge', make_bridge)
     def session(work, prompt, **kwargs):
         calls.append(kwargs)
-        assert prompt.startswith(episode_prompts.continuation_prompt())
+        if kwargs['resume']:
+            assert prompt.startswith('Continue this same saved episode session.')
+            assert '/work/input/current-task.json' in prompt
+            assert '/work/input/current-status.json' in prompt
+        else:
+            assert prompt.startswith(episode_prompts.continuation_prompt())
         if preserve_session:
             assert read_json(work/'episode-session.json')['session_id'] == 'old-session'
         else:

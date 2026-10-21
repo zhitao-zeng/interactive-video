@@ -143,7 +143,7 @@ def test_targeted_check_receives_named_current_character_references(tmp_path, mo
     monkeypatch.setattr(confirmed,'image_part',lambda path,width:{'type':'image','file':str(path)})
     def ask(parts,*a,**kw):
         seen['parts']=parts
-        return {'observations':['两人'],'checks':[{'criterion':'头盔闭合','scope':'visual','met':True,'evidence':'闭合'}]}
+        return {'observations':['两人'],'checks':[{'criterion':'面罩保持闭合','scope':'visual','met':True,'evidence':'闭合'}]}
     monkeypatch.setattr(confirmed,'ask_json',ask)
     clip={'references':[{'role':'character','name':'医生','path':'doctor.jpg'},
                         {'role':'character','name':'穿甲人','path':'closed.jpg','view':'closed'}]}
@@ -320,3 +320,193 @@ def test_scoped_criteria_do_not_clear_a_real_spatial_defect(tmp_path, monkeypatc
     result = confirmed.enforce(d, fresh, previous, verify=True)
     assert result['clips']['a']['severity'] == 'fail'
     assert 'a' in result['feedback']
+
+
+def test_real_clip23_scope_drift_is_corrected_and_clip20_phone_stays_a_failure(tmp_path, monkeypatch):
+    # Extracted from the real clip_23/clip_20 confirmed checks: clip_23 added
+    # unchanged device states; clip_20 tried to explain away a visible phone.
+    target23 = ('保持G15-02拆机前设备状态：后置画面不再出现从握柄到可见空端的完整独立已拆空杆。'
+                '拍摄手机仍在镜头后方画外；自身手脚或部分杆柄可自然出现，连接处不入画不判缺失，'
+                '不要求手机自身可见，也不将此条件套到G16-02。')
+    target20 = ('保持G13-01拆机前设备状态：后置画面不再出现从握柄到可见空端的完整独立已拆空杆。'
+                '自己的拍摄手机和屏幕保持画外；自身手脚、部分杆柄可自然入画，连接处在画外不因未显示判失败，'
+                '不要求拍摄手机出现在自身画面。')
+    first23 = {'observations':['六帧无杆，脚停浅台'], 'checks':[
+        {'criterion':'头灯仍藏原背包内未开启，手机与背包干燥','scope':'visual','met':None,'evidence':'未入画'},
+        {'criterion':'后置画面不再出现从握柄到可见空端的完整独立已拆空杆','scope':'visual','met':True,'evidence':'无杆'}]}
+    corrected23 = {'observations':['六帧无杆，脚停浅台'], 'checks':[
+        {'criterion':'后置画面不再出现从握柄到可见空端的完整独立已拆空杆','scope':'visual','met':True,'evidence':'无杆'},
+        {'criterion':'拍摄手机仍在镜头后方画外','scope':'visual','met':True,'evidence':'无手机入画'}]}
+    monkeypatch.setattr(confirmed, 'clip_frames', lambda *a: [tmp_path/'frame.jpg'])
+    monkeypatch.setattr(confirmed, 'image_part', lambda *a: {'type':'image'})
+    answers = iter([first23, corrected23])
+    monkeypatch.setattr(confirmed, 'ask_json', lambda *a, **k: copy.deepcopy(next(answers)))
+    result23 = confirmed.judge_finding({}, tmp_path/'v.mp4', {'instruction':target23}, tmp_path/'frames')
+    assert result23['result'] == 'resolved'
+    assert result23['correction_history'][0] == first23
+    assert {k:v for k,v in result23['correction_history'][1].items() if k!='correction_history'} == corrected23
+    json.dumps(result23, ensure_ascii=False)
+
+    phone_in_frame = {'observations':['手机连在夹具和杆上'], 'checks':[
+        {'criterion':'自己的拍摄手机和屏幕保持画外','scope':'visual','met':False,'evidence':'手机、夹具和杆同时入画'}]}
+    monkeypatch.setattr(confirmed, 'ask_json', lambda *a, **k: phone_in_frame)
+    result20 = confirmed.judge_finding({}, tmp_path/'v.mp4', {'instruction':target20}, tmp_path/'frames')
+    assert result20['result'] == 'unresolved'
+
+
+def test_scope_correction_failure_is_uncertain_and_cached_scope_error_recovers_once(tmp_path, monkeypatch):
+    d, clips, rows = fixture_episode(tmp_path)
+    claim = {'video':'old.mp4','take':[0,0,0],'issue':'old empty rod','instruction':'当前目标'}
+    previous = json.loads((d/'episode_review.json').read_text())
+    previous['clips']['a']['confirmed'] = {**claim, 'check': {
+        'video':rows['a']['video'],'take':rows['a']['take'],'result':'uncertain',
+        'checks':[{'criterion':'当前目标','scope':'visual','met':True,'evidence':'符合'},
+                  {'criterion':'头灯仍在背包且手机干燥','scope':'visual','met':None,'evidence':'未入画'}],
+        'evidence':'未入画'}}
+    previous['clips']['b']['confirmed'] = {
+        'video':'older.mp4','take':[0,0,0],'issue':'other','instruction':'other target',
+        'check':{'video':rows['b']['video'],'take':rows['b']['take'],'result':'resolved'}}
+    fresh = copy.deepcopy(previous)
+    for cid in ('a','b'):
+        fresh['clips'][cid].update(video=rows[cid]['video'],take=rows[cid]['take'],severity='pass',tier='ignore')
+    calls=[]
+    real_judge = confirmed.judge_finding
+    monkeypatch.setattr(confirmed, 'judge_finding', lambda *a, **k:
+        calls.append('a') or {'result':'resolved','observations':['目标通过'],'evidence':'当前帧符合'})
+    recovered = confirmed.enforce(d, fresh, previous, verify=True)
+    assert calls == ['a']
+    c = recovered['clips']['a']['confirmed']['check']
+    assert c['result']=='resolved' and c['scope_recovery_attempted'] is True
+    assert c['check_history'][0]['result']=='uncertain'
+    assert c['check_history'][0]['checks'][1]['criterion']=='头灯仍在背包且手机干燥'
+    assert recovered['clips']['b']['confirmed']['check']['result']=='resolved'
+    calls.clear()
+    again=confirmed.enforce(d, recovered, recovered, verify=True)
+    assert calls == [] and again['clips']['a']['confirmed']['check']['check_history']==c['check_history']
+
+    errored = copy.deepcopy(previous)
+    errored['clips']['a']['confirmed']['check']['scope_recovery_attempted'] = False
+    errors=[]
+    monkeypatch.setattr(confirmed, 'judge_finding', lambda *a, **k:
+        errors.append(1) or (_ for _ in ()).throw(RuntimeError('offline')))
+    failed_recovery = confirmed.enforce(d, fresh, errored, verify=True)
+    confirmed.enforce(d, failed_recovery, failed_recovery, verify=True)
+    assert len(errors)==1
+    assert failed_recovery['clips']['a']['confirmed']['check']['scope_recovery_attempted'] is True
+
+    bad={'observations':['仍越界'], 'checks':[{'criterion':'头灯干燥','scope':'visual','met':None,'evidence':'未知'}]}
+    monkeypatch.setattr(confirmed, 'judge_finding', real_judge)
+    monkeypatch.setattr(confirmed, 'clip_frames', lambda *a:[tmp_path/'f.jpg'])
+    monkeypatch.setattr(confirmed, 'image_part', lambda *a:{'type':'image'})
+    monkeypatch.setattr(confirmed, 'ask_json', lambda *a, **k:bad)
+    uncertain=confirmed.judge_finding({},tmp_path/'v.mp4',{'instruction':'目标'},tmp_path/'frames')
+    assert uncertain['result']=='uncertain' and uncertain['error_kind']=='review_scope_violation'
+    assert len(uncertain['correction_history']) == 2
+
+
+def test_unreviewed_new_take_labels_the_confirmed_defect_as_old_take_evidence():
+    row=confirmed.apply_claim({'video':'new.mp4','take':[4,5,6]},
+        {'video':'old.mp4','take':[1,2,3],'issue':'旧片出现完整空杆','instruction':'当前空杆目标'},
+        'new.mp4',[4,5,6])
+    assert row['severity']=='fail'
+    assert '旧take确认的问题' in row['defect_issue']
+    assert row['verify']['verdict']=='uncertain'
+    assert '当前take尚未通过目标复核' in row['verify']['evidence']
+
+
+def test_current_take_unresolved_check_reports_its_own_failure_evidence():
+    row=confirmed.apply_claim({'video':'new.mp4','take':[4,5,6]},
+        {'video':'old.mp4','take':[1,2,3],'issue':'旧片出现完整空杆','instruction':'拍摄手机保持画外',
+         'check':{'video':'new.mp4','take':[4,5,6],'result':'unresolved',
+                  'evidence':'当前帧手机连夹具和杆同时入画'}},
+        'new.mp4',[4,5,6])
+    assert row['severity']=='fail' and row['verify']['verdict']=='obvious'
+    assert row['defect_issue']=='当前帧手机连夹具和杆同时入画'
+    assert row['verify']['evidence']==row['defect_issue']
+
+
+def test_imported_current_take_finding_keeps_observed_issue_as_defect_text(tmp_path):
+    d, clips, rows = fixture_episode(tmp_path)
+    issue='当前take画面可见完整空杆'
+    instruction='只保留目标要求的手机画外状态'
+    imported=import_confirmed_findings(d, {'a':{
+        'video':rows['a']['video'],'take':rows['a']['take'],
+        'issue':issue,'instruction':instruction}})
+    row=imported['clips']['a']
+    assert row['confirmed']['check']['result']=='unresolved'
+    assert 'evidence' not in row['confirmed']['check']
+    assert row['defect_issue']==issue
+    assert row['verify']['evidence']==issue
+
+
+def test_host_review_criterion_is_a_valid_visual_target(tmp_path, monkeypatch):
+    criterion='允许镜头切换，但人物和座位关系必须连续。'
+    monkeypatch.setattr(confirmed, 'clip_frames', lambda *a:[tmp_path/'f.jpg'])
+    monkeypatch.setattr(confirmed, 'image_part', lambda *a:{'type':'image'})
+    monkeypatch.setattr(confirmed, 'ask_json', lambda *a, **k:{
+        'observations':['座位关系连续'], 'checks':[{'criterion':criterion,'scope':'visual','met':True,'evidence':'连续'}]})
+    result=confirmed.judge_finding({},tmp_path/'v.mp4',{'instruction':'按当前镜头构图验收'},
+                                   tmp_path/'frames',review_criteria=[criterion])
+    assert result['result']=='resolved'
+
+
+def test_scope_quote_allows_only_terminal_punctuation_differences():
+    target='手机自身可见，必须保持画外；不得出现1.25米杆体，X-Y状态不变。'
+    assert not confirmed._out_of_target_visual_checks(
+        {'checks':[{'criterion':'手机自身可见。','scope':'visual'}]},target)
+    for criterion in ('不得出现1.26米杆体', '必须出现1.25米杆体', '不得出现1.25米杆体，X—Y状态不变'):
+        assert confirmed._out_of_target_visual_checks(
+            {'checks':[{'criterion':criterion,'scope':'visual'}]},target)
+
+
+def test_cached_valid_correction_reparses_without_judge_call(tmp_path, monkeypatch):
+    d, clips, rows=fixture_episode(tmp_path)
+    instruction=('保持G15-02拆机前设备状态：后置画面不再出现从握柄到可见空端的完整独立已拆空杆。'
+        '拍摄手机仍在镜头后方画外；自身手脚或部分杆柄可自然出现，连接处不入画不判缺失，'
+        '不要求手机自身可见，也不将此条件套到G16-02。')
+    correction={'observations':['手机和空杆均未入画'], 'premise_valid':True,
+        'premise_evidence':'当前帧符合当前镜头前提', 'checks':[
+            {'criterion':'后置画面不再出现从握柄到可见空端的完整独立已拆空杆。',
+             'scope':'visual','met':True,'evidence':'未见完整空杆'},
+            {'criterion':'拍摄手机仍在镜头后方画外；自身手脚或部分杆柄可自然出现，连接处不入画不判缺失，不要求手机自身可见。',
+             'scope':'visual','met':True,'evidence':'手机未入画'},
+            {'criterion':'不将此条件套到G16-02。','scope':'visual','met':True,'evidence':'本镜为G15-02'}]}
+    stale={'video':'old.mp4','take':[0,0,0],'issue':'旧take出现完整空杆',
+        'instruction':instruction,'check':{
+            'video':rows['a']['video'],'take':rows['a']['take'],'result':'uncertain',
+            'error_kind':'review_scope_violation','scope_recovery_attempted':True,
+            'observations':['已完成旧协议纠正'], 'checks':[], 'correction':correction,
+            'correction_history':[{'observations':['首次答复'],'checks':[]},correction]}}
+    previous=json.loads((d/'episode_review.json').read_text())
+    previous['clips']['a']['confirmed']=stale
+    fresh=copy.deepcopy(previous)
+    fresh['clips']['a'].update(video=rows['a']['video'],take=rows['a']['take'],severity='pass',tier='ignore')
+    monkeypatch.setattr(confirmed,'judge_finding',lambda *a,**k:pytest.fail('cached correction must not call judge'))
+    result=confirmed.enforce(d,fresh,previous,verify=True)
+    check=result['clips']['a']['confirmed']['check']
+    assert check['result']=='resolved' and check['reparsed'] is True
+    assert check['reparsed_from']=='review_scope_violation'
+    assert check['scope_recovery_attempted'] is True
+    assert check['check_history'][-1]['error_kind']=='review_scope_violation'
+    assert result['clips']['a']['severity']=='pass'
+
+
+@pytest.mark.parametrize(('met','expected'),[(False,'unresolved'),(None,'uncertain')])
+def test_cached_reparse_keeps_visual_false_or_unknown_blocking(tmp_path, monkeypatch, met, expected):
+    d, clips, rows=fixture_episode(tmp_path)
+    instruction='画面不得出现完整空杆。'
+    correction={'observations':['当前帧已检查'], 'premise_valid':True,'premise_evidence':'前提成立',
+        'checks':[{'criterion':'画面不得出现完整空杆。','scope':'visual','met':met,'evidence':'当前证据'}]}
+    previous=json.loads((d/'episode_review.json').read_text())
+    previous['clips']['a']['confirmed']={'video':'old.mp4','take':[0,0,0],
+        'issue':'旧take缺陷','instruction':instruction,'check':{
+            'video':rows['a']['video'],'take':rows['a']['take'],'result':'uncertain',
+            'error_kind':'review_scope_violation','scope_recovery_attempted':True,
+            'checks':[], 'observations':[], 'correction':correction}}
+    fresh=copy.deepcopy(previous)
+    fresh['clips']['a'].update(video=rows['a']['video'],take=rows['a']['take'],severity='pass',tier='ignore')
+    monkeypatch.setattr(confirmed,'judge_finding',lambda *a,**k:pytest.fail('reparse must remain deterministic'))
+    result=confirmed.enforce(d,fresh,previous,verify=True)
+    check=result['clips']['a']['confirmed']['check']
+    assert check['result']==expected and check['reparsed'] is True
+    assert result['clips']['a']['severity']=='fail'
