@@ -20,7 +20,11 @@ class FirstTakeStream:
 
     def __init__(self,ctx,media):
         self.ctx=ctx;self.media=media;self.futures={};self.video_progress=False
-        self.pool=ThreadPoolExecutor(max_workers=1)
+        import os
+        from novel_manga.config import Settings
+        workers=int(os.environ.get('NOVEL_MEDIA_WORKERS',Settings.media_workers))
+        workers=max(1,min(workers,4))
+        self.pool=ThreadPoolExecutor(max_workers=workers)
 
     def __enter__(self):
         return self

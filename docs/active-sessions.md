@@ -270,3 +270,5 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 
 | ZCode 堵点简化修复收工 | 诊断报告8真缺陷修6:no-progress默认计入已完成修复、改编自动桥(produce+系列material合并)、首轮过验候选容忍exit124(修订轮严契约保留)、create幂等/路径双解析/画风库自举容错;#5留配置层(需配CLI认识的路由名)、#7暂缓(修复③后首轮不再触发该死锁)。全量4039过/exit=0(pytest汇总行直读),4个新回归测试;报告修复状态已更新(诊断树18d9c1c) | main(88704d7) | flow.py/creation.py/creative_material.py/film.py/style_packs.py+4测试文件 | 2026-10-22 | 已提交未推送;下一整集零介入跑待用户决定(现有修复可直接复验) |
 | ZCode EP02-A复验 | 修复后管线完整复验:produce一条命令(官方CLI)改编EP02-A——create首轮收尾+改编自动桥+no-progress三修复的实际复验;新edition,不动诊断edition预算 | codex/backrooms55-ep02-diagnostic-20261022(main合并后) | .runtime/ep02a-verify与新edition | 2026-10-22 | 进行中 |
+
+| ZCode EP02-A·SD2.0-fast无首帧对照 | 同一份已验证EP02-A material起SD2.0-fast传统参考绑定对照线(与H3首帧复验并行):删profile首帧字段→prepare_authored→sd20-fast build_assets→run_episode→审片;不动诊断树ep02a-verify/outputs、不生成开场图、不碰心动生产;SD走PHANROUTER_IMAGE_API_KEY,单worker,每段≤3次,自建task-only ngrok通道发布参考图(不接管旧域名);产出delivery/suspense/backrooms55-ep02a-sd-noframe-20261022+逐镜审片对照 | codex/backrooms55-ep02a-sd-noframe-20261022(新worktree自main fc5c6a8) | 新worktree独立.runtime与outputs;main树只写本板 | 2026-10-22 | 进行中 |
