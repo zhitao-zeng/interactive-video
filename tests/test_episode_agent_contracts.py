@@ -247,7 +247,8 @@ def test_format_collector_checks_all_clips_without_modifying_or_adopting_invalid
     saved = copy.deepcopy(draft)
     rows = contracts.collect_format_issues(draft, catalog=CATALOG, source_segments=SOURCES, profile={})
     assert [row["clip_id"] for row in rows] == ["clip_01", "clip_08"]
-    assert rows[0]["request_issues"] == ['H3 description contains Chinese outside bound dialogue']
+    assert rows[0]["request_issues"][0] == 'H3 description contains Chinese outside bound dialogue'
+    assert rows[0]["request_issues"][1].startswith('offending excerpt: ')
     assert rows[0]["subject_ids"] and rows[0]["dialogue_bindings"]
     assert rows[0]["speech_format"] and rows[0]["reference_order"]
     assert rows[0]["cjk_excerpts"] == ["No wind. 中文说明。"]
