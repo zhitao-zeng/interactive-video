@@ -118,9 +118,10 @@ def test_existing_h3_and_sd25_routes_remain_explicit(tmp_path, monkeypatch):
         assert os.environ['NOVEL_QUOTA_STOP_FILE'].endswith('sd25-quota.stop')
 
 
-def test_h3cloud_overflow_lane_selects_cloud_model_and_image_key(tmp_path, monkeypatch):
-    """Cloud MiniMax-H3 verified end-to-end 2026-10-22 (9s probe, v2+v3); it runs
-    on the image key's gateway group and shares that key's quota stop file."""
+def test_h3cloud_overflow_lane_selects_cloud_model_and_dedicated_key(tmp_path, monkeypatch):
+    """Cloud MiniMax-H3 verified end-to-end 2026-10-22 (9s probe, v2+v3). It runs
+    on the image key's gateway group but behind its OWN env var, so swapping in a
+    dedicated key later is a one-line .env change; its quota stop is independent."""
     import os
     atomic_write_json(tmp_path/'configs/interactive.json', {'services': {'text_endpoint': 'phanthy-ds41'}})
     monkeypatch.setattr(runtime, 'environment', lambda *args: {})
@@ -128,8 +129,8 @@ def test_h3cloud_overflow_lane_selects_cloud_model_and_image_key(tmp_path, monke
     with patch.dict(os.environ, {}, clear=True):
         runtime.configure(tmp_path, 'h3cloud')
         assert os.environ['NOVEL_VIDEO_MODEL'] == 'MiniMax-H3'
-        assert os.environ['PHANROUTER_VIDEO_KEY_VAR'] == 'PHANROUTER_IMAGE_API_KEY'
-        assert os.environ['NOVEL_QUOTA_STOP_FILE'].endswith('sd20-quota.stop')
+        assert os.environ['PHANROUTER_VIDEO_KEY_VAR'] == 'PHANROUTER_H3CLOUD_API_KEY'
+        assert os.environ['NOVEL_QUOTA_STOP_FILE'].endswith('h3cloud-quota.stop')
         assert os.environ['NOVEL_LOCAL_H3_URL'] == ''
 
 
