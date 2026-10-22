@@ -12,7 +12,7 @@ VIDEO_LANES = {
     # end-to-end 2026-10-22: 9s probe succeeded on both v2 and v3). Reference-image
     # mode only — the gateway path has no first-frame role; shares the image-key
     # quota with sd20 lanes and the image API.
-    'h3cloud': {'model': 'MiniMax-H3', 'key_var': 'PHANROUTER_IMAGE_API_KEY'},
+    'h3cloud': {'model': 'MiniMax-H3', 'key_var': 'PHANROUTER_H3CLOUD_API_KEY'},
     'sd25': {'model': 'sd2.5', 'key_var': 'PHANROUTER_SD25_KEY'},
     'sd20-fast': {'model': 'sd2.0-fast', 'key_var': 'PHANROUTER_IMAGE_API_KEY'},
     'sd20-mini': {'model': 'sd2.0-mini', 'key_var': 'PHANROUTER_IMAGE_API_KEY'},
@@ -39,7 +39,7 @@ def configure(root: Path, lane: str = 'h3', *, project: str = 'adventure') -> No
         raise ValueError(f'Unknown video lane: {lane}')
     selected=VIDEO_LANES[lane]
     remote=lane!='h3'
-    quota_lane='sd25' if lane=='sd25' else 'sd20'
+    quota_lane='sd25' if lane=='sd25' else 'h3cloud' if lane=='h3cloud' else 'sd20'
     source = environment(root, {})
     os.environ.update(environment(root))
     config=project_config(root,project)
