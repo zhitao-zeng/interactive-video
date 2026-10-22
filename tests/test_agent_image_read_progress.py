@@ -165,7 +165,7 @@ def test_real_runner_wires_hooks_without_mutating_installed_skills(tmp_path, mon
         return 0
     monkeypatch.setattr(sandbox.subprocess, 'call', fake)
     config = {'runs_root': str(work.parent), 'model': 'test', 'image': 'test',
-              'base_url': 'http://localhost', 'key_var': 'TEST_READ_KEY'}
+              'base_url': 'http://localhost', 'docker_network': 'host', 'key_var': 'TEST_READ_KEY'}
     result = sandbox.run_agent('review', config=config, timeout=1200, log=lambda *_: None)
     assert result.ok
     command = commands[0]

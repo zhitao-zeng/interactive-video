@@ -139,6 +139,15 @@ def run_agent(run: str, *, skills: str = "", config: dict | None = None, model: 
     Raises SandboxRefused before touching anything when the run cannot start as asked.
     """
     config = config or load_config()
+    base = str(config.get("base_url") or "")
+    # A localhost endpoint is the HOST's loopback: without host networking the
+    # container resolves its own loopback and every call dies (2026-10-22: three
+    # failed restarts before the missing docker_network was spotted).
+    if "127.0.0.1" in base or "localhost" in base:
+        if config.get("docker_network") != "host":
+            raise SandboxRefused(
+                f"base_url {base} 指向本机回环，沙箱容器必须 docker_network=host 才可达；"
+                "改配置或换可达端点")
     run_dir = Path(config["runs_root"]) / run
     prompt_path = Path(prompt) if prompt else (run_dir / "prompt.txt")
     if not prompt_path.is_file():
