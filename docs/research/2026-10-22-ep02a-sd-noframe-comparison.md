@@ -155,3 +155,27 @@ bible 是唯一离群——clip_03 假阳性即由此产生。同源 material �
 - accepted 转换路径(移交主会话):终审接 WATCHABLE_CRITERIA + fix_tier 分级替换单布尔
   issues 门 → 复跑终审(头灯裁决已记档,预期 15 项落 observations)→ delivery 转
   accepted;本 edition 与 H3 复验线随后可做逐镜双向对照。
+
+
+## 十、后续追加(2026-10-22 深夜):终审分级落地与本线复评
+
+主会话当日将 6.3 需求单落地(main 2863a5a,全量 4044 过):WATCHABLE_CRITERIA 入交互线
+contracts、终审 issue 必标 severity、passed 只由 must_fix 决定、minor 不再进修复循环、
+POLICY 升 v3;H3 线同源 bible 头灯 BUG 两处 material+两份烤入 story_bible 已修(本会话执行)。
+
+**本 edition v3 复评实测(21:24–23:31)**:
+- 机制验证成功——头灯/道具状态类发现全部落 minor(20 条),不再拦截、不再重开修复循环。
+- 暴露真问题——**location_010/011/012 三张场景卡被图片 API 画成室内池厅**(白砖/蓝绿水/柱,
+  与 bible"室外废弃园区"spec 矛盾;目检+视觉模型双重确认),导致 clip_09–18 共 10 段绑错卡
+  成池室景象,属"观众会误认地点"的真 must_fix。
+- 管线自愈半程:clip_15 的 asset 决策已产出修正草稿卡 draft_location_0001(室外日景旧拱口,
+  目检符合)入 repair_candidates;但步道/旧摊位无修正草稿,且各段 Agent 反复选 input 而未选
+  候选资产采纳路径,23 沙箱未收敛,按边界停线(状态可 resume)。
+
+**终态**:delivery 仍 candidate(v3 终审 complete,passed=False,must_fix=10/minor=20);
+clip_03/12 已按修正请求重生成。
+
+**修复方案(待人工/主会话决策,涉 ~10 段重拍 API 开销)**:采纳 draft_location_0001 绑旧拱口
+段;为步道/旧摊位出修正卡(同 create_asset 路径);重绑重拍(预算内,各段仅用 1/3 take)。
+根治项:场景卡 prompt 对室外 spec 加反池室约束(或画风方言路由),防剩余 53 片复发——
+这是"改编桥 bible 从本集剧本推导"之外的第二个桥级验收用例。
