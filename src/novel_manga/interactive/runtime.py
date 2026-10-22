@@ -8,6 +8,11 @@ from novel_manga.interactive.intake import PROJECTS
 
 VIDEO_LANES = {
     'h3': {'model': 'minimax-h3-ref2va-turbo', 'key_var': 'PHANROUTER_API_KEY'},
+    # Cloud MiniMax-H3 overflow lane (v3 tasks via the image key's group; verified
+    # end-to-end 2026-10-22: 9s probe succeeded on both v2 and v3). Reference-image
+    # mode only — the gateway path has no first-frame role; shares the image-key
+    # quota with sd20 lanes and the image API.
+    'h3cloud': {'model': 'MiniMax-H3', 'key_var': 'PHANROUTER_IMAGE_API_KEY'},
     'sd25': {'model': 'sd2.5', 'key_var': 'PHANROUTER_SD25_KEY'},
     'sd20-fast': {'model': 'sd2.0-fast', 'key_var': 'PHANROUTER_IMAGE_API_KEY'},
     'sd20-mini': {'model': 'sd2.0-mini', 'key_var': 'PHANROUTER_IMAGE_API_KEY'},
