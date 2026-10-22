@@ -142,7 +142,7 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                         result['repacked_preparation']=prepared
                         job={**job,'result':{**outcome,'changed':[]}}
                 if (progress_rules.applied_repair(job)
-                        and (time.monotonic() < state.deadline or config.get('complete_started_repairs'))):
+                        and (time.monotonic() < state.deadline or config.get('complete_started_repairs', True))):
                     # An accepted source/input change can invalidate the approved
                     # opening. Render only when the host reports it as legal.
                     from .readiness import next_action
@@ -253,7 +253,7 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                     or current_job.get('status') != prior_job.get('status')
                     or current_job.get('result') != prior_job.get('result')
                 )
-                if (config.get('complete_started_repairs') and repair_finished_this_turn
+                if (config.get('complete_started_repairs', True) and repair_finished_this_turn
                         and progress_rules.applied_repair(current_job)):
                     # The submitted repair is already validated and published.
                     # Let the host close its media chain even if the author CLI

@@ -91,6 +91,12 @@ def freeze_selected_style(key: str, work: Path) -> tuple[dict, list[dict]]:
         source = Path(example['path'])
         source = source if source.is_absolute() else root / source
         if not source.is_file():
+            if not Path(root).exists():
+                # A fresh checkout has no style-library at all (gitignored media); the
+                # text rules still bind the style, so stay usable without the examples.
+                example['path'] = None
+                example['missing_example_note'] = f'style library absent in this checkout: {Path(root).name}'
+                continue
             raise FileNotFoundError(f'style example is missing: {source}')
         pictures.append((example, source, Path('input/style-examples') / f'{key}-{index:02d}{source.suffix}'))
     references = []

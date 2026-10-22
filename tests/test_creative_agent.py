@@ -292,6 +292,28 @@ def test_repeated_validation_error_stops_bounded_correction_in_the_same_session(
     assert 'max_turns' not in config and not (run/'delivery').exists()
 
 
+def test_first_pass_timeout_with_complete_validated_draft_is_a_candidate(tmp_path, monkeypatch):
+    """Zero-intervention diagnostic 2026-10-22: the author finished writing a complete,
+    fully validated draft and only the sandbox wrapper hit its slice edge."""
+    source = task(tmp_path); run = tmp_path/'run'; manifest = creation.prepare(source, run)
+    work = run/'sandbox'
+
+    def invoke(work, prompt, **kwargs):
+        write(work/'output/episode.json', episode())
+        (work/'output/creative-notes.md').write_text('完整绑定。')
+        attempt = work/'attempts/first'; attempt.mkdir(parents=True)
+        rows = [{'type':'tool_use','name':'Read','input':{'file_path':'/work/'+p}}
+                for p in manifest['required_reads']]
+        (attempt/'session.jsonl').write_text(json.dumps({'message':{'content':rows}}))
+        return SimpleNamespace(ok=False, exit_code=124, seconds=1, directory=attempt,
+            record={'session_id':'first-creator','model':'configured-model'})
+
+    monkeypatch.setattr(creation, 'run_session', invoke)
+    result = creation.run(source, run, config={'timeout_seconds':5400}, resume=False)
+    assert result['status'] == 'creative_candidate', result
+    assert result['agent_exit'] == 124 and result['accepted_despite_agent_exit'] is True
+
+
 def test_resumed_correction_has_a_turn_bound_but_timeout_is_not_success(tmp_path, monkeypatch):
     source = task(tmp_path); run = tmp_path/'run'; manifest = creation.prepare(source, run)
     work = run/'sandbox'; write(work/'output/episode.json', episode())

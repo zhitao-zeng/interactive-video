@@ -123,3 +123,93 @@ def write_material(episode, manifest, destination, *, style_source=None):
         import shutil
         shutil.copy2(style_source,destination/'style.json')
     return destination
+
+
+def adaptation_issues(episode, manifest):
+    """Adaptation drafts bind a supplied screenplay; design facts come from the
+    approved series material, so only the script contract is checked here."""
+    shots=(episode.get('chapter_script') or {}).get('shots',[])
+    if not shots:
+        return ['adaptation draft needs chapter_script.shots']
+    scenes={s.get('scene_id'):s for s in (episode.get('spatial_plan') or {}).get('scenes',[])}
+    issues=[]
+    for s in shots:
+        if not s.get('duration_seconds'):
+            issues.append(f"shot {s.get('index')}: needs duration_seconds")
+        if s.get('scene_id') and s['scene_id'] not in scenes:
+            issues.append(f"shot {s['index']}: spatial_plan has no scene {s['scene_id']}")
+    indexes=[s['index'] for s in shots]
+    if indexes!=list(range(1,len(shots)+1)):
+        issues.append('adaptation shots must be indexed 1..N in order')
+    covered=[i for g in episode.get('clips',[]) for i in g['shot_indexes']]
+    if sorted(covered)!=indexes:
+        issues.append('adaptation clips must cover every shot exactly once')
+    return issues
+
+
+def _normalize_adaptation_script(script, scenes):
+    for i,s in enumerate(script['shots'],1):
+        sid=f'S{i:02d}'
+        standard=scenes.get(s.get('scene_id'),{}).get('location')
+        if standard and s.get('location')!=standard:
+            s['location']=standard
+        for key in ('sfx','purpose','audio_plan'):
+            if isinstance(s.get(key),list):
+                s[key]='；'.join(map(str,s[key])) or '无'
+        s.update(segment_id=f'seg_{i}',segment_ids=[f'seg_{i}'],shot_id=sid,label=sid,
+                 origin_index=i,source_kind='adapted-agent',authored_duration_seconds=s['duration_seconds'])
+        s.setdefault('source_quote',s.get('event') or s.get('start_state') or '')
+        s.setdefault('visual_prompt',s.get('start_state') or '')
+        s.setdefault('motion_prompt',s.get('event') or '')
+    return script
+
+
+def write_adaptation_material(episode, manifest, destination, *, series_material,
+                              package_script, style_source=None):
+    """Merge a validated adaptation candidate into an approved series material.
+
+    The series material supplies bible/voice/reference facts; the candidate
+    supplies the bound script, groups, interaction and any new scenes."""
+    if issues:=adaptation_issues(episode,manifest):
+        raise ValueError('; '.join(issues))
+    destination=Path(destination);series_material=Path(series_material)
+    base=read_json(series_material/'material.json')
+    scenes={s.get('scene_id'):s for s in (episode.get('spatial_plan') or {}).get('scenes',[])}
+    bible=copy.deepcopy(base['bible'])
+    known={loc.split('：',1)[0] for loc in bible['locations']}
+    for scene in (episode.get('spatial_plan') or {}).get('scenes',[]):
+        name=scene.get('location')
+        if name and name not in known:
+            bible['locations'].append(f"{name}：{'；'.join(scene.get('anchors') or []) or name}")
+    script=_normalize_adaptation_script(copy.deepcopy(episode['chapter_script']),scenes)
+    shots={s['index']:s for s in script['shots']}
+    groups=[]
+    for number,clip in enumerate(episode.get('clips',[]),1):
+        first=shots[clip['shot_indexes'][0]]
+        speakers={t.get('speaker') or t.get('speaker_name') for s in
+                  (shots[i] for i in clip['shot_indexes']) for t in s.get('turns',[])}
+        groups.append({'source_segment':f'S{number:02d}','shot_indexes':clip['shot_indexes'],
+            'request_seconds':clip.get('request_seconds') or sum(shots[i]['duration_seconds'] for i in clip['shot_indexes']),
+            'location':first['location'],'speaker':sorted(speakers)[0] if speakers else first.get('characters',[''])[0]})
+    profile=copy.deepcopy(base['profile'])
+    profile.update(manifest.get('profile') or {})
+    profile.setdefault('h3_speech_policy','no_reference_performance_first')
+    profile.setdefault('h3_input_mode','first-frame'); profile.setdefault('h3_extra_reference_policy','needed')
+    interaction=copy.deepcopy(episode['interaction']);interaction.setdefault('seconds',3)
+    segments=[{'segment_id':f'seg_{i}','text':'\n'.join(filter(None,[s.get('start_state'),s.get('event'),
+        *[f"{t.get('speaker') or t.get('speaker_name','')}：{t['text']}" for t in s.get('turns',[])],s.get('end_state')]))}
+        for i,s in enumerate(script['shots'],1)]
+    value={'profile':profile,'bible':bible,'groups':groups,'segments':segments,'overlays':[],
+        'interaction':interaction,'voice_specs':copy.deepcopy(base.get('voice_specs') or {}),
+        'script':script,'reference_images':copy.deepcopy(base.get('reference_images') or []),
+        'source_archive':manifest.get('source_archive'),'source_seconds':round(sum(s['duration_seconds'] for s in script['shots']),2),
+        'source_seconds_kind':'authored_budget','target_seconds':round(sum(s['duration_seconds'] for s in script['shots'])+interaction['seconds'],2),
+        'style_snapshot':'style.json','asset_status':copy.deepcopy(base.get('asset_status') or {})}
+    destination.mkdir(parents=True,exist_ok=True)
+    (destination/'owner').write_text('Adaptation creative Agent handoff / series-material merge, deterministic binding\n')
+    atomic_write_json(destination/'material.json',value)
+    import shutil
+    shutil.copy2(package_script,destination/'source.md')
+    atomic_write_json(destination/'layout.json',episode.get('spatial_plan') or {})
+    if style_source:shutil.copy2(style_source,destination/'style.json')
+    return destination

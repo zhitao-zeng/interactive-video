@@ -13,8 +13,12 @@ def run(root, task_path, run_dir, edition, *, config=None, resume=False):
     if not edition or Path(edition).name!=edition:
         raise ValueError('edition must be a new output directory name')
     task=copy.deepcopy(read_json(Path(task_path),{}))
-    if task.get('mode')!='original':
-        raise ValueError('produce currently accepts an original brief; use approved material intake for adaptation')
+    if task.get('mode') not in {'original','adaptation'}:
+        raise ValueError('produce accepts an original brief or a package adaptation')
+    if task.get('mode')=='adaptation' and not task.get('series_material'):
+        raise ValueError('adaptation produce needs series_material: an approved material dir from this series')
+    if task.get('mode')=='adaptation' and not task.get('source_script'):
+        raise ValueError('adaptation produce needs source_script: the package screenplay path bound by the creator')
     if task.get('end_card_seconds',3)!=3:
         raise ValueError('The existing delivery requires a three-second choice card')
     if task.get('world_card_seconds'):
@@ -51,8 +55,13 @@ def run(root, task_path, run_dir, edition, *, config=None, resume=False):
         work=creator_dir/'sandbox'
         manifest=read_json(work/'input/manifest.json')
         draft=read_json(work/'output/episode.json')
-        material=creative_material.write_material(draft,manifest,run_dir/'material',
-            style_source=work/manifest['selected_style']['file'] if manifest.get('selected_style')else None)
+        style_source=work/manifest['selected_style']['file'] if manifest.get('selected_style')else None
+        if task.get('mode')=='adaptation':
+            material=creative_material.write_adaptation_material(draft,manifest,run_dir/'material',
+                series_material=root/task['series_material'] if not Path(task['series_material']).is_absolute() else Path(task['series_material']),
+                package_script=work/'package'/task['source_script'],style_source=style_source)
+        else:
+            material=creative_material.write_material(draft,manifest,run_dir/'material',style_source=style_source)
         runtime.configure(root,'h3',project=task['project'])
         if not book.exists():
             authored.prepare_authored(material,book,family=task['project'])
