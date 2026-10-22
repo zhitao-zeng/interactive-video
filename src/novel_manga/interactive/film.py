@@ -59,7 +59,7 @@ def run(root, task_path, run_dir, edition, *, config=None, resume=False):
         if task.get('mode')=='adaptation':
             material=creative_material.write_adaptation_material(draft,manifest,run_dir/'material',
                 series_material=root/task['series_material'] if not Path(task['series_material']).is_absolute() else Path(task['series_material']),
-                package_script=work/'package'/task['source_script'],style_source=style_source)
+                package_script=work/'input/package'/task['source_script'],style_source=style_source)
         else:
             material=creative_material.write_material(draft,manifest,run_dir/'material',style_source=style_source)
         runtime.configure(root,'h3',project=task['project'])
