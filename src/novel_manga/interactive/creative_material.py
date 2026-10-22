@@ -189,7 +189,8 @@ def write_adaptation_material(episode, manifest, destination, *, series_material
         name=scene.get('location') or shots_by_scene.get(scene.get('scene_id'),'')
         if name and name not in known:
             a=scene.get('anchors') or []
-            desc='；'.join(a if isinstance(a,list) else [str(a)]) or name
+            desc='；'.join(x if isinstance(x,str) else json.dumps(x,ensure_ascii=False)
+                          for x in (a if isinstance(a,list) else [a])) or name
             bible['locations'].append(f"{name}：{desc}")
     script=_normalize_adaptation_script(copy.deepcopy(episode['chapter_script']),scenes)
     shots={s['index']:s for s in script['shots']}
