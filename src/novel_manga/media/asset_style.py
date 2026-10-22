@@ -33,6 +33,14 @@ class AssetStyle:
     # separately from how its characters are.
     scene_style: str = ''
     scene_direction: str = ''
+    # A style whose set wording only fits some places (a pool-room pack drawn for a
+    # book that also walks outdoors) lists the location-name words that carry it.
+    # A location outside that scope is drawn from the neutral wording instead, so the
+    # pack's stage vocabulary cannot be forced onto a place it does not describe.
+    # Empty scope = the wording applies to every location, as before.
+    scene_scope: tuple = ()
+    scene_neutral_style: str = ''
+    scene_neutral_direction: str = ''
     prop_direction: str = ''
     # True when the style states its own render_direction, and so already says how it
     # is drawn: appending the genre's wording on top only repeats it.
@@ -77,6 +85,9 @@ class AssetStyle:
             declares_card_suffix=bool(style.get('card_suffix')),
             scene_style=style.get('scene_style', ''),
             scene_direction=asset_direction(style, 'location', style.get('scene_direction', '')),
+            scene_scope=tuple(str(w) for w in (style.get('scene_scope') or ()) if str(w).strip()),
+            scene_neutral_style=style.get('scene_neutral_style', ''),
+            scene_neutral_direction=style.get('scene_neutral_direction', ''),
             prop_direction=asset_direction(style, 'prop', style.get('render_direction', '')),
             speaks_for_itself=bool(style.get('render_direction')),
             tidy_prompts=bool(style.get('tidy_prompts', False)),
@@ -97,6 +108,14 @@ class AssetStyle:
             location_empty_suffix=style.get('location_empty_suffix') or (
                 '。主体空无一人：近景和中景不出现任何人物或人形剪影，远处允许少量模糊的背景行人'
                 if genre.get('location_policy') == 'sparse' else LOCATION_EMPTY_SUFFIX))
+
+
+def scene_in_scope(style: 'AssetStyle', location) -> bool:
+    """True when the pack's set wording describes this place (or declares no scope)."""
+    if not style.scene_scope:
+        return True
+    name = str(location).split('：', 1)[0]
+    return any(word in name for word in style.scene_scope)
 
 
 QWEN = 'qwen'

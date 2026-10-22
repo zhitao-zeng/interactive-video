@@ -155,13 +155,25 @@ def expression_prompt(
 
 
 def location_prompt(bible: StoryBible, location: str, *, family: str = "", direction: str = "",
-                    fingerprint: bool = True, scene_style: str = "", tidy: bool = False) -> str:
+                    fingerprint: bool = True, scene_style: str = "", tidy: bool = False,
+                    palette: str | None = None, in_scope: bool = True,
+                    neutral_style: str = "") -> str:
     """scene_style replaces the character-shaped style text for an empty set: the book's
-    visual_style describes faces, skin and hair, none of which a room has."""
+    visual_style describes faces, skin and hair, none of which a room has.
+
+    in_scope=False: the pack's set wording (and the book's palette, which carries the same
+    stage vocabulary) does not describe this place, so it is left out and only the neutral
+    wording is used.  Without this a pool-room pack drew every outdoor location as a pool hall
+    (backrooms55 EP02-A, 2026-10-22: three park-edge cards came back as white-tile pools)."""
+    if not in_scope:
+        style_text, palette_text = neutral_style, ""
+    else:
+        style_text = scene_style or bible.visual_style
+        palette_text = bible.palette if palette is None else palette
     return (
-        _end(scene_style or bible.visual_style, tidy)
+        _end(style_text, tidy)
         + (f"系列风格指纹 {bible.style_fingerprint}。" if fingerprint else "")
-        + _end(bible.palette, tidy)
+        + _end(palette_text, tidy)
         + f"场景资产：{location}。固定建筑结构、空间布局、关键物品、天气、时间和光线方向。"
         "严格空场，竖屏建立镜头与对话主角度可复用背景板；前景、中景、背景层次明确，"
         # The room the actors will need, said as floor rather than as people.  "预留一至两名人物站立、

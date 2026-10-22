@@ -8,7 +8,7 @@ from novel_manga.models.bible import StoryBible
 from novel_manga.models.assets import AssetRecord, SeriesAssetManifest
 from ..util import atomic_write_json
 from .common import sha256_file, sha256_text, log
-from .asset_style import AssetStyle, card_suffix as _card_suffix
+from .asset_style import AssetStyle, card_suffix as _card_suffix, scene_in_scope
 from .asset_specs import character_spec, location_spec, prop_spec
 from .asset_prompts import character_prompt, expression_prompt as make_expression_prompt, location_prompt, prop_prompt
 from .asset_images import ensure_image, _archive_stale
@@ -43,10 +43,14 @@ class FramedAssetFactory:
         self.location_time = dict(location_time or {})
 
     def _location_prompt(self, bible, location):
+        in_scope = scene_in_scope(self.style, location)
+        direction = ((self.style.scene_direction or self.style.render_direction) if in_scope
+                     else (self.style.scene_neutral_direction or self.style.render_direction))
         prompt = location_prompt(bible, location, family=self.style.render_family,
-                                 direction=self.style.scene_direction or self.style.render_direction,
+                                 direction=direction,
                                  fingerprint=self.style.prompt_fingerprint,
-                                 scene_style=self.style.scene_style, tidy=self.style.tidy_prompts)
+                                 scene_style=self.style.scene_style, tidy=self.style.tidy_prompts,
+                                 in_scope=in_scope, neutral_style=self.style.scene_neutral_style)
         when = self.location_time.get(str(location).split('：', 1)[0].strip(), '')
         if when:
             prompt += f'时段与主光源：{when}。'
