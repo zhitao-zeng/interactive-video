@@ -314,6 +314,31 @@ def test_first_pass_timeout_with_complete_validated_draft_is_a_candidate(tmp_pat
     assert result['agent_exit'] == 124 and result['accepted_despite_agent_exit'] is True
 
 
+def test_resumed_correction_that_rewrote_the_draft_and_validates_clean_is_a_candidate(tmp_path, monkeypatch):
+    """Verification run 2026-10-22: the revision author finished the correction, the
+    process wrapper still died, and the validator passes — accept the artifact."""
+    source = task(tmp_path); run = tmp_path/'run'; manifest = creation.prepare(source, run)
+    work = run/'sandbox'
+    old_draft = episode(); old_draft['chapter_script']['shots'][0]['event'] = '旧稿未改'
+    write(work/'output/episode.json', old_draft)
+    (work/'output/creative-notes.md').write_text('修订说明。')
+    write(run/'creator-state.json', {'seconds_used': 77})
+
+    def invoke(work, prompt, **kwargs):
+        write(work/'output/episode.json', episode())  # the correction lands on disk
+        attempt = work/'attempts/rev'; attempt.mkdir(parents=True)
+        rows = [{'type':'tool_use','name':'Read','input':{'file_path':'/work/'+p}}
+                for p in manifest['required_reads']]
+        (attempt/'session.jsonl').write_text(json.dumps({'message':{'content':rows}}))
+        return SimpleNamespace(ok=False, exit_code=1, seconds=1, directory=attempt,
+            record={'session_id':'rev-creator','model':'configured-model'})
+
+    monkeypatch.setattr(creation, 'run_session', invoke)
+    result = creation.run(source, run, config={'timeout_seconds':5400}, resume=True)
+    assert result['status'] == 'creative_candidate', result
+    assert result['accepted_despite_agent_exit'] is True
+
+
 def test_resumed_correction_has_a_turn_bound_but_timeout_is_not_success(tmp_path, monkeypatch):
     source = task(tmp_path); run = tmp_path/'run'; manifest = creation.prepare(source, run)
     work = run/'sandbox'; write(work/'output/episode.json', episode())

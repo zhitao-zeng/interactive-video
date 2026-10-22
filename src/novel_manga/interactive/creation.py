@@ -247,9 +247,13 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
             # Check a bounded correction promptly instead of another long self-edit loop.
             turns = config.get('max_turns')
             call_config['max_turns'] = 16 if turns is None else min(int(turns), 16)
+        draft_path = work / 'output/episode.json'
+        draft_before = (draft_path.stat().st_mtime_ns, draft_path.stat().st_size) if draft_path.is_file() else None
         attempt = execute(work, prompt, resume=resume, timeout=min(remaining, slice_seconds), config=call_config,
                               expected_output='episode.json', enable_tools=False)
         used += time.monotonic() - started
+        draft_after = (draft_path.stat().st_mtime_ns, draft_path.stat().st_size) if draft_path.is_file() else None
+        draft_changed = draft_after != draft_before
         reads = read_evidence(work)
         seen = {r['path'] for r in reads}
         missing = [p for p in manifest['required_reads'] if p not in seen]
@@ -266,12 +270,14 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
         atomic_write_json(work / 'input/creative-validation.json', report)
         atomic_write_json(run_dir / 'skill-read-evidence.json', report)
         stalled = bool(issues) and issues == previous_issues
-        # A FIRST-PASS draft that passes every structural/read check is a candidate even
-        # when the sandbox process was killed at its slice edge: the validator already
-        # judged the artifact. Revision turns keep the stricter contract: a timed-out
-        # correction leaves the previous draft unconfirmed and stays agent_failed.
-        accepted_despite_exit = (not revision and bool(candidate) and not issues
-                                 and attempt.exit_code in {0, 124})
+        # A draft that passes every structural/read check is a candidate even when the
+        # sandbox process died at its edge: the validator already judged the artifact.
+        # Revision turns keep the stricter contract for an UNCHANGED draft (the
+        # correction never landed); a revision that demonstrably rewrote the draft
+        # and validates clean is accepted on the same terms as a first pass.
+        accepted_despite_exit = (bool(candidate) and not issues
+                                 and attempt.exit_code in {0, 1, 124}
+                                 and (not revision or draft_changed))
         state = {'status': 'revision_stalled' if stalled else 'agent_failed' if not attempt.ok and not accepted_despite_exit else 'draft_invalid' if issues else 'creative_candidate',
             'run_dir': str(run_dir), 'session_id': attempt.record.get('session_id'),
             'seconds_used': round(used, 3), 'allowance_seconds': allowance,
