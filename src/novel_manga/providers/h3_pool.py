@@ -269,9 +269,13 @@ class H3Pool:
             handle.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} cooldown {seconds / 60:.0f} min: {reason}\n")
 
     def _reachable(self, url: str) -> bool:
+        # Pool instances are internal services: a session proxy must never sit in
+        # front of this probe, or every instance reads as "does not answer" and the
+        # whole pool cools down (2026-10-22: 80min stall traced to exactly this).
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
         for path in ("/health", "/v1/videos?limit=1&order=desc"):
             try:
-                with urllib.request.urlopen(url + path, timeout=5) as response:
+                with opener.open(url + path, timeout=5) as response:
                     return response.status == 200
             except urllib.error.HTTPError as error:
                 if error.code != 404:
