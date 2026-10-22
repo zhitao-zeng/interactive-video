@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 from novel_manga.util import read_json, atomic_write_json
 
-PROJECTS = ('adventure', 'romance', 'suspense')
+PROJECTS = ('adventure', 'romance', 'suspense', 'zhiyao')
 
 
 def finalize(directory: Path, project: str, *, documents=()) -> dict:

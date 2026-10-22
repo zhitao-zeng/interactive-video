@@ -23,8 +23,9 @@ def prepare(task_path, run_dir):
     if task.get('mode') not in {'adaptation', 'original'} or not task.get('brief'):
         raise ValueError('task requires mode adaptation/original and a complete brief')
     project = task.get('project', 'adventure')
-    if project not in {'adventure', 'romance', 'suspense'}:
-        raise ValueError('project must be adventure, romance or suspense')
+    from .intake import PROJECTS
+    if project not in PROJECTS:
+        raise ValueError(f'project must be one of {PROJECTS}')
     previous = read_json(run_dir / 'sandbox/input/manifest.json', {})
     if previous:
         if previous['task'] != task:
@@ -76,7 +77,10 @@ def prepare(task_path, run_dir):
                       [{k: m[k] for k in ('key', 'name', 'strategy')} for m in methods])
     skill, refs = _install_skill(SimpleNamespace(work_dir=work))
     genre = {'adventure': 'travel_authoring', 'romance': 'romance_authoring',
-             'suspense': 'suspense_authoring'}[project]
+             'suspense': 'suspense_authoring',
+             # Zhiyao fixed-branch fairy-tale adventures share the travel/exploration
+             # authoring guidance until the series earns its own genre file.
+             'zhiyao': 'travel_authoring'}[project]
     selected_style = None
     style_reads = []
     if task.get('style'):

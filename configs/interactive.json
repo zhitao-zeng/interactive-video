@@ -94,6 +94,15 @@
         "text_endpoint": "phanthy-ds41",
         "asset_publish_dir": "/mnt/disk1/zengzhitao/interactive-video-worktrees/suspense-reference-study/outputs/.published-suspense"
       }
+    },
+    "zhiyao": {
+      "production": {
+        "workers_by_lane": {
+          "h3": 2,
+          "sd25": 4,
+          "sd20-fast": 4
+        }
+      }
     }
   }
 }
