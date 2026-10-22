@@ -275,6 +275,8 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
                     ('created_at', 'completed_at', 'inference_time_s') if key in state}})
             return output
 
+        from novel_manga.resource_waits import QueueWait
+        provider_queue = QueueWait('h3_queue')
         try:
             deadline = time.monotonic() + self.settings.poll_timeout
             if self.pool and task_id:
@@ -371,9 +373,16 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
                 if state is None:
                     # The service keeps its task index in memory, so a restart loses every id we
                     # hold.  Nothing was charged and nothing is running: ask for the work again.
+                    provider_queue.finish()
                     task_id = None
                     continue
                 status = str(state.get("status", "")).lower()
+                if status == "queued":
+                    # Provider-side queuing is infrastructure wait, not creative
+                    # budget: record it so the episode window can refund it.
+                    provider_queue.begin()
+                else:
+                    provider_queue.finish()
                 if status in {"completed", "succeeded", "success"}:
                     return download_completed(state)
                 if status in {"failed", "error", "cancelled", "canceled"}:
@@ -391,4 +400,5 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
                 time.sleep(POLL_SECONDS)
             raise TimeoutError(f"local H3 task {task_id} still {status} after {self.settings.poll_timeout:.0f}s")
         finally:
+            provider_queue.finish()
             release_slot(slot)
