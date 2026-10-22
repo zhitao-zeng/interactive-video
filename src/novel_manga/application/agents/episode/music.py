@@ -7,12 +7,15 @@ from novel_manga.application import music_selection
 from novel_manga.util import atomic_write_json,read_json,run,media_duration
 from .tool_inputs import input_file
 
-SOURCE_REVIEW_POLICY = 'episode-music-source-v2-native-and-postmix-scope'
+SOURCE_REVIEW_POLICY = 'episode-music-source-v3-query-intent'
 
 def status(ctx):
     try:music_selection.configuration(getattr(ctx,'project_root',Path()));configured=True
     except ValueError:configured=False
-    return {'configured':configured,'command':'python3 /work/tools/episode.py select_music output/music-selection.json',
+    latest=read_json(ctx.work_dir/'input/latest-music-apply.json',{})
+    return {'configured':configured,
+        'last_rejection':latest if latest.get('ok') is False else None,
+        'command':'python3 /work/tools/episode.py select_music output/music-selection.json',
         'search':{'action':'search','query':'source-backed mood/scene/avoid requirements; local candidates only','limit':3,
             'track_ids':'optional list of original IDs for exact candidate lookup, not an adoption'},
         'apply':{'action':'apply','search_id':'search-001','candidate_id':'returned candidate id',
@@ -40,7 +43,10 @@ def source_check(ctx,candidate,plan):
     source=music_selection.source_inputs(ctx.episode_dir,ctx.run_dir/'source.txt')
     return ask_json([{'type':'text','text':'核对配乐采用是否符合批准原文、任务及声音设计。明确无配乐的范围必须保留；'
         '仅按已选曲目及Agent提供的音频证据核对，不冒称你听过音乐。曲库排名不是符合剧情的证据。'
-        'authored_music_plan是当前批准的配乐设计，按其cues与silences分别判断进入与留白范围。'
+        'authored_music_plan提供叙事配乐意图，按其cues与silences核对进入、退出和留白范围，保留精确anchors。'
+        'cues[].query是检索与音色意向，不自动构成逐项配器硬约束。先从批准原文、任务及明确成片声音要求识别硬约束；'
+        '制作Agent可凭提供的实际音频证据，在采用理由中说明实际音色如何承担相同叙事作用。'
+        '未证实的乐器不得宣称匹配；替代音色是否适合具体情节仍需判断，不能仅因query是意向就自动通过。'
         '必须区分原生生成与后期成片：native_bgm=None，或audio_plan同时写music_delivery=postmix与bgm=None，'
         '表示H3不生成音乐、由后期加配乐，不是禁止成片配乐。现场声清单、安静近讲或未逐镜列出音乐，'
         '本身不构成后期禁配乐；明确要求最终成片仅现场声或无配乐的范围仍不能覆盖。'
@@ -104,7 +110,10 @@ class MusicOperations:
             atomic_write_json(ctx.run_dir/'music-decisions.json',decisions)
         checked=saved['source_review']
         if checked.get('consistent')is not True or checked.get('problems'):
-            return {'ok':False,'error':'music source rejected','source_review':checked}
+            outcome={'ok':False,'error':'music source rejected','source_review':checked,
+                'next':'Read the specific source_review problems and revise the candidate selection; do not resubmit the same rejected selection.'}
+            atomic_write_json(ctx.work_dir/'input/latest-music-apply.json',outcome)
+            return outcome
         output=ctx.episode_dir/'work/music-assets'/f'selection-{decisions.index(saved)+1:03d}.wav'
         output.parent.mkdir(parents=True,exist_ok=True)
         if not output.is_file():
@@ -164,7 +173,11 @@ class MusicOperations:
             saved={'inputs':inputs,'source_review':self.source_checker(ctx,[r['asset']for r in prepared],plan)}
             records.append(saved);atomic_write_json(path,records)
         checked=saved['source_review']
-        if checked.get('consistent')is not True or checked.get('problems'):return {'ok':False,'error':'music source rejected','source_review':checked}
+        if checked.get('consistent')is not True or checked.get('problems'):
+            outcome={'ok':False,'error':'music source rejected','source_review':checked,
+                'next':'Read the specific source_review problems and revise the candidate selection; do not resubmit the same rejected selection.'}
+            atomic_write_json(ctx.work_dir/'input/latest-music-apply.json',outcome)
+            return outcome
         folder=ctx.episode_dir/'work/music-assets'/f'timeline-selection-{records.index(saved)+1:03d}';folder.mkdir(parents=True,exist_ok=True)
         for i,row in enumerate(prepared):
             asset=row['asset'];original=Path(asset['path']);output=folder/f'cue-{i+1:03d}.wav'

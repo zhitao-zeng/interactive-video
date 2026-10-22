@@ -102,6 +102,9 @@
           "sd25": 4,
           "sd20-fast": 4
         }
+      },
+      "services": {
+        "text_endpoint": "codex-luna"
       }
     }
   }

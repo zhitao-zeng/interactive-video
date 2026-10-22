@@ -261,8 +261,25 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
         reads = read_evidence(work)
         seen = {r['path'] for r in reads}
         missing = [p for p in manifest['required_reads'] if p not in seen]
-        candidate = read_json(work / 'output/episode.json', {})
-        issues = validate(candidate, manifest, work) if candidate else ['Complete output/episode.json is missing']
+        draft_file = work / 'output/episode.json'
+        json_error = None
+        candidate = {}
+        if not draft_file.is_file():
+            json_error = None  # reported below as missing
+        else:
+            import json as _json
+            try:
+                candidate = _json.loads(draft_file.read_text(encoding='utf-8'))
+            except _json.JSONDecodeError as error:
+                # util.read_json swallows decode errors into {}; a 100KB draft with
+                # one broken symbol must report the exact position instead (EP04A
+                # line 999 col 7, 2026-10-23).
+                json_error = (f'{error.msg} (line {error.lineno}, column {error.colno})')
+                candidate = {}
+        issues = validate(candidate, manifest, work) if candidate else (
+            ['Complete output/episode.json is missing'] if json_error is None
+            else [f'output/episode.json is not valid JSON: {json_error}; '
+                  'fix only the JSON syntax at that line/column and keep the complete story content'])
         notes = work / 'output/creative-notes.md'
         if not notes.is_file() or not notes.read_text().strip():
             issues.append('Write output/creative-notes.md with the actual camera/cut choices and shot numbers')

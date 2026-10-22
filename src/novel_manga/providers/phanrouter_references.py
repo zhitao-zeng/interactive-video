@@ -32,7 +32,12 @@ class ReferenceMaterials:
         """Where publish_cards.sh puts a copy of this card: <base>/<novel>/<asset>/<view>-<sha12><ext>."""
         base = getattr(self.settings, "phanrouter_asset_public_base", None) or ""
         novel = path.parents[3].name if len(path.parents) > 3 else "novel"
-        return f"{base}/{novel}/{path.parent.name}/{path.stem}-{digest[:12]}{path.suffix}"
+        from urllib.parse import quote
+        # Edition names carry non-ASCII (zhiyao episodes, 2026-10-23): the gateway
+        # downloads the URL verbatim, so every path segment must be percent-encoded
+        # or the library side answers InvalidParameter.DownloadFailed.
+        segments = "/".join(quote(part) for part in (novel, path.parent.name))
+        return f"{base}/{segments}/{quote(path.stem)}-{digest[:12]}{path.suffix}"
 
 
     def _asset_base_url(self) -> str:
@@ -46,13 +51,26 @@ class ReferenceMaterials:
         by the file's content, so a redrawn card gets a new asset and an unchanged one never a second.
         The library fetches the image itself, so the source is the published copy under the public base
         when one is configured (checked with a HEAD first), else the hosted URL handed in or looked up."""
+        # Same-card registrations from parallel clip workers must serialize around one sidecar:
+        # without the lock four workers raced CreateAsset with the same Name (3 duplicate assets,
+        # one "no asset id", same-PID .partial collisions; backrooms/zhiyao 2026-10-23). flock on a
+        # per-sidecar lockfile blocks across threads and processes; the lock holder registers once
+        # and the rest reuse the remembered ID after re-reading the sidecar inside the lock.
+        path = image.path
+        sidecar = path.with_suffix(path.suffix + ASSET_SIDECAR)
+        import fcntl
+        lock_path = sidecar.with_suffix(sidecar.suffix + ".lock")
+        with lock_path.open("a") as lock_handle:
+            fcntl.flock(lock_handle, fcntl.LOCK_EX)
+            return self._asset_reference_locked(image, hosted_url, sidecar)
+
+    def _asset_reference_locked(self, image: ImageResult, hosted_url: str | None, sidecar) -> str:
         group = getattr(self.settings, "phanrouter_asset_group_id", None)
         if not group:
             raise ValueError("PHANROUTER_REFERENCE_ASSETS is on but PHANROUTER_ASSET_GROUP_ID is not set")
         path = image.path
         if not path.is_file():
             raise FileNotFoundError(path)
-        sidecar = path.with_suffix(path.suffix + ASSET_SIDECAR)
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         try:
             record = json.loads(sidecar.read_text(encoding="utf-8"))

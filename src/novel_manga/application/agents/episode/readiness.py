@@ -71,7 +71,7 @@ def next_action(ctx, status=None):
     from novel_manga.application.review.execution import media_matches
     notes = read_json(ctx.episode_dir / 'review_feedback.json', {})
     videos = [c for c in plan.get('clips', []) if c.get('kind') == 'video']
-    if videos and not media_started(ctx.episode_dir):
+    if videos and (not media_started(ctx.episode_dir) or not media):
         return {'action': 'render', 'reason': 'opening and request inputs are current; no video has started'}
     if media and not media_matches(plan, media, notes=notes):
         return {'action': 'render', 'reason': 'current requests are newer than the selected takes'}
