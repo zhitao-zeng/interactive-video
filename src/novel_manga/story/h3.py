@@ -482,10 +482,15 @@ def request_issues(clip: dict) -> list[str]:
     if people and len(people_declared) > len(people):
         issues.append(f'{len(people_declared)} subjects are declared for {len(people)} characters: '
                       "one person's reference images were declared as separate people")
-    if CJK.search(re.sub(r'<d>.*?</d>', '', text, flags=re.S)):
+    cjk_body = re.sub(r'<d>.*?</d>', '', text, flags=re.S)
+    hit = CJK.search(cjk_body)
+    if hit:
         # Every clip, not only authored scenes: H3 reads Chinese aloud wherever it stands.  美漫 ch12 clip_20
         # (2026-09-25) carried the naming table's traits after a subject tag and passed as "ok".
+        excerpt = cjk_body[max(0, hit.start()-24):hit.end()+24].replace('\n', ' ')
         issues.append(CHINESE_OUTSIDE_DIALOGUE)
+        issues.append(f'offending excerpt: …{excerpt}… — keep descriptions English and refer to people '
+                      'by their bound Subject/reference labels, not their Chinese names')
     # Positive phrasing is authoring advice. A legacy sentence such as
     # "no other person has this face" does not invalidate its identities or words.
     # Callers may surface positive_direction_issues separately from hard failures.
@@ -501,7 +506,8 @@ def identity_issues(clip: dict) -> list[str]:
     the identity correction below.  (Every translation made before 2026-09-17 names its subjects in
     Chinese: 30,810 of 30,986 translated clips on 2026-09-25.)"""
     return [issue for issue in request_issues(clip)
-            if issue not in {CHINESE_OUTSIDE_DIALOGUE, AFFIRMATIVE_DIRECTIONS}]
+            if issue not in {CHINESE_OUTSIDE_DIALOGUE, AFFIRMATIVE_DIRECTIONS}
+            and not issue.startswith('offending excerpt: ')]
 
 
 def source_crowds(clip: dict, bible: dict, passage: str, *, context=None) -> dict:
