@@ -166,6 +166,36 @@ class BootstrapResult:
     completed: dict | None = None
 
 
+def _consume_window_grant(ctx, saved):
+    """A user-authorized time-window renewal: run_dir/window-grant.json with
+    {'seconds': N, 'authorized_by': ...}. Consumed exactly once under a lock;
+    a blocked run becomes deferred so the fresh window is actually used."""
+    import fcntl
+    path = ctx.run_dir/'window-grant.json'
+    grant = read_json(path, {})
+    if not grant or grant.get('consumed_at') or not int(grant.get('seconds') or 0):
+        return saved
+    if saved.get('upstream_recovery') or saved.get('passed'):
+        return saved
+    lock = ctx.run_dir/'window-grant.lock'
+    with lock.open('a') as handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        current = read_json(path, {})
+        if not current or current.get('consumed_at') or not int(current.get('seconds') or 0):
+            return saved
+        import time as _t, datetime as _dt
+        current['consumed_at'] = _dt.datetime.now().astimezone().isoformat()
+        atomic_write_json(path, current)
+    saved = {**saved,
+             'remaining_seconds': max(0.0, float(saved.get('remaining_seconds') or 0)) + float(current['seconds']),
+             'window_grant': {'seconds': current['seconds'], 'authorized_by': current.get('authorized_by'),
+                              'consumed_at': current['consumed_at']}}
+    if saved.get('status') == 'blocked':
+        saved.update(status='deferred', reason=None, stop_detail=None)
+    print(f"[window-grant] +{current['seconds']:.0f}s by {current.get('authorized_by','authorized user')}", flush=True)
+    return saved
+
+
 def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_factory):
     from . import recovery
     explicit_config = config is not None
@@ -239,6 +269,7 @@ def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_facto
     from .bounded_recovery import resume_window
     recovered_window=resume_window(ctx,saved)
     if recovered_window is not None:saved=recovered_window
+    saved=_consume_window_grant(ctx,saved)
     if saved.get('upstream_recovery') and saved.get('status') in {'blocked','finished_with_issues'}:
         return BootstrapResult(completed=saved)
     if saved.get('status') == 'deferred':

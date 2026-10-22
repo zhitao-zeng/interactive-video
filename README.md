@@ -63,6 +63,19 @@ PYTHONPATH=src .venv/bin/python scripts/interactive_video.py run \
 图片、视频与配音只在相应制作动作获得授权后执行。`sd25` 选择另一视频路线。
 旧任务续跑保留原回执、take 与次数，不自动增加重拍额度；候选、审片完整和影片通过是不同状态。
 
+### Agent 配置选择(重要)
+
+同机生产直接用默认 `configs/agent_sandbox.json`:base_url 指向本机 8789 网关
+(phanthy-local-api.service,常驻)、`docker_network: "host"`(容器回环≠宿主回环,
+指 127.0.0.1 的配置必须带它,沙箱会启动即校验)。这条路由的 agent 轮次约 2-3 分钟。
+`--config` 指向云端官方配置(如 official-ds41)仅用于跨机/无本机网关场景:云端 ds41
+推理流慢(单轮 5-10 分钟),且该配置不带 host 网络,不可与 8789 混搭。
+
+窗口续期:操作时间窗(默认 5400s)耗尽后 blocked,把
+`{"seconds": 5400, "authorized_by": "用户xx批准", "reason": "..."}`
+写入该集 run 目录 `window-grant.json` 后 `--resume` 即生效,单次消费、留档可审计;
+提供方排队等待已自动退费(不烧创作预算)。
+
 视频通道还可显式选择 `--lane sd20-fast` 或 `--lane sd20-mini`，分别发送
 `sd2.0-fast` / `sd2.0-mini`，使用现有 `PHANROUTER_IMAGE_API_KEY` 和素材库通道。
 两者暂按项目保守上限 15 秒、单路并发接入，共用该凭据的 `sd20-quota.stop`；
