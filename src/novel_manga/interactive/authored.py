@@ -104,11 +104,18 @@ def pack_authored(directory: Path) -> dict:
     for number,group in enumerate(read_json(directory/'authored_groups.json',[]),1):
         selected=[shots[i-1] for i in group['shot_indexes']]
         seconds=sum(s['duration_seconds'] for s in selected)
-        if not (0 < seconds <= 15 if first_frame else 4 <= seconds <= 15) or len(selected)>6:
+        # A single authored micro cutaway (e.g. a 2s establishing empty shot) cannot
+        # share a group when the neighbours live in another location, and cannot stand
+        # alone under the 4s floor on its own seconds. The provider floors every
+        # Fast/Mini request to 4s anyway and assembly keeps the authored timing, so
+        # such a group requests max(4, seconds) exactly like the first-frame rule.
+        micro_cutaway=not first_frame and len(selected)==1 and 0 < seconds < 4
+        if not (0 < seconds <= 15 if first_frame else (4 <= seconds <= 15 or micro_cutaway)) or len(selected)>6:
             raise ValueError('Travel generation group exceeds the existing duration/stage budget')
         packed={'kind':'video','location':selected[0]['location'],'shots':selected,
-            'seconds':seconds,'request_seconds':max(4,seconds)if first_frame else seconds,
+            'seconds':seconds,'request_seconds':max(4,seconds)if first_frame or micro_cutaway else seconds,
             'shot_timing':[{'seconds':s['duration_seconds']} for s in selected]}
+        if micro_cutaway:packed['micro_cutaway']=True
         clip=clip_entry(packed,f'clip_{number:02d}',context)
         if first_frame:clip['request_seconds']=max(4,seconds)
         clip['source_authored_segment']=group['source_segment']
