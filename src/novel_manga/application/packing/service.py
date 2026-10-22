@@ -72,6 +72,10 @@ def clip_entry(clip: dict, clip_id: str, ctx: dict, override: dict | None = None
         source_seconds=sum(t['seconds'] for t in clip['shot_timing'])
         allowed_floor=(any(ctx.get('profile',{}).get(key)=='first-frame' for key in ('h3_input_mode','sd_input_mode'))
                        and len(clip['shots'])==1 and 0 < source_seconds < 4 and clip['request_seconds']==4)
+        # An authored micro cutaway packed by pack_authored carries the same shape:
+        # one shot under 4s, requested at the provider's 4s floor.
+        allowed_floor=allowed_floor or (clip.get('micro_cutaway') is True
+                                        and len(clip['shots'])==1 and 0 < source_seconds < 4 and clip['request_seconds']==4)
         if (len(clip['shot_timing']) != len(clip['shots'])
                 or not 3 <= clip['request_seconds'] <= options.max_clip_seconds
                 or (abs(source_seconds - clip['request_seconds']) > .01 and not allowed_floor)):
