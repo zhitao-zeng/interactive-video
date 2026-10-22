@@ -26,8 +26,12 @@ def source_document(episode, manifest):
 
 
 def design_issues(episode, manifest):
+    if manifest.get('mode')=='adaptation':
+        # Adaptations bind a supplied screenplay and take design facts from the
+        # approved series material; only the reduced script contract applies here.
+        return adaptation_issues(episode, manifest)
     if manifest.get('mode')!='original':
-        return ['Automatic creative production currently requires original mode; preserve adaptation source handoff']
+        return ['Automatic creative production currently requires original mode; use the adaptation handoff']
     if manifest['task'].get('world_card_seconds'):
         return ['Automatic original handoff does not yet support world cards; use approved material intake']
     from novel_manga.story.voice_delivery import native_speech_selected
