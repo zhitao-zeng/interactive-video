@@ -219,3 +219,18 @@ VERIFY_QUESTIONS = (BODY_QUESTION +
 
 
 INSTRUCTION_SCHEMA = model_client.obj({"instruction": {"type": "string"}})
+
+# Same acceptance text as the parent novel production line (novel-manga-video
+# review/contracts.py).  The final movie reviewer and the repair boundary share
+# one standard: prompt-tier differences are recorded, never blocking.
+WATCHABLE_CRITERIA = (
+    '验收以观众能顺畅看懂剧情为准，允许正常剪辑、表演简化和不改变关键因果的合理改编。'
+    '不影响人物识别或关键事件的服饰、配饰、发色、外貌细节、口型、站坐、手脚摆放和动作幅度差异，'
+    '非关键动作省略、背景布置、无关背景人物增减和道具局部形状差异，只记提示，不要求重拍。'
+    '旧分镜或提示词写得精确，不等于这些细节本身决定剧情；背景多一名旁观者不等于关键人物错误。'
+    '服饰或物件承担关键身份、防护、交接或功能，人数决定事件，或动作差异改变生死、行动能力与攻击防御时，仍须修复。'
+    '关键对白错漏或意思反转、明显错人或性别物种错误、人物分身、关键角色缺席、动作归属错误、关键事件缺失、'
+    '剧情必需群体完全未出现、额外肢体、严重头身或肢体比例失真、持续严重抖动，仍必须修复。'
+    '不能只凭与原文或旧请求有差别判失败，必须指出观众会误认的关键人物、误解的事件或可见的严重画面缺陷。'
+    '无法判断或审核未完成不能记通过；一项轻微差异不能清除其他独立失败。'
+)

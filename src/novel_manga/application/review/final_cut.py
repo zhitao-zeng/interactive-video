@@ -13,7 +13,7 @@ from threading import Event
 from novel_manga.llm import client as model
 from novel_manga.llm.config import ENDPOINTS, endpoint_settings
 from novel_manga.media.speech_repair import merge_note
-from novel_manga.review.contracts import MAX_IMAGES
+from novel_manga.review.contracts import MAX_IMAGES, WATCHABLE_CRITERIA
 from novel_manga.util import atomic_write_json, read_json
 
 from .movie_context import POLICY, context
@@ -24,6 +24,13 @@ def current(directory, media, final):
     return bool(isinstance(final,dict) and final.get('movie') and final.get('policy')==POLICY
                 and final.get('context')==context(directory,media,final.get('movie',''))
                 and independent.current(directory,final))
+
+
+def blocking_issues(issues):
+    """Only must_fix blocks acceptance.  Issues without a severity are the
+    code-added ones (ambience, audio, independent) and stay blocking, so the
+    change is conservative for every existing producer of issues."""
+    return [issue for issue in issues if issue.get('severity') != 'minor']
 
 
 def apply_feedback(directory, review, final):
@@ -46,6 +53,10 @@ def apply_feedback(directory, review, final):
         known=independent.confirmed_failure(directory,final)
         if not known or final.get('independent_review')!=known:return review
         issues=known['issues']
+    # Prompt-tier findings stay recorded in the retained final review; only
+    # must_fix ones become repair targets, so a minor note cannot re-open the
+    # repair loop forever.
+    issues=blocking_issues(issues)
     grouped={}
     for issue in issues:
         for cid in issue['clip_ids']:grouped.setdefault(cid,[]).append(issue)
@@ -84,10 +95,12 @@ def _nonproblem_issue(issue):
 def validate_group(answer, selected):
     if (not isinstance(answer.get('passed'),bool) or not isinstance(answer.get('observations'),list)
             or not answer['observations'] or not isinstance(answer.get('issues'),list)
-            or answer['passed']!= (not answer['issues'])):
+            or answer['passed']!= (not blocking_issues(answer['issues']))):
         raise ValueError('final reviewer omitted observations or returned conflicting passage')
     allowed={r['clip_id'] for r in selected}
     for issue in answer['issues']:
+        if issue.get('severity') not in ('must_fix','minor'):
+            raise ValueError('final reviewer issue lacks a must_fix/minor severity grade')
         if (not issue.get('clip_ids') or not set(issue['clip_ids'])<=allowed
                 or not issue.get('frame_numbers') or not issue.get('problem')
                 or not issue.get('evidence') or not issue.get('source_basis')):
@@ -135,7 +148,7 @@ def ambience_speech_issues(media, receipt, frames):
             overlaps.append({'text':text,'start':start,'end':end,'overlap':round(overlap,3)})
     if not overlaps:return []
     cid=source['clip_id']
-    return [{'clip_ids':[cid],'problem':'互动卡环境音来源窗口包含口播',
+    return [{'clip_ids':[cid],'severity':'must_fix','problem':'互动卡环境音来源窗口包含口播',
              'source_basis':'互动卡指定 silent_action 镜头的三秒环境音；该窗口应无说话',
              'evidence':json.dumps({'ambience_source':source,'ASR_overlap':overlaps},ensure_ascii=False),
              'frame_paths':[f['path'] for f in frames if f['clip_id']==cid],
@@ -224,6 +237,7 @@ def review_assembly(runner, media, *, receipt=None):
                     'issues':{'type':'array','items':model.obj({
                         'clip_ids':{'type':'array','minItems':1,'items':{'type':'string','enum':ids}},
                         'frame_numbers':{'type':'array','minItems':1,'items':{'type':'integer','minimum':1,'maximum':len(selected)}},
+                        'severity':{'type':'string','enum':['must_fix','minor']},
                         'problem':{'type':'string'},'evidence':{'type':'string'},'source_basis':{'type':'string'}})}})
                 parts=[]
                 for n,row in enumerate(selected,1):
@@ -232,7 +246,13 @@ def review_assembly(runner, media, *, receipt=None):
                 parts.append({'type':'text','text':
                     '审核真正组装后的影片，逐张写实际观察，再对照批准源文、台词、人物与机位约束判定。只指认给出的帧/clip，不猜未显示的画面。'
                     '没有实际违规时返回passed=true、issues=[]；正常观察和正确对照只放observations，不在issues写“无问题”或“未发现明确违规”。'
-                    '重点看目标与画面是否自相矛盾、动作因果、同一空间/服装/道具/摄影机的跨镜连续性、字幕和互动结尾。'
+                    '每个issue必须标severity分级：观众会误认关键人物、误解事件或可见严重画面缺陷的才是must_fix；'
+                    '不影响剧情理解的服饰、配饰、道具状态与开关、姿态、背景人数等差异一律severity=minor（只记录提示，不拦截、不触发重拍）。'
+                    'passed必须严格等于“不存在must_fix级issue”；minor级issue可以与passed=true并存。'
+                    '画面忠实执行了该镜自己的script要求、只与bible等全局文字互相矛盾时，属素材文本不一致：记severity=minor，'
+                    '并在source_basis注明“素材层不一致，画面无责”，不得据此判视频失败。'
+                    '验收标准：'+WATCHABLE_CRITERIA+
+                    ' 重点看目标与画面是否自相矛盾、动作因果、同一空间/服装/道具/摄影机的跨镜连续性、字幕和互动结尾。'
                     '每个clip按映射的shot_indexes对应当前script.shots的index，不能把原组号、shot_id中的数字或别镜机位套到本镜。'
                     '原稿若明确单人单手机第一人称，就不能从外部拍到正在录像的同一手机；若没有该限制，合理第三人称镜头允许。'
                     '大空间、倒影、正常摇晃、剪近景、湿衣/光照轻微色差、遮挡及作者明确的异象不自动算错。'
@@ -261,7 +281,8 @@ def review_assembly(runner, media, *, receipt=None):
                         if revision==1 or time.monotonic()>=deadline:raise
                         parts.append({'type':'text','text':'上一份完整回复：'+json.dumps(answer,ensure_ascii=False)+
                             '\n格式校验失败：'+str(error)+'。保留有依据的实际观察与问题，纠正响应协议。'
-                            'observations须非空；passed须严格等于issues为空；所有clip_ids必须来自本组并有对应所引用帧。'
+                            'observations须非空；每个issue须有severity（must_fix或minor）；passed须严格等于“无must_fix级issue”；'
+                            '所有clip_ids必须来自本组并有对应所引用帧。'
                             '显式无问题的条目应作为正常观察，完整重新给出判定；没有实际违规时passed=true、issues=[]。'
                             '若真有问题请passed=false并写issues，不得为了通过协议删除问题或凭空补证据。'})
                 for issue in answer['issues']:
@@ -293,7 +314,7 @@ def review_assembly(runner, media, *, receipt=None):
                     break
         if before!=context(directory,media,movie):raise ValueError('movie or episode inputs changed during final review')
         if not final['errors']:
-            final.update(complete=True,passed=not final['issues'])
+            final.update(complete=True,passed=not blocking_issues(final['issues']))
     except Exception as error:
         final['errors'].append(type(error).__name__+': '+str(error)[:250])
     final=independent.combine(directory,final)

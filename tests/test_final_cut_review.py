@@ -40,7 +40,7 @@ def test_real_extractor_cache_and_incomplete_retry(tmp_path,monkeypatch):
 
 def test_issue_requires_cited_clip_evidence():
     answer={'passed':False,'observations':['actual frames'], 'issues':[{
-        'clip_ids':['b'],'frame_numbers':[1],'problem':'bad','evidence':'visible','source_basis':'source'}]}
+        'clip_ids':['b'],'frame_numbers':[1],'severity':'must_fix','problem':'bad','evidence':'visible','source_basis':'source'}]}
     with pytest.raises(ValueError,match='no cited'):
         final_cut.validate_group(answer,[{'clip_id':'a'},{'clip_id':'b'}])
 
@@ -50,7 +50,7 @@ def test_invalid_review_response_returns_exact_protocol_feedback_once(tmp_path,m
     monkeypatch.setattr(final_cut.subprocess,'check_output',lambda *a,**k:json.dumps({'format':{'duration':9}}))
     monkeypatch.setattr(final_cut.subprocess,'run',lambda command,**k:Path(command[-1]).write_bytes(b'frame'))
     monkeypatch.setattr(final_cut.model,'image_part',lambda *a:{'type':'text','text':'test image placeholder'})
-    issue={'clip_ids':['a'],'frame_numbers':[1],'problem':'wet ground on dry platform',
+    issue={'clip_ids':['a'],'frame_numbers':[1],'severity':'must_fix','problem':'wet ground on dry platform',
            'evidence':'visible water','source_basis':'source requires dry platform'}
     def judge(parts,*args,**kwargs):
         calls.append(parts[-1]['text'])

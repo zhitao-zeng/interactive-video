@@ -44,7 +44,7 @@ def movie_review(tmp_path,monkeypatch):
 
 
 def issue(problem='无问题：服装与原文一致。'):
-    return {'clip_ids':['a'],'frame_numbers':[1],'problem':problem,
+    return {'clip_ids':['a'],'frame_numbers':[1],'severity':'must_fix','problem':problem,
             'evidence':'actual visible frame','source_basis':'approved source'}
 
 

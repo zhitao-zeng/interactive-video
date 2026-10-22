@@ -4,7 +4,7 @@ from novel_manga.application.profiles import plan_fingerprint, h3_prompt_fingerp
 from novel_manga.review.storage import take_identity
 from novel_manga.util import read_json
 
-POLICY='final-movie-v2-approved-postproduction-caption-origin'
+POLICY='final-movie-v3-watchable-severity-approved-postproduction-caption-origin'
 
 
 def context(directory, media, movie):
