@@ -272,3 +272,5 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | ZCode EP02-A复验 | 修复后管线完整复验:produce一条命令(官方CLI)改编EP02-A——create首轮收尾+改编自动桥+no-progress三修复的实际复验;新edition,不动诊断edition预算 | codex/backrooms55-ep02-diagnostic-20261022(main合并后) | .runtime/ep02a-verify与新edition | 2026-10-22 | 进行中 |
 
 | ZCode EP02-A·SD2.0-fast无首帧对照 | 同一份已验证EP02-A material起SD2.0-fast传统参考绑定对照线(与H3首帧复验并行):删profile首帧字段→prepare_authored→sd20-fast build_assets→run_episode→审片;不动诊断树ep02a-verify/outputs、不生成开场图、不碰心动生产;SD走PHANROUTER_IMAGE_API_KEY,单worker,每段≤3次,自建task-only ngrok通道发布参考图(不接管旧域名);产出delivery/suspense/backrooms55-ep02a-sd-noframe-20261022+逐镜审片对照 | codex/backrooms55-ep02a-sd-noframe-20261022(新worktree自main fc5c6a8) | 新worktree独立.runtime与outputs;main树只写本板 | 2026-10-22 | 进行中 |
+
+| ZCode EP02-A复验收工 | 复验+修复链闭环:创作端三轮修复达candidate、改编桥全自动、首帧64候选18采纳、视频4落地、选曲接通、no-progress/智能窗/池健康/沙箱守卫/正式续窗等10+修复入main(全量4043过);剩余3帧+17视频+审片未完,两个新发现留档:#11新worktree缺选曲runtime(已修:拷runtime.json)、#12 episode CLI对首帧edition的run_dir与produce不同名(retry开平行状态)、作者会话退化(2万thinking事件/轮,快速档已配未验) | codex/backrooms55-ep02-diagnostic-20261022 | 诊断树+.runtime台账;verify edition状态全保留 | 2026-10-22 | 已收工;明日优先CLI run-dir兼容+会话退化对策;sd-noframe并行会话在产同集SD版;未推送 |
