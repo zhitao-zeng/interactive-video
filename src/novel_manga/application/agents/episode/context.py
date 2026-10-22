@@ -38,6 +38,19 @@ def _target(value):
     return tuple(float(v) for v in values)
 
 
+def _discover_existing_output(root: Path, book: str, episode: str, mode: str) -> Path:
+    """An edition's agent state may live under any entry's convention. When the
+    caller passes no explicit output_root, continue the EXISTING run instead of
+    silently opening a parallel one (2026-10-22: a CLI retry on a first-frame
+    edition created an empty episode-agent/ dir while the real state sat in
+    episode-agent-firstframes/ untouched)."""
+    for name in ('episode-agent-firstframes', 'episode-agent-music', 'episode-agent'):
+        candidate = root / 'outputs' / name / book / f'{episode}-{mode}'
+        if (candidate / 'agent-run.json').is_file() or (candidate / 'sandbox').is_dir():
+            return root / 'outputs' / name
+    return root / 'outputs/episode-agent'
+
+
 def create_context(novel_dir, episode, *, output_root=None, input_mode='auto', target_seconds=None):
     source = Path(novel_dir).expanduser().resolve()
     if not source.is_dir():
@@ -69,7 +82,10 @@ def create_context(novel_dir, episode, *, output_root=None, input_mode='auto', t
         if mode == 'source':
             target = (120.0, 150.0)
     root = configured_root()
-    output = Path(output_root).expanduser().resolve() if output_root else root / 'outputs/episode-agent'
+    if output_root:
+        output = Path(output_root).expanduser().resolve()
+    else:
+        output = _discover_existing_output(root, source.name, source_episode.name, mode)
     if output.is_relative_to(source):
         raise ValueError('Agent output_root must be outside the source novel directory')
     run = output / source.name / f'{source_episode.name}-{mode}'
