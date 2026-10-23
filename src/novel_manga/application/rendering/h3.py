@@ -63,6 +63,10 @@ ASK = (
 )
 
 INPUT_RULES = REQUEST_CONTENT_RULES + (
+    "source_quote and source_excerpt are selected excerpts, not an exhaustive dialogue transcript. "
+    "Use the supplied source stage turns as that stage's dialogue evidence, and match every native slot "
+    "to its supplied speaker, text and delivery; a slot alone is not proof of source support. "
+    "Keep real disagreements in conflicts without inventing, dropping or reassigning dialogue. "
     "If sources leave an unresolved factual conflict, return it in conflicts rather than choosing an identity, "
     "body count or new event. Otherwise conflicts is empty. "
     "For audio_delivery=silent_visual, thoughts or speech in the source and action metadata are mixed "
@@ -100,7 +104,7 @@ def request_context(clip: dict, episode_dir: Path | None, *, source_script=None)
     source = [r for r in rows if str(r.get('segment_id')) in ids]
     script = source_script if source_script is not None else read_json(directory / 'chapter_script.json', {})
     indexes = set(clip.get('shot_indexes', []))
-    fields = ('origin_index', 'wears', 'props', 'scene_objects', 'source_quote', 'camera', 'sfx', 'start_state', 'end_state', 'avoid')
+    fields = ('origin_index', 'wears', 'props', 'scene_objects', 'source_quote', 'turns', 'camera', 'sfx', 'start_state', 'end_state', 'avoid')
     if 'action_bindings' not in clip:
         fields += ('actions',)
     # The plan addresses prepared stage indexes, not origin_index retained from an older split.

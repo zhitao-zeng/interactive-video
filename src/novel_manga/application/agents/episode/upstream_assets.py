@@ -14,6 +14,7 @@ from .arguments import RepairArgumentError, UnsupportedInput
 
 
 OPERATION = 'upstream_asset'
+SOURCE_SCOPE_POLICY = 'upstream-asset-source-v2-before-after-diff'
 
 
 def validate(ctx, row):
@@ -74,18 +75,35 @@ def diagnose(ctx, row):
         '原文未明确年龄、衣料、脸型等时允许现有美术设计，不因未提到判剧情错误。'
         '不把泛称合并成另一具名角色。年龄阶段、附体和换装不能当永久基础形态。'
         '核对此次字段与直接依赖，不提出额外剧情；不能凭Agent申请就默认缺陷成立。'
-        '有明确事实依据的design/image须给逐字source_quote；binding_shots仅给有源依据的原镜修正，'
-        '每项含index与现有入镜/说话人字段，不修改机位或事件；不能判断则uncertain。\n'
+        'design/image/binding的source_quote必须直接从source_text逐字拷贝，可沿用申请中已核实的source_quote；'
+        '不可把design、fields或你自己的诊断文字当作原文引文。binding_shots仅给有源依据的原镜修正，'
+        '每项含index；不修改的in_frame/listeners/speaker_map返回null，明确清空的列表才返回[]。'
+        'speaker_map用from/to对象数组表达，宿主再还原既有映射；不修改机位或事件；不能判断则uncertain。\n'
         +json.dumps({k:row[k] for k in ('source_text','source_quote','reason','role','name','fields','design','registered_owner')},ensure_ascii=False))
     answer=ask_json([{'type':'text','text':prompt},image_part(Path(row['picture']),1024)],
         obj({'kind':{'type':'string','enum':['binding','design','image','false_positive','uncertain']},
              'reason':{'type':'string'},'source_quote':{'type':'string'},
              'replacement_asset_id':{'type':'string'},
-             'binding_shots':{'type':'array','items':{'type':'object','additionalProperties':False,'required':['index'],'properties':{'index':{'type':'integer'},'in_frame':{'type':'array','items':{'type':'string'}},'speaker_map':{'type':'object','additionalProperties':{'type':'string'}},'listeners':{'type':'array','items':{'type':'string'}}}}}}),
+             'binding_shots':{'type':'array','items':obj({
+                 'index':{'type':'integer'},
+                 'in_frame':{'type':['array','null'],'items':{'type':'string'}},
+                 'speaker_map':{'type':['array','null'],'items':obj({'from':{'type':'string'},'to':{'type':'string'}})},
+                 'listeners':{'type':['array','null'],'items':{'type':'string'}}})}}),
         name='upstream_asset_diagnosis',max_tokens=1500,timeout=180,settings=judge_settings())
+    folder=ctx.episode_dir/'work/input_repairs/diagnostic_answers'/row['clip_id']
+    folder.mkdir(parents=True,exist_ok=True)
+    number=max((int(p.stem.split('-')[-1])for p in folder.glob('answer-*.json')),default=0)+1
+    atomic_write_json(folder/f'answer-{number:03d}.json',answer)
+    binding_shots=[]
+    for item in answer.get('binding_shots') or []:
+        patch={k:v for k,v in item.items() if v is not None}
+        if isinstance(patch.get('speaker_map'),list):
+            patch['speaker_map']={row['from']:row['to'] for row in patch['speaker_map']}
+        binding_shots.append(patch)
+    answer['binding_shots']=binding_shots
     quote=str(answer.get('source_quote') or '').strip()
     if answer['kind'] in {'design','image','binding'} and (not quote or quote not in row['source_text']):
-        raise UnsupportedInput('asset diagnosis lacks a verbatim source fact')
+        raise ValueError('asset diagnosis lacks a verbatim source fact')
     return {**row,**answer,'source_quote':quote or row['source_quote']}
 
 
@@ -115,7 +133,26 @@ def prepare(ctx, row):
     with path.with_suffix('.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX);record=read_json(path,record)
         if record.get('status')=='prepared':return record['result']
-        if record.get('status')=='rejected':raise UnsupportedInput(record['error'])
+        if (record.get('status')=='rejected' and not record.get('diagnosis')
+                and record.get('error')=='asset diagnosis lacks a verbatim source fact'
+                and record.get('resume_count',0)<1):
+            record['diagnosis_format_recovery']={'previous_status':'rejected','previous_error':record['error']}
+            record['status']='incomplete'
+            atomic_write_json(path,record)
+        if record.get('status')=='rejected':
+            if (record.get('step')=='source' and record.get('diagnosis')
+                    and record.get('source_scope_policy')!=SOURCE_SCOPE_POLICY):
+                # Recheck the same receipt after correcting its host-supplied scope;
+                # retain prior rejection and all continuation/input/video counters.
+                record.setdefault('source_scope_rechecks',[]).append({
+                    'previous_policy':record.get('source_scope_policy'),
+                    'previous_error':record.get('error'),
+                    'reason':'Source reviewer formerly received raw old shots without the required before/after diff'})
+                record.update(status='checking',source_scope_policy=SOURCE_SCOPE_POLICY)
+                record.pop('error',None)
+                atomic_write_json(path,record)
+            else:
+                raise UnsupportedInput(record['error'])
         if record.get('status')=='incomplete':
             if record.get('resume_count',0)>=1:raise UnsupportedInput('asset continuation used; preserve completed candidate')
             record['resume_count']=record.get('resume_count',0)+1
@@ -130,10 +167,26 @@ def prepare(ctx, row):
                 locations={diagnosis['name']:diagnosis['design']} if diagnosis['role']=='location' else {}
                 addresses={i for c in read_json(ctx.episode_dir/'clip_plan.json')['clips']
                            if c['clip_id']in checked['affected_clips'] for i in c.get('shot_indexes',[])}
-                scoped=[shot for i,shot in enumerate(read_json(ctx.episode_dir/'chapter_script.json')['shots'],1)
-                        if shot.get('index',i) in addresses]
+                from .input_repair import _source_review_shot_context
+                script=read_json(ctx.episode_dir/'chapter_script.json')
+                after_shots=script['shots']
+                patches=diagnosis.get('binding_shots') or []
+                if patches:
+                    from .input_candidate import prepare_candidate
+                    plan=read_json(ctx.episode_dir/'clip_plan.json')
+                    target=next(c for c in plan['clips'] if c['clip_id']==row['clip_id'])
+                    binding={'clip_id':row['clip_id'],'action':'input',
+                        'clip_ids':checked['affected_clips'],'reason':diagnosis['reason'],
+                        'source_quote':diagnosis['source_quote'],'shots':patches}
+                    prepared=prepare_candidate(ctx,binding,plan,script,target,addresses,
+                                               checked['affected_clips'],None)
+                    after_shots=prepared.compilation.shots
+                scoped=_source_review_shot_context(script['shots'],after_shots,addresses)
+                record['source_scope_policy']=SOURCE_SCOPE_POLICY
+                record['source_scope']=scoped
+                atomic_write_json(path,record)
                 record['source']=source_check(checked['source_text'],diagnosis['source_quote'],
-                    diagnosis.get('binding_shots') or [],phases,locations,scoped)
+                    patches,phases,locations,scoped)
                 outcome['source']=record['source'];atomic_write_json(path,record)
             if diagnosis['kind'] in {'image','design'}:
                 from .draft_assets import _asset
