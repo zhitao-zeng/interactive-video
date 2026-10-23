@@ -171,8 +171,14 @@ def rebuild_clips(episode_dir: Path, bible_path: Path, script: dict, plan: dict,
                 # Update recovered provenance without losing any runtime/cache
                 # mode (notably prompt_h3_skip) from the existing request.
                 kept = {**before, **{key: after[key] for key in ("shot_indexes", "shot_parts") if key in after}}
+                native_changed = kept != before
+                if after.get('music_delivery') == 'postmix':
+                    if 'external_music_cues' in after:
+                        kept['external_music_cues'] = copy.deepcopy(after['external_music_cues'])
+                    else:
+                        kept.pop('external_music_cues', None)
                 merged.append(kept)
-                if kept != before:
+                if native_changed:
                     changed.append(before["clip_id"])
                 continue
             merged.append({k: v for k, v in after.items() if k not in LANE_FIELDS})

@@ -48,7 +48,9 @@ def resolve(directory,policy,timeline):
         loop=row.get('loop',False)
         if type(loop)is not bool:raise ValueError('cue loop must be boolean')
         available=float(asset.get('selected_seconds')or media_duration(path))
-        if not loop and available+.02<end-start:raise ValueError('cue source range is shorter than actual cue; select more audio or explicitly loop')
+        if not loop and available+.02<end-start:
+            raise ValueError(f'music cue {row["id"]}: selected {available:g}s, but its resolved shot interval needs {end-start:.6f}s '
+                             f'({start:.6f} to {end:.6f}). Select a longer source range, or explicitly loop only if consistent with the music design.')
         cues.append({'id':row['id'],'asset_id':asset['id'],'asset_path':str(path),'asset':take_identity(path),
             'start':start,'end':end,'gain_db':gain,'fade_in_seconds':fade_in,'fade_out_seconds':fade_out,'loop':loop})
     if not cues or len({r['id']for r in cues})!=len(cues):raise ValueError('music needs nonempty distinct cue ids')

@@ -31,8 +31,22 @@ def build(ctx, directory, role, name, design):
     bible = bible.model_copy(update={'characters': [Character(name=name, **design)] if role == 'character' else [],
         'locations': [name+'：'+design] if role == 'location' else [], 'props': []})
     bible = styled_bible(bible, profile, ctx.novel_dir)
+    style_data = load_style(profile, ctx.novel_dir)
+    # The author declares this type in an existing Character field; never infer
+    # it from a name or transplant the traveller's identity into another actor.
+    if role == 'character' and str(design.get('visual_archetype') or '').startswith('非人动物'):
+        import copy
+        style_data = copy.deepcopy(style_data)
+        style_data.update({'render_direction': '保持本书已选媒介、光色和材质表现；当前动物的身体结构、体表与表情按本资产已审外貌呈现，不强制人类皮肤、发型、双手、站姿或现代衣服，也不抹去本资产已明确的相关特征。已审固定服装、饰物和持物照原字段保留，不自动增加或清空。', 'card_brief': '只呈现当前一个非人动物主体且只出现一次，完整本体及其已审固定构成清楚可辨；取景和朝向以能核对本资产已有解剖、体表、轮廓和固定特征为准，不预设肢体数量、眼睛数量、尾巴数量或体表种类。保留本资产字段明确的固定服装、饰物与持物。除已审设计明确属于该资产的固定构成外，不额外画人类主角、另一动物或剧情陪体；临时与谁同框、站在哪个包上等分镜状态不进入独立卡。纯色简洁背景，不画多视角、镜像、局部小头像或拼图。'})
+        style_data['visual_style'] = (str(style_data.get('render_family') or profile.get('render_family') or '')
+            + '：沿用本书已选媒介与材质；当前非人动物的独立身份仅按本资产已审外貌。')
+        style_data.setdefault('art_direction', {}).setdefault('asset_guidance', {})['character'] = ['当前素材的独立身份仅依据本资产已审外貌和类型；不将主角或其他角色的人脸、身体、衣服或参考图复制给它。', '尊重每个动物自己已审的解剖与体表，包括特殊肢体；不把某个动物的足、翼、眼或尾巴设计推广给其他动物。', '固定服装、饰物、持物依当前Character既有字段保留；没有相关设计时不凭空增加，也不在共用模板中一律禁止。', '定妆卡表达独立素材；剧情临时搭乘、站位或其他陪体留在分镜，不把主角与动物合成一张身份卡。']
+        if design.get('signature_prop'):
+            style_data['card_brief'] += '本资产已审固定持物：' + str(design['signature_prop']) + '。'
+        bible = bible.model_copy(update={'visual_style': style_data['visual_style'],
+                                        'palette': '以各世界原设定和本资产已审专属配色为准；本动物身份依据自己的已审设计，不使用其他角色作为它的人脸或身体来源。'})
     style = AssetStyle.for_genre(load_genre(profile), frame_text=frame['text'],
-                                style=load_style(profile, ctx.novel_dir), backend=image_backend(settings))
+                                style=style_data, backend=image_backend(settings))
     factory = FramedAssetFactory(settings, FramedPhanRouter(settings, frame), style=style)
     factory.build_selected(directory, bible, {'character_001'} if role == 'character' else set(),
         {'location_001'} if role == 'location' else set(), expressions=False, prop_ids=set())
