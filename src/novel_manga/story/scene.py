@@ -126,7 +126,12 @@ def resolve_scene(script: dict | ResolvedScene, context: SceneContext) -> Resolv
     # receive the carried prop, so a spoken-about person earns no reference.
     wearing = {}
     for shot in shots:
-        wearing.update(shot.get('wears') or {})
+        # A supplied empty/null wears field explicitly clears the carried state;
+        # an omitted field alone inherits it. This is the existing input contract.
+        if 'wears' in shot and not shot['wears']:
+            wearing.clear()
+        else:
+            wearing.update(shot.get('wears') or {})
         visible = set(shot.get('characters') or []) | set(shot.get('listeners') or []) | set(shot.get('in_frame') or [])
         carried = {name: item for name, item in wearing.items() if name in visible}
         if carried:

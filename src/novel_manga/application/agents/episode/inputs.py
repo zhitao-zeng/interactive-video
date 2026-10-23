@@ -232,6 +232,7 @@ def _catalog(ctx, references, *, fresh=False):
             local = ctx.novel_dir/original
             if local.is_file():
                 source = local
+        target_existed = target.is_file()
         copied = _snapshot_file(ctx, source, relative) if fresh else _copy(source, target)
         if not copied:
             missing.append({'role': ref['role'], 'name': ref.get('name'), 'path': str(original),
@@ -239,11 +240,15 @@ def _catalog(ctx, references, *, fresh=False):
             continue
         if fresh:
             target = local_target
-            for suffix in ('.request.json', '.task.json'):
+            for suffix in ('.request.json', '.task.json', '.origin.json'):
                 sidecar = source.with_name(source.name + suffix)
                 _snapshot_file(ctx, sidecar, relative.with_name(relative.name + suffix))
             if ref['role'] == 'character':
                 _snapshot_file(ctx, source.parent / 'spec.json', relative.parent / 'spec.json')
+        elif not target_existed:
+            # Imported image scope is part of the frozen asset, not its filename.
+            _copy(source.with_name(source.name + '.origin.json'),
+                  target.with_name(target.name + '.origin.json'))
         ident = str(ref.get('id') or ref.get('asset_id') or source.stem)
         if ident in ids:
             ident = f'{ident}_{source.stem}'
