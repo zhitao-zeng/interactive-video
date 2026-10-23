@@ -386,7 +386,7 @@ def reviewed_delivery(runner,report,destination):
     from novel_manga.application.review.final_cut import review_assembly
     from novel_manga.util import read_json
     destination=Path(destination)
-    pending={**report,'quality_review':{**report.get('quality_review',{}),'passed':False}}
+    pending={**report,'quality_review':{**report.get('quality_review',{}),'passed':False,'content_passed':False}}
     inputs=export_context(runner,report)
     receipt=read_json(destination/'delivery.json',{})
     if receipt.get('export_context')!=inputs or not Path(receipt.get('final_video','')).is_file():
@@ -401,6 +401,8 @@ def reviewed_delivery(runner,report,destination):
     if not receipt.get('final_video'):
         return {'movie':str(Path(destination)/'episode01.mp4'),'complete':False,'passed':False,
                 'issues':[],'frames':[],'errors':['No current assembled movie available for delivered review']}
+    # Final acceptance belongs to finish_reviewed_delivery after visual and audio gates.
+    receipt.update(status='candidate',content_passed=False)
     final=review_assembly(runner,report,receipt=receipt)
     final['final_audio_review_required'] = True
     receipt['final_audio_review_required'] = True
