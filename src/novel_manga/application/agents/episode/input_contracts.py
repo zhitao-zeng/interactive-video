@@ -10,7 +10,7 @@ from novel_manga.application.identity.phases import LOOK_FIELDS
 SHOT_NAMES = {'in_frame', 'extras', 'listeners'}
 SHOT_FIELDS = {'location', 'light', 'camera', 'shot_scale', 'scene_id', 'scene_time', 'scene_transition',
                'wears', 'props', 'scene_objects', 'visual_prompt', 'motion_prompt',
-               'start_state', 'event', 'end_state', 'sfx', 'actions', 'speaker_map', 'turn_texts', 'turns','opening_frame', *SHOT_NAMES}
+               'start_state', 'event', 'end_state', 'sfx', 'actions', 'speaker_map', 'turn_texts', 'turns','opening_frame', 'audio_plan', *SHOT_NAMES}
 
 
 
@@ -47,7 +47,12 @@ def normalize_arguments(row):
         if extra := set(patch)-{'index'}-SHOT_FIELDS:
             raise RepairArgumentError(f'{path} unsupported fields {sorted(extra)}; allowed: {sorted(SHOT_FIELDS)}')
         for field, value in patch.items():
-            if field=='opening_frame':
+            if field=='audio_plan':
+                if (not isinstance(value,dict) or not value
+                        or set(value)-{'music_cue','entry','withdrawal'}
+                        or any(v is not None and not isinstance(v,str) for v in value.values())):
+                    raise RepairArgumentError(f'{path}.audio_plan supports postmix music_cue/entry/withdrawal text or null only; native sound and voice fields are not changed here')
+            elif field=='opening_frame':
                 from novel_manga.story.fields import opening_frame_error
                 if issue:=opening_frame_error(value):raise RepairArgumentError(issue)
             elif field == 'turns':
@@ -115,8 +120,8 @@ def normalize_arguments(row):
             raise RepairArgumentError('characters must map missing source actors to appearance/wardrobe designs')
         for name, design in characters.items():
             if (not isinstance(name, str) or not name.strip() or not isinstance(design, dict)
-                    or set(design)-{'gender', 'age', 'appearance', 'wardrobe'}):
-                raise RepairArgumentError('characters must describe named source actors using gender, age, appearance, wardrobe')
+                    or set(design)-{'gender', 'age', 'appearance', 'wardrobe', 'visual_archetype'}):
+                raise RepairArgumentError('characters must describe named source actors using gender, age, appearance, wardrobe, visual_archetype')
             try:
                 Character(name=name, **design)
             except ValueError as error:

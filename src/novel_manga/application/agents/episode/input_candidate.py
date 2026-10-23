@@ -44,7 +44,10 @@ def prepare_candidate(ctx, row, plan, script, target, addresses, scope, matching
             from .speech_budget import compress_turns
             dependent = [c for c in plan['clips'] if index in c.get('shot_indexes', [])]
             shots[index]['turns'] = compress_turns(ctx.input_mode, shots[index], patch['turn_texts'], dependent)
-        shots[index].update({k: copy.deepcopy(v) for k, v in patch.items() if k not in {'index', 'speaker_map', 'turn_texts'}})
+        updates={k:copy.deepcopy(v)for k,v in patch.items()if k not in {'index','speaker_map','turn_texts'}}
+        if 'audio_plan' in updates:
+            updates['audio_plan']={**(shots[index].get('audio_plan')or{}),**updates['audio_plan']}
+        shots[index].update(updates)
         for turn in shots[index].get('turns', []):
             if turn.get('speaker_name') in speaker_map:
                 turn['speaker_name'] = speaker_map[turn['speaker_name']]

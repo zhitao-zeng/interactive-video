@@ -310,6 +310,18 @@ class RepairOperations:
             record = history.load(directory)
             record['trials'][-1]['managed'] = True
             history.save(directory, record)
+            # Before first adoption, render still reads this initial draft.
+            # Keep its accepted edits in sync without reviving it after adoption.
+            if (self.ctx.input_mode == 'script'
+                    and not (self.ctx.run_dir/'prepared.json').is_file()
+                    and not media_started(directory)):
+                draft_path = self.ctx.work_dir/'output/requests.json'
+                draft = read_json(draft_path, {})
+                if isinstance(draft.get('prompts'), dict):
+                    current = {c['clip_id']: c for c in candidate['clips']}
+                    for cid in changed:
+                        draft['prompts'][cid] = current[cid]['prompt_h3']
+                    atomic_write_json(draft_path, draft)
         return {'changed': changed, 'accepted': kept, 'blocked': blocked, 'risk_accepted': risk_accepted,
                 'unresolved_clips':unresolved_clips,
                 **({'argument_errors': argument_errors} if argument_errors else {}),
