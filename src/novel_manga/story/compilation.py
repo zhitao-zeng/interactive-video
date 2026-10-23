@@ -427,7 +427,19 @@ class ClipCompiler:
         """
         listed: list[str] = []
         active: set[str] = set()
+        offscreen_speakers: set[str] = set()
+        other_delivery_speakers: set[str] = set()
+        visible_presence: set[str] = set()
         for shot in clip["shots"]:
+            visible_presence.update(shot.get("in_frame") or [])
+            visible_presence.update(shot.get("listeners") or [])
+            for turn in shot["turns"]:
+                name = turn.get("speaker_name")
+                if name:
+                    if turn.get("delivery_mode") == "offscreen_dialogue":
+                        offscreen_speakers.add(name)
+                    else:
+                        other_delivery_speakers.add(name)
             explicit = shot.get("in_frame") or []
             active.update(explicit)
             # A listener is on camera - framing turned them around, it did not send them home - so the
@@ -456,6 +468,16 @@ class ClipCompiler:
                     active.add(turn["speaker_name"])
                     if turn["speaker_name"] not in listed:
                         listed.append(turn["speaker_name"])
+        # An explicitly offscreen-only speaker is an audio identity, even if
+        # an older source characters list or picture prose still names it.
+        # Any authored visible presence in this clip keeps the actor's card.
+        voice_only = offscreen_speakers - other_delivery_speakers - visible_presence
+        if voice_only:
+            listed = [name for name in listed if name not in voice_only]
+            active.difference_update(voice_only)
+            if "background_only" in clip:
+                clip["background_only"] = [name for name in clip["background_only"]
+                                           if name not in voice_only]
         if len(listed) <= 2:
             return listed
         kept = [name for name in listed if name in active]
