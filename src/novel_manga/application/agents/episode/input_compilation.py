@@ -65,6 +65,26 @@ def compile_input(case: InputCompilation, receipt, record, progress) -> Compiled
     candidate, changed = rebuild_clips(directory, ctx.novel_dir/'story_bible.json', candidate_script, plan, targets,
                                       repack_report=structural, preserve_timing=True,
                                       **({'source_checked_turns':source_checked_turns} if source_checked_turns else {}))
+    music_only=(bool(patches) and not(phases or locations or characters)
+        and all(set(p)=={'index','audio_plan'} and isinstance(p['audio_plan'],dict)
+                and p['audio_plan'] and not(set(p['audio_plan'])-{'music_cue','entry','withdrawal'})
+                for p in patches))
+    if music_only:
+        if record.get('source',{}).get('consistent') is not True:
+            raise ValueError('postmix metadata requires the normal source review')
+        if changed or any(c.get('music_delivery')!='postmix'for c in candidate['clips']if c['clip_id']in targets):
+            raise ValueError('postmix metadata must not alter native requests or native music delivery')
+        # This publication changes only the source's postmix labels. Preserve
+        # every native request, reference, repair counter and cache identifier.
+        old_native=copy.deepcopy(plan);new_native=copy.deepcopy(candidate)
+        for native in (old_native,new_native):
+            for c in native['clips']:c.pop('external_music_cues',None)
+        if old_native!=new_native:
+            raise ValueError('postmix metadata changed protected native plan fields')
+        proposal=RepairProposal(result={'changed':[],'postmix_metadata_only':True},
+            script=candidate_script,plan=candidate,
+            notes=read_json(directory/'review_feedback.json',{}),changes={cid:row})
+        return CompiledInput(proposal,candidate,[])
     from novel_manga.media.first_frames import enabled, matches_current_contract
     frame_mode=enabled(ctx)
     if frame_mode:
