@@ -719,19 +719,26 @@ class Store:
             ).fetchone()
             if shot is None or shot["frame_request_hash"] != expected_frame_request_hash:
                 raise ValueError("expected_frame_request_hash does not match current shot")
-            frame = connection.execute(
-                """
-                SELECT * FROM artifacts
-                WHERE id = ? AND kind = 'frame' AND sha256 = ? AND input_hash = ?
-                """,
-                (
-                    shot["current_frame_artifact_id"],
-                    expected_frame_hash,
-                    expected_frame_request_hash,
-                ),
-            ).fetchone()
-            if frame is None:
-                raise ValueError("expected_frame_hash does not match the current accepted frame")
+            if expected_frame_hash is None:
+                # reference mode: no accepted frame is bound to this shot
+                if shot["current_frame_artifact_id"] is not None:
+                    raise ValueError(
+                        "reference mode cannot adopt a shot that already has an accepted frame"
+                    )
+            else:
+                frame = connection.execute(
+                    """
+                    SELECT * FROM artifacts
+                    WHERE id = ? AND kind = 'frame' AND sha256 = ? AND input_hash = ?
+                    """,
+                    (
+                        shot["current_frame_artifact_id"],
+                        expected_frame_hash,
+                        expected_frame_request_hash,
+                    ),
+                ).fetchone()
+                if frame is None:
+                    raise ValueError("expected_frame_hash does not match the current accepted frame")
             if shot["video_request_hash"] != video_request_hash:
                 updated = connection.execute(
                     """
