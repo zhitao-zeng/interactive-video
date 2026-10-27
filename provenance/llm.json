@@ -63,7 +63,7 @@
     },
     {
       "path": "src/clean_studio/frozen/llm.py",
-      "sha256": "52e49d9427c2392954f90288cf2c27c0276e287d447e488c5281f809df57e6c0",
+      "sha256": "f62daa0a30ab0048d79372bc008fd44f579da4e7165bab72d04b62655e50a826",
       "sources": [
         "client",
         "codex",

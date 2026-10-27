@@ -58,7 +58,7 @@
     },
     {
       "path": "src/clean_studio/cli.py",
-      "sha256": "dcef33d5aa5774064bed1cc6f846a16662dce8122433b9adf020fca5acd2a87e",
+      "sha256": "d2cdba2784d51cda21b84ceaa9e29f821107b5efc4bca4bf25209b4d585bbc06",
       "sources": [
         "publication_worker"
       ]

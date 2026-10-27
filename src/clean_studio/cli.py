@@ -11,7 +11,7 @@ import subprocess
 
 from clean_studio.acceptance import AcceptedExport, accept_export
 from clean_studio.agents.authoring import Author
-from clean_studio.agents.codex import CodexClient
+from clean_studio.agents.codex import CodexClient, HttpJsonClient
 from clean_studio.agents.review import Reviewer
 from clean_studio.frozen.llm import image_part
 from clean_studio.frozen.music import file_sha256
@@ -44,6 +44,17 @@ def _resolve(root, value):
 
 
 def _codex(config, root):
+    llm = config.get("llm")
+    if isinstance(llm, dict) and llm.get("base_url"):
+        import os
+
+        key = os.environ.get(llm.get("api_key_env", ""), "")
+        return HttpJsonClient(
+            model=llm.get("model", "kimi-k3"),
+            base_url=llm["base_url"],
+            api_key=key,
+            reasoning=llm.get("reasoning", "low"),
+        )
     return CodexClient(
         root=root,
         model=config.get("model", "gpt-5.6-luna"),

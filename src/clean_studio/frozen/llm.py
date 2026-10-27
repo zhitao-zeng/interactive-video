@@ -72,6 +72,24 @@ def _new_work_dir() -> Path:
     return root / ".runtime/clean-codex" / f"json-{uuid.uuid4()}"
 
 
+def http_completion(payload: dict, settings: "JsonEndpoint", *, timeout: float, client=None) -> dict:
+    """OpenAI-compatible chat completions over HTTP (official k3/ds41 gateway)."""
+    import httpx
+
+    if not settings.endpoints:
+        raise ValueError("HTTP JSON endpoint requires a base URL")
+    url = settings.endpoints[0].rstrip("/") + "/chat/completions"
+    headers = {"Authorization": f"Bearer {settings.key}"} if settings.key else {}
+    client = client or httpx.Client(timeout=timeout, trust_env=False)
+    try:
+        response = client.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        return response.json()
+    finally:
+        if client is not None:
+            client.close()
+
+
 def ask_json(
     parts: list[dict],
     schema: dict,
@@ -87,8 +105,9 @@ def ask_json(
     sandbox=None,
 ) -> dict:
     settings = settings or JsonEndpoint.from_env()
-    if list(settings.endpoints) != ["codex://local"]:
-        raise ValueError("Clean frozen Task 3 adapter only supports codex://local")
+    http_mode = bool(settings.endpoints) and settings.endpoints[0].startswith("http")
+    if not http_mode and list(settings.endpoints) != ["codex://local"]:
+        raise ValueError("Clean frozen adapter supports codex://local or an HTTP endpoint")
     payload = {
         "model": settings.model,
         "temperature": 0,
@@ -118,13 +137,16 @@ def ask_json(
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             raise TimeoutError(f"{name}: request budget exhausted")
-        body = completion(
-            payload,
-            timeout=remaining,
-            work_dir=request_work_dir,
-            resume=resume or retry > 0,
-            sandbox=sandbox,
-        )
+        if http_mode:
+            body = http_completion(payload, settings, timeout=remaining)
+        else:
+            body = completion(
+                payload,
+                timeout=remaining,
+                work_dir=request_work_dir,
+                resume=resume or retry > 0,
+                sandbox=sandbox,
+            )
         choice = body["choices"][0]
         content = choice["message"].get("content") or ""
         if choice.get("finish_reason") == "length":

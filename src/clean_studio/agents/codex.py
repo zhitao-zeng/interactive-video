@@ -15,6 +15,49 @@ class CodexSession:
     started: bool = False
 
 
+class HttpJsonClient:
+    """Same ask_json surface as CodexClient, backed by an official OpenAI-compatible
+    HTTP endpoint (official-k3 / official-ds41). Sessions are stateless: resume
+    semantics degrade to a fresh call with the same parts."""
+
+    def __init__(self, *, model, base_url, api_key="", reasoning="low"):
+        from clean_studio.frozen.llm import JsonEndpoint
+
+        self.settings = JsonEndpoint(
+            model=model,
+            endpoints=(base_url.rstrip("/"),),
+            key=api_key,
+            reasoning=reasoning,
+        )
+
+    def create_session(self, prefix="json"):
+        return CodexSession(Path(f"http-{prefix}-stateless"))
+
+    def ask_json(
+        self,
+        parts,
+        schema,
+        *,
+        name,
+        max_tokens=700,
+        timeout=600.0,
+        retry_truncated=True,
+        session=None,
+        **options,
+    ):
+        from clean_studio.frozen.llm import ask_json
+
+        return ask_json(
+            parts,
+            schema,
+            name=name,
+            max_tokens=max_tokens,
+            timeout=timeout,
+            retry_truncated=retry_truncated,
+            settings=self.settings,
+        )
+
+
 class CodexClient:
     def __init__(
         self,

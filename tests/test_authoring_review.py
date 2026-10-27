@@ -313,6 +313,71 @@ def context(tmp_path):
     return source, references, _episode(source)
 
 
+def test_http_completion_posts_openai_format_with_attachments():
+    import json as _json
+
+    import httpx
+
+    from clean_studio.frozen.llm import JsonEndpoint, http_completion
+
+    captured = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["url"] = str(request.url)
+        captured["auth"] = request.headers.get("Authorization")
+        captured["body"] = _json.loads(request.content)
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": "ok"}, "finish_reason": "stop"}]},
+        )
+
+    settings = JsonEndpoint(
+        model="kimi-k3",
+        endpoints=("https://example.invalid/phanrouter",),
+        key="test-key",
+    )
+    body = http_completion(
+        {"model": "kimi-k3", "messages": [{"role": "user", "content": [
+            {"type": "text", "text": "hi"},
+            {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64,AAAA"}},
+        ]}]},
+        settings,
+        timeout=5,
+        client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+    assert body["choices"][0]["message"]["content"] == "ok"
+    assert captured["url"] == "https://example.invalid/phanrouter/chat/completions"
+    assert captured["auth"] == "Bearer test-key"
+    parts = captured["body"]["messages"][0]["content"]
+    assert any(part.get("type") == "image_url" for part in parts)
+
+
+def test_http_json_client_routes_settings_into_frozen_ask_json(monkeypatch):
+    from clean_studio.agents.codex import HttpJsonClient
+    from clean_studio.frozen import llm as llm_module
+
+    seen = {}
+
+    def fake_ask_json(parts, schema, *, name, **options):
+        seen["settings"] = options.get("settings")
+        seen["name"] = name
+        return {"ok": True}
+
+    monkeypatch.setattr(llm_module, "ask_json", fake_ask_json)
+    client = HttpJsonClient(
+        model="kimi-k3",
+        base_url="https://example.invalid/phanrouter/",
+        api_key="test-key",
+        reasoning="low",
+    )
+    result = client.ask_json([{"type": "text", "text": "hi"}], {}, name="probe")
+    assert result == {"ok": True}
+    settings = seen["settings"]
+    assert settings.model == "kimi-k3"
+    assert settings.endpoints == ("https://example.invalid/phanrouter",)
+    assert settings.key == "test-key"
+
+
 def test_author_start_returns_complete_episode_with_source_text_and_real_images(context):
     source, references, expected = context
     client = FakeClient([_episode_payload(expected)])
