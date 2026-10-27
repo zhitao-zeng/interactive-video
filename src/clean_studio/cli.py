@@ -184,9 +184,13 @@ class CodexVideoReviewer:
         }
         facts = {
             "instruction": (
-                "Review only this current shot's actual sampled frames against its H3 request, "
-                "source action/end state, technical decode and ASR. Report only explicit "
-                "contradictions; this is not final-film visual or complete-audio acceptance."
+                "Review only this current shot's sampled frames against the H3 request, source"
+                " action/end state, decode and ASR. Watchability bar — report only what makes a"
+                " viewer stumble: the person becomes someone else (gender/age), the core action"
+                " runs opposite to the request or a key plot event is missing, frames are broken"
+                " / black / severely distorted, or speech clearly diverges from the lines."
+                " Outfit color, styling, composition and minor wording differences are NOT"
+                " findings. This is not final-film visual or complete-audio acceptance."
             ),
             "shot_id": request.shot_id,
             "request": request.prompt,
