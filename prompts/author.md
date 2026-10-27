@@ -20,7 +20,7 @@
 
 音乐：
 - music_cues 在镜头时长确定后填写，使用实际正文时间线（各镜 duration_seconds 累计），不含宿主 3 秒片尾；每条满足 0 ≤ start < end ≤ 正文总秒数，按时间顺序排列。
-- 修订任何镜头时长后必须同步重校验并调整 music_cues；当前修订授权不含音乐字段时，若失配则明确失败返回，不得越权修改。
+- 修订任何镜头时长后必须同步重校验并调整 music_cues。轻微越界的 cue 宿主会截断到正文范围（host 片尾不计入），但应尽量按正文时间线填写；当前修订授权不含音乐字段时不得主动改写音乐。
 
 主体与引用：
 - 只使用已注册 subject_id。reference_subjects 只能引用 REGISTERED SUBJECTS 中 bound_reference_images 大于 0 的 subject，且 character 必须同时出现在该镜 visible_characters；没有绑定参考图的角色只能出现在 visible_characters。风格附件只约束色光、材质和渲染，不是 subject。

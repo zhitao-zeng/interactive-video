@@ -632,6 +632,23 @@ def test_review_relation_may_quote_an_array_element(context):
         raise AssertionError("array quote absent from elements must not ground")
 
 
+def test_author_draft_with_oversized_music_cues_is_clamped_to_body(context):
+    source, references, expected = context
+    invalid = _episode_payload(expected)
+    body = sum(shot["duration_seconds"] for shot in invalid["shots"])
+    invalid["music_cues"] = [
+        {"start_seconds": body - 5, "end_seconds": body + 20, "mood": "m", "soundscape": "s"}
+    ]
+    client = FakeClient([invalid])
+    author = Author(source, references, client)
+
+    episode = author.start()
+
+    cue = episode.music_cues[-1]
+    assert cue.end_seconds == body
+    assert cue.start_seconds == body - 5
+
+
 def test_review_finding_null_optionals_behave_as_absent(context):
     source, references, episode = context
     sources = _review_sources(source, references)

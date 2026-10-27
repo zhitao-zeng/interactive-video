@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from copy import deepcopy
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from hashlib import sha256
 import json
 import math
@@ -205,6 +205,19 @@ def _parse_episode(raw, source, references) -> EpisodeSpec:
             ),
             music_cues=tuple(MusicCue(**cue) for cue in raw["music_cues"]),
         )
+        body = sum(shot.duration_seconds for shot in episode.shots)
+        clamped = []
+        for cue in episode.music_cues:
+            end = min(cue.end_seconds, body)
+            start = min(cue.start_seconds, max(0, end - 1))
+            clamped.append(
+                cue if (cue.start_seconds, cue.end_seconds) == (start, end)
+                else replace(cue, start_seconds=start, end_seconds=end)
+            )
+        if len(clamped) != len(episode.music_cues) or any(
+            a is not b for a, b in zip(clamped, episode.music_cues)
+        ):
+            episode = replace(episode, music_cues=tuple(clamped))
         validate_episode(episode, source, references)
         return episode
     except AuthorProtocolError:
