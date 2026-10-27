@@ -225,7 +225,9 @@ def _ordered_music(episode: EpisodeSpec, accepted_music) -> tuple[AcceptedMusic,
             None,
         )
         if index is None:
-            raise ValueError("an authored music cue has no accepted actual-audition music")
+            # no auditioned track cleared the content bar for this cue: the segment
+            # plays with native audio only (silent-cue degradation, recorded upstream)
+            continue
         ordered.append(remaining.pop(index))
     if remaining:
         raise ValueError("accepted music contains an unauthored or duplicate cue")

@@ -958,11 +958,20 @@ class Pipeline:
         if stored is not None:
             return stored
         accepted = []
+        skipped = []
         for cue in self._stage_spec().music_cues:
             candidates = search_music(cue, provider=self._service("music_provider"))
             if not candidates:
-                raise _StageBlock("music search returned no candidates", "resume MUSIC")
-            accepted.append(self._select_music(cue, candidates))
+                # nothing playable in the local catalogue for this cue: silent segment
+                skipped.append(asdict(cue))
+                continue
+            try:
+                accepted.append(self._select_music(cue, candidates))
+            except ValueError as error:
+                if "did not adopt an actually auditioned candidate" not in str(error):
+                    raise
+                # auditioned candidates all failed the content bar: silent segment
+                skipped.append(asdict(cue))
         input_hash = self._music_input()
         operation = self.store.begin_operation(
             f"music:{input_hash}", "music", input_hash, None
@@ -970,7 +979,10 @@ class Pipeline:
         if operation.status != "completed":
             self.store.complete_operation(
                 operation.id,
-                metadata={"accepted_music": [_json(asdict(row)) for row in accepted]},
+                metadata={
+                    "accepted_music": [_json(asdict(row)) for row in accepted],
+                    "skipped_cues": skipped,
+                },
             )
         return tuple(accepted)
 

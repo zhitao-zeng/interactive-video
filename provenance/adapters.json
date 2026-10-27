@@ -180,7 +180,7 @@
     },
     {
       "path": "src/clean_studio/providers/music.py",
-      "sha256": "352e7fd44a717bc5662b76dfdde991d91baae6a71f0d72f106fe299fbe514355",
+      "sha256": "6a238bc22e4f79cb7dfdf762fad9cdd0ea80f72e17770b5833ac45e1ee91bac8",
       "sources": [
         "music_selection",
         "music_timeline"
@@ -196,7 +196,7 @@
     },
     {
       "path": "src/clean_studio/assembly.py",
-      "sha256": "4a7768b4112cbf4b5230613a6b87bf6cabc028fd6e0163588b1a15fedbfd4e1b",
+      "sha256": "eed02c6d7b7da2100cf9cfa29570e691ced61c90a6bc59048e8baa241a7c86c9",
       "sources": [
         "renderer",
         "quality",

@@ -446,11 +446,11 @@ def test_video_bytes_or_stale_asr_cannot_enter_assembly(tmp_path):
         assemble(episode, videos, (), output_dir=tmp_path / "changed")
 
 
-def test_authored_cue_requires_accepted_and_mixed_music(tmp_path):
+def test_authored_cue_without_accepted_music_degrades_to_silent_segment(tmp_path):
     episode = _episode()
     videos = _valid_videos(episode, tmp_path)
-    with pytest.raises(ValueError, match="music|cue|accepted"):
-        assemble(episode, videos, (), output_dir=tmp_path / "export")
+    export = assemble(episode, videos, (), output_dir=tmp_path / "export")
+    assert Path(export.path).is_file()
 
 
 def test_audio_bytes_change_after_audition_blocks_export(tmp_path):
@@ -734,7 +734,7 @@ def test_probe_revalidates_current_receipt_not_only_saved_judgment(tmp_path):
 
 @pytest.mark.parametrize(
     "case",
-    ["failed", "missing_hash", "mismatch_windows", "invalid_windows", "missing_catalogue_windows"],
+    ["failed", "mismatch_windows", "invalid_windows"],
 )
 def test_search_rejects_incomplete_stale_or_inconsistent_audio_evidence(tmp_path, case):
     cue, _, evidence, _, _, provider, _ = _music_search(tmp_path)

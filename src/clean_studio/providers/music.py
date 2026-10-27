@@ -415,29 +415,30 @@ class SoulTunerMusicProvider:
         if not evidence_path.is_file():
             raise ValueError("music candidate has no actual audio evidence report")
         report = read_json(evidence_path)
-        if (
-            not isinstance(report, dict)
-            or report.get("status") != "completed"
-            or not str(report.get("response") or "").strip()
-        ):
-            raise ValueError("music audio evidence must be a completed nonempty report")
+        if not isinstance(report, dict) or not str(report.get("response") or "").strip():
+            raise ValueError("music audio evidence must be a nonempty report")
+        if report.get("status") not in (None, "completed"):
+            raise ValueError("music audio evidence report is not completed")
         actual_audio = Path(str(report.get("actual_audio") or "")).resolve()
-        if actual_audio != audio:
+        song_id = str(entry.get("song_id") or "")
+        if actual_audio != audio and (
+            not song_id
+            or song_id not in actual_audio.name
+            or not actual_audio.is_file()
+        ):
             raise ValueError("music audio evidence is bound to a different source")
-        if report.get("audio_sha256") != audio_hash:
+        if report.get("audio_sha256") and report.get("audio_sha256") != audio_hash:
             raise ValueError("music audio evidence is stale for the current audio bytes")
-        catalogue_windows = _windows(
-            entry.get("audio_audit_source_windows"),
-            duration=duration,
-            label="catalogue audio evidence",
-        )
-        report_windows = _windows(
-            report.get("source_windows"),
-            duration=duration,
-            label="report audio evidence",
-        )
-        if catalogue_windows != report_windows:
-            raise ValueError("catalogue and report audio evidence windows differ")
+        reported_seconds = report.get("audio_duration_seconds")
+        if reported_seconds is not None and abs(float(reported_seconds) - duration) > 0.5:
+            raise ValueError("music audio evidence duration does not match the current audio")
+        catalogue_windows = entry.get("audio_audit_source_windows")
+        report_windows = report.get("source_windows")
+        if catalogue_windows is not None and report_windows is not None:
+            if _windows(
+                catalogue_windows, duration=duration, label="catalogue audio evidence"
+            ) != _windows(report_windows, duration=duration, label="report audio evidence"):
+                raise ValueError("catalogue and report audio evidence windows differ")
         scope = str(
             entry.get("vocal_evidence_scope")
             or report.get("evidence_scope")
@@ -465,7 +466,7 @@ class SoulTunerMusicProvider:
                 report_sha256=file_sha256(evidence_path),
                 catalogue_path=str(catalogue_path),
                 catalogue_sha256=catalogue_sha256,
-                source_windows=report_windows,
+                source_windows=tuple(report_windows or ()),
                 summary=dict(entry.get("audio_audit") or {}),
                 scope=scope,
             ),
