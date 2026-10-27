@@ -790,9 +790,9 @@ def _h3_prompt(
                 )
     if shot.dialogue:
         lines.append(
-            "DIALOGUE (speak every Chinese line verbatim, exactly once, in the listed"
-            " order, by its speaker; the English ACTION describes the same process —"
-            " do not add, drop, translate or reorder speech):"
+            "DIALOGUE — THE ONLY SPOKEN AUDIO IN THIS SHOT. Speak every Chinese line"
+            " verbatim, exactly once, in the listed order, by its speaker. Do not add,"
+            " drop, translate or reorder speech:"
         )
         lines.extend(f"{line.speaker}: {line.line}" for line in shot.dialogue)
     else:
@@ -800,12 +800,9 @@ def _h3_prompt(
     lines.extend(
         [
             f"DURATION: exactly {shot.duration_seconds} seconds.",
-            "SOURCE SEGMENTS (host trace; preserve their source events without additions or omissions): "
-            + ", ".join(shot.source_segments),
-            "SOURCE ACTION (authoritative Chinese trace; preserve against the English action):",
-            shot.action,
-            "SOURCE END STATE (authoritative Chinese trace; preserve against the English end state):",
-            shot.end_state,
+            "NARRATION RULE: nothing outside the DIALOGUE block is ever spoken — no"
+            " voice-over, no narration, no self-talk, no subtitles read aloud. All"
+            " other text in this prompt is staging description for visuals only.",
         ]
     )
     return "\n".join(lines)

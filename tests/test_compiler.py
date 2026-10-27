@@ -217,10 +217,11 @@ def test_opening_and_h3_preserve_temporal_boundary_dialogue_and_trace(episode, r
     assert "exactly once" in compiled.h3_prompt
     assert "C02 enters from the pier" in compiled.h3_prompt
     assert "把船灯递给我，别松手。" in compiled.h3_prompt
-    assert "S1/flow/0" in compiled.h3_prompt
     assert "9 seconds" in compiled.h3_prompt
-    assert episode.shots[0].action in compiled.h3_prompt
-    assert episode.shots[0].end_state in compiled.h3_prompt
+    assert "THE ONLY SPOKEN AUDIO" in compiled.h3_prompt
+    assert "NARRATION RULE" in compiled.h3_prompt
+    assert episode.shots[0].action not in compiled.h3_prompt
+    assert episode.shots[0].end_state not in compiled.h3_prompt
     assert compiled.source_segments == ("S1/flow/0",)
     assert compiled.dialogue == episode.shots[0].dialogue
     assert len(translator.fidelity_calls) == 1
