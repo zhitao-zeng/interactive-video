@@ -588,18 +588,20 @@ def _opening(
     return "\n".join(lines)
 
 
-def _translation_input(shot: Shot, opening: str) -> dict:
-    return {
+def _translation_input(shot: Shot, opening: str, *, include_camera: bool = False) -> dict:
+    payload = {
         "shot_id": shot.shot_id,
         "source_segments": list(shot.source_segments),
         "opening": opening,
         "action": shot.action,
         "end_state": shot.end_state,
-        "camera": shot.camera,
-        "shot_scale": shot.shot_scale,
         "dialogue": [asdict(line) for line in shot.dialogue],
         "duration_seconds": shot.duration_seconds,
     }
+    if include_camera:
+        payload["camera"] = shot.camera
+        payload["shot_scale"] = shot.shot_scale
+    return payload
 
 
 def _parse_translation(raw: object) -> _Translation:
@@ -630,7 +632,7 @@ def _review_translation(
         raise ValueError("a typed H3 translation fidelity reviewer is required")
     payload = {
         "task": "fidelity_review",
-        "source": _translation_input(shot, opening),
+        "source": _translation_input(shot, opening, include_camera=True),
         "translation": asdict(translated),
     }
     raw = reviewer.ask_json(

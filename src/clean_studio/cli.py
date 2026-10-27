@@ -449,6 +449,8 @@ def build_real_services(
         "model": config.get("model", "gpt-5.6-luna"),
         "effort": config.get("effort", "low"),
     }
+    if models.get("llm"):
+        codex_config = {**codex_config, "llm": models["llm"]}
     if source is None:
         source = load_source(_resolve(root, config["source_archive"]))
     if references is None:
