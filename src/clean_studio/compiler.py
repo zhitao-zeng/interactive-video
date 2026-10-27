@@ -586,6 +586,10 @@ def _opening(
             "人物锚定（仅限 opening_characters 声明的首帧入画者，与附件同源的文字约束）：\n"
             + "\n".join(anchors)
         )
+    lines.append(
+        "【物件唯一性】起始状态写在人物之外位置（水面/地面/他人手中）的随身物件："
+        "画面中只画一只，且不要画在任何人物身上。"
+    )
     return "\n".join(lines)
 
 

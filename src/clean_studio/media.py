@@ -23,7 +23,7 @@ from clean_studio.providers.asr import evaluate_speech
 from clean_studio.store import Store
 
 
-FRAME_REVIEW_POLICY = "clean-first-frame-watchability-v5"
+FRAME_REVIEW_POLICY = "clean-first-frame-watchability-v6"
 FRAME_REVIEW_SCHEMA = {
     "type": "object",
     "properties": {
@@ -279,8 +279,10 @@ def review_frame(
         "identity/wardrobe/location/style 各附件只约束其 scope；参考卡不增加人物。"
         "判准为观众观看级——单帧里观众看不出问题的一律不报："
         "contradiction 只报两类——身份错乱（人物明显变成另一个人：性别改变、明显年龄段错位）；"
-        "t=0 剧情违背（剧本点名的剧情物件画错、多出、缺失或关系错误——如把剧情背包画成行李箱、"
-        "同一物件出现两只、该脱手的物件仍随身、动作或后加入人物提前发生）。"
+        "t=0 剧情违背（剧本点名的剧情物件类型画错或完全缺失——如把剧情背包画成行李箱、"
+        "关键物件不在画面；动作或后加入人物提前发生）。"
+        "同一物件在画面中重复出现（如一只在身一只在水面）不报——单帧观众难以察觉，"
+        "跨镜剧情一致性由成片终审负责。"
         "以下不报：衣装颜色与色系偏差、衣物款式近似变化（夹克↔衬衫式外套）、发型细节变化"
         "（马尾↔披发/盘发）、鞋包等非剧情装备的款式差异、整体色温——观众单帧无感，"
         "跨镜一致性由成片终审负责。"

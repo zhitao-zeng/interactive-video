@@ -41,7 +41,7 @@
     },
     {
       "path": "src/clean_studio/providers/modelscope_runtime.py",
-      "sha256": "e525e604cffcd775f2b93482040def0a7f0fe507d2967c1491ebdfdae08c76fd",
+      "sha256": "c92693133536c53b248c46f1debaca4d7b96a147b642e5187cc620639a738a48",
       "sources": [
         "publication_worker",
         "modelscope_api"
@@ -58,7 +58,7 @@
     },
     {
       "path": "src/clean_studio/cli.py",
-      "sha256": "4a53eb617a8557159a19cc02811a7c8cee2e135eaeaeb32a4ddc79549b85ab6a",
+      "sha256": "44ca84e2a0ae6aa8d2df45c81f99673fe415b254bdb2c000777274a46196a496",
       "sources": [
         "publication_worker"
       ]

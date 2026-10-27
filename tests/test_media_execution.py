@@ -1395,7 +1395,7 @@ def test_frozen_provider_media_asr_closure_and_provenance():
         assert Path(source["path"]).is_absolute()
         assert len(source["sha256"]) == 64
     task8_hashes = {
-        "src/clean_studio/media.py": "eb7b9ab88737724b263275e790d14cbbf777dad64a340f2225d8d2c8d1501e08",
+        "src/clean_studio/media.py": "edc0943859121f52f1aab9d2eb46f7238aaada18fbe5abc5d1ee030b1d4adc2a",
         "src/clean_studio/frozen/render.py": "5365a96e9d8086f7d5b9090e1d35766cd8bf6018046fbcb9895e207d739c935f",
     }
     for frozen in provenance["frozen_files"]:
