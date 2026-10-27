@@ -91,7 +91,7 @@
     },
     {
       "path": "src/clean_studio/frozen/h3.py",
-      "sha256": "ad76227b4bd4af132a1d7822f6cbd67dc9c267d94c399fdebc479666071abac6",
+      "sha256": "bed7c11b1fad0802562626f79497ff8e76b5a6b3b6e7cf1227bacd6adf8f147d",
       "sources": [
         "local_h3"
       ]
@@ -124,7 +124,7 @@
     },
     {
       "path": "src/clean_studio/providers/h3.py",
-      "sha256": "8dc80f3ee0537960ccb5765b61b01595e83ed4a04c191105d760af3b126b32dd",
+      "sha256": "ef5f6f75b68cd9cc5ceb6573d55db01650575e58f1ca26a5fc56b8fbd530236a",
       "sources": [
         "local_h3",
         "downloads"
@@ -140,7 +140,7 @@
     },
     {
       "path": "src/clean_studio/media.py",
-      "sha256": "c03c9a9a4f2098dfb232178b5ab8daa8c6b35405b15e488e9a65a19a607ddf27",
+      "sha256": "a0be5fedd5190b7c75119d9804ff0b234f760c0e1911a99e68c48a3ecb255ff5",
       "sources": [
         "first_frames",
         "analysis",

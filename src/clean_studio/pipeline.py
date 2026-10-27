@@ -833,10 +833,14 @@ class Pipeline:
         self._compile()
         return StageOutcome.completed()
 
+    def _frameless(self) -> bool:
+        return (self.frozen_config.get("channel") or "h3-first-frame") == "h3-reference"
+
     def _media(self):
         return MediaOperations(
             self.store,
             self._compilation(),
+            frameless=self._frameless(),
             image_provider=self._service("image_provider"),
             h3_provider=self._service("h3_provider"),
             frame_review_client=self._service("frame_review_client"),
@@ -851,6 +855,8 @@ class Pipeline:
         )
 
     def _first_frames(self):
+        if self._frameless():
+            return StageOutcome.completed()
         media = self._media()
         for shot in self._selected_shots():
             media.ensure_first_frame(shot.shot_id)

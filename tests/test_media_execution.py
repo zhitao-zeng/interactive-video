@@ -108,6 +108,7 @@ def _shot(shot_id="shot-1", segment="S1/flow/0"):
         camera="固定机位",
         shot_scale="中景",
         visible_characters=("C01",),
+        opening_characters=("C01",),
         dialogue=(Dialogue("C01", "把船灯递给我。"),),
         reference_subjects=("C01", "PIER"),
         duration_seconds=9,
@@ -1394,7 +1395,7 @@ def test_frozen_provider_media_asr_closure_and_provenance():
         assert Path(source["path"]).is_absolute()
         assert len(source["sha256"]) == 64
     task8_hashes = {
-        "src/clean_studio/media.py": "c03c9a9a4f2098dfb232178b5ab8daa8c6b35405b15e488e9a65a19a607ddf27",
+        "src/clean_studio/media.py": "a0be5fedd5190b7c75119d9804ff0b234f760c0e1911a99e68c48a3ecb255ff5",
         "src/clean_studio/frozen/render.py": "5365a96e9d8086f7d5b9090e1d35766cd8bf6018046fbcb9895e207d739c935f",
     }
     for frozen in provenance["frozen_files"]:

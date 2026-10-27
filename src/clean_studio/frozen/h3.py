@@ -45,35 +45,39 @@ def h3_payload(
     model: str,
     prompt: str,
     duration_seconds: int,
-    first_frame: Path,
+    first_frame: Path | None,
     references: tuple[Path, ...],
     seed: int,
 ) -> dict:
     seconds = validate_duration(duration_seconds)
     if type(seed) is not int or not 0 <= seed < 2**31:
         raise ValueError("H3 seed must be an integer in [0, 2**31)")
-    first_frame = Path(first_frame)
-    paths = (first_frame, *references)
+    paths = tuple(Path(path) for path in references)
+    if first_frame is not None:
+        first_frame = Path(first_frame)
+        paths = (first_frame, *paths)
     for path in paths:
         if not path.is_file():
             raise FileNotFoundError(path)
-    first_uri = raw_image_data_url(first_frame)
     conditions = [
         {
             "type": "image",
             "role": "reference",
-            "uri": first_uri if index == 0 else image_data_url(path),
+            "uri": raw_image_data_url(path)
+            if first_frame is not None and index == 0
+            else image_data_url(path),
         }
         for index, path in enumerate(paths)
     ]
-    conditions.append(
-        {
-            "type": "image",
-            "role": "keyframe",
-            "frame_index": 0,
-            "uri": first_uri,
-        }
-    )
+    if first_frame is not None:
+        conditions.append(
+            {
+                "type": "image",
+                "role": "keyframe",
+                "frame_index": 0,
+                "uri": raw_image_data_url(first_frame),
+            }
+        )
     return {
         "model": model,
         "task": "ref2va",

@@ -609,7 +609,6 @@ def test_reference_order_is_shared_by_frame_review_video_and_cache(episode, refe
         ("identity", "C01"),
         ("wardrobe", "C01"),
         ("location", "PIER"),
-        ("style", "travel-live"),
     ]
     assert compiled.review_references is compiled.references
     request = video_request(compiled, _accepted_frame(compiled))

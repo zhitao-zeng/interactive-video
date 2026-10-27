@@ -34,19 +34,25 @@ class H3Provider:
         self.client = client or httpx.Client(timeout=timeout, trust_env=False)
         self.sleeper = sleeper
 
-    def payload(self, request, first_frame: Path, *, seed: int = 0) -> dict:
+    def payload(self, request, first_frame: Path | None, *, seed: int = 0) -> dict:
         validate_duration(request.duration_seconds)
         validate_current_references(request.shot_id, request.references)
-        first_frame = Path(first_frame)
-        actual_hash = sha256(first_frame.read_bytes()).hexdigest()
-        if actual_hash != request.accepted_frame_hash:
-            raise ValueError("first frame bytes do not match the accepted frame hash")
+        if first_frame is None:
+            if request.accepted_frame_hash:
+                raise ValueError("reference-mode request must not carry an accepted frame hash")
+            frame = None
+        else:
+            first_frame = Path(first_frame)
+            actual_hash = sha256(first_frame.read_bytes()).hexdigest()
+            if actual_hash != request.accepted_frame_hash:
+                raise ValueError("first frame bytes do not match the accepted frame hash")
+            frame = first_frame
         references = tuple(reference_path(reference) for reference in request.references)
         return h3_payload(
             model=self.model,
             prompt=request.prompt,
             duration_seconds=request.duration_seconds,
-            first_frame=first_frame,
+            first_frame=frame,
             references=references,
             seed=seed,
         )

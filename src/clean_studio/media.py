@@ -23,7 +23,7 @@ from clean_studio.providers.asr import evaluate_speech
 from clean_studio.store import Store
 
 
-FRAME_REVIEW_POLICY = "clean-first-frame-explicit-relations-v3"
+FRAME_REVIEW_POLICY = "clean-first-frame-structural-v4"
 FRAME_REVIEW_SCHEMA = {
     "type": "object",
     "properties": {
@@ -277,10 +277,14 @@ def review_frame(
         "检查新生成的单一镜头首帧。第一张是候选首帧，后续图片是与生图请求"
         "完全同序的原始参考附件。只判断时间零点 t=0，不要求后续动作或末态提前出现。"
         "identity/wardrobe/location/style 各附件只约束其 scope；参考卡不增加人物。"
-        "返回两类 finding，均须落到具体画面证据："
-        "contradiction——画面出现与请求明确冲突的状态（错误的身份/衣装、提前发生的动作、"
-        "提前入场的人物、错误的位置关系）；missing_content——请求明确要求本帧可见的内容"
-        "在画面中缺失（起始状态点名的物件或入画人物完全没画）。"
+        "返回两类 finding，均须落到具体画面证据，判准为产品级而非逐像素对卡："
+        "contradiction 只报三类——身份不符（性别、年龄段或发型类型改变，如马尾变披发/短发、"
+        "女性变男性）；套装结构不符（外套/上衣/裤型/鞋的品类改变或关键装备有无变化，如连帽夹克"
+        "变衬衫、双肩包消失或多出第二只包）；t=0 合同违背（起始状态点名的剧情物件画错、缺失或"
+        "位置关系错误，动作或人物提前，物件该脱手却仍随身）。"
+        "同族近似色差不报 contradiction（米色↔米白、灰褐↔橄榄绿↔卡其等土色系内偏移、"
+        "整体色温轻微漂移）——这类差异留给成片终审的观众视角判断。"
+        "missing_content——请求明确要求本帧可见的剧情物件或入画人物完全没画。"
         "构图或镜头朝向允许背影/侧脸时，身份细节只能记为不可判定，不得臆断为换脸；"
         "只有请求明确要求可辨认而画面背离时才报告。整镜人物名单不是首帧出席要求，"
         "未要求入画的人不在画面不算缺失。无可观察问题返回空 findings，不作内容改稿。\n"
@@ -430,9 +434,11 @@ class MediaOperations:
         poll_timeout: float = 3600.0,
         sleeper=None,
         clock=None,
+        frameless: bool = False,
     ) -> None:
         if not callable(video_reviewer):
             raise ValueError("a callable video reviewer is required")
+        self.frameless = bool(frameless)
         self.store = store
         self.compilation = compilation
         self.image_provider = image_provider
@@ -939,7 +945,7 @@ class MediaOperations:
             raise ValueError("rejected video review requires findings")
         return verdict == "accepted", dict(raw)
 
-    def _execute_video(self, operation: dict, request, frame_artifact: Mapping[str, object]):
+    def _execute_video(self, operation: dict, request, frame_artifact):
         if operation["status"] == "completed":
             artifact = self._operation_artifact(operation["id"], "video")
             if artifact is None:
@@ -949,7 +955,9 @@ class MediaOperations:
             self._artifact_file(artifact, "video")
             return Artifact.from_row(artifact)
 
-        frame_path = self._artifact_file(frame_artifact, "frame")
+        frame_path = (
+            self._artifact_file(frame_artifact, "frame") if frame_artifact is not None else None
+        )
         seed = int(sha256(f"{operation['id']}:video".encode("utf-8")).hexdigest()[:8], 16) % 2**31
         validate_current_references(request.shot_id, request.references)
         payload = self.h3_provider.payload(request, frame_path, seed=seed)
@@ -1041,6 +1049,19 @@ class MediaOperations:
 
     def ensure_video(self, shot_id: str) -> Artifact:
         compiled, frame_request = self._prepare_frame_request(shot_id)
+        if self.frameless:
+            validate_current_references(shot_id, compiled.references)
+            request = video_request(compiled, None)
+            frame_artifact = None
+            shot = self._shot(shot_id)
+            if shot["video_request_hash"] != request.input_hash:
+                self.store.set_video_request(
+                    shot_id,
+                    expected_frame_request_hash=compiled.frame_request_hash,
+                    expected_frame_hash=None,
+                    video_request_hash=request.input_hash,
+                )
+            return self._ensure_video_loop(shot_id, request, frame_artifact)
         validate_current_references(shot_id, frame_request.references)
         frame = self._accepted_current(shot_id, "image", frame_request.input_hash, frame_request)
         if frame is None:
@@ -1057,6 +1078,18 @@ class MediaOperations:
                 expected_frame_hash=frame.sha256,
                 video_request_hash=request.input_hash,
             )
+        return self._ensure_video_loop(shot_id, request, frame_artifact)
+
+    def _ensure_video_loop(self, shot_id: str, request, frame_artifact):
+        while True:
+            accepted = self._accepted_current(shot_id, "video", request.input_hash)
+            if accepted is not None:
+                return accepted
+            operation = self._active_operation(shot_id, "video", request.input_hash)
+            outcome = self._execute_video(operation, request, frame_artifact)
+            if outcome is _RETRY or outcome is _REJECTED:
+                continue
+            return outcome
         while True:
             accepted = self._accepted_current(shot_id, "video", request.input_hash)
             if accepted is not None:

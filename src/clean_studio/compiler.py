@@ -509,7 +509,7 @@ def _frame_references(shot: Shot, references: tuple[Reference, ...]) -> tuple[Re
     return tuple(
         reference
         for reference in references
-        if reference.role in ("style", "location") or reference.subject_id in opening
+        if reference.role == "location" or reference.subject_id in opening
     )
 
 
@@ -538,7 +538,7 @@ def _attachment_map(references: tuple[Reference, ...], profiles=None) -> str:
     for index, reference in enumerate(references, 1):
         if reference.role == "style":
             lines.append(f"附件{index}（style）：仅约束光色、材质与渲染，不添加人物或衣装")
-            continue
+            continue  # kept for callers that do include style; frame requests exclude it
         if profiles and reference.subject_id in profiles:
             who = f"，{profiles[reference.subject_id]['name']} {reference.subject_id}"
         else:
@@ -567,7 +567,7 @@ def _opening(
         "未提及的部分保持参考卡造型。"
         "起始状态中正在滑落、漂浮、被追赶或抛出的随身物件视为已离开人物身体"
         "（同一物件，不是第二件）：其外观仍依参考卡，位置与状态依起始状态。",
-        "风格附件只约束光色、材质与渲染；参考卡的版面、文字与示范姿势不进入画面。",
+        "参考卡的版面、文字与示范姿势不进入画面；整体色光与材质风格由宿主在视频生成阶段统一控制。",
         "画面中出现的人物只由起始状态决定；身份与衣装参考用于保持长相一致，不代表人物必须在场。",
     ]
     if frame_refs:
@@ -737,6 +737,7 @@ def _h3_prompt(
     translated: _Translation,
     profiles: Mapping[str, str] | None = None,
     references: tuple[Reference, ...] = (),
+    keyframe_first: bool = True,
 ) -> str:
     lines = [
         "Generate one continuous shot from the supplied accepted first frame.",
@@ -759,10 +760,17 @@ def _h3_prompt(
         if known:
             lines.append("CHARACTERS: " + "; ".join(known))
     if references:
-        lines.append(
-            "ATTACHMENTS (in request order; image 1 is the accepted first frame — start from it):"
-        )
-        lines.append("image 1 = accepted first frame for this shot")
+        offset_base = 2 if keyframe_first else 1
+        if keyframe_first:
+            lines.append(
+                "ATTACHMENTS (in request order; image 1 is the accepted first frame — start from it):"
+            )
+            lines.append("image 1 = accepted first frame for this shot")
+        else:
+            lines.append(
+                "ATTACHMENTS (reference mode; no keyframe — realize the described t=0 state"
+                " yourself, keeping every subject's look strictly tied to their cards):"
+            )
         for offset, reference in enumerate(references):
             who = (
                 f" for {profiles[reference.subject_id]['name']} ({reference.subject_id})"
@@ -771,11 +779,11 @@ def _h3_prompt(
             )
             if reference.role == "style":
                 lines.append(
-                    f"image {offset + 2} = style card: constrains color, light and material only"
+                    f"image {offset + offset_base} = style card: constrains color, light and material only"
                 )
             else:
                 lines.append(
-                    f"image {offset + 2} = {reference.role} card{who}:"
+                    f"image {offset + offset_base} = {reference.role} card{who}:"
                     " constrains that subject's look only"
                 )
     if shot.dialogue:
@@ -1113,16 +1121,21 @@ def _frame_value(frame: object, name: str, *, required: bool = True):
 
 
 def video_request(compiled: CompiledShot, accepted_frame: object) -> VideoRequest:
-    frame_hash = _frame_value(accepted_frame, "sha256")
-    frame_input_hash = _frame_value(accepted_frame, "input_hash")
-    frame_shot_id = _frame_value(accepted_frame, "shot_id")
-    frame_id = _frame_value(accepted_frame, "id", required=False)
-    if not isinstance(frame_hash, str) or re.fullmatch(r"[0-9a-f]{64}", frame_hash) is None:
-        raise ValueError("accepted frame sha256 must be 64 lowercase hex characters")
-    if frame_input_hash != compiled.frame_request_hash:
-        raise ValueError("accepted frame is stale for the current frame request/H3 compilation")
-    if frame_shot_id != compiled.shot_id:
-        raise ValueError("accepted frame belongs to another shot")
+    frameless = accepted_frame is None
+    if frameless:
+        frame_hash = ""
+        frame_id = None
+    else:
+        frame_hash = _frame_value(accepted_frame, "sha256")
+        frame_input_hash = _frame_value(accepted_frame, "input_hash")
+        frame_shot_id = _frame_value(accepted_frame, "shot_id")
+        frame_id = _frame_value(accepted_frame, "id", required=False)
+        if not isinstance(frame_hash, str) or re.fullmatch(r"[0-9a-f]{64}", frame_hash) is None:
+            raise ValueError("accepted frame sha256 must be 64 lowercase hex characters")
+        if frame_input_hash != compiled.frame_request_hash:
+            raise ValueError("accepted frame is stale for the current frame request/H3 compilation")
+        if frame_shot_id != compiled.shot_id:
+            raise ValueError("accepted frame belongs to another shot")
 
     validate_current_references(compiled.shot_id, compiled.references)
 
@@ -1132,7 +1145,8 @@ def video_request(compiled: CompiledShot, accepted_frame: object) -> VideoReques
             "shot_id": compiled.shot_id,
             "source_compile_hash": compiled.compile_hash,
             "frame_request_hash": compiled.frame_request_hash,
-            "accepted_frame_hash": frame_hash,
+            "mode": "reference" if frameless else "keyframe",
+            "accepted_frame_hash": frame_hash or None,
             "h3_prompt": compiled.h3_prompt,
             "duration_seconds": compiled.duration_seconds,
             "references": _reference_data(compiled.references),

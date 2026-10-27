@@ -162,6 +162,8 @@ def build_reference_manifest(
             for key in ("role", "appearance", "wardrobe")
             if profile.get(key)
         )
+        if subject.get("wardrobe_note"):
+            profile_text += f"\nwardrobe_note: {subject['wardrobe_note']}"
         subjects.append(
             SubjectRegistration(
                 subject_id=subject["subject_id"],
