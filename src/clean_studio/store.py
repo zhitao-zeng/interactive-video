@@ -740,21 +740,38 @@ class Store:
                 if frame is None:
                     raise ValueError("expected_frame_hash does not match the current accepted frame")
             if shot["video_request_hash"] != video_request_hash:
-                updated = connection.execute(
-                    """
-                    UPDATE shots
-                    SET video_request_hash = ?, current_video_artifact_id = NULL
-                    WHERE episode_id = ? AND shot_id = ?
-                      AND frame_request_hash = ? AND current_frame_artifact_id = ?
-                    """,
-                    (
-                        video_request_hash,
-                        episode_id,
-                        shot_id,
-                        expected_frame_request_hash,
-                        frame["id"],
-                    ),
-                )
+                if expected_frame_hash is None:
+                    updated = connection.execute(
+                        """
+                        UPDATE shots
+                        SET video_request_hash = ?, current_video_artifact_id = NULL
+                        WHERE episode_id = ? AND shot_id = ?
+                          AND frame_request_hash = ?
+                          AND current_frame_artifact_id IS NULL
+                        """,
+                        (
+                            video_request_hash,
+                            episode_id,
+                            shot_id,
+                            expected_frame_request_hash,
+                        ),
+                    )
+                else:
+                    updated = connection.execute(
+                        """
+                        UPDATE shots
+                        SET video_request_hash = ?, current_video_artifact_id = NULL
+                        WHERE episode_id = ? AND shot_id = ?
+                          AND frame_request_hash = ? AND current_frame_artifact_id = ?
+                        """,
+                        (
+                            video_request_hash,
+                            episode_id,
+                            shot_id,
+                            expected_frame_request_hash,
+                            frame["id"],
+                        ),
+                    )
                 if updated.rowcount != 1:
                     raise ValueError("accepted frame changed during video request update")
                 self._invalidate_episode(connection, episode_id)
