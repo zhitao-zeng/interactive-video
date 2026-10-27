@@ -1,0 +1,67 @@
+{
+  "recorded_date": "2026-10-27",
+  "source_revision": "c698b644dea9501d290fe3f575fd83a3df9b2db0",
+  "source_note": "Read-only exact source bytes. The ModelScope SDK remains an external dedicated-runtime dependency. Only the independent /mnt/disk1/zengzhitao/ms_venv/bin/python worker imports HubApi; the main Python never imports its site-packages.",
+  "scope": "Clean Studio Task7 single-writer private dataset publication and Task8 structured JSON runtime adapter. Includes source SHA-256, upload/inflight reconciliation, inventory and index readback, and offline HubApi import/construct verification. Clean Store acceptance is queried directly; legacy acceptance_status and delivery episode state are excluded.",
+  "sources": {
+    "legacy_publication": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/interactive/publication.py",
+      "sha256": "94a15023c2999120778f54d74f6f3c95e0d68765de42af70ca82d4b1b485bceb"
+    },
+    "publication_worker": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/scripts/publish_deliveries.py",
+      "sha256": "58b8250c4388760efe1cea51a66d9c594ec52b2a67719d2d704add3bbeb24f09"
+    },
+    "modelscope_api": {
+      "path": "/mnt/disk1/zengzhitao/ms_venv/lib/python3.10/site-packages/modelscope_hub/api.py",
+      "sha256": "faad0b28a1892ca0466b2a8475102ca41c88ebb720e0e8891fc50c2b8f10705c"
+    },
+    "modelscope_constants": {
+      "path": "/mnt/disk1/zengzhitao/ms_venv/lib/python3.10/site-packages/modelscope_hub/constants.py",
+      "sha256": "c3f9cf1469faf756d0cd69a475a40f989ae75e25ea2927d81b26d24964441400"
+    }
+  },
+  "frozen_files": [
+    {
+      "path": "src/clean_studio/frozen/modelscope.py",
+      "sha256": "37ec2ca31d1a340acc3472e64a7d951be1b77e35c43091da73c0f7a4b5d92aed",
+      "sources": [
+        "legacy_publication"
+      ]
+    },
+    {
+      "path": "src/clean_studio/providers/modelscope.py",
+      "sha256": "bf4f80aa16e149c69e46d447d26247c8340b0880cc1205a3d97b07bfe858a39c",
+      "sources": [
+        "legacy_publication",
+        "publication_worker",
+        "modelscope_api",
+        "modelscope_constants"
+      ]
+    },
+    {
+      "path": "src/clean_studio/providers/modelscope_runtime.py",
+      "sha256": "e525e604cffcd775f2b93482040def0a7f0fe507d2967c1491ebdfdae08c76fd",
+      "sources": [
+        "publication_worker",
+        "modelscope_api"
+      ]
+    },
+    {
+      "path": "src/clean_studio/providers/modelscope_worker.py",
+      "sha256": "47889ec541fb4be17a5936baa2869b705820cc506b145f4ced27365ab2677a67",
+      "sources": [
+        "publication_worker",
+        "modelscope_api",
+        "modelscope_constants"
+      ]
+    },
+    {
+      "path": "src/clean_studio/cli.py",
+      "sha256": "dcef33d5aa5774064bed1cc6f846a16662dce8122433b9adf020fca5acd2a87e",
+      "sources": [
+        "publication_worker"
+      ]
+    }
+  ]
+}

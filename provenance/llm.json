@@ -1,0 +1,75 @@
+{
+  "recorded_date": "2026-10-26",
+  "source_revision": "c698b644dea9501d290fe3f575fd83a3df9b2db0",
+  "source_note": "Read-only exact working-tree bytes; source hashes identify the frozen inputs, including uncommitted source state. No legacy runtime module is imported.",
+  "scope": "Structured Codex JSON, inline images, strict truncation handling, and model_json-only saved-login session resume. Legacy episode skills, production tools, endpoint fallback, media scheduling, and resource-pool recovery are excluded.",
+  "sources": {
+    "codex": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/llm/codex.py",
+      "sha256": "a627afc310d29a4deb136306591cb8240a7bc0dc0b182c0f602b047457486b66"
+    },
+    "client": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/llm/client.py",
+      "sha256": "294a69d20e4bb6db2ec9078902048d29ce8e3591a0f1933cf36857c15f632e13"
+    },
+    "codex_session": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/application/agents/episode/codex_session.py",
+      "sha256": "1c4631e55c298d68db27c467e65454e9841f844f7148004e26db370bc20b1820"
+    },
+    "attempt": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/application/agents/attempt.py",
+      "sha256": "4e3e66a57384beaf0c1dbd77ddd93ea475d8c3ecd5998440fb9c2ac6813dfffc"
+    },
+    "util": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/util.py",
+      "sha256": "b1215b384fef35dab27f4a436e74dd9b6bc5ac40f09d8ad7cea174a478170021"
+    },
+    "configuration": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/application/configuration.py",
+      "sha256": "5683a460228ed20e97da6c28e0be04fd8b4cd42e6ae95f2b418a576489e1505d"
+    },
+    "resource_waits": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/resource_waits.py",
+      "sha256": "94f8d528192c8da089590055ee3b21dbbebc6b3b79895998344e491afe3d2264"
+    }
+  },
+  "frozen_files": [
+    {
+      "path": "src/clean_studio/frozen/__init__.py",
+      "sha256": "5a17ae9757a65979398b461198ddea84b6ceb12862c4a996114e791ee7aeb756",
+      "sources": [
+        "codex",
+        "client"
+      ]
+    },
+    {
+      "path": "src/clean_studio/frozen/codex.py",
+      "sha256": "625f9044ba5b0eff2d0fc8ce1e83a99d08f9288c6066205f3d5b7a16cbf40134",
+      "sources": [
+        "codex",
+        "codex_session",
+        "util",
+        "configuration"
+      ]
+    },
+    {
+      "path": "src/clean_studio/frozen/codex_session.py",
+      "sha256": "8312a9293a3531400cfdf40c6c5dd9ed0a0c853e2effa48de368962375daac36",
+      "sources": [
+        "codex_session",
+        "attempt",
+        "util"
+      ]
+    },
+    {
+      "path": "src/clean_studio/frozen/llm.py",
+      "sha256": "52e49d9427c2392954f90288cf2c27c0276e287d447e488c5281f809df57e6c0",
+      "sources": [
+        "client",
+        "codex",
+        "configuration",
+        "resource_waits"
+      ]
+    }
+  ]
+}

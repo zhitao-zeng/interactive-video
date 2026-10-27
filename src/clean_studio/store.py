@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from copy import deepcopy
 from dataclasses import asdict
 from hashlib import sha256
 import json
@@ -11,12 +12,15 @@ from uuid import uuid4
 from clean_studio.domain import (
     Dialogue,
     EpisodeSpec,
+    Finding,
     FixedOption,
     MusicCue,
     Operation,
     Review,
     Shot,
+    export_bundle_identity,
 )
+from clean_studio.review_contract import validate_final_review
 
 _GENERATION_QUOTAS = {"image": 3, "video": 3}
 _INPUT_QUOTA = 2
@@ -97,6 +101,68 @@ def _is_review_kind(kind: str) -> bool:
     return kind == "review" or kind.endswith("_review")
 
 
+def validate_frozen_config(value, path="config") -> None:
+    if isinstance(value, Mapping):
+        for key, item in value.items():
+            if not isinstance(key, str):
+                raise ValueError(f"configuration keys must be strings at {path}")
+            lower = key.lower()
+            field_path = f"{path}.{key}"
+            if lower.endswith(("_env", "_key_var")):
+                if not isinstance(item, str) or re.fullmatch(
+                    r"[A-Za-z_][A-Za-z0-9_]*", item
+                ) is None:
+                    raise ValueError(
+                        f"environment variable name required at {field_path}"
+                    )
+                continue
+            normalized = re.sub(r"[^a-z0-9]", "", lower)
+            suspicious = (
+                normalized in {
+                    "key",
+                    "keys",
+                    "apikey",
+                    "apikeys",
+                    "authorization",
+                    "token",
+                    "secret",
+                    "password",
+                    "credential",
+                    "credentials",
+                }
+                or lower.endswith(
+                    (
+                        "_key",
+                        "_token",
+                        "_secret",
+                        "_password",
+                        "_authorization",
+                        "_credential",
+                        "_credentials",
+                    )
+                )
+                or normalized.startswith(("api", "st"))
+                and normalized.endswith(("key", "token", "secret"))
+                or normalized.endswith(
+                    (
+                        "accesstoken",
+                        "refreshtoken",
+                        "sessiontoken",
+                        "privatekey",
+                        "clientsecret",
+                    )
+                )
+            )
+            if suspicious:
+                raise ValueError(
+                    f"secret-like configuration field is not allowed at {field_path}"
+                )
+            validate_frozen_config(item, field_path)
+    elif isinstance(value, (list, tuple)):
+        for index, item in enumerate(value):
+            validate_frozen_config(item, f"{path}[{index}]")
+
+
 def _episode_from_json(payload: str) -> EpisodeSpec:
     raw = json.loads(payload)
     return EpisodeSpec(
@@ -138,6 +204,23 @@ def _artifact_hash(value: str) -> str:
     if re.fullmatch(r"[0-9a-f]{64}", value) is None:
         raise ValueError("artifact SHA-256 must be 64 lowercase hex characters")
     return value
+
+
+def _validated_export_bundle(metadata, video_sha256):
+    if not isinstance(metadata, Mapping):
+        raise ValueError("export artifact metadata must be an object")
+    bundle = metadata.get("export_bundle")
+    if not isinstance(bundle, Mapping):
+        raise ValueError("assembly requires a complete export bundle")
+    identity = bundle.get("bundle_hash")
+    if not isinstance(identity, str):
+        raise ValueError("export bundle identity must be a SHA-256")
+    _artifact_hash(identity)
+    if identity != export_bundle_identity(bundle):
+        raise ValueError("export bundle identity does not match its canonical contents")
+    if bundle.get("video_sha256") != video_sha256:
+        raise ValueError("export bundle video SHA-256 differs from the artifact")
+    return dict(bundle)
 
 
 class Store:
@@ -279,6 +362,7 @@ class Store:
     def create_episode(
         self, spec: EpisodeSpec, frozen_config: Mapping[str, object]
     ) -> dict:
+        validate_frozen_config(frozen_config)
         script = _canonical_json(asdict(spec))
         config = _canonical_json(dict(frozen_config))
         with self._db() as connection:
@@ -383,20 +467,46 @@ class Store:
         if export_id is None:
             return "in_progress"
         export = connection.execute(
-            "SELECT sha256 FROM artifacts WHERE id = ? AND kind = 'export'", (export_id,)
+            "SELECT sha256, metadata FROM artifacts WHERE id = ? AND kind = 'export'",
+            (export_id,),
         ).fetchone()
         if export is None:
             raise RuntimeError("current export artifact is missing")
-        export_hash = export["sha256"]
+        try:
+            bundle = _validated_export_bundle(
+                json.loads(export["metadata"]), export["sha256"]
+            )
+        except (ValueError, TypeError, KeyError):
+            return "candidate"
+        bundle_hash = bundle["bundle_hash"]
         for review_kind in ("final_visual_review", "final_audio_review"):
             review = self._latest_valid_review(
-                connection, episode["episode_id"], export_hash, review_kind
+                connection, episode["episode_id"], bundle_hash, review_kind
             )
-            if review is None or review["verdict"] != "accepted":
+            if review is None:
+                return "candidate"
+            try:
+                artifact = connection.execute(
+                    """
+                    SELECT sha256 FROM artifacts
+                    WHERE operation_id = ? AND kind = 'receipt' AND path = ?
+                    """,
+                    (review["id"], review["receipt_path"]),
+                ).fetchone()
+                if artifact is None:
+                    return "candidate"
+                receipt, _ = self._read_receipt(
+                    review["receipt_path"], artifact["sha256"]
+                )
+                self._validate_receipt(review, receipt, review["verdict"])
+                decision = validate_final_review(review_kind, receipt, bundle)
+            except (ValueError, TypeError, KeyError, OSError, IndexError):
+                return "candidate"
+            if not decision.accepted:
                 return "candidate"
         upload = connection.execute(
             """
-            SELECT operations.id, artifacts.metadata
+            SELECT operations.*, artifacts.sha256 AS receipt_sha256
             FROM operations
             JOIN artifacts
               ON artifacts.operation_id = operations.id
@@ -409,19 +519,30 @@ class Store:
             ORDER BY operations.rowid DESC
             LIMIT 1
             """,
-            (episode["episode_id"], export_hash),
+            (episode["episode_id"], bundle_hash),
         ).fetchone()
         if upload is not None:
-            receipt = json.loads(upload["metadata"])
+            try:
+                receipt, _ = self._read_receipt(
+                    upload["receipt_path"], upload["receipt_sha256"]
+                )
+                self._validate_receipt(upload, receipt, None)
+            except (ValueError, TypeError, KeyError, OSError):
+                return "accepted"
             target = self._publish_target(connection, episode["episode_id"])
             if (
-                receipt.get("input_hash") == export_hash
+                receipt.get("input_hash") == bundle_hash
+                and receipt.get("bundle_hash") == bundle_hash
                 and receipt.get("target") == target
-                and receipt.get("remote_sha256") == export_hash
+                and receipt.get("verified") is True
+                and receipt.get("remote_sha256") == bundle["video_sha256"]
+                and receipt.get("cover_sha256") == bundle["cover_sha256"]
                 and receipt.get("private") is True
-                and receipt.get("visibility", "private") == "private"
+                and receipt.get("visibility") == "private"
                 and isinstance(receipt.get("remote_object"), str)
                 and receipt["remote_object"]
+                and isinstance(receipt.get("cover_object"), str)
+                and receipt["cover_object"]
             ):
                 return "complete"
         return "accepted"
@@ -471,6 +592,8 @@ class Store:
         kind: str,
         input_hash: str,
         shot_id: str | None,
+        *,
+        metadata: Mapping[str, object] | None = None,
     ) -> Operation:
         if kind == "input":
             raise ValueError("input operations must use apply_script_revision")
@@ -504,7 +627,13 @@ class Store:
                     raise ValueError(f"{kind} quota exhausted: {_GENERATION_QUOTAS[kind]}")
             return _operation(
                 self._insert_operation(
-                    connection, episode_id, idempotency_key, kind, input_hash, shot_id
+                    connection,
+                    episode_id,
+                    idempotency_key,
+                    kind,
+                    input_hash,
+                    shot_id,
+                    metadata=metadata,
                 )
             )
 
@@ -653,7 +782,12 @@ class Store:
         spec: EpisodeSpec,
         *,
         expected_script_hash: str,
+        plan: object,
     ) -> Operation:
+        if plan is None:
+            raise ValueError("a patch plan is required for script revision")
+        if plan.input_hash != input_hash:
+            raise ValueError("plan input_hash does not match revision input_hash")
         spec_dict = asdict(spec)
         script = _canonical_json(spec_dict)
         script_hash = _value_hash(spec_dict)
@@ -677,6 +811,15 @@ class Store:
             if episode["current_script_hash"] != expected_script_hash:
                 raise ValueError("expected_script_hash does not match current script")
             current_spec = _episode_from_json(episode["current_script"])
+            if plan.expected_script_hash != expected_script_hash:
+                raise ValueError("plan expected_script_hash does not match revision expectation")
+            if plan.input_hash != input_hash:
+                raise ValueError("plan input_hash does not match revision input_hash")
+            from clean_studio.agents.repair import apply_patch
+
+            planned_spec, planned_affected = apply_patch(current_spec, plan)
+            if spec != planned_spec:
+                raise ValueError("submitted spec does not match plan-applied episode")
             current_dict = asdict(current_spec)
             current_episode_fields = {**current_dict, "shots": None}
             revised_episode_fields = {**spec_dict, "shots": None}
@@ -696,6 +839,10 @@ class Store:
                 for shot_id in current_shots
                 if asdict(current_shots[shot_id]) != asdict(revised_shots[shot_id])
             )
+            if set(affected) != planned_affected or planned_affected != set(
+                plan.affected_shot_ids
+            ):
+                raise ValueError("affected shot IDs do not match the applied patch plan")
             if not affected:
                 raise ValueError("script revision has no changes")
             for affected_id in affected:
@@ -740,6 +887,28 @@ class Store:
                 )
             return _operation(operation)
 
+    def mark_submitting(self, operation_id: str) -> Operation:
+        with self._db() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            operation = self._get_operation(connection, operation_id)
+            if operation["external_task_id"] is not None:
+                return _operation(operation)
+            if operation["status"] == "submitting":
+                return _operation(operation)
+            if operation["status"] != "pending":
+                raise ValueError(
+                    f"cannot start submission in {operation['status']} state"
+                )
+            connection.execute(
+                """
+                UPDATE operations
+                SET status = 'submitting', error = NULL
+                WHERE id = ?
+                """,
+                (operation_id,),
+            )
+            return _operation(self._get_operation(connection, operation_id))
+
     def mark_submitted(self, operation_id: str, external_task_id: str) -> Operation:
         if not external_task_id:
             raise ValueError("external task ID must be non-empty")
@@ -750,7 +919,7 @@ class Store:
                 if operation["external_task_id"] != external_task_id:
                     raise ValueError("operation is bound to a different external task ID")
                 return _operation(operation)
-            if operation["status"] not in {"pending", "submission_uncertain"}:
+            if operation["status"] not in {"pending", "submitting", "submission_uncertain"}:
                 raise ValueError(f"cannot submit operation in {operation['status']} state")
             connection.execute(
                 """
@@ -768,6 +937,7 @@ class Store:
         reason: str,
         *,
         not_accepted: bool = False,
+        metadata: Mapping[str, object] | None = None,
     ) -> Operation:
         with self._db() as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -784,7 +954,7 @@ class Store:
                 raise ValueError("download_failed requires an external task ID")
             if not_accepted and (
                 operation["kind"] not in {"image", "video"}
-                or operation["status"] not in {"pending", "submission_uncertain"}
+                or operation["status"] not in {"pending", "submitting", "submission_uncertain"}
                 or operation["external_task_id"] is not None
             ):
                 raise ValueError(
@@ -799,11 +969,21 @@ class Store:
             )
             if operation["status"] == "not_accepted" and status != "not_accepted":
                 raise ValueError("not_accepted operation is final")
+            merged_metadata = {
+                **json.loads(operation["metadata"]),
+                **dict(metadata or {}),
+            }
+            metadata_json = _canonical_json(merged_metadata)
             if operation["status"] == status and operation["error"] == reason:
-                return _operation(operation)
+                if metadata_json != operation["metadata"]:
+                    connection.execute(
+                        "UPDATE operations SET metadata = ? WHERE id = ?",
+                        (metadata_json, operation_id),
+                    )
+                return _operation(self._get_operation(connection, operation_id))
             connection.execute(
-                "UPDATE operations SET status = ?, error = ? WHERE id = ?",
-                (status, reason, operation_id),
+                "UPDATE operations SET status = ?, error = ?, metadata = ? WHERE id = ?",
+                (status, reason, metadata_json, operation_id),
             )
             return _operation(self._get_operation(connection, operation_id))
 
@@ -849,10 +1029,12 @@ class Store:
         expected_current_hash: str | None = None,
         metadata: Mapping[str, object] | None = None,
         verdict: str | None = None,
-        findings: tuple[str, ...] = (),
+        findings: tuple[Finding, ...] = (),
     ) -> Operation:
         if verdict is not None and verdict not in _VALID_VERDICTS:
             raise ValueError("verdict must be accepted or rejected")
+        if any(not isinstance(finding, dict) for finding in findings):
+            raise TypeError("findings must be structured objects")
         if (path is None) != (sha256 is None):
             raise ValueError("artifact path and SHA-256 are required together")
         if (receipt_path is None) != (receipt_sha256 is None):
@@ -864,7 +1046,7 @@ class Store:
             _relative_path(receipt_path)
             _artifact_hash(receipt_sha256)
         metadata_json = _canonical_json(dict(metadata or {}))
-        findings_json = _canonical_json(tuple(findings))
+        findings_json = _canonical_json(deepcopy(tuple(findings)))
 
         with self._db() as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -896,6 +1078,17 @@ class Store:
                     connection, operation["episode_id"]
                 ):
                     raise ValueError("upload target does not match frozen publish_target")
+            if operation["kind"] == "assembly":
+                merged_metadata = dict(metadata or {})
+                metadata_bundle = merged_metadata.get("export_bundle")
+                receipt_bundle = receipt.get("export_bundle") if receipt is not None else None
+                if metadata_bundle is not None and receipt_bundle is not None and metadata_bundle != receipt_bundle:
+                    raise ValueError("assembly metadata and receipt export bundles differ")
+                bundle = metadata_bundle if metadata_bundle is not None else receipt_bundle
+                merged_metadata["export_bundle"] = _validated_export_bundle(
+                    {"export_bundle": bundle}, sha256
+                )
+                metadata_json = _canonical_json(merged_metadata)
             if operation["status"] == "completed":
                 self._check_completion_retry(
                     connection,

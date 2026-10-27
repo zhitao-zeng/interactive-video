@@ -1,0 +1,13 @@
+{
+  "recorded_date": "2026-10-26",
+  "scope": "Clean Studio Task 4 host-owned H3 translation prompt. No historical prompt or runtime code was copied; the typed execution closure is the already frozen Task 3 Codex/LLM adapter.",
+  "adapter_provenance": "provenance/llm.json",
+  "sources": [],
+  "frozen_files": [
+    {
+      "path": "prompts/h3-translation.md",
+      "sha256": "d55bd041041bd787ad5eb71357f1cb4dce3f7aeef7fdb1e2700a646114763672",
+      "origin": "New Clean Studio Task 4 translation contract"
+    }
+  ]
+}

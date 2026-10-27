@@ -1,4 +1,7 @@
+from collections.abc import Mapping
+from copy import deepcopy
 from dataclasses import asdict, dataclass
+from hashlib import sha256
 import json
 
 
@@ -36,6 +39,7 @@ class Shot:
     camera: str
     shot_scale: str
     visible_characters: tuple[str, ...]
+    opening_characters: tuple[str, ...]
     dialogue: tuple[Dialogue, ...]
     reference_subjects: tuple[str, ...]
     duration_seconds: int
@@ -56,6 +60,7 @@ class Shot:
         dialogue: tuple[Dialogue, ...],
         reference_subjects: tuple[str, ...],
         duration_seconds: int,
+        opening_characters: tuple[str, ...] = (),
         extra_fields: tuple[str, ...] = (),
         **non_author_fields: object,
     ) -> None:
@@ -69,6 +74,7 @@ class Shot:
         object.__setattr__(self, "camera", camera)
         object.__setattr__(self, "shot_scale", shot_scale)
         object.__setattr__(self, "visible_characters", tuple(visible_characters))
+        object.__setattr__(self, "opening_characters", tuple(opening_characters))
         object.__setattr__(self, "dialogue", tuple(dialogue))
         object.__setattr__(self, "reference_subjects", tuple(reference_subjects))
         object.__setattr__(self, "duration_seconds", duration_seconds)
@@ -201,15 +207,85 @@ class ReferenceManifest:
         return (payload + "\n").encode("utf-8")
 
 
+EXPORT_BUNDLE_SCHEMA = "clean-studio-export-bundle-v1"
+
+
+def _bundle_value(export, name, alias=None):
+    if isinstance(export, Mapping):
+        value = export.get(name)
+        if value is None and alias is not None:
+            value = export.get(alias)
+    else:
+        value = getattr(export, name, None)
+        if value is None and alias is not None:
+            value = getattr(export, alias, None)
+    if value is None:
+        raise ValueError(f"export bundle requires {name}")
+    return value
+
+
+def _bundle_json(value):
+    return json.loads(
+        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    )
+
+
+def export_bundle_parts(export):
+    if isinstance(export, Mapping) and export.get("schema", EXPORT_BUNDLE_SCHEMA) != EXPORT_BUNDLE_SCHEMA:
+        raise ValueError("export bundle schema is unsupported")
+    return {
+        "schema": EXPORT_BUNDLE_SCHEMA,
+        "video_sha256": _bundle_value(export, "video_sha256", "sha256"),
+        "cover_sha256": _bundle_value(export, "cover_sha256"),
+        "end_card_sha256": _bundle_value(export, "end_card_sha256"),
+        "subtitle_sha256": _bundle_value(export, "subtitle_sha256"),
+        "credits_sha256": _bundle_value(export, "credits_sha256"),
+        "manifest_sha256": _bundle_value(export, "manifest_sha256"),
+        "episode_hash": _bundle_value(export, "episode_hash"),
+        "expected_duration_seconds": _bundle_value(export, "expected_duration_seconds"),
+        "body_seconds": _bundle_value(export, "body_seconds"),
+        "expected_frames": _bundle_value(export, "expected_frames"),
+        "shot_ids": list(_bundle_value(export, "shot_ids")),
+        "fixed_question": _bundle_value(export, "fixed_question"),
+        "fixed_options": _bundle_json(_bundle_value(export, "fixed_options")),
+        "mixed_music": _bundle_json(_bundle_value(export, "mixed_music")),
+        "subtitles": _bundle_json(_bundle_value(export, "subtitles")),
+        "source_videos": _bundle_json(_bundle_value(export, "source_videos")),
+    }
+
+
+def export_bundle_identity(export):
+    parts = export_bundle_parts(export)
+    encoded = json.dumps(
+        parts, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    return sha256(encoded).hexdigest()
+
+
+def export_bundle_metadata(export):
+    return {
+        **export_bundle_parts(export),
+        "bundle_hash": export_bundle_identity(export),
+    }
+
+
+Finding = dict[str, object]
+
+
 @dataclass(frozen=True)
 class Review:
     review_id: str
     content_hash: str
     verdict: str
-    findings: tuple[str, ...] = ()
+    findings: tuple[Finding, ...] = ()
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, "findings", tuple(self.findings))
+        findings = tuple(self.findings)
+        if any(not isinstance(finding, dict) for finding in findings):
+            raise TypeError("findings must be structured objects")
+        object.__setattr__(
+            self, "findings", tuple(deepcopy(finding) for finding in findings)
+        )
 
 
 @dataclass(frozen=True)

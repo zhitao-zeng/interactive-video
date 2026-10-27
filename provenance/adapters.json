@@ -1,0 +1,208 @@
+{
+  "recorded_date": "2026-10-26",
+  "updated_date": "2026-10-27",
+  "source_revision": "c698b644dea9501d290fe3f575fd83a3df9b2db0",
+  "source_note": "Read-only exact working-tree bytes from main, including its uncommitted source state. Hashes identify the frozen evidence; no legacy runtime module is imported.",
+  "scope": "Clean Studio Tasks 5-6 ordered media adapters, independent media evidence, real SoulTuner candidate retrieval, explicit exception-Agent audition, one-pass FFmpeg assembly and technical-only export probing. Clean Store Operations alone authorize paid submission; assembly never grants content acceptance.",
+  "excluded": [
+    "legacy local_h3 generic retry and pool switching",
+    "discarding a known external task after endpoint or pool changes",
+    "automatic image resubmission after a purged result",
+    "legacy episode flow, generation, cache and recovery state machines",
+    "legacy runner/report and episode music selection/adoption state machines",
+    "content-Agent recovery or ASR-based final audio acceptance",
+    "search/rank/sample analysis as music content acceptance",
+    "SenseVoice dependencies in the main interpreter"
+  ],
+  "sources": {
+    "phanrouter": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/providers/phanrouter.py",
+      "sha256": "bf8ab4ee707553d02edb5b913e11b6adfe48f1a3f9525c386439fb218e7f108f"
+    },
+    "phanrouter_images": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/providers/phanrouter_images.py",
+      "sha256": "f0e8a80fc97382133be98415e9e4049bece403a49eca354c6ef96f7dbb678a5d"
+    },
+    "phanrouter_tasks": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/providers/phanrouter_tasks.py",
+      "sha256": "18355d5e80179fec66058f1157e74800edc4b2f72fa1d1ccf391f421031269bf"
+    },
+    "downloads": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/providers/downloads.py",
+      "sha256": "1292b596b5a56c14081dd6758fa2338d07382c5eb4f3e9b604a988f8f5f9de64"
+    },
+    "local_h3": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/providers/local_h3.py",
+      "sha256": "fbd22af5f018340e5569c4c9fb24c0ae27004b78535675d7ea9355e9e3cf69d2"
+    },
+    "analysis": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/media/analysis.py",
+      "sha256": "b717bd662844fff7a8b0a0fc983299c7ec2fe267084bab48589bf228a2cbd31a"
+    },
+    "video_quality": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/media/video_quality.py",
+      "sha256": "cd13c2af4c3f27a3e98367a8966b43057a7cb50e52c9cb97288ad614bf3b1ff8"
+    },
+    "asr_segments": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/application/rendering/asr_segments.py",
+      "sha256": "903123a6f49aaa7bd067715114328b29ce33c767f74abe64ed378c7cb90a45c3"
+    },
+    "thin_asr_segments": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/scripts/thin_asr_segments.py",
+      "sha256": "918d436849642e8ea90f7d8d3b9a65dcbf3720d0ff5df9780a4994e3d0e50f35"
+    },
+    "first_frames": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/application/agents/episode/first_frames.py",
+      "sha256": "d3d4c8793e8adba0689a66a5aa27afbe5c60e8e24200fb2662df8a7b48d394ef"
+    },
+    "music_selection": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/application/music_selection.py",
+      "sha256": "a9c9a527ac127102df9926646b0245b3420f4eb114f9f56923a74a743e91158a"
+    },
+    "soultuner_worker": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/scripts/soultuner_recommend.py",
+      "sha256": "b403e0b386f312dadf2d08c263d6ab9d9ce9b71d2339fb10ce6b627827a18ccf"
+    },
+    "music_timeline": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/application/music_timeline.py",
+      "sha256": "6afadb588e499d74740a093e7d2540420082dd8ed2499eb1bbd0b98433468f56"
+    },
+    "renderer": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/media/renderer.py",
+      "sha256": "b2decbddf4caf1586d4bffac11722bb2f5bd46d842bd6798860c4bcbeb479563"
+    },
+    "quality": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/media/quality.py",
+      "sha256": "1546083f24b0d1796a993122dcc5cfa7ac94f16d652e0fdce91fa4e4c37ed641"
+    },
+    "config": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/config.py",
+      "sha256": "e308b77a427b38e5bf33480fb7208f10979aa17a9146607c75383a09c78fab96"
+    }
+  },
+  "frozen_files": [
+    {
+      "path": "src/clean_studio/frozen/provider.py",
+      "sha256": "b17f527c8851f9bc1afe8f45bbe431d5a2a279c779c063158c9a871d9aeea11e",
+      "sources": [
+        "phanrouter_tasks",
+        "downloads"
+      ]
+    },
+    {
+      "path": "src/clean_studio/frozen/h3.py",
+      "sha256": "ad76227b4bd4af132a1d7822f6cbd67dc9c267d94c399fdebc479666071abac6",
+      "sources": [
+        "local_h3"
+      ]
+    },
+    {
+      "path": "src/clean_studio/frozen/media.py",
+      "sha256": "a95f2124296431b503394ab81c4a10ff47bfb6d68331b65673142ffbc174b369",
+      "sources": [
+        "analysis",
+        "video_quality"
+      ]
+    },
+    {
+      "path": "src/clean_studio/frozen/asr_worker.py",
+      "sha256": "3f69909846d7cad0ff7815c68ec0735b653d51cf6f675d026607b8867ad559d1",
+      "sources": [
+        "asr_segments",
+        "thin_asr_segments"
+      ]
+    },
+    {
+      "path": "src/clean_studio/providers/image.py",
+      "sha256": "dd3b88859ded12a4f806e425974b1ffaf56eccb217394b8f278a1840fcea739b",
+      "sources": [
+        "phanrouter",
+        "phanrouter_images",
+        "phanrouter_tasks",
+        "downloads"
+      ]
+    },
+    {
+      "path": "src/clean_studio/providers/h3.py",
+      "sha256": "8dc80f3ee0537960ccb5765b61b01595e83ed4a04c191105d760af3b126b32dd",
+      "sources": [
+        "local_h3",
+        "downloads"
+      ]
+    },
+    {
+      "path": "src/clean_studio/providers/asr.py",
+      "sha256": "a6386f0e9d13b18b4f7a3d75d812db9109b990e4e91794c85e3c80906bb0221d",
+      "sources": [
+        "analysis",
+        "asr_segments"
+      ]
+    },
+    {
+      "path": "src/clean_studio/media.py",
+      "sha256": "bb3a883b6016e47612c6092855717c9bd42aa1fdc36fc933510fda1ab423395e",
+      "sources": [
+        "first_frames",
+        "analysis",
+        "video_quality"
+      ]
+    },
+    {
+      "path": "src/clean_studio/frozen/music.py",
+      "sha256": "c6491cd645e4449481f0b8bff2f6b2995ba330753cc6a6ba726a2e99e37f3dda",
+      "sources": [
+        "music_selection",
+        "music_timeline"
+      ]
+    },
+    {
+      "path": "src/clean_studio/frozen/soultuner_worker.py",
+      "sha256": "cfb745fc1aa202c58ce4d2e705b7a4f071f2e78cbe88ea9c924e0a99f435e78a",
+      "sources": [
+        "soultuner_worker"
+      ]
+    },
+    {
+      "path": "src/clean_studio/frozen/render.py",
+      "sha256": "5365a96e9d8086f7d5b9090e1d35766cd8bf6018046fbcb9895e207d739c935f",
+      "sources": [
+        "renderer",
+        "music_timeline",
+        "config"
+      ]
+    },
+    {
+      "path": "src/clean_studio/frozen/quality.py",
+      "sha256": "fa93d12e2ce8c8c9d3853c3b2ddbee2113de025075d972484f802e811251243a",
+      "sources": [
+        "quality"
+      ]
+    },
+    {
+      "path": "src/clean_studio/providers/music.py",
+      "sha256": "352e7fd44a717bc5662b76dfdde991d91baae6a71f0d72f106fe299fbe514355",
+      "sources": [
+        "music_selection",
+        "music_timeline"
+      ]
+    },
+    {
+      "path": "src/clean_studio/providers/ffmpeg.py",
+      "sha256": "a161be39c8cb5ecf3d66190dd4eba9b3403b3c3056a18e3d478aba88c1cdb5e5",
+      "sources": [
+        "renderer",
+        "quality"
+      ]
+    },
+    {
+      "path": "src/clean_studio/assembly.py",
+      "sha256": "4a7768b4112cbf4b5230613a6b87bf6cabc028fd6e0163588b1a15fedbfd4e1b",
+      "sources": [
+        "renderer",
+        "quality",
+        "music_timeline",
+        "music_selection"
+      ]
+    }
+  ]
+}

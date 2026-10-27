@@ -1,0 +1,73 @@
+{
+  "recorded_date": "2026-10-27",
+  "source_revision": "c698b644dea9501d290fe3f575fd83a3df9b2db0",
+  "source_note": "Read-only exact source bytes. Only the required review algorithms and CPU worker branch were frozen; no legacy runtime module is imported.",
+  "scope": "Clean Studio Task7 local-frame visual review with validate_group/blocking_issues, complete final-movie audio decode, 30-second windows with 2-second overlap, Eureka worker and bound text judgment. Legacy episode directories, acceptance_status and episode recovery flows are excluded.",
+  "sources": {
+    "final_cut": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/application/review/final_cut.py",
+      "sha256": "6f0df9fb7bdd6560ba51532a2d158f61276fb8e5e2e8d241b884d495e9257f63"
+    },
+    "review_contracts": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/review/contracts.py",
+      "sha256": "f884ae40885cadf332e73933e88b64d28b8da430d505298ed126eae5177965c6"
+    },
+    "final_audio": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/src/novel_manga/application/review/final_audio.py",
+      "sha256": "05e941d548f2eed83c9462d9df46f00e2ebb2ab44b81c382b6bde1edce4f518f"
+    },
+    "eureka_worker": {
+      "path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main/scripts/music_library_worker.py",
+      "sha256": "cbd348ea5e77433b485d37ea864c0dea0623fd3ed842120b2c9c88b3f5537c48"
+    }
+  },
+  "frozen_files": [
+    {
+      "path": "src/clean_studio/frozen/final_review.py",
+      "sha256": "d5cc85ffa338b6c1f067497c24d39bcb954d26d2752ff5f06f5410f270ab7ca7",
+      "sources": [
+        "final_cut",
+        "review_contracts"
+      ]
+    },
+    {
+      "path": "prompts/final-visual-review.md",
+      "sha256": "cf632728b0bb5bfe55243ed366239ea4d98f4a0c871aea6e9bf07680ae9a8684",
+      "sources": [
+        "final_cut",
+        "review_contracts"
+      ]
+    },
+    {
+      "path": "src/clean_studio/frozen/final_audio.py",
+      "sha256": "7bbf26a33aaa4776dfa9c59b11d0b118c4a9283ac6e0375b50c950ee7e5ea40c",
+      "sources": [
+        "final_audio"
+      ]
+    },
+    {
+      "path": "src/clean_studio/frozen/eureka_worker.py",
+      "sha256": "5415c4f5ca64c94ecbb1627bfb560ff17f6aa3015368ec1b65b5841a7050487e",
+      "sources": [
+        "eureka_worker"
+      ]
+    },
+    {
+      "path": "src/clean_studio/acceptance.py",
+      "sha256": "8c3db02707472f6558ac07aac150b975b95ef5405aac2c381a1108e7ce4083a4",
+      "sources": [
+        "final_cut",
+        "final_audio"
+      ]
+    },
+    {
+      "path": "src/clean_studio/review_contract.py",
+      "sha256": "978b1bf7fe4676f82c62ee5aed33e1c60959baa364a5990c3d2500df2ab064b6",
+      "sources": [
+        "final_cut",
+        "review_contracts",
+        "final_audio"
+      ]
+    }
+  ]
+}

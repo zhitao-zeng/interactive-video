@@ -1,12 +1,15 @@
 import json
 import sqlite3
-from dataclasses import replace
+from dataclasses import fields, replace
 from hashlib import sha256
 from typing import get_type_hints
 
 import pytest
 
+from clean_studio.agents.repair import check_patch
 from clean_studio.domain import EpisodeSpec, FixedOption, Operation, Shot
+from clean_studio.frozen.final_audio import AUDIO_POLICY
+from clean_studio.frozen.final_review import VISUAL_POLICY
 from clean_studio.store import Store
 
 PUBLISH_TARGET = "team/private-dataset"
@@ -49,12 +52,62 @@ def _two_shot_episode() -> EpisodeSpec:
     return replace(episode, shots=(episode.shots[0], second))
 
 
+def _revision_plan(current, revised):
+    patch = {}
+    grant = {}
+    for old, new in zip(current.shots, revised.shots):
+        changes = {}
+        for field in fields(Shot):
+            if field.name in {"shot_id", "extra_fields"}:
+                continue
+            if getattr(old, field.name) != getattr(new, field.name):
+                changes[field.name] = getattr(new, field.name)
+        if changes:
+            patch[old.shot_id] = changes
+            grant[old.shot_id] = set(changes)
+    return check_patch(current, patch, grant)
+
+
 def _config():
     return {"model": "frozen", "max_launches": 3, "publish_target": PUBLISH_TARGET}
 
 
 def _hash(value: str) -> str:
     return sha256(value.encode("utf-8")).hexdigest()
+
+
+def _bundle_for_content(content):
+    parts = {
+        "schema": "clean-studio-export-bundle-v1",
+        "video_sha256": _hash(content),
+        "cover_sha256": _hash(content + ":cover"),
+        "end_card_sha256": _hash(content + ":end"),
+        "subtitle_sha256": _hash(content + ":subtitles"),
+        "credits_sha256": _hash(content + ":credits"),
+        "manifest_sha256": _hash(content + ":manifest"),
+        "episode_hash": _hash("episode:" + content),
+        "expected_duration_seconds": 12.0,
+        "body_seconds": 9.0,
+        "expected_frames": 300,
+        "shot_ids": ["shot-1"],
+        "fixed_question": "下一站？",
+        "fixed_options": [{"label": "A", "target_world": "W11"}],
+        "mixed_music": [],
+        "subtitles": [],
+        "source_videos": [],
+    }
+    encoded = json.dumps(
+        parts, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    return {**parts, "bundle_hash": sha256(encoded).hexdigest()}
+
+
+def _bundle(store, bundle_hash):
+    for artifact in store.load()["artifacts"]:
+        bundle = artifact["metadata"].get("export_bundle")
+        if bundle and bundle["bundle_hash"] == bundle_hash:
+            return bundle
+    raise KeyError(bundle_hash)
 
 
 def _receipt(operation, *, receipt_id=None, verdict=None, **evidence):
@@ -155,6 +208,9 @@ def _complete_media(store, operation, content, *, expected_current_hash=None, re
     path, receipt_hash = _write_receipt(
         store, operation, receipt=receipt, path=receipt_path
     )
+    metadata = {"input": operation.input_hash}
+    if operation.kind == "assembly":
+        metadata["export_bundle"] = _bundle_for_content(content)
     return store.complete_operation(
         operation.id,
         path=f"media/{operation.id}.bin",
@@ -164,8 +220,73 @@ def _complete_media(store, operation, content, *, expected_current_hash=None, re
         expected_current_hash=(
             operation.input_hash if expected_current_hash is None else expected_current_hash
         ),
-        metadata={"input": operation.input_hash},
+        metadata=metadata,
     )
+
+
+def _final_evidence(store, key, kind, content_hash, verdict):
+    bundle = _bundle(store, content_hash)
+    issues = []
+    if verdict == "rejected" and kind == "final_visual_review":
+        issues = [{
+            "clip_ids": ["shot-1"],
+            "frame_numbers": [1],
+            "severity": "must_fix",
+            "problem": "关键画面错误",
+            "evidence": "第 1 帧",
+            "source_basis": "当前镜头事实",
+        }]
+    if verdict == "rejected" and kind == "final_audio_review":
+        issues = [{
+            "start": 0.0,
+            "end": 1.0,
+            "problem": "必需对白不可懂",
+            "evidence": "完整窗口声音证据",
+            "source_basis": "当前对白",
+            "clip_ids": ["shot-1"],
+        }]
+    common = {
+        "complete": True,
+        "passed": verdict == "accepted",
+        "review_id": key,
+        "content_hash": content_hash,
+        "input_hash": content_hash,
+        "bundle_hash": content_hash,
+        "export_sha256": bundle["video_sha256"],
+        "video_sha256": bundle["video_sha256"],
+        "issues": issues,
+        "findings": issues,
+        "errors": [],
+    }
+    if kind == "final_visual_review":
+        group = {
+            "passed": verdict == "accepted",
+            "observations": ["实际抽帧"],
+            "issues": issues,
+        }
+        return {
+            **common,
+            "policy": VISUAL_POLICY,
+            "cover_sha256": bundle["cover_sha256"],
+            "frames": [{"clip_id": "shot-1", "seconds": 0.15}],
+            "groups": [group],
+        }
+    duration = bundle["expected_duration_seconds"]
+    return {
+        **common,
+        "policy": AUDIO_POLICY,
+        "movie": "current-export.mp4",
+        "decode": {
+            "fully_decoded": True,
+            "samples": round(duration * 16000),
+            "sample_rate": 16000,
+            "export_sha256": bundle["video_sha256"],
+        },
+        "coverage_seconds": duration,
+        "coverage": [{"start": 0.0, "end": duration}],
+        "windows": [{"start": 0.0, "end": duration, "response": "完整声音"}],
+        "summary": "完整声音判断",
+    }
 
 
 def _complete_review(
@@ -177,17 +298,24 @@ def _complete_review(
     *,
     receipt_id=None,
     receipt_path=None,
+    evidence_changes=None,
 ):
     operation = store.begin_operation(key, kind, content_hash, None)
+    final = kind in {"final_visual_review", "final_audio_review"}
+    evidence = _final_evidence(store, key, kind, content_hash, verdict) if final else {}
+    evidence.update(evidence_changes or {})
     path, receipt_hash = _write_receipt(
         store,
         operation,
-        receipt=_receipt(operation, receipt_id=receipt_id, verdict=verdict),
+        receipt=_receipt(
+            operation, receipt_id=receipt_id, verdict=verdict, **evidence
+        ),
         path=receipt_path or f"receipts/{key}.json",
     )
     return store.complete_operation(
         operation.id,
         verdict=verdict,
+        findings=tuple(evidence.get("issues") or ()),
         receipt_path=path,
         receipt_sha256=receipt_hash,
     )
@@ -205,7 +333,7 @@ def _export(store, key, content):
     _compile_episode(store, compile_hash)
     operation = store.begin_operation(key, "assembly", compile_hash, None)
     _complete_media(store, operation, content)
-    return _hash(content)
+    return _bundle_for_content(content)["bundle_hash"]
 
 
 def _accepted_export(store, key="assembly-1", content="export-1"):
@@ -216,12 +344,18 @@ def _accepted_export(store, key="assembly-1", content="export-1"):
 
 
 def _upload(store, key, export_hash, **evidence_changes):
+    bundle = _bundle(store, export_hash)
     operation = store.begin_operation(key, "upload", export_hash, None)
     evidence = {
         "target": PUBLISH_TARGET,
+        "bundle_hash": export_hash,
+        "verified": True,
         "private": True,
+        "visibility": "private",
         "remote_object": "objects/current-export.mp4",
-        "remote_sha256": export_hash,
+        "remote_sha256": bundle["video_sha256"],
+        "cover_object": "objects/current-cover.jpg",
+        "cover_sha256": bundle["cover_sha256"],
     }
     evidence.update(evidence_changes)
     path, receipt_hash = _write_receipt(
@@ -381,6 +515,25 @@ def test_video_takes_have_an_independent_limit(store):
         store.begin_operation(f"video-{index}", "video", f"h3-{index}", "shot-1")
     with pytest.raises(ValueError, match="video.*quota|quota.*video"):
         store.begin_operation("video-3", "video", "h3-3", "shot-1")
+
+
+def test_submitting_is_transactional_and_can_be_marked_submitted(store):
+    operation = _begin_image(store)
+    submitting = store.mark_submitting(operation.id)
+    assert submitting.status == "submitting"
+    assert submitting.external_task_id is None
+    assert store.mark_submitting(operation.id).status == "submitting"
+    assert store.usage("shot-1", "image") == 1
+
+    reopened = Store(store.path)
+    recovered = reopened.begin_operation(
+        "image-1", "image", "frame-request-1", "shot-1"
+    )
+    assert recovered.status == "submitting"
+    assert recovered.external_task_id is None
+    submitted = reopened.mark_submitted(operation.id, "external-task-123")
+    assert submitted.status == "submitted"
+    assert submitted.external_task_id == "external-task-123"
 
 
 def test_crash_after_submission_recovers_same_operation_and_task_id(store):
@@ -660,6 +813,61 @@ def test_current_export_projects_candidate_accepted_complete_and_stale_evidence(
     assert store.load()["status"] == "candidate"
 
 
+def test_export_bundle_is_persisted_and_same_video_new_cover_is_candidate(store):
+    export_hash = _accepted_export(store)
+    artifact = _artifact(store, store.load()["current_export_artifact_id"])
+    assert artifact["metadata"]["export_bundle"]["bundle_hash"] == export_hash
+    assert store.load()["status"] == "accepted"
+
+    changed = dict(_bundle_for_content("export-1"))
+    changed["cover_sha256"] = _hash("different-cover")
+    parts = {key: value for key, value in changed.items() if key != "bundle_hash"}
+    changed["bundle_hash"] = sha256(
+        json.dumps(parts, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    assert changed["video_sha256"] == artifact["sha256"]
+    assert changed["bundle_hash"] != export_hash
+    _compile_episode(store, "compile-new-cover")
+    operation = store.begin_operation("assembly-new-cover", "assembly", "compile-new-cover", None)
+    receipt_path, receipt_hash = _write_receipt(store, operation)
+    store.complete_operation(
+        operation.id,
+        path=f"media/{operation.id}.bin",
+        sha256=artifact["sha256"],
+        receipt_path=receipt_path,
+        receipt_sha256=receipt_hash,
+        expected_current_hash="compile-new-cover",
+        metadata={"export_bundle": changed},
+    )
+    assert store.load()["status"] == "candidate"
+
+
+def test_store_visual_projection_uses_group_aggregation_not_only_verdict(store):
+    export_hash = _accepted_export(store)
+    assert store.load()["status"] == "accepted"
+    issue = {
+        "clip_ids": ["shot-1"],
+        "frame_numbers": [1],
+        "severity": "must_fix",
+        "problem": "组内关键错误",
+        "evidence": "第 1 帧",
+        "source_basis": "当前镜头事实",
+    }
+    _complete_review(
+        store,
+        "visual-malformed-aggregate",
+        "final_visual_review",
+        export_hash,
+        "accepted",
+        evidence_changes={
+            "groups": [{"passed": False, "observations": ["实际错误"], "issues": [issue]}],
+            "issues": [],
+            "findings": [],
+        },
+    )
+    assert store.load()["status"] == "candidate"
+
+
 @pytest.mark.parametrize(
     "changes",
     [
@@ -688,7 +896,7 @@ def test_upload_target_must_exactly_match_frozen_target(store):
             target="team/another-target",
             private=True,
             remote_object="objects/export.mp4",
-            remote_sha256=export_hash,
+            remote_sha256=_bundle(store, export_hash)["video_sha256"],
         ),
     )
     with pytest.raises(ValueError, match="target"):
@@ -811,11 +1019,13 @@ def test_script_revision_invalidates_only_affected_shots_and_preserves_artifacts
     before = store.load()
     changed = replace(before["spec"].shots[0], start_state="知遥坐在码头，船灯已经点亮")
     revision = replace(before["spec"], shots=(changed, before["spec"].shots[1]))
+    plan = _revision_plan(before["spec"], revision)
     operation = store.apply_script_revision(
         "patch-1",
-        "patch-input-1",
+        plan.input_hash,
         revision,
         expected_script_hash=before["current_script_hash"],
+        plan=plan,
     )
     assert operation.status == "completed"
     assert operation.shot_id is None
@@ -844,8 +1054,13 @@ def test_multi_shot_revision_prechecks_actual_usage_and_atomically_compares_scri
         initial["spec"],
         shots=tuple(replace(shot, action=f"多镜修订一 {shot.shot_id}") for shot in initial["spec"].shots),
     )
+    plan_1 = _revision_plan(initial["spec"], revision_1)
     operation_1 = store.apply_script_revision(
-        "patch-1", "input-1", revision_1, expected_script_hash=initial["current_script_hash"]
+        "patch-1",
+        plan_1.input_hash,
+        revision_1,
+        expected_script_hash=initial["current_script_hash"],
+        plan=plan_1,
     )
     assert store.usage("shot-1", "input") == 1
     assert store.usage("shot-2", "input") == 1
@@ -854,8 +1069,13 @@ def test_multi_shot_revision_prechecks_actual_usage_and_atomically_compares_scri
         revision_1,
         shots=(replace(revision_1.shots[0], action="只修第一镜"), revision_1.shots[1]),
     )
+    plan_2 = _revision_plan(revision_1, revision_2)
     store.apply_script_revision(
-        "patch-2", "input-2", revision_2, expected_script_hash=store.load()["current_script_hash"]
+        "patch-2",
+        plan_2.input_hash,
+        revision_2,
+        expected_script_hash=store.load()["current_script_hash"],
+        plan=plan_2,
     )
     assert store.usage("shot-1", "input") == 2
     assert store.usage("shot-2", "input") == 1
@@ -864,9 +1084,14 @@ def test_multi_shot_revision_prechecks_actual_usage_and_atomically_compares_scri
         revision_2,
         shots=tuple(replace(shot, end_state=f"新状态 {shot.shot_id}") for shot in revision_2.shots),
     )
+    plan_both = _revision_plan(revision_2, revision_both)
     with pytest.raises(ValueError, match="shot-1.*input.*quota|input.*quota.*shot-1"):
         store.apply_script_revision(
-            "patch-3", "input-3", revision_both, expected_script_hash=store.load()["current_script_hash"]
+            "patch-3",
+            plan_both.input_hash,
+            revision_both,
+            expected_script_hash=store.load()["current_script_hash"],
+            plan=plan_both,
         )
     assert store.usage("shot-1", "input") == 2
     assert store.usage("shot-2", "input") == 1
@@ -874,20 +1099,38 @@ def test_multi_shot_revision_prechecks_actual_usage_and_atomically_compares_scri
 
     revision_stale = replace(revision_2.shots[1], action="过期旧稿")
     stale_spec = replace(revision_2, shots=(revision_2.shots[0], revision_stale))
+    stale_plan = _revision_plan(revision_2, stale_spec)
     with pytest.raises(ValueError, match="expected_script_hash"):
         store.apply_script_revision(
-            "patch-stale", "input-stale", stale_spec, expected_script_hash=initial["current_script_hash"]
+            "patch-stale",
+            stale_plan.input_hash,
+            stale_spec,
+            expected_script_hash=initial["current_script_hash"],
+            plan=stale_plan,
         )
     assert store.load()["spec"] == revision_2
 
     assert store.apply_script_revision(
-        "patch-1", "input-1", revision_1, expected_script_hash=initial["current_script_hash"]
+        "patch-1",
+        plan_1.input_hash,
+        revision_1,
+        expected_script_hash=initial["current_script_hash"],
+        plan=plan_1,
     ).id == operation_1.id
     assert store.load()["spec"] == revision_2
 
-    with pytest.raises(ValueError, match="no changes"):
+    noop_plan = check_patch(
+        revision_2,
+        {"shot-2": {"action": "计划变化但提交未变化"}},
+        {"shot-2": {"action"}},
+    )
+    with pytest.raises(ValueError, match="no changes|does not match.*plan"):
         store.apply_script_revision(
-            "patch-noop", "input-noop", revision_2, expected_script_hash=store.load()["current_script_hash"]
+            "patch-noop",
+            noop_plan.input_hash,
+            revision_2,
+            expected_script_hash=store.load()["current_script_hash"],
+            plan=noop_plan,
         )
     assert store.usage("shot-2", "input") == 1
 
@@ -895,17 +1138,23 @@ def test_multi_shot_revision_prechecks_actual_usage_and_atomically_compares_scri
         revision_2,
         shots=(revision_2.shots[0], replace(revision_2.shots[1], action="只修第二镜")),
     )
+    plan_4 = _revision_plan(revision_2, revision_4)
     store.apply_script_revision(
-        "patch-4", "input-4", revision_4, expected_script_hash=store.load()["current_script_hash"]
+        "patch-4",
+        plan_4.input_hash,
+        revision_4,
+        expected_script_hash=store.load()["current_script_hash"],
+        plan=plan_4,
     )
     assert store.usage("shot-1", "input") == 2
     assert store.usage("shot-2", "input") == 2
     with pytest.raises(ValueError, match="idempotency"):
         store.apply_script_revision(
             "patch-1",
-            "input-1",
+            plan_1.input_hash,
             replace(revision_1, title="冲突旧稿"),
             expected_script_hash=initial["current_script_hash"],
+            plan=plan_1,
         )
     assert store.load()["spec"] == revision_4
 

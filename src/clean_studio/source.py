@@ -231,7 +231,10 @@ def validate_episode(
     if episode.episode_id != source.video_id:
         raise ValueError("episode_id does not match source")
     if episode.title != source.title or episode.target_seconds != source.target_seconds:
-        raise ValueError("episode title/target_seconds do not match source")
+        raise ValueError(
+            "episode title/target_seconds do not match source: expected title "
+            f"{source.title!r} and target_seconds {source.target_seconds}"
+        )
     if episode.style_id != references.style_id:
         raise ValueError("style_id does not match reference manifest")
     if episode.fixed_question != source.fixed_question:
@@ -275,6 +278,13 @@ def validate_episode(
         for subject_id in shot.visible_characters + shot.reference_subjects:
             if subject_id not in subjects:
                 raise ValueError(f"unregistered subject: {subject_id}")
+        for subject_id in shot.opening_characters:
+            if subject_id not in subjects:
+                raise ValueError(f"unregistered subject: {subject_id}")
+            if subject_id not in shot.visible_characters:
+                raise ValueError(
+                    f"opening character must appear in visible_characters: {subject_id}"
+                )
         for subject_id in shot.reference_subjects:
             if (
                 subjects[subject_id].subject_type == "character"
