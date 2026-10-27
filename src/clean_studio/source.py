@@ -274,7 +274,11 @@ def validate_episode(
     body_seconds = sum(shot.duration_seconds for shot in episode.shots)
     total_seconds = body_seconds + END_CARD_SECONDS
     if not 180 <= total_seconds <= 300:
-        raise ValueError("total duration including end card must be from 180 to 300")
+        raise ValueError(
+            "total duration including end card must be from 180 to 300:"
+            f" current body is {body_seconds} seconds, {total_seconds} with the"
+            f" {END_CARD_SECONDS}-second end card — adjust shot durations"
+        )
 
     for cue in episode.music_cues:
         if not 0 <= cue.start_seconds < cue.end_seconds <= body_seconds:
