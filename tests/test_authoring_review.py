@@ -698,11 +698,12 @@ def test_review_fails_when_every_finding_is_ungrounded(context):
     source, references, episode = context
     sources = _review_sources(source, references)
     ungrounded = _finding(episode, finding_id="bad-1", quote="稿件里不存在的话")
-    client = FakeClient([{"findings": [ungrounded]}])
+    client = FakeClient([{"findings": [ungrounded]}] * 3)
     reviewer = Reviewer(client)
 
     with pytest.raises(ReviewProtocolError, match="all review findings were ungrounded"):
         reviewer.review(episode, sources)
+    assert len(client.calls) == 3
 
 
 def test_retracted_candidate_plus_dropped_finding_cannot_yield_accepted(context):
@@ -983,16 +984,20 @@ def test_store_reuses_valid_review_across_reviewers_but_not_policy_change(contex
 def test_invalid_or_failed_review_is_not_cached(context, tmp_path, failure):
     source, references, episode = context
     store = _store(tmp_path, episode)
-    client = FakeClient([failure, {"findings": []}])
+    if isinstance(failure, dict):
+        # protocol failures now retry in-stage (bounded 3) before failing
+        client = FakeClient([failure, failure, failure, {"findings": []}])
+    else:
+        client = FakeClient([failure, {"findings": []}])
     reviewer = Reviewer(client, store=store)
     sources = _review_sources(source, references)
 
     with pytest.raises((ConnectionError, ReviewProtocolError)):
         reviewer.review(episode, sources)
     reviewer.review(episode, sources)
-    assert len(client.calls) == 2
+    assert len(client.calls) == (4 if isinstance(failure, dict) else 2)
     reviewer.review(episode, sources)
-    assert len(client.calls) == 2
+    assert len(client.calls) == (4 if isinstance(failure, dict) else 2)
 
 
 def test_invalid_confirmation_is_not_cached_or_used_to_erase_other_findings(context):

@@ -463,9 +463,31 @@ class Reviewer:
                 return _copy_review(cached)
         retracted = set()
         try:
-            parts = self._initial_parts(episode, sources)
-            raw = self._ask(parts, _REVIEW_SCHEMA, "clean_source_review")
-            candidates = self._candidates(raw, episode, sources)
+            base_parts = self._initial_parts(episode, sources)
+            feedback = []
+            candidates = None
+            for attempt in range(3):
+                parts = base_parts
+                if feedback:
+                    parts = [
+                        *base_parts,
+                        {
+                            "type": "text",
+                            "text": (
+                                "HOST PROTOCOL REJECTIONS OF PREVIOUS REVIEW ATTEMPTS"
+                                " (fix the output protocol; do not repeat):\n"
+                                + "\n".join(f"- {message}" for message in feedback)
+                            ),
+                        },
+                    ]
+                raw = self._ask(parts, _REVIEW_SCHEMA, "clean_source_review")
+                try:
+                    candidates = self._candidates(raw, episode, sources)
+                    break
+                except ReviewProtocolError as error:
+                    feedback.append(str(error)[:400])
+                    if attempt == 2:
+                        raise
             if candidates:
                 confirmation_parts = [
                     *parts,
