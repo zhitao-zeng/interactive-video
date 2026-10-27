@@ -506,6 +506,38 @@ def test_two_rejected_frames_third_accepted_consumes_exactly_three(
     ]
 
 
+def test_completed_frame_revalidation_under_changed_review_policy(
+    store, compilation, monkeypatch
+):
+    images = FakeProvider([{"bytes": _png(10)}, {"bytes": _png(11)}])
+    reviews = FakeReviewClient([{"findings": []}])
+    operations = _operations(store, compilation, images, reviews=reviews)
+    artifact = operations.ensure_first_frame("shot-1")
+    assert len(reviews.calls) == 1
+    assert store.usage("shot-1", "image") == 1
+
+    # Code update: review policy version changes. The stored acceptance was
+    # computed under the old policy and must NOT be reused; the existing image
+    # is re-reviewed (no new generation for the re-review itself), and the
+    # remaining candidate quota still applies.
+    monkeypatch.setattr(
+        "clean_studio.media.FRAME_REVIEW_POLICY",
+        "clean-first-frame-explicit-relations-v4-test",
+    )
+    strict = FakeReviewClient([_rejected("policy-changed"), {"findings": []}])
+    strict_operations = _operations(store, compilation, images, reviews=strict)
+    result = strict_operations.ensure_first_frame("shot-1")
+
+    # one re-review of the existing image, one regular review of the new candidate
+    assert len(strict.calls) == 2
+    assert images.submit_calls == ["shot-1", "shot-1"]  # new candidate after rejection
+    assert store.usage("shot-1", "image") == 2  # the re-review itself consumed no quota
+    frames = [a for a in store.load()["artifacts"] if a["kind"] == "frame"]
+    verdicts = [f["metadata"]["review"]["verdict"] for f in frames]
+    assert "rejected" in verdicts
+    assert result is not None
+
+
 def test_video_takes_have_the_same_three_candidate_limit(store, compilation):
     images = FakeProvider([{"bytes": _png(10)}])
     videos = FakeProvider(
@@ -1324,6 +1356,11 @@ def test_speech_evaluation_forgives_same_pinyin_proper_nouns():
     assert rejected["passed"] is False
     assert rejected["phonetic_equivalence"] is False
 
+    import inspect as _inspect
+    from clean_studio.providers.asr import evaluate_speech as _es
+    default = _inspect.signature(_es).parameters["max_cer"].default
+    assert default == 0.5, "tests must track the production max_cer default"
+
 
 def test_frozen_provider_media_asr_closure_and_provenance():
     for directory in (ROOT / "src/clean_studio/frozen", ROOT / "src/clean_studio/providers"):
@@ -1357,7 +1394,7 @@ def test_frozen_provider_media_asr_closure_and_provenance():
         assert Path(source["path"]).is_absolute()
         assert len(source["sha256"]) == 64
     task8_hashes = {
-        "src/clean_studio/media.py": "bb3a883b6016e47612c6092855717c9bd42aa1fdc36fc933510fda1ab423395e",
+        "src/clean_studio/media.py": "c03c9a9a4f2098dfb232178b5ab8daa8c6b35405b15e488e9a65a19a607ddf27",
         "src/clean_studio/frozen/render.py": "5365a96e9d8086f7d5b9090e1d35766cd8bf6018046fbcb9895e207d739c935f",
     }
     for frozen in provenance["frozen_files"]:

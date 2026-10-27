@@ -120,6 +120,7 @@ def _copy_review(review: Review) -> Review:
         content_hash=review.content_hash,
         verdict=review.verdict,
         findings=deepcopy(review.findings),
+        unresolved=deepcopy(review.unresolved),
     )
 
 
@@ -388,6 +389,10 @@ class Reviewer:
         if cached.verdict == "accepted":
             if cached.findings:
                 raise ReviewProtocolError("cached accepted review must have no findings")
+            if cached.unresolved:
+                raise ReviewProtocolError(
+                    "cached accepted review must have no unresolved evidence items"
+                )
             return
         if cached.verdict != "rejected" or not cached.findings:
             raise ReviewProtocolError("cached rejected review must have findings")
@@ -429,6 +434,7 @@ class Reviewer:
                 "policy_version": _POLICY_VERSION,
                 "retracted_ids": sorted(retracted),
                 "dropped_ungrounded_findings": list(self.last_dropped),
+                "unresolved_findings": list(review.unresolved),
             },
         )
 
@@ -493,13 +499,15 @@ class Reviewer:
             for finding in candidates
             if finding["id"] not in retracted
         )
+        unresolved = tuple(self.last_dropped)
         review = Review(
             review_id=(
                 operation.id if operation is not None else f"source-review-{fingerprint}"
             ),
             content_hash=fingerprint,
-            verdict="rejected" if findings else "accepted",
+            verdict="rejected" if findings or unresolved else "accepted",
             findings=findings,
+            unresolved=unresolved,
         )
         if operation is not None:
             self._persist(operation, review, fingerprint, retracted)

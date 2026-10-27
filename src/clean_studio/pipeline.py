@@ -65,6 +65,7 @@ _REVISION_FIELDS = (
     "camera",
     "shot_scale",
     "visible_characters",
+    "opening_characters",
     "dialogue",
     "reference_subjects",
     "duration_seconds",
@@ -667,6 +668,12 @@ class Pipeline:
         if review.verdict == "accepted":
             return StageOutcome.completed()
         if not review.findings:
+            if getattr(review, "unresolved", ()):
+                return StageOutcome.blocked(
+                    "source review has unresolved evidence items (ungrounded"
+                    " findings; format repair or host adjudication required)",
+                    "resume SOURCE_REVIEW",
+                )
             raise ValueError("rejected source review requires confirmed content findings")
         self._repair_content(review.findings)
         self._compile()

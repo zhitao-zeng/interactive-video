@@ -536,7 +536,7 @@ class MediaOperations:
             pass
         return self._restore_artifact(artifact, kind)
 
-    def _accepted_current(self, shot_id: str, kind: str, input_hash: str):
+    def _accepted_current(self, shot_id: str, kind: str, input_hash: str, request=None):
         shot = self._shot(shot_id)
         artifact_kind = "frame" if kind == "image" else "video"
         pointer = (
@@ -553,7 +553,13 @@ class MediaOperations:
             review = metadata.get("review") or {}
             if review.get("verdict") != "accepted" or not review.get("content_hash"):
                 return None
-            valid = self.store.find_valid_review(review["content_hash"], "frame_review")
+            if request is not None:
+                current_hash = _frame_review_hash(artifact["sha256"], request)
+                if review.get("content_hash") != current_hash:
+                    return None
+                valid = self.store.find_valid_review(current_hash, "frame_review")
+            else:
+                valid = self.store.find_valid_review(review["content_hash"], "frame_review")
             if valid is None or valid.verdict != "accepted":
                 return None
         elif not _has_valid_video_quality(artifact):
@@ -797,13 +803,53 @@ class MediaOperations:
             raise RuntimeError("completed media operation has no artifact")
         return Artifact.from_row(artifact)
 
+    def _revalidate_frame_review(self, artifact, request):
+        """E06: a stored acceptance only counts under the CURRENT review policy.
+
+        Re-reviewing an already-generated image never consumes generation quota;
+        the old receipt stays on its own operation."""
+        review = (artifact["metadata"].get("review") or {})
+        current_hash = _frame_review_hash(artifact["sha256"], request)
+        if review.get("verdict") == "accepted" and review.get("content_hash") == current_hash:
+            cached = self.store.find_valid_review(current_hash, "frame_review")
+            if cached is not None and cached.verdict == "accepted":
+                return artifact
+        path = self._artifact_file(artifact, "frame")
+        fresh = review_frame(
+            path,
+            request,
+            self.frame_review_client,
+            store=self.store,
+        )
+        metadata = {
+            **artifact["metadata"],
+            "review": {
+                "verdict": fresh.verdict,
+                "content_hash": fresh.content_hash,
+                "review_id": fresh.review_id,
+                "findings": fresh.findings,
+            },
+        }
+        self.store.refresh_frame_review(
+            artifact["operation_id"],
+            metadata["review"],
+        )
+        return {**artifact, "metadata": metadata}
+
     def _execute_image(self, operation: dict, request):
         if operation["status"] == "completed":
             artifact = self._operation_artifact(operation["id"], "frame")
             if artifact is None:
                 raise RuntimeError("completed image operation has no frame artifact")
+            verdict = (artifact["metadata"].get("review") or {}).get("verdict")
+            if verdict == "accepted":
+                artifact = self._revalidate_frame_review(artifact, request)
+                if (artifact["metadata"].get("review") or {}).get("verdict") != "accepted":
+                    return _REJECTED
+                self._artifact_file(artifact, "frame")
+                return Artifact.from_row(artifact)
             self._artifact_file(artifact, "frame")
-            return Artifact.from_row(artifact)
+            return _REJECTED
 
         validate_current_references(request.shot_id, request.references)
         payload = self.image_provider.payload(request)
@@ -984,7 +1030,7 @@ class MediaOperations:
         _, request = self._prepare_frame_request(shot_id)
         validate_current_references(shot_id, request.references)
         while True:
-            accepted = self._accepted_current(shot_id, "image", request.input_hash)
+            accepted = self._accepted_current(shot_id, "image", request.input_hash, request)
             if accepted is not None:
                 return accepted
             operation = self._active_operation(shot_id, "image", request.input_hash)
@@ -996,7 +1042,7 @@ class MediaOperations:
     def ensure_video(self, shot_id: str) -> Artifact:
         compiled, frame_request = self._prepare_frame_request(shot_id)
         validate_current_references(shot_id, frame_request.references)
-        frame = self._accepted_current(shot_id, "image", frame_request.input_hash)
+        frame = self._accepted_current(shot_id, "image", frame_request.input_hash, frame_request)
         if frame is None:
             raise ValueError("a current accepted first frame is required before H3 generation")
         frame_artifact = self._artifact_row(frame.id, "frame")

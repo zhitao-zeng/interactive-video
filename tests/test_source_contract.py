@@ -323,6 +323,25 @@ def test_domain_is_immutable_and_has_no_derived_shot_fields(episode):
         episode.shots[0].duration_seconds = 12
 
 
+def test_music_cues_must_stay_inside_body_timeline(episode, source, references):
+    body = sum(shot.duration_seconds for shot in episode.shots)
+    cue = episode.music_cues[0] if episode.music_cues else None
+    if cue is None:
+        from clean_studio.domain import MusicCue
+
+        cue = MusicCue(start_seconds=0, end_seconds=10, mood="m", soundscape="s")
+    oversized = replace(
+        episode, music_cues=(replace(cue, start_seconds=body - 1, end_seconds=body + 5),)
+    )
+    with pytest.raises(ValueError, match="music cue bounds"):
+        validate_episode(oversized, source, references)
+
+    legal = replace(
+        episode, music_cues=(replace(cue, start_seconds=0, end_seconds=body),)
+    )
+    validate_episode(legal, source, references)
+
+
 def test_valid_episode_passes(episode, source, references):
     assert len(episode.shots) == 20
     assert sum(shot.duration_seconds for shot in episode.shots) + 3 == 183

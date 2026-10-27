@@ -533,20 +533,46 @@ def _initial_scale(shot_scale: str) -> str:
     return shot_scale.strip()
 
 
-def _opening(shot: Shot, profiles: Mapping[str, str] | None = None) -> str:
+def _attachment_map(references: tuple[Reference, ...], profiles=None) -> str:
+    lines = []
+    for index, reference in enumerate(references, 1):
+        if reference.role == "style":
+            lines.append(f"附件{index}（style）：仅约束光色、材质与渲染，不添加人物或衣装")
+            continue
+        if profiles and reference.subject_id in profiles:
+            who = f"，{profiles[reference.subject_id]['name']} {reference.subject_id}"
+        else:
+            who = f"，{reference.subject_id}"
+        label = {"identity": "身份", "wardrobe": "基础衣装", "location": "场景"}.get(
+            reference.role, reference.role
+        )
+        lines.append(f"附件{index}（{reference.role}，{label}{who}）：{reference.scope}")
+    return "\n".join(lines)
+
+
+def _opening(
+    shot: Shot,
+    profiles: Mapping[str, str] | None = None,
+    frame_refs: tuple[Reference, ...] = (),
+) -> str:
     lines = [
         "首帧只表现镜头零点：采用本镜开场机位与初始构图，镜内后续的运镜、景别切换、"
         "抓握与位移等全部动作过程均不进入首帧；起始状态中已在进行的动作只表现当前这一瞬间。",
         f"地点：{shot.location}",
         f"起始状态：{shot.start_state}",
         f"景别：{_initial_scale(shot.shot_scale)}（本镜起始景别，单一定格构图）",
-        "附件图片依序为身份、衣装与风格参考：出场人物的长相严格以身份参考附件为准"
-        "（同一张脸，不得更换性别、年龄或发型），发型、衣装与装备的外观严格以衣装参考附件为准，"
-        "风格附件只约束色光、材质与渲染；参考卡的版面、文字与示范姿势不进入画面。",
-        "参考卡决定人物与物件长什么样（外形、颜色、款式）；物件与衣装此刻在哪里、"
-        "由谁携带、是否穿在身上或已经脱手，一律以起始状态为准，参考卡的默认佩戴关系不自动生效。",
+        "出场人物的长相以身份参考附件为准（同一张脸），发型与衣装以衣装参考附件为准；"
+        "基础衣装与随身装备默认沿用对应角色的衣装参考卡，"
+        "只有起始状态明确写出的不同穿戴或携带（如物件已脱手、外衣已交给他人）才覆盖默认，"
+        "未提及的部分保持参考卡造型。",
+        "风格附件只约束光色、材质与渲染；参考卡的版面、文字与示范姿势不进入画面。",
         "画面中出现的人物只由起始状态决定；身份与衣装参考用于保持长相一致，不代表人物必须在场。",
     ]
+    if frame_refs:
+        lines.append(
+            "附件清单（与本次请求图片顺序一致，每张只约束其注明的对象）：\n"
+            + _attachment_map(frame_refs, profiles)
+        )
     anchors = [
         profiles[sid]["anchor"]
         for sid in shot.opening_characters
@@ -567,6 +593,8 @@ def _translation_input(shot: Shot, opening: str) -> dict:
         "opening": opening,
         "action": shot.action,
         "end_state": shot.end_state,
+        "camera": shot.camera,
+        "shot_scale": shot.shot_scale,
         "dialogue": [asdict(line) for line in shot.dialogue],
         "duration_seconds": shot.duration_seconds,
     }
@@ -702,19 +730,57 @@ def _translate(
     return translated
 
 
-def _h3_prompt(shot: Shot, translated: _Translation) -> str:
+def _h3_prompt(
+    shot: Shot,
+    translated: _Translation,
+    profiles: Mapping[str, str] | None = None,
+    references: tuple[Reference, ...] = (),
+) -> str:
     lines = [
         "Generate one continuous shot from the supplied accepted first frame.",
         "OPENING AT t=0 (preserve this state):",
         translated.opening_en,
+        "CAMERA & FRAMING (the authored camera intent for this single continuous shot):",
+        shot.camera,
+        f"SCALE PROGRESSION: {shot.shot_scale} (the frame starts at {_initial_scale(shot.shot_scale)})",
         "ACTION DURING THE SHOT (preserve the complete process and order):",
         translated.action_en,
         "END STATE AT THE END OF THE SHOT:",
         translated.end_state_en,
     ]
+    if profiles:
+        known = [
+            f"{sid} = {profiles[sid]['name']}"
+            for sid in shot.visible_characters
+            if sid in profiles
+        ]
+        if known:
+            lines.append("CHARACTERS: " + "; ".join(known))
+    if references:
+        lines.append(
+            "ATTACHMENTS (in request order; image 1 is the accepted first frame — start from it):"
+        )
+        lines.append("image 1 = accepted first frame for this shot")
+        for offset, reference in enumerate(references):
+            who = (
+                f" for {profiles[reference.subject_id]['name']} ({reference.subject_id})"
+                if profiles and reference.subject_id in profiles
+                else f" for {reference.subject_id}"
+            )
+            if reference.role == "style":
+                lines.append(
+                    f"image {offset + 2} = style card: constrains color, light and material only"
+                )
+            else:
+                lines.append(
+                    f"image {offset + 2} = {reference.role} card{who}:"
+                    " constrains that subject's look only"
+                )
     if shot.dialogue:
         lines.append(
-            "DIALOGUE (speak every Chinese line verbatim; do not add, remove, translate, or reorder):"
+            "DIALOGUE (speak every Chinese line verbatim, exactly once, in the listed"
+            " order, by its speaker; the English ACTION describes the same process —"
+            " do not add, drop, translate or reorder speech):"
         )
         lines.extend(f"{line.speaker}: {line.line}" for line in shot.dialogue)
     else:
@@ -768,11 +834,12 @@ def _assemble_compiled(
     config_hash: str,
     profiles: Mapping[str, str] | None = None,
 ) -> CompiledShot:
-    opening = _opening(shot, profiles)
-    h3_prompt = _h3_prompt(shot, translated)
+    frame_refs = _frame_references(shot, references)
+    opening = _opening(shot, profiles, frame_refs)
+    h3_prompt = _h3_prompt(shot, translated, profiles, references)
     source_hash = _value_hash(asdict(shot))
     reference_data = _reference_data(references)
-    frame_reference_data = _reference_data(_frame_references(shot, references))
+    frame_reference_data = _reference_data(frame_refs)
     receipt = _make_translation_receipt(translated, cache_key, config_hash)
     frame_request_hash = _value_hash(
         {
@@ -828,7 +895,7 @@ def _compile_expanded(
     config_hash: str,
     profiles: Mapping[str, str] | None = None,
 ) -> CompiledShot:
-    opening = _opening(shot, profiles)
+    opening = _opening(shot, profiles, _frame_references(shot, references))
     translated = _translate(
         shot,
         opening,
@@ -983,7 +1050,7 @@ def compile_episode(
             translated = _parse_translation(receipt.translation)
             _review_translation(
                 shot,
-                _opening(shot, profiles),
+                _opening(shot, profiles, _frame_references(shot, selected)),
                 translated,
                 reviewer,
                 prompt=prompt,

@@ -278,6 +278,7 @@ class Review:
     content_hash: str
     verdict: str
     findings: tuple[Finding, ...] = ()
+    unresolved: tuple[dict, ...] = ()
 
     def __post_init__(self) -> None:
         findings = tuple(self.findings)

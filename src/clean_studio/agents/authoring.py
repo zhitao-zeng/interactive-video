@@ -36,6 +36,7 @@ _AUTHOR_SHOT_FIELDS = (
     "camera",
     "shot_scale",
     "visible_characters",
+    "opening_characters",
     "dialogue",
     "reference_subjects",
     "duration_seconds",

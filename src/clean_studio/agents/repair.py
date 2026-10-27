@@ -18,6 +18,7 @@ _PATCHABLE_FIELDS = frozenset(
         "camera",
         "shot_scale",
         "visible_characters",
+        "opening_characters",
         "dialogue",
         "reference_subjects",
         "duration_seconds",
@@ -27,7 +28,7 @@ _STRING_FIELDS = frozenset(
     {"scene_id", "location", "start_state", "action", "end_state", "camera", "shot_scale"}
 )
 _ID_SEQUENCE_FIELDS = frozenset(
-    {"source_segments", "visible_characters", "reference_subjects"}
+    {"source_segments", "visible_characters", "opening_characters", "reference_subjects"}
 )
 
 

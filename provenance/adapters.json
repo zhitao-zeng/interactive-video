@@ -140,7 +140,7 @@
     },
     {
       "path": "src/clean_studio/media.py",
-      "sha256": "bb3a883b6016e47612c6092855717c9bd42aa1fdc36fc933510fda1ab423395e",
+      "sha256": "c03c9a9a4f2098dfb232178b5ab8daa8c6b35405b15e488e9a65a19a607ddf27",
       "sources": [
         "first_frames",
         "analysis",

@@ -1256,15 +1256,40 @@ class Store:
             counts["input"] = self._input_usage(connection, episode_id, shot_id)
         return counts[kind] if kind is not None else counts
 
+    def refresh_frame_review(self, operation_id: str, review: Mapping[str, object]) -> None:
+        """Mirror a re-review verdict onto an existing frame artifact.
+
+        The re-review's own operation/receipt already exists; this only updates
+        the artifact metadata so later readers see the current-policy verdict."""
+        with self._db() as connection:
+            row = connection.execute(
+                "SELECT metadata FROM artifacts WHERE operation_id = ? AND kind = 'frame'",
+                (operation_id,),
+            ).fetchone()
+            if row is None:
+                raise ValueError(f"no frame artifact for operation {operation_id}")
+            metadata = json.loads(row["metadata"] or "{}")
+            metadata["review"] = dict(review)
+            connection.execute(
+                "UPDATE artifacts SET metadata = ? WHERE operation_id = ? AND kind = 'frame'",
+                (_canonical_json(metadata), operation_id),
+            )
+            connection.execute(
+                "UPDATE operations SET metadata = ? WHERE id = ?",
+                (_canonical_json(metadata), operation_id),
+            )
+
     def find_valid_review(self, content_hash: str, kind: str | None = None) -> Review | None:
         with self._db(readonly=True) as connection:
             episode_id = self._resolve_episode_id(connection)
             row = self._latest_valid_review(connection, episode_id, content_hash, kind)
             if row is None:
                 return None
+            metadata = json.loads(row["metadata"] or "{}")
             return Review(
                 review_id=row["id"],
                 content_hash=row["input_hash"],
                 verdict=row["verdict"],
                 findings=tuple(json.loads(row["findings"])),
+                unresolved=tuple(metadata.get("unresolved_findings") or ()),
             )

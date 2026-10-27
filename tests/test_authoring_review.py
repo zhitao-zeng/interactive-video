@@ -623,6 +623,32 @@ def test_review_fails_when_every_finding_is_ungrounded(context):
         reviewer.review(episode, sources)
 
 
+def test_retracted_candidate_plus_dropped_finding_cannot_yield_accepted(context):
+    source, references, episode = context
+    sources = _review_sources(source, references)
+    grounded = _finding(episode, finding_id="keep-1")
+    misindexed = _finding(
+        episode,
+        finding_id="drop-1",
+        field_path="/shots/1/action",
+        quote=episode.shots[0].action,
+        time="during",
+    )
+    client = FakeClient(
+        [
+            {"findings": [grounded, misindexed]},
+            {"retract_ids": ["keep-1"]},
+        ]
+    )
+    reviewer = Reviewer(client)
+
+    review = reviewer.review(episode, sources)
+
+    assert review.verdict == "rejected"
+    assert review.findings == ()
+    assert [row["id"] for row in review.unresolved] == ["drop-1"]
+
+
 def test_reviewer_structure_failure_never_calls_model(context):
     source, references, episode = context
     invalid = _with_shot(episode, 0, end_state="同上")

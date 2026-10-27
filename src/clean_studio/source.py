@@ -269,9 +269,19 @@ def validate_episode(
         if type(shot.duration_seconds) is not int or not 4 <= shot.duration_seconds <= 15:
             raise ValueError("duration_seconds must be an integer from 4 to 15")
 
-    total_seconds = sum(shot.duration_seconds for shot in episode.shots) + END_CARD_SECONDS
+    body_seconds = sum(shot.duration_seconds for shot in episode.shots)
+    total_seconds = body_seconds + END_CARD_SECONDS
     if not 180 <= total_seconds <= 300:
         raise ValueError("total duration including end card must be from 180 to 300")
+
+    for cue in episode.music_cues:
+        if not 0 <= cue.start_seconds < cue.end_seconds <= body_seconds:
+            raise ValueError(
+                "music cue bounds must satisfy 0 <= start < end <= body seconds "
+                f"(cues follow the actual shot timeline, host end card excluded);"
+                f" body is {body_seconds} seconds, cue was"
+                f" {cue.start_seconds}-{cue.end_seconds}"
+            )
 
     subjects = {subject.subject_id: subject for subject in references.subjects}
     for shot in episode.shots:

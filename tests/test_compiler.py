@@ -205,7 +205,15 @@ def test_opening_and_h3_preserve_temporal_boundary_dialogue_and_trace(episode, r
     assert "缓慢推近" not in compiled.opening
     assert "景别：中景（本镜起始景别" in compiled.opening
     assert "潮叔（C046）" in compiled.opening
-    assert "默认佩戴关系不自动生效" in compiled.opening
+    assert "默认沿用对应角色的衣装参考卡" in compiled.opening
+    assert "附件1（identity" in compiled.opening
+    assert "附件3（location" in compiled.opening
+    assert "CAMERA & FRAMING" in compiled.h3_prompt
+    assert episode.shots[0].camera in compiled.h3_prompt
+    assert episode.shots[0].shot_scale in compiled.h3_prompt
+    assert "CHARACTERS: C01 = 知遥" in compiled.h3_prompt
+    assert "image 1 = accepted first frame" in compiled.h3_prompt
+    assert "exactly once" in compiled.h3_prompt
     assert "C02 enters from the pier" in compiled.h3_prompt
     assert "把船灯递给我，别松手。" in compiled.h3_prompt
     assert "S1/flow/0" in compiled.h3_prompt

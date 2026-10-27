@@ -158,6 +158,19 @@ def test_check_apply_composes_with_store_hash_quota_and_preserves_unrelated_outp
     assert recovered.external_task_id == "external-task-2"
 
 
+def test_opening_characters_is_patchable_and_scoped():
+    episode = _episode()
+    patch = {"shot-1": {"opening_characters": ["C01"]}}
+    grant = {"shot-1": ["opening_characters"]}
+    plan = check_patch(episode, patch, grant)
+    revised, affected = apply_patch(episode, plan)
+    assert affected == {"shot-1"}
+    assert revised.shots[0].opening_characters == ("C01",)
+
+    with pytest.raises(ValueError):
+        check_patch(episode, patch, {"shot-1": ["action"]})
+
+
 def test_apply_returns_new_spec_and_only_actual_affected_ids():
     episode = _episode()
     plan = check_patch(
