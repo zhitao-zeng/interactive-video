@@ -206,6 +206,7 @@ def test_opening_and_h3_preserve_temporal_boundary_dialogue_and_trace(episode, r
     assert "景别：中景（本镜起始景别" in compiled.opening
     assert "潮叔（C046）" in compiled.opening
     assert "默认沿用对应角色的衣装参考卡" in compiled.opening
+    assert "视为已离开人物身体" in compiled.opening
     assert "附件1（identity" in compiled.opening
     assert "附件3（location" in compiled.opening
     assert "CAMERA & FRAMING" in compiled.h3_prompt
