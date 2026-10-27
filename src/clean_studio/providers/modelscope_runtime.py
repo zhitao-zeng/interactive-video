@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -46,12 +47,20 @@ class ModelScopeWorkerAPI:
                 ),
                 encoding="utf-8",
             )
+            environment = {
+                key: value
+                for key, value in os.environ.items()
+                if key.lower() not in {
+                    "http_proxy", "https_proxy", "all_proxy", "ftp_proxy"
+                }
+            }
             done = self.runner(
                 [self.python, str(self.worker), str(request_path), str(response_path)],
                 capture_output=True,
                 text=True,
                 check=False,
                 timeout=self.timeout,
+                env=environment,
             )
             if not response_path.is_file():
                 raise ModelScopeWorkerError(
