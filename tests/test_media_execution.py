@@ -1363,6 +1363,28 @@ def test_speech_evaluation_forgives_same_pinyin_proper_nouns():
     assert default == 0.5, "tests must track the production max_cer default"
 
 
+def test_speech_evaluation_does_not_score_a_dialogue_free_shot_against_empty_text():
+    from clean_studio.providers.asr import evaluate_speech
+
+    transcript = {
+        "status": "completed",
+        "video_sha256": "v" * 64,
+        "hypothesis": "只样这样只要去妖爷",
+    }
+    result = evaluate_speech("", transcript, video_sha256="v" * 64)
+    assert result["passed"] is True
+    assert result["cer"] is None
+    assert result["phonetic_cer"] is None
+    assert result["phonetic_equivalence"] is False
+    assert result["hypothesis"] == "只样这样只要去妖爷"
+    assert result["evaluation"] == "clean-current-shot-dialogue-cer-v2-phonetic"
+
+    silent = evaluate_speech(
+        "", {**transcript, "hypothesis": ""}, video_sha256="v" * 64
+    )
+    assert silent["passed"] is True and silent["cer"] is None
+
+
 def test_frozen_provider_media_asr_closure_and_provenance():
     for directory in (ROOT / "src/clean_studio/frozen", ROOT / "src/clean_studio/providers"):
         for path in directory.glob("*.py"):
@@ -1395,7 +1417,7 @@ def test_frozen_provider_media_asr_closure_and_provenance():
         assert Path(source["path"]).is_absolute()
         assert len(source["sha256"]) == 64
     task8_hashes = {
-        "src/clean_studio/media.py": "edc0943859121f52f1aab9d2eb46f7238aaada18fbe5abc5d1ee030b1d4adc2a",
+        "src/clean_studio/media.py": "ecfbb9c42cce30a02bdb6d5168572aae4273094f95fee1d8e774a407651ccf1a",
         "src/clean_studio/frozen/render.py": "5365a96e9d8086f7d5b9090e1d35766cd8bf6018046fbcb9895e207d739c935f",
     }
     for frozen in provenance["frozen_files"]:

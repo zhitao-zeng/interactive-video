@@ -1092,15 +1092,6 @@ class MediaOperations:
             if outcome is _RETRY or outcome is _REJECTED:
                 continue
             return outcome
-        while True:
-            accepted = self._accepted_current(shot_id, "video", request.input_hash)
-            if accepted is not None:
-                return accepted
-            operation = self._active_operation(shot_id, "video", request.input_hash)
-            outcome = self._execute_video(operation, request, frame_artifact)
-            if outcome is _RETRY or outcome is _REJECTED:
-                continue
-            return outcome
 
 
 MediaExecutor = MediaOperations

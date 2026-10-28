@@ -132,7 +132,7 @@
     },
     {
       "path": "src/clean_studio/providers/asr.py",
-      "sha256": "a6386f0e9d13b18b4f7a3d75d812db9109b990e4e91794c85e3c80906bb0221d",
+      "sha256": "d384aac61e3c199c4b5e89980bdb7bb0d3f5aa146ff922a288d96d57452bf919",
       "sources": [
         "analysis",
         "asr_segments"
@@ -140,7 +140,7 @@
     },
     {
       "path": "src/clean_studio/media.py",
-      "sha256": "edc0943859121f52f1aab9d2eb46f7238aaada18fbe5abc5d1ee030b1d4adc2a",
+      "sha256": "ecfbb9c42cce30a02bdb6d5168572aae4273094f95fee1d8e774a407651ccf1a",
       "sources": [
         "first_frames",
         "analysis",

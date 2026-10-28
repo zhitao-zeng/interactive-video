@@ -59,10 +59,21 @@ def evaluate_speech(
     reference_key = _speech_key(reference)
     hypothesis_key = _speech_key(hypothesis)
     errors = _edit_distance(reference_key, hypothesis_key)
-    cer = round(errors / max(1, len(reference_key)), 6)
     phonetic_errors = _edit_distance(_phonemes(reference_key), _phonemes(hypothesis_key))
-    phonetic_cer = round(phonetic_errors / max(1, len(_phonemes(reference_key))), 6)
-    passed = cer <= max_cer or phonetic_cer <= max_cer
+    if reference_key:
+        cer = round(errors / len(reference_key), 6)
+        phonetic_cer = round(phonetic_errors / max(1, len(_phonemes(reference_key))), 6)
+        passed = cer <= max_cer or phonetic_cer <= max_cer
+        phonetic_equivalence = bool(cer > max_cer >= phonetic_cer)
+    else:
+        # A shot that owes no line has no spoken-content contract: there is no
+        # reference to score against, so transcribing ambient audio (or the ASR
+        # model hallucinating on it) cannot prove a defect. The hypothesis stays
+        # in the receipt for diagnosis.
+        cer = None
+        phonetic_cer = None
+        passed = True
+        phonetic_equivalence = False
     return {
         **dict(transcript),
         "reference": reference,
@@ -73,7 +84,7 @@ def evaluate_speech(
         "cer": cer,
         "phonetic_errors": phonetic_errors,
         "phonetic_cer": phonetic_cer,
-        "phonetic_equivalence": bool(cer > max_cer >= phonetic_cer),
+        "phonetic_equivalence": phonetic_equivalence,
         "max_cer": max_cer,
         "passed": passed,
         "evaluation": "clean-current-shot-dialogue-cer-v2-phonetic",
