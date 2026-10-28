@@ -719,30 +719,45 @@ class Author:
         """allowed_fields is the host grant; findings are evidence, not authorization.
 
         An omitted grant is derived by the host only after every finding has been
-        grounded again in the current episode.
+        grounded again in the current episode. A reply that edits fields outside
+        the grant is a protocol slip, not a content verdict: the author gets a
+        bounded retry that names the exact violation.
         """
         if self._current is None:
             raise AuthorProtocolError("Author.start must succeed before revise")
         confirmed = self._ground_findings(self._confirmed_findings(findings))
         allowed = self._allowed_fields(confirmed, allowed_fields)
-        payload = {
-            "current_episode": _episode_data(self._current),
-            "confirmed_findings": confirmed,
-            "allowed_fields": allowed,
-            "instruction": (
-                "allowed_fields is the host grant; findings are evidence only. "
-                "Revise only the granted shot fields and return the complete EpisodeSpec. "
-                "Preserve every other value and all original source obligations."
-            ),
-        }
-        parts = [{"type": "text", "text": self.prompt + "\n" + _canonical(payload)}]
-        raw, context = self._call(parts, "clean_author_revise")
-        try:
-            revised = _parse_episode(raw, self.source, self.references)
-            self._validate_revision(revised, allowed)
-        except Exception as error:
-            self._persist_call(context, error)
-            raise
-        self._persist_call(context)
-        self._current = revised
-        return revised
+        rejected = None
+        for _attempt in range(3):
+            payload = {
+                "current_episode": _episode_data(self._current),
+                "confirmed_findings": confirmed,
+                "allowed_fields": allowed,
+                "instruction": (
+                    "allowed_fields is the host grant; findings are evidence only. "
+                    "Revise only the granted shot fields and return the complete EpisodeSpec. "
+                    "Preserve every other value and all original source obligations. "
+                    "A continuity finding about a shot's opening state is fixed in that "
+                    "opening field; later action fields cannot repair it."
+                ),
+            }
+            if rejected is not None:
+                payload["rejected_previous_attempt"] = rejected
+            parts = [{"type": "text", "text": self.prompt + "\n" + _canonical(payload)}]
+            raw, context = self._call(parts, "clean_author_revise")
+            try:
+                revised = _parse_episode(raw, self.source, self.references)
+                self._validate_revision(revised, allowed)
+            except Exception as error:
+                self._persist_call(context, error)
+                rejected = {
+                    "error": f"{type(error).__name__}: {error}",
+                    "allowed_fields": allowed,
+                }
+                continue
+            self._persist_call(context)
+            self._current = revised
+            return revised
+        raise AuthorProtocolError(
+            f"revision protocol failed after 3 attempts: {rejected['error']}"
+        )

@@ -517,7 +517,7 @@ def test_author_incomplete_or_truncated_output_is_never_a_candidate(context, res
 def test_author_rejects_derived_or_out_of_scope_revision(context):
     source, references, episode = context
     bad = _with_shot(episode, 0, visual_prompt="旧派生提示")
-    client = FakeClient([_episode_payload(episode), asdict(bad)])
+    client = FakeClient([_episode_payload(episode), asdict(bad)] + [asdict(bad)] * 2)
     author = Author(source, references, client)
     author.start()
     finding = _confirmed(_finding(episode))
@@ -527,10 +527,35 @@ def test_author_rejects_derived_or_out_of_scope_revision(context):
     assert author.current == episode
 
     out_of_scope = _with_shot(episode, 0, camera="另一个机位")
-    client.responses.append(_episode_payload(out_of_scope))
+    client.responses.extend([_episode_payload(out_of_scope)] * 3)
     with pytest.raises(AuthorProtocolError, match="scope"):
         author.revise([finding], allowed_fields={"shot_001": {"action"}})
     assert author.current == episode
+
+
+def test_author_retries_a_scope_violation_with_concrete_feedback(context):
+    source, references, episode = context
+    out_of_scope = _with_shot(episode, 0, action="越权改动作")
+    legal = _with_shot(episode, 0, camera="另一个机位")
+    client = FakeClient(
+        [
+            _episode_payload(episode),
+            _episode_payload(out_of_scope),
+            _episode_payload(legal),
+        ]
+    )
+    author = Author(source, references, client)
+    author.start()
+    finding = _confirmed(_finding(episode))
+
+    actual = author.revise([finding], allowed_fields={"shot_001": {"camera"}})
+
+    assert actual == legal
+    assert len(client.calls) == 3
+    retry_text = "\n".join(part.get("text", "") for part in client.calls[2]["parts"])
+    assert "rejected_previous_attempt" in retry_text
+    assert "revision scope violation: shot_001.action" in retry_text
+    assert '"shot_001":["camera"]' in retry_text
 
 
 def test_author_refuses_unconfirmed_or_non_contradiction_feedback(context):
