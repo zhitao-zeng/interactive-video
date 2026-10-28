@@ -1,5 +1,5 @@
 import json
-from dataclasses import replace
+from dataclasses import asdict, replace
 from hashlib import sha256
 from pathlib import Path
 from types import SimpleNamespace
@@ -291,6 +291,31 @@ def test_start_change_updates_requests_without_retranslating_unrelated_shot(
     assert changed.shots[1] is not baseline.shots[1]
     assert len(translator.calls) == 3
     assert len(translator.fidelity_calls) == 6
+
+
+def test_stored_compilation_reuses_typed_receipts(episode, references):
+    from clean_studio.pipeline import _compilation_from_dict
+
+    translator = FakeTranslator()
+    baseline = compile_episode(
+        episode,
+        references,
+        translator,
+        translation_reviewer=translator.independent_reviewer(),
+    )
+    stored = _compilation_from_dict(json.loads(json.dumps(asdict(baseline))))
+
+    reused = compile_episode(
+        episode,
+        references,
+        translator,
+        previous=stored,
+        translation_reviewer=translator.independent_reviewer(),
+    )
+
+    assert reused.shots == baseline.shots
+    assert len(translator.calls) == 2
+    assert len(translator.fidelity_calls) == 4
 
 
 def test_video_request_binds_accepted_frame_and_rejects_old_frame_for_new_h3(

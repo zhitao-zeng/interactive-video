@@ -328,7 +328,10 @@ def _validate_translation_receipt(
     ):
         raise TranslationError("translation receipt is not bound to the current compilation")
     expected = _translation_receipt_hash(
-        receipt.translation, cache_key, config_hash, receipt.compiler_version
+        _parse_translation(receipt.translation),
+        cache_key,
+        config_hash,
+        receipt.compiler_version,
     )
     if receipt.receipt_hash != expected:
         raise TranslationError("translation receipt hash does not match typed translation")
