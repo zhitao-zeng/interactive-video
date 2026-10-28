@@ -28,7 +28,14 @@
       "subject_type": "character",
       "subject_id": "C046",
       "name": "潮叔",
-      "references": []
+      "references": [
+        {
+          "file": "潮叔-身份基准-批处理批准卡-v1.0.jpeg",
+          "role": "identity",
+          "scope": "潮叔面部与外形基准（W10 批处理版已批准卡，同源于本次物料）；不约束场景、剧情或其他人物"
+        }
+      ],
+      "wardrobe_note": "本集已绑定身份基准附件，面部与外形以本镜附件清单中的潮叔身份附件为准；衣装为同一套当地日常装束：深灰蓝色工装外套、卡其色衬衫、灰色长裤、深色运动鞋、短须。"
     }
   ],
   "snapshots": [
@@ -58,6 +65,13 @@
       "source_path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/zhiyao-batch-20261022/.runtime/zhiyao-base/material/知遥-综合视觉卡-v1.1.png",
       "path": "inputs/w10/material/知遥-综合视觉卡-v1.1.png",
       "sha256": "0a3c63180aa656675a7f7334a99c234ddd08441390a8b8c2ea9ae16eb1ef61d2",
+      "recorded_date": "2026-10-26"
+    },
+    {
+      "kind": "identity_image",
+      "source_path": "/mnt/disk1/zengzhitao/interactive-video-worktrees/zhiyao-batch-20261022/outputs/zhiyao-EP04C_W10_失物海-20261022/series_assets/characters/character_057/turnaround.jpeg",
+      "path": "inputs/w10/material/潮叔-身份基准-批处理批准卡-v1.0.jpeg",
+      "sha256": "c4c4a0f9e27239c794b7e970efaebd3820c31142c6e6fda30053ffe9ad4e0682",
       "recorded_date": "2026-10-26"
     },
     {

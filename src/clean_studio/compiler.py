@@ -420,7 +420,16 @@ def _expand_references(
             )
 
     selected = []
-    for subject_id in dict.fromkeys(shot.reference_subjects):
+    requested = tuple(dict.fromkeys(shot.reference_subjects))
+    # A person declared in frame at t=0 needs their identity card even when the
+    # author did not also list them in reference_subjects; a card-less local
+    # character stays legal here and is drawn from the opening description.
+    in_frame = tuple(
+        subject_id
+        for subject_id in dict.fromkeys(shot.opening_characters)
+        if subject_id not in requested
+    )
+    for subject_id in requested + in_frame:
         if subject_id not in registrations:
             continue
         bound = tuple(
@@ -429,15 +438,17 @@ def _expand_references(
             if reference.subject_id == subject_id and reference.role != "style"
         )
         if not bound:
-            issues.append(
-                _issue(
-                    shot.shot_id,
-                    "unbound_subject",
-                    "host",
-                    subject_id,
-                    "registered subject has no bound non-style reference image",
+            if subject_id in requested:
+                issues.append(
+                    _issue(
+                        shot.shot_id,
+                        "unbound_subject",
+                        "host",
+                        subject_id,
+                        "registered subject has no bound non-style reference image",
+                    )
                 )
-            )
+            continue
         selected.extend(bound)
 
     style = tuple(
@@ -552,7 +563,7 @@ def _attachment_map(references: tuple[Reference, ...], profiles=None) -> str:
 
 def _opening(
     shot: Shot,
-    profiles: Mapping[str, str] | None = None,
+    profiles: Mapping[str, Mapping[str, str]] | None = None,
     frame_refs: tuple[Reference, ...] = (),
 ) -> str:
     lines = [
@@ -561,7 +572,8 @@ def _opening(
         f"地点：{shot.location}",
         f"起始状态：{shot.start_state}",
         f"景别：{_initial_scale(shot.shot_scale)}（本镜起始景别，单一定格构图）",
-        "出场人物的长相以身份参考附件为准（同一张脸），发型与衣装以衣装参考附件为准；"
+        "有参考卡的出场人物：长相以该角色的身份参考附件为准（同一张脸），"
+        "发型与衣装以衣装参考附件为准；"
         "基础衣装与随身装备默认沿用对应角色的衣装参考卡，"
         "只有起始状态明确写出的不同穿戴或携带（如物件已脱手、外衣已交给他人）才覆盖默认，"
         "未提及的部分保持参考卡造型。"
@@ -576,6 +588,19 @@ def _opening(
             "附件清单（与本次请求图片顺序一致，每张只约束其注明的对象）：\n"
             + _attachment_map(frame_refs, profiles)
         )
+    carded = {reference.subject_id for reference in frame_refs}
+    uncarded = [sid for sid in shot.opening_characters if sid not in carded]
+    if uncarded:
+        names = "、".join(
+            f"{sid} {profiles[sid]['name']}"
+            if profiles and sid in profiles and profiles[sid].get("name")
+            else sid
+            for sid in uncarded
+        )
+        lines.append(
+            f"没有参考卡的出场人物（{names}）：只按人物锚定与起始状态绘制，"
+            "不得套用其他角色的脸、发型或衣装，也不得让其他角色替代其动作主体地位。"
+        )
     anchors = [
         profiles[sid]["anchor"]
         for sid in shot.opening_characters
@@ -583,7 +608,8 @@ def _opening(
     ]
     if anchors:
         lines.append(
-            "人物锚定（仅限 opening_characters 声明的首帧入画者，与附件同源的文字约束）：\n"
+            "人物锚定（opening_characters 声明的首帧入画者；有参考卡者与对应附件一致，"
+            "无参考卡者只以本条文字为准）：\n"
             + "\n".join(anchors)
         )
     lines.append(

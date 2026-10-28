@@ -215,7 +215,7 @@ def test_snapshot_provenance_matches_original_and_copies():
     ]
     assert "shots" not in config
     assert "shot_patches" not in config
-    assert len(config["snapshots"]) == 7
+    assert len(config["snapshots"]) == 8
     for item in config["snapshots"]:
         original = Path(item["source_path"])
         snapshot = ROOT / item["path"]
@@ -244,18 +244,22 @@ def test_reference_manifest_is_real_deterministic_and_separates_registration(
     assert [reference.role for reference in references.references] == [
         "identity",
         "wardrobe",
+        "identity",
         "style",
         "style",
     ]
-    assert [reference.order for reference in references.references] == [1, 2, 3, 4]
+    assert [reference.order for reference in references.references] == [1, 2, 3, 4, 5]
     assert [reference.path for reference in references.references] == [
         "material/知遥-身份基准-v1.1.png",
         "material/知遥-综合视觉卡-v1.1.png",
+        "material/潮叔-身份基准-批处理批准卡-v1.0.jpeg",
         "style/board.png",
         "style/historical-frame.jpg",
     ]
     assert len(references.references_for("C01")) == 2
-    assert references.references_for("C046") == ()
+    assert [reference.role for reference in references.references_for("C046")] == [
+        "identity"
+    ]
     assert all(
         reference.role not in {"location", "prop"}
         for reference in references.references
@@ -265,8 +269,9 @@ def test_reference_manifest_is_real_deterministic_and_separates_registration(
         assert _digest(SNAPSHOT_ROOT / reference.path) == reference.sha256
         assert reference.recorded_date == "2026-10-26"
         assert reference.path not in {"style.json", "material/style.json"}
-        assert not reference.path.endswith(".jpeg")
-    for reference in references.references[2:]:
+    for reference in references.references:
+        if reference.role != "style":
+            continue
         assert "不复制人物" in reference.scope
         assert "文字" in reference.scope
         assert "POV" in reference.scope
@@ -527,6 +532,14 @@ def test_unregistered_and_registered_but_unbound_subjects_are_distinct(
     with pytest.raises(ValueError, match="unregistered subject"):
         validate_episode(unregistered, source, references)
 
+    without_c046_card = replace(
+        references,
+        references=tuple(
+            reference
+            for reference in references.references
+            if reference.subject_id != "C046"
+        ),
+    )
     unbound = _with_shot(episode, 0, reference_subjects=("C046",))
     with pytest.raises(ValueError, match="registered subject.*no bound image"):
-        validate_episode(unbound, source, references)
+        validate_episode(unbound, source, without_c046_card)
