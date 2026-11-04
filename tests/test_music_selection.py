@@ -265,8 +265,13 @@ def test_music_and_room_tone_are_idempotent_and_keep_video_and_native_voice(epis
         data=subprocess.check_output(['ffmpeg','-v','error','-i',str(p),'-map','0:a:0','-ac','1','-ar','16000','-f','f32le','-'])
         samples=struct.unpack('<'+'f'*(len(data)//4),data)
         return abs(sum(x*complex(math.cos(2*math.pi*hz*i/16000),math.sin(2*math.pi*hz*i/16000))for i,x in enumerate(samples)))/len(samples)
-    assert strength(output,1000)>.8*strength(video,1000)
-    assert strength(output,300)>3*strength(video,300)
+    assert strength(output,1000)==pytest.approx(strength(video,1000),rel=.05)
+    assert strength(output,300)>max(3*strength(video,300),.005)
+    mix=first['assembly']['episode_music_mix']
+    assert mix['target_lufs']==-23 and mix['loudness_reference_lufs']==-5
+    graph=mix['command'][mix['command'].index('-filter_complex')+1]
+    assert 'loudnorm=I=-5:TP=-1.5:LRA=11,volume=-18dB' in graph
+    assert 'amix=inputs=2:duration=first:normalize=0' in graph
     policy['episode_music']['gain_db']=-12;atomic_write_json(ctx.episode_dir/'delivery_policy.json',policy)
     revised=ambience.apply_assembly(ctx.episode_dir,again)
     assert revised['assembly']['final_video']!=str(output)

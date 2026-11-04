@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 """Copy a modifiable starting kit, or launch the workspace's own Pi code."""
 import argparse
+import contextlib
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict
-from datetime import datetime
+from datetime import datetime, timezone
+import fcntl
 import json
 import os
 from pathlib import Path
 import shutil
 import subprocess
 import sys
+import threading
 import time
 
 
@@ -18,6 +22,11 @@ VIEWPOINTS = {
     'mixed': '混合视角：按戏混用主观与客观视角，不规定比例；在主观镜头中明确谁在看。',
     'auto': '导演自定：由导演按戏选择，不额外限定视角。',
 }
+
+LANES = ('sd2.0-fast', 'sd2.0-mini', 'MiniMax-H3', 'FastH3-Omni')
+FIRST_FRAME_POLICIES = ('none', 'selective', 'required')
+INTERACTION_PAGE_POLICIES = ('required', 'none')
+H3_MODES = ('local', 'cloud')
 
 
 def _seed_assets(workspace, cache):
@@ -69,6 +78,30 @@ def _asset_publish_dir(sdk_root):
     return ''
 
 
+def _atomic_write_json(path, data):
+    """Write JSON atomically so concurrent readers never see a partial file."""
+    path = Path(path)
+    tmp = path.with_suffix(path.suffix + '.tmp')
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    tmp.replace(path)
+
+
+@contextlib.contextmanager
+def _batch_lock(manifest):
+    """Exclusive advisory lock for batches sharing the same manifest directory."""
+    lock_path = manifest.with_name('batch-state.lock')
+    fd = os.open(str(lock_path), os.O_CREAT | os.O_RDWR)
+    try:
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except (BlockingIOError, OSError) as exc:
+            raise ValueError(f'Another batch is already running in {manifest.parent}') from exc
+        yield
+    finally:
+        fcntl.flock(fd, fcntl.LOCK_UN)
+        os.close(fd)
+
+
 def _expose_previous(workspace, previous):
     """Copy a same-episode earlier attempt so the new Agent cannot edit the original."""
     previous = Path(previous).resolve()
@@ -105,9 +138,17 @@ def _expose_previous(workspace, previous):
 
 def initialize(workspace, sdk_root, dependencies, inputs=None, skills=None, previous=None, asset_cache=None,
                lane=None, first_frame='selective', interaction_page='required', h3_mode='local',
-               wall_seconds=14400, max_model_requests=256, viewpoint='auto'):
+               wall_seconds=14400, max_model_requests=256, viewpoint='auto', fasth3_endpoint=None):
     workspace, sdk_root = Path(workspace).resolve(), Path(sdk_root).resolve()
     viewpoint_instruction = VIEWPOINTS[viewpoint]
+    sys.path.insert(0, str(sdk_root / 'src'))
+    from novel_manga.providers.fast_h3 import normalize_endpoint
+    if fasth3_endpoint is not None:
+        fasth3_endpoint = normalize_endpoint(fasth3_endpoint)
+    if lane == 'FastH3-Omni' and not (fasth3_endpoint or '').strip():
+        raise ValueError('FastH3-Omni requires an explicit --fasth3-endpoint; no machine default is allowed')
+    if lane == 'FastH3-Omni' and first_frame == 'required':
+        raise ValueError('first_frame_policy=required is incompatible with FastH3-Omni; only selective or none is allowed')
     # Init is deliberately separate from resume: never replace an Agent's edits.
     workspace.mkdir(parents=True, exist_ok=False)
     template = Path(__file__).resolve().parent / 'template'
@@ -149,6 +190,7 @@ def initialize(workspace, sdk_root, dependencies, inputs=None, skills=None, prev
               'audio_service_url': os.environ.get('AUDIO_SERVICE_URL', ''),
               'novel_asset_publish_dir': _asset_publish_dir(sdk_root),
               'media_lane': lane or '',
+              'fasth3_endpoint': (fasth3_endpoint or '').rstrip('/'),
               'first_frame_policy': first_frame,
               'interaction_page': interaction_page,
               'h3_mode': h3_mode, 'viewpoint': viewpoint,
@@ -163,7 +205,9 @@ def initialize(workspace, sdk_root, dependencies, inputs=None, skills=None, prev
         '路线、首帧、片尾选项页和 H3 模式是用户选项，不由 agent 自行切换；'
         '`tools/media.py` 会拒绝与路线/首帧策略不符的请求。\n'
         '- `none`：不允许首帧；`selective`：由 agent 决定哪些镜头需要首帧；`required`：每个视频请求都必须带首帧。\n'
-        '- 路线 `sd2.0-fast`、`sd2.0-mini` 只接受 `action=video`；路线 `MiniMax-H3` 只接受 `action=h3`。\n'
+        '- 路线 `sd2.0-fast`、`sd2.0-mini` 只接受 `action=video`；路线 `MiniMax-H3` 只接受 `action=h3`；'
+        '路线 `FastH3-Omni` 只接受 `action=fasth3`。\n'
+        '- `FastH3-Omni` 只使用普通 reference，不支持显式 first_frame；required 与其不兼容，selective 不等于 keyframe 已验证。\n'
         '- `sd2.0-fast` 是 720P；`sd2.0-mini` 是约 480P（样片 864×496，竖屏约 496×864）。\n'
         '- `interaction_page=required`：成片最后必须用 `tools/interaction.py` 追加一个正好 3 秒的 A/B/C 选项页，'
         '并保持到最后一帧；`none`：不做独立选项页。\n'
@@ -181,6 +225,9 @@ def initialize(workspace, sdk_root, dependencies, inputs=None, skills=None, prev
                'available':Path(asr_python).is_file()and Path(asr_model,'model.int8.onnx').is_file()},
         'audio_runtime':'audio-runtime.json','audio_service_config':'local.json.audio_service_url',
         'agent_budget':{'wall_seconds':wall_seconds,'provider_requests':max_model_requests,'max_output_tokens':128000}}
+    if fasth3_endpoint:
+        capabilities['fasth3'] = {'model': 'FastH3-Omni', 'endpoint': config['fasth3_endpoint'],
+                                  'restart_clears_jobs_and_content': True}
     (workspace/'CAPABILITIES.json').write_text(json.dumps(capabilities,ensure_ascii=False,indent=2)+'\n')
     shutil.copy2(Path(__file__), workspace / 'starter.py')
     (workspace / 'owner').write_text('Pi editable starter / user-owned experiment; no generation launched by init.\n')
@@ -229,40 +276,220 @@ def run(workspace, endpoint=None, resume=False, prompt=None):
     return subprocess.call(cmd, cwd=workspace, env=env)
 
 
+def _positive_int(value, name):
+    if type(value) is not int or value <= 0:
+        raise ValueError(f'{name} must be a positive integer, got {value!r}')
+    return value
+
+
 def run_batch(manifest):
-    """Initialize and run independent episodes sequentially; no content or stage scheduler."""
-    data = json.loads(Path(manifest).read_text(encoding='utf-8'))
+    """Validate the whole manifest under a directory lock, init sequentially, then run in parallel.
+
+    The manifest is fully validated before any `initialize`/`run` call and before the shared
+    directory lock is released. `workers` defaults to the episode count and must be a positive
+    integer. Workspace paths must not overlap (siblings are allowed). Resume must be a real
+    boolean. All init options are checked without side effects.
+
+    Each episode keeps its own workspace, session and budgets. A failure in one episode does not
+    block or cancel the others. The return value records process completion only; `ok` does not
+    mean content was accepted.
+
+    After each episode finishes (including init failures), its workspace, returncode and
+    completion timestamp are written atomically to `batch-state.json` next to the manifest.
+    State-write failures are treated as batch infrastructure errors and are not converted into
+    a fake accepted/complete result.
+
+    The coordinator reviews, recovers or uploads each episode separately; the batch stage does
+    not schedule content or fake an accepted status.
+    """
+    manifest = Path(manifest).resolve()
+    data = json.loads(manifest.read_text(encoding='utf-8'))
     episodes = data.get('episodes')
     if not isinstance(episodes, list) or not episodes:
         raise ValueError('batch manifest needs a nonempty episodes list')
-    results = []
-    for item in episodes:
-        workspace = Path(item['workspace']).resolve()
-        row = {'workspace': str(workspace)}
-        try:
-            if workspace.exists():
-                if not item.get('resume'):
-                    raise ValueError('Existing episode workspace requires resume=true')
-            else:
-                if item.get('resume'):
-                    raise ValueError('Cannot resume a missing episode workspace')
-                initialize(workspace, item.get('sdk_root') or data['sdk_root'],
-                           item.get('dependencies') or data['dependencies'],
-                           inputs=item.get('input'), skills=item.get('skills'),
-                           previous=item.get('previous'), asset_cache=item.get('asset_cache'),
-                           lane=item.get('lane'), first_frame=item.get('first_frame', 'selective'),
-                           interaction_page=item.get('interaction_page', 'required'),
-                           h3_mode=item.get('h3_mode', 'local'),
-                           wall_seconds=item.get('wall_seconds', data.get('wall_seconds', 14400)),
-                           max_model_requests=item.get('max_model_requests', data.get('max_model_requests', 256)),
-                           viewpoint=item.get('viewpoint', data.get('viewpoint', 'auto')))
-            row['returncode'] = run(workspace, endpoint=item.get('endpoint'),
-                                    resume=bool(item.get('resume')), prompt=item.get('prompt'))
-        except Exception as error:
-            row['returncode'] = 2
-            row['error'] = f'{type(error).__name__}: {error}'
-        results.append(row)
-    return {'episodes': results, 'ok': all(row['returncode'] == 0 for row in results)}
+    workers = data.get('workers', len(episodes))
+    if type(workers) is not int or workers <= 0:
+        raise ValueError('workers must be a positive integer')
+
+    # Make the SDK source importable for FastH3 endpoint normalization during pre-check.
+    # If the manifest omits a top-level sdk_root, we defer the import until an episode
+    # supplies one; episodes without any sdk_root cannot select FastH3-Omni.
+    import_sdk_root = data.get('sdk_root')
+    if not import_sdk_root:
+        for item in episodes:
+            if item.get('sdk_root'):
+                import_sdk_root = item['sdk_root']
+                break
+    normalize_endpoint = None
+    if import_sdk_root:
+        sys.path.insert(0, str(Path(import_sdk_root) / 'src'))
+        from novel_manga.providers.fast_h3 import normalize_endpoint as _normalize_endpoint
+        normalize_endpoint = _normalize_endpoint
+
+    # Validate the whole manifest before any init, run or state file creation.
+    seen = []
+    validated = []
+    for idx, item in enumerate(episodes):
+        if not isinstance(item, dict):
+            raise ValueError(f'episode {idx} must be an object')
+
+        raw_resume = item.get('resume')
+        if raw_resume is not None and not isinstance(raw_resume, bool):
+            raise ValueError(f'episode {idx} resume must be a boolean')
+        resume = bool(raw_resume)
+
+        ws_path = item.get('workspace')
+        if not ws_path:
+            raise ValueError(f'episode {idx} missing workspace')
+        workspace = Path(ws_path).resolve()
+        for seen_ws in seen:
+            if workspace == seen_ws or workspace in seen_ws.parents or seen_ws in workspace.parents:
+                raise ValueError(f'episode workspaces overlap: {workspace} and {seen_ws}')
+        seen.append(workspace)
+
+        if workspace.exists():
+            if not resume:
+                raise ValueError(f'Existing episode workspace requires resume=true: {workspace}')
+        else:
+            if resume:
+                raise ValueError(f'Cannot resume a missing episode workspace: {workspace}')
+
+        ep_sdk_root = item.get('sdk_root') or data.get('sdk_root')
+        ep_dependencies = item.get('dependencies') or data.get('dependencies')
+        if not resume:
+            if not ep_sdk_root:
+                raise ValueError(f'episode {idx} missing sdk_root')
+            if not ep_dependencies:
+                raise ValueError(f'episode {idx} missing dependencies')
+
+        lane = item.get('lane')
+        if lane is not None and lane not in LANES:
+            raise ValueError(f'episode {idx} invalid lane {lane}')
+
+        first_frame = item.get('first_frame', 'selective')
+        if first_frame not in FIRST_FRAME_POLICIES:
+            raise ValueError(f'episode {idx} invalid first_frame {first_frame}')
+
+        interaction_page = item.get('interaction_page', 'required')
+        if interaction_page not in INTERACTION_PAGE_POLICIES:
+            raise ValueError(f'episode {idx} invalid interaction_page {interaction_page}')
+
+        h3_mode = item.get('h3_mode', 'local')
+        if h3_mode not in H3_MODES:
+            raise ValueError(f'episode {idx} invalid h3_mode {h3_mode}')
+
+        viewpoint = item.get('viewpoint', data.get('viewpoint', 'auto'))
+        if viewpoint not in VIEWPOINTS:
+            raise ValueError(f'episode {idx} invalid viewpoint {viewpoint}')
+
+        wall_seconds = item.get('wall_seconds', data.get('wall_seconds', 14400))
+        _positive_int(wall_seconds, f'episode {idx} wall_seconds')
+
+        max_model_requests = item.get('max_model_requests', data.get('max_model_requests', 256))
+        _positive_int(max_model_requests, f'episode {idx} max_model_requests')
+
+        fasth3_endpoint = item.get('fasth3_endpoint', data.get('fasth3_endpoint'))
+        if lane == 'FastH3-Omni' or fasth3_endpoint is not None:
+            if not fasth3_endpoint:
+                raise ValueError(f'episode {idx} FastH3-Omni requires an explicit fasth3_endpoint')
+            if normalize_endpoint is None:
+                raise ValueError(f'episode {idx} sdk_root required to validate fasth3_endpoint')
+            fasth3_endpoint = normalize_endpoint(fasth3_endpoint)
+        if lane == 'FastH3-Omni' and first_frame == 'required':
+            raise ValueError('first_frame_policy=required is incompatible with FastH3-Omni')
+
+        init_kwargs = {
+            'sdk_root': ep_sdk_root,
+            'dependencies': ep_dependencies,
+            'inputs': item.get('input'),
+            'skills': item.get('skills'),
+            'previous': item.get('previous'),
+            'asset_cache': item.get('asset_cache'),
+            'lane': lane,
+            'first_frame': first_frame,
+            'interaction_page': interaction_page,
+            'h3_mode': h3_mode,
+            'wall_seconds': wall_seconds,
+            'max_model_requests': max_model_requests,
+            'viewpoint': viewpoint,
+            'fasth3_endpoint': fasth3_endpoint,
+        }
+        validated.append({'item': item, 'workspace': workspace, 'resume': resume,
+                          'index': idx, 'init_kwargs': init_kwargs})
+
+    with _batch_lock(manifest):
+        state_path = manifest.with_name('batch-state.json')
+        state = {
+            'manifest': str(manifest),
+            'workers': workers,
+            'episodes': [
+                {'workspace': str(v['workspace']), 'returncode': None, 'completed_at': None}
+                for v in validated
+            ],
+        }
+        _atomic_write_json(state_path, state)
+
+        rows = [None] * len(episodes)
+        state_lock = threading.Lock()
+
+        def mark_completed(index, returncode, error=None):
+            completed_at = datetime.now(timezone.utc).isoformat()
+            row = rows[index] or {'workspace': str(validated[index]['workspace'])}
+            row['returncode'] = returncode
+            row['completed_at'] = completed_at
+            if error is not None:
+                row['error'] = error
+            rows[index] = row
+            state['episodes'][index] = {
+                'workspace': str(validated[index]['workspace']),
+                'returncode': returncode,
+                'completed_at': completed_at,
+            }
+            if error is not None:
+                state['episodes'][index]['error'] = error
+            with state_lock:
+                _atomic_write_json(state_path, state)
+
+        # Initialize sequentially; each workspace is created in manifest order.
+        for v in validated:
+            idx, workspace, resume = v['index'], v['workspace'], v['resume']
+            row = {'workspace': str(workspace)}
+            if not resume:
+                try:
+                    initialize(workspace, **v['init_kwargs'])
+                except Exception as error:
+                    error_text = f'{type(error).__name__}: {error}'
+                    mark_completed(idx, 2, error_text)
+                    continue
+            rows[idx] = row
+
+        # Run the remaining episodes in parallel, keeping each session independent.
+        def run_one(v):
+            idx, item, workspace, resume = v['index'], v['item'], v['workspace'], v['resume']
+            row = rows[idx]
+            try:
+                rc = run(workspace, endpoint=item.get('endpoint'),
+                         resume=resume, prompt=item.get('prompt'))
+            except Exception as error:
+                rc = 2
+                row['error'] = f'{type(error).__name__}: {error}'
+            mark_completed(idx, rc, row.get('error'))
+            return row
+
+        pending = [v for v in validated
+                   if rows[v['index']] is not None and 'returncode' not in rows[v['index']]]
+        if pending:
+            with ThreadPoolExecutor(max_workers=workers) as executor:
+                list(executor.map(run_one, pending))
+
+        result_rows = []
+        for idx in range(len(episodes)):
+            row = rows[idx] or {'workspace': str(validated[idx]['workspace'])}
+            if 'returncode' not in row:
+                row['returncode'] = 2
+                row['error'] = 'episode did not run'
+            result_rows.append(row)
+        return {'episodes': result_rows, 'ok': all(row['returncode'] == 0 for row in result_rows), 'workers': workers}
 
 
 def main():
@@ -279,13 +506,14 @@ def main():
     init.add_argument('--asset-cache', type=Path,
                       help='Series-specific recurring assets to seed into input/ when absent; no default. '
                            'For the zhiyao series pass series-assets/zhiyao')
-    init.add_argument('--lane', choices=('sd2.0-fast', 'sd2.0-mini', 'MiniMax-H3'),
+    init.add_argument('--lane', choices=LANES,
                       help='Pinned video lane from the start; media.py rejects the other lane')
-    init.add_argument('--first-frame', choices=('none', 'selective', 'required'), default='selective',
+    init.add_argument('--fasth3-endpoint', help='Explicit UniServe endpoint for FastH3-Omni; no machine default')
+    init.add_argument('--first-frame', choices=FIRST_FRAME_POLICIES, default='selective',
                       help='First-frame policy: none, agent-selective, or required for every video request')
-    init.add_argument('--interaction-page', choices=('required', 'none'), default='required',
+    init.add_argument('--interaction-page', choices=INTERACTION_PAGE_POLICIES, default='required',
                       help='Append the fixed 3-second A/B/C page at the end')
-    init.add_argument('--h3-mode', choices=('local', 'cloud'), default='local',
+    init.add_argument('--h3-mode', choices=H3_MODES, default='local',
                       help='H3 route: local pool or PhanRouter cloud (cloud is 768p/24fps)')
     init.add_argument('--wall-seconds', type=int, default=14400)
     init.add_argument('--max-model-requests', type=int, default=256)
@@ -297,7 +525,8 @@ def main():
     launch.add_argument('--resume', action='store_true')
     launch.add_argument('--prompt', help='Optional instruction for this turn; not a new production mode')
     batch = sub.add_parser('batch')
-    batch.add_argument('manifest', type=Path, help='Independent episode init/run settings; sequential and blocking')
+    batch.add_argument('manifest', type=Path,
+                       help='Independent episode init/run settings; init sequential, run parallel up to manifest workers')
     args = parser.parse_args()
     if args.command == 'init':
         print(initialize(args.workspace, args.sdk_root, args.dependencies, args.input, args.skills,
@@ -305,7 +534,7 @@ def main():
                          lane=args.lane, first_frame=args.first_frame,
                          interaction_page=args.interaction_page, h3_mode=args.h3_mode,
                          wall_seconds=args.wall_seconds, max_model_requests=args.max_model_requests,
-                         viewpoint=args.viewpoint))
+                         viewpoint=args.viewpoint, fasth3_endpoint=args.fasth3_endpoint))
     elif args.command == 'run':
         raise SystemExit(run(args.workspace, args.endpoint, args.resume, args.prompt))
     else:

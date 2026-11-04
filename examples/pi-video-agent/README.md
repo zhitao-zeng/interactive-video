@@ -29,9 +29,52 @@
 <local.json中的python> .runtime/pi-v2/starter.py run .runtime/pi-v2 --endpoint <同一端点名> --resume
 ```
 
+## 批量执行
+
+`batch` 先完整校验整个 manifest，校验失败在任何 init 或生产调用前报错。校验范围包括：
+
+- `workers` 必须是正整数，默认等于集数；`0`、负数、非整数或布尔都会被拒绝。
+- `resume` 必须是真正的 JSON 布尔，`"false"` 等字符串不被接受。
+- 每集必须提供 `workspace`；非 resume 集必须能从顶层或单集拿到 `sdk_root` 与 `dependencies`。
+- workspace 解析后不能重叠（`a == b`、`a` 是 `b` 的父目录或子目录均拒绝），siblings 允许。
+- `lane`、`first_frame`、`interaction_page`、`h3_mode`、`viewpoint`、`wall_seconds`、`max_model_requests` 等 init 选项均须合法。
+- `FastH3-Omni` 必须显式提供 `fasth3_endpoint`，且 `first_frame=required` 与其不兼容；endpoint 会按 SDK 规则规范化。
+
+校验通过后，batch 会获取 manifest 同级目录的 `batch-state.lock` 文件排他锁。第二个同目录批次在 init/run 前即被拒绝；锁在批次结束时释放。状态文件写入失败属于批次基础设施错误，不会冒充 accepted 或完整结果。
+
+然后按 manifest 顺序逐集 init，再用 `ThreadPoolExecutor` 并行调用各集 `run`。每集保留独立的 workspace、session 和 budgets；一集失败不会阻塞或取消其他集。
+
+```bash
+<local.json中的python> .runtime/pi-v2/starter.py batch /path/to/batch.json
+```
+
+manifest 示例：
+
+```json
+{
+  "sdk_root": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main",
+  "dependencies": "/path/to/existing/pi/node_modules",
+  "workers": 2,
+  "episodes": [
+    {"workspace": "/path/to/episode-A", "input": "/path/to/input-A", "endpoint": "official-ds41"},
+    {"workspace": "/path/to/episode-B", "input": "/path/to/input-B", "endpoint": "official-ds41"}
+  ]
+}
+```
+
+已有工作区必须显式 `resume=true`，不存在的恢复目标会拒绝。
+
+每集完成后立即在 manifest 同级目录写入 `batch-state.json`（原子写），记录该集 workspace、returncode 与 completed_at；这只是进程完成状态，不是内容 accepted。最终输出保留 `episodes`/`ok` 并新增 `workers`，退出码只反映进程是否全部退出 0，不能当作内容通过。整批不等待内容审核或上传，每集结束后由协调者分别审核、恢复或发布。
+
+使用 `FastH3-Omni` 时，UniServe 服务应在批次期间保持常驻，Agent 只调用其 API；batch 不会为每一集单独启停服务。batch 只负责 init/run 与进程状态，不调度内容阶段，也不伪造 accepted 状态。
+
 默认沿用已验证的 DS/Kimi 兼容接入，context_window=1048576、max_output_tokens=128000；可改 local.json，服务实际能力仍以端点为准。密钥只进入环境，不写配置/日志。Bun 直接加载 SDK（本机旧 Node 的 Pi CLI 不兼容，未安装新 Node）。
 
 媒体脚本用法见工作副本 TOOLS.md。保留一次真实提交的边界：实际附件与实际 task id 留证；未知提交不隐式再发。Agent 可以改连接脚本，但仍受用户原预算、原始证据和真实交付要求约束。没有新增状态机、轮询调度器或内容审核服务。
+
+可选 `FastH3-Omni` lane 使用 `action=fasth3`；init 示例追加 `--lane FastH3-Omni --fasth3-endpoint http://127.0.0.1:30027`。batch manifest 可在顶层或单集设置 `fasth3_endpoint`。endpoint 冻结到 `local.json`、`PRODUCTION.md` 和 `CAPABILITIES.json`，没有机器默认值，`h3_mode` 不参与 Fast 路由。请求 endpoint 规范化后必须等于冻结值，userinfo/query/fragment 会在写文件前拒绝。此版只接受无需 Bearer 的内部 UniServe 端点，不增加密钥配置。Fast 仅普通 reference，显式 first_frame 和 `first_frame_policy=required` 均拒绝，`selective` 不等于 keyframe 已验证。
+
+UniServe 需另行启动，代码不负责服务启停；重启会清 jobs/content。Fast 以原 prompt 和原字节图片/音频 data URI 提交，保存 target/seed/附件 SHA/状态历史/耗时；同 task 恢复不重新 POST，404 只报错。新 take 必须新输出名并受原预算约束。Fast 不代表普遍优于 Turbo，music_selection 保持原状。
 
 本效率分支已通过16项相关Python回归、JS预算检查及独立代码审查；SNAPSHOT.md / V2-NOTES.md保留此前基线记录。原生会话恢复沿用原起点、时限与请求计数。
 

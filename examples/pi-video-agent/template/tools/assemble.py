@@ -45,15 +45,16 @@ def _mix_music(joined, output, music):
         cmd += ['-t', str(float(seconds))]
     cmd += ['-i', str(track), '-i', str(joined)]
     fade_out_at = max(0., film - fade_out)
-    chain = (f'[0:a]volume={gain}dB,afade=t=in:st=0:d={fade_in},'
-             f'afade=t=out:st={fade_out_at}:d={fade_out}[bgm];'
+    chain = (f'[0:a]loudnorm=I=-5:TP=-1.5:LRA=11,volume={gain}dB,'
+             f'afade=t=in:st=0:d={fade_in},afade=t=out:st={fade_out_at}:d={fade_out}[bgm];'
              '[1:a]volume=1.0[voice];[voice][bgm]amix=inputs=2:duration=first:'
-             'dropout_transition=2:normalize=0[a]')
+             'dropout_transition=2:normalize=0,alimiter=limit=0.98:level=false[a]')
     cmd += ['-filter_complex', chain, '-map', '1:v:0', '-map', '[a]',
             '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-ac', '2',
             '-t', f'{film}', '-movflags', '+faststart', str(output)]
     subprocess.run(cmd, check=True)
-    return {'track': str(track), 'gain_db': gain, 'loop': loop, 'start': start,
+    return {'track': str(track), 'gain_db': gain, 'target_lufs': -5 + gain,
+            'loudness_reference_lufs': -5, 'loop': loop, 'start': start,
             'seconds': seconds, 'film_duration': film}
 
 

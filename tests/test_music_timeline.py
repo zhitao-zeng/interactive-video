@@ -115,7 +115,13 @@ def test_music_bus_leaves_real_gap_and_native_audio_remains_while_video_is_copie
     assert signal(output,1,1,300)>10*signal(output,3.2,.5,300)
     assert signal(output,4.2,.5,300)>10*signal(output,3.2,.5,300)
     assert signal(output,7,.5,300)<signal(output,1,1,300)/10 # no restart in an unscored tail/card
-    assert signal(output,3.2,.5,1000)>.8*signal(video,3.2,.5,1000)
+    assert signal(output,3.2,.5,1000)==pytest.approx(signal(video,3.2,.5,1000),rel=.05)
+    assert signal(output,1,1,300)>.005
+    mix=mixed['assembly']['episode_music_mix']
+    assert mix['inputs']['processing']=='music-ebur128-reference--5-v1'
+    assert mix['inputs']['music_timeline']['cues'][0]['target_lufs']==-17
+    graph=mix['command'][mix['command'].index('-filter_complex')+1]
+    assert 'amix=inputs=2:duration=first:normalize=0' in graph
     elementary=lambda p:subprocess.check_output(['ffmpeg','-v','error','-i',str(p),'-map','0:v:0','-c','copy','-f','h264','-'])
     assert elementary(output)==elementary(video)
     again=apply_assembly(directory,copy.deepcopy(mixed))

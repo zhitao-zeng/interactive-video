@@ -1,11 +1,17 @@
 """No paid calls: native Pi with fake SSE, real SDK with MockTransport, real ffmpeg."""
+import fcntl
 import importlib.util
 import io
 import json
+import math
 import os
 from pathlib import Path
+import struct
 import subprocess
 import sys
+import threading
+import time
+import types
 
 import httpx
 from PIL import Image
@@ -270,14 +276,22 @@ def test_assembly_uses_current_cuts_not_cached_movie(media, workspace):
     assert pixel(second['movie'])[2] > pixel(second['movie'])[0] + 100
 
 
-def test_assembly_mixes_only_explicitly_reviewed_music(media, workspace):
+def test_assembly_mixes_only_explicitly_reviewed_music(tmp_path, monkeypatch):
+    workspace = tmp_path
+    media = types.ModuleType('media')
+    media.WORK = workspace
+    media.file = lambda name: (workspace / name).resolve()
+    media.probe = lambda path: json.loads(subprocess.check_output([
+        'ffprobe', '-v', 'error', '-show_format', '-show_streams', '-of', 'json', str(path)], text=True))
+    monkeypatch.setitem(sys.modules, 'media', media)
     for name, color in [('red', 'red'), ('blue', 'blue')]:
         subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-f', 'lavfi', '-i', f'color=c={color}:s=64x96:d=0.5',
-            '-f', 'lavfi', '-i', 'anullsrc=r=48000:cl=stereo', '-t', '0.5', '-c:v', 'libx264', '-c:a', 'aac',
+            '-f', 'lavfi', '-i', 'sine=frequency=1000:sample_rate=48000:duration=0.5',
+            '-t', '0.5', '-c:v', 'libx264', '-c:a', 'aac',
             '-pix_fmt', 'yuv420p', '-shortest', str(workspace / f'{name}.mp4')], check=True)
     subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-f', 'lavfi', '-i', 'sine=frequency=440:duration=1.2',
                     '-ar', '48000', '-ac', '2', str(workspace / 'track.wav')], check=True)
-    assemble = module_at('starter_assemble_music', workspace / 'tools/assemble.py')
+    assemble = module_at('starter_assemble_music', HERE / 'template/tools/assemble.py')
     music = {'path': 'track.wav', 'track_id': 'test-1', 'title': 'Test tone', 'artist': 'test',
              'license_id': 'test-only', 'attribution': 'test', 'gain_db': -24, 'loop': True,
              'fade_in': 0.1, 'fade_out': 0.1,
@@ -286,7 +300,20 @@ def test_assembly_mixes_only_explicitly_reviewed_music(media, workspace):
                                 'width': 64, 'height': 96, 'fps': 25, 'music': music},
                                'output/mixed.mp4')
     assert result['music'] is True
-    assert (workspace / 'output/mixed.mp4.music.json').is_file()
+    manifest = workspace / 'output/mixed.mp4.music.json'
+    record = json.loads(manifest.read_text())
+    assert record['music']['attribution'] == 'test'
+    assert record['mix']['target_lufs'] == -29 and record['mix']['loudness_reference_lufs'] == -5
+    output = workspace / result['movie']
+    joined = workspace / 'output/mixed.mp4.parts/joined.mp4'
+    def strength(path, hz):
+        data = subprocess.check_output(['ffmpeg', '-v', 'error', '-ss', '0.15', '-i', str(path), '-t', '0.3',
+            '-map', '0:a:0', '-ac', '1', '-ar', '16000', '-f', 'f32le', '-'])
+        samples = struct.unpack('<' + 'f' * (len(data) // 4), data)
+        return abs(sum(x * complex(math.cos(2 * math.pi * hz * i / 16000),
+            math.sin(2 * math.pi * hz * i / 16000)) for i, x in enumerate(samples))) / len(samples)
+    assert strength(output, 1000) == pytest.approx(strength(joined, 1000), rel=.05)
+    assert strength(output, 440) > max(5 * strength(joined, 440), .005)
     with pytest.raises(ValueError, match='review.status'):
         assemble.assemble({'clips': [{'path': 'red.mp4'}], 'music': {'path': 'track.wav'}},
                           'output/unreviewed.mp4')
@@ -521,7 +548,7 @@ def test_init_records_explicit_budget(tmp_path):
     assert config['max_model_requests'] == 7
 
 
-def test_batch_initializes_and_waits_for_each_episode(tmp_path, monkeypatch):
+def test_batch_initializes_and_runs_episodes(tmp_path, monkeypatch):
     calls = []
 
     def fake_init(workspace, *args, **kwargs):
@@ -543,8 +570,11 @@ def test_batch_initializes_and_waits_for_each_episode(tmp_path, monkeypatch):
         {'workspace': str(tmp_path / 'second'), 'endpoint': 'test', 'resume': True},
     ]}))
     result = starter.run_batch(manifest)
-    assert calls == [('init', 'first'), ('run', 'first'), ('run', 'second')]
+    assert calls[0] == ('init', 'first')
+    assert sorted(calls[1:]) == [('run', 'first'), ('run', 'second')]
     assert [row['returncode'] for row in result['episodes']] == [2, 0]
+    assert result['workers'] == 2
+    assert (manifest.parent / 'batch-state.json').is_file()
 
 
 def test_previous_copy_cannot_modify_original(tmp_path):
@@ -644,3 +674,421 @@ globalThis.fetch=async(url,options={})=>{
         assert budget['started_at'] == original_budget['started_at']
         assert budget['deadline_at'] == original_budget['deadline_at']
         assert budget['provider_requests'] == original_budget['provider_requests'] + 1
+
+
+def test_fasth3_init_requires_endpoint_and_rejects_required(tmp_path):
+    if not DEPS:
+        pytest.skip('Set PI_STARTER_NODE_MODULES to existing Pi dependencies; no install is performed.')
+    with pytest.raises(ValueError, match='endpoint'):
+        starter.initialize(tmp_path / 'missing-endpoint', SDK, DEPS, lane='FastH3-Omni')
+    with pytest.raises(ValueError, match='first_frame_policy=required'):
+        starter.initialize(tmp_path / 'required-frame', SDK, DEPS, lane='FastH3-Omni',
+                           first_frame='required', fasth3_endpoint='http://127.0.0.1:30027')
+
+
+def test_fasth3_init_freezes_endpoint(tmp_path):
+    if not DEPS:
+        pytest.skip('Set PI_STARTER_NODE_MODULES to existing Pi dependencies; no install is performed.')
+    work = starter.initialize(tmp_path / 'fast-options', SDK, DEPS, lane='FastH3-Omni',
+                              first_frame='selective', h3_mode='cloud',
+                              fasth3_endpoint='http://127.0.0.1:30027')
+    config = json.loads((work / 'local.json').read_text())
+    assert config['media_lane'] == 'FastH3-Omni'
+    assert config['fasth3_endpoint'] == 'http://127.0.0.1:30027'
+    assert config['first_frame_policy'] == 'selective'
+    capabilities = json.loads((work / 'CAPABILITIES.json').read_text())
+    assert capabilities['fasth3']['model'] == 'FastH3-Omni'
+    assert capabilities['fasth3']['endpoint'] == 'http://127.0.0.1:30027'
+    assert capabilities['fasth3']['restart_clears_jobs_and_content'] is True
+    assert 'FastH3-Omni' in (work / 'PRODUCTION.md').read_text()
+
+
+def test_fasth3_media_preserves_bytes_nested_duration_and_lane_rules(media, monkeypatch, workspace):
+    config = json.loads((workspace / 'local.json').read_text())
+    config.update(media_lane='FastH3-Omni', fasth3_endpoint='http://127.0.0.1:30027', h3_mode='cloud')
+    (workspace / 'local.json').write_text(json.dumps(config))
+    media = module_at('media_fast_options', workspace / 'tools/media.py')
+    posted = []
+
+    def handler(request):
+        if request.method == 'POST':
+            posted.append(json.loads(request.content))
+            return httpx.Response(202, json={'id': 'fast-task'})
+        if request.url.path.endswith('/content'):
+            return httpx.Response(200, content=b'fake MP4', headers={'Content-Type': 'video/mp4'})
+        return httpx.Response(200, json={'id': 'fast-task', 'status': 'completed'})
+
+    from novel_manga.providers import fast_h3
+    original = fast_h3.FastH3MediaProvider
+
+    def create(*args, **kwargs):
+        provider = original(*args, **kwargs)
+        provider.fast_client.close()
+        provider.fast_client = httpx.Client(transport=httpx.MockTransport(handler))
+        return provider
+
+    monkeypatch.setattr(fast_h3, 'FastH3MediaProvider', create)
+    media.execute({'action': 'fasth3', 'prompt': 'Picture 1 corridor', 'references': ['input/identity.png'],
+                   'seconds': 5, 'seed': 2101, 'ratio': '9:16', 'output': 'media/fast.mp4'})
+    assert len(posted) == 1
+    payload = posted[0]
+    assert payload['model'] == 'FastH3-Omni' and payload['task'] == 'ref2va'
+    assert payload['prompt'] == 'Picture 1 corridor'
+    assert payload['target'] == {'short_edge': 768, 'aspect_ratio': '9:16', 'duration_seconds': 5.0}
+    assert payload['seed'] == 2101
+    uri = payload['conditions'][0]['uri']
+    import base64
+    assert base64.b64decode(uri.split(',', 1)[1]) == (workspace / 'input/identity.png').read_bytes()
+    wire = json.loads((workspace / 'media/fast.mp4.wire/request.json').read_text())
+    assert wire['kind'] == 'fasth3' and wire['duration'] == 5.0
+    assert wire['target']['short_edge'] == 768 and wire['seed'] == 2101
+    assert json.loads((workspace / 'media/fast.mp4.wire/response.json').read_text())['task_id'] == 'fast-task'
+    media.execute({'action': 'fasth3', 'prompt': 'Picture 1 corridor', 'references': ['input/identity.png'],
+                   'seconds': 5, 'seed': 2101, 'ratio': '9:16', 'output': 'media/fast.mp4'})
+    assert len(posted) == 1
+    with pytest.raises(ValueError, match='first_frame'):
+        media.execute({'action': 'fasth3', 'prompt': 'x', 'references': ['input/identity.png'],
+                       'first_frame': 'input/identity.png', 'seconds': 5, 'output': 'media/fast-frame.mp4'})
+    with pytest.raises(ValueError, match='Pinned video lane is FastH3-Omni'):
+        media.execute({'action': 'h3', 'endpoint': 'pool', 'prompt': 'x', 'references': [],
+                       'seconds': 5, 'output': 'media/fast-old-lane.mp4'})
+    assert len(posted) == 1
+    config['first_frame_policy'] = 'required'
+    (workspace / 'local.json').write_text(json.dumps(config))
+    media = module_at('media_fast_required', workspace / 'tools/media.py')
+    with pytest.raises(ValueError, match='first_frame_policy=required'):
+        media.execute({'action': 'fasth3', 'prompt': 'x', 'references': ['input/identity.png'],
+                       'seconds': 5, 'output': 'media/fast-required.mp4'})
+    assert len(posted) == 1
+
+
+def test_fasth3_batch_passes_explicit_endpoint(tmp_path, monkeypatch):
+    captured = {}
+
+    def fake_init(workspace, *args, **kwargs):
+        workspace = Path(workspace)
+        workspace.mkdir()
+        captured.update(kwargs)
+        return workspace
+
+    monkeypatch.setattr(starter, 'initialize', fake_init)
+    monkeypatch.setattr(starter, 'run', lambda *args, **kwargs: 0)
+    manifest = tmp_path / 'batch.json'
+    manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS,
+        'fasth3_endpoint': 'http://127.0.0.1:30027',
+        'episodes': [{'workspace': str(tmp_path / 'episode'), 'lane': 'FastH3-Omni'}]}))
+    assert starter.run_batch(manifest)['ok'] is True
+    assert captured['fasth3_endpoint'] == 'http://127.0.0.1:30027'
+
+
+@pytest.mark.parametrize('endpoint', [
+    'http://user:pass@example.test', 'http://example.test/?token=secret', 'http://example.test/#fragment'])
+def test_fasth3_init_rejects_credential_urls_before_any_files(tmp_path, endpoint):
+    if not DEPS:
+        pytest.skip('Set PI_STARTER_NODE_MODULES to existing Pi dependencies; no install is performed.')
+    workspace = tmp_path / 'unsafe-endpoint'
+    with pytest.raises(ValueError):
+        starter.initialize(workspace, SDK, DEPS, lane='FastH3-Omni', fasth3_endpoint=endpoint)
+    assert not workspace.exists()
+
+
+def test_fasth3_init_normalizes_trailing_slash(tmp_path):
+    if not DEPS:
+        pytest.skip('Set PI_STARTER_NODE_MODULES to existing Pi dependencies; no install is performed.')
+    work = starter.initialize(tmp_path / 'normalized-endpoint', SDK, DEPS, lane='FastH3-Omni',
+                              fasth3_endpoint='http://127.0.0.1:30027/')
+    assert json.loads((work / 'local.json').read_text())['fasth3_endpoint'] == 'http://127.0.0.1:30027'
+
+
+@pytest.mark.parametrize('endpoint', [
+    'http://127.0.0.1:30028', 'http://user:pass@127.0.0.1:30027', 'http://127.0.0.1:30027/?token=secret'])
+def test_fasth3_request_endpoint_mismatch_writes_no_request_files(media, workspace, endpoint):
+    config = json.loads((workspace / 'local.json').read_text())
+    config.update(media_lane='FastH3-Omni', fasth3_endpoint='http://127.0.0.1:30027')
+    (workspace / 'local.json').write_text(json.dumps(config))
+    media = module_at('media_frozen_endpoint', workspace / 'tools/media.py')
+    output = workspace / 'media/endpoint-mismatch.mp4'
+    with pytest.raises(ValueError):
+        media.execute({'action': 'fasth3', 'endpoint': endpoint, 'prompt': 'Picture 1 corridor',
+                       'references': ['input/identity.png'], 'seconds': 5,
+                       'output': 'media/endpoint-mismatch.mp4'})
+    assert not output.with_suffix(output.suffix + '.request.json').exists()
+    assert not output.with_suffix('.mp4.wire').exists()
+
+
+
+def test_batch_runs_episodes_in_parallel(tmp_path, monkeypatch):
+    barrier = threading.Barrier(2)
+    events = []
+    lock = threading.Lock()
+
+    def fake_init(workspace, *args, **kwargs):
+        Path(workspace).mkdir()
+        return Path(workspace)
+
+    def fake_run(workspace, **kwargs):
+        name = Path(workspace).name
+        with lock:
+            events.append(('start', name))
+        barrier.wait(timeout=5)
+        with lock:
+            events.append(('end', name))
+        return 0
+
+    monkeypatch.setattr(starter, 'initialize', fake_init)
+    monkeypatch.setattr(starter, 'run', fake_run)
+    manifest = tmp_path / 'batch.json'
+    manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'workers': 2,
+        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test'},
+                     {'workspace': str(tmp_path / 'b'), 'endpoint': 'test'}]}))
+    result = starter.run_batch(manifest)
+    assert [row['returncode'] for row in result['episodes']] == [0, 0]
+    starts = {name for kind, name in events if kind == 'start'}
+    ends = {name for kind, name in events if kind == 'end'}
+    assert starts == ends == {'a', 'b'}
+    # Both runs must have started before either finished.
+    second_start = max(events.index(('start', 'a')), events.index(('start', 'b')))
+    first_end = min(events.index(('end', 'a')), events.index(('end', 'b')))
+    assert second_start < first_end
+
+
+def test_batch_results_stay_in_manifest_order_and_failure_does_not_block(tmp_path, monkeypatch):
+    barrier = threading.Barrier(2)
+
+    def fake_init(workspace, *args, **kwargs):
+        Path(workspace).mkdir()
+        return Path(workspace)
+
+    def fake_run(workspace, **kwargs):
+        barrier.wait(timeout=5)
+        return 1 if Path(workspace).name == 'a' else 0
+
+    monkeypatch.setattr(starter, 'initialize', fake_init)
+    monkeypatch.setattr(starter, 'run', fake_run)
+    manifest = tmp_path / 'batch.json'
+    manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'workers': 2,
+        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test'},
+                     {'workspace': str(tmp_path / 'b'), 'endpoint': 'test'}]}))
+    result = starter.run_batch(manifest)
+    assert [row['workspace'] for row in result['episodes']] == [str(tmp_path / 'a'), str(tmp_path / 'b')]
+    assert [row['returncode'] for row in result['episodes']] == [1, 0]
+    assert result['ok'] is False
+    state = json.loads((manifest.parent / 'batch-state.json').read_text())
+    assert [e['returncode'] for e in state['episodes']] == [1, 0]
+    assert all(e['completed_at'] for e in state['episodes'])
+
+
+def test_batch_state_updated_when_single_episode_finishes(tmp_path, monkeypatch):
+    hold = threading.Event()
+    result_holder = [None]
+
+    def fake_init(workspace, *args, **kwargs):
+        Path(workspace).mkdir()
+        return Path(workspace)
+
+    def fake_run(workspace, **kwargs):
+        if Path(workspace).name == 'a':
+            hold.wait(timeout=30)
+        return 0
+
+    monkeypatch.setattr(starter, 'initialize', fake_init)
+    monkeypatch.setattr(starter, 'run', fake_run)
+    manifest = tmp_path / 'batch.json'
+    manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'workers': 2,
+        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test'},
+                     {'workspace': str(tmp_path / 'b'), 'endpoint': 'test'}]}))
+    state_path = manifest.parent / 'batch-state.json'
+
+    def target():
+        result_holder[0] = starter.run_batch(manifest)
+
+    runner = threading.Thread(target=target)
+    runner.start()
+    try:
+        for _ in range(200):
+            if state_path.exists():
+                state = json.loads(state_path.read_text())
+                if state['episodes'][1]['completed_at'] is not None:
+                    break
+            time.sleep(0.05)
+        else:
+            raise AssertionError('episode b did not complete before a was released')
+        assert state['episodes'][0]['returncode'] is None
+        assert state['episodes'][0]['completed_at'] is None
+        assert state['episodes'][1]['returncode'] == 0
+        assert state['episodes'][1]['completed_at'] is not None
+    finally:
+        hold.set()
+    runner.join(timeout=10)
+    assert runner.is_alive() is False
+    assert [row['returncode'] for row in result_holder[0]['episodes']] == [0, 0]
+
+
+def test_batch_pre_check_errors_never_call_run(tmp_path, monkeypatch):
+    (tmp_path / 'existing').mkdir()
+    (tmp_path / 'parent').mkdir()
+
+    def fake_init(*args, **kwargs):
+        raise AssertionError('initialize should not be called during pre-check failures')
+
+    def fake_run(*args, **kwargs):
+        raise AssertionError('run should not be called during pre-check failures')
+
+    monkeypatch.setattr(starter, 'initialize', fake_init)
+    monkeypatch.setattr(starter, 'run', fake_run)
+    base = {'sdk_root': str(SDK), 'dependencies': DEPS,
+            'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test'}]}
+    cases = [
+        ({**base, 'workers': 0}, 'workers'),
+        ({**base, 'workers': -2}, 'workers'),
+        ({**base, 'workers': 'two'}, 'workers'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test'},
+                               {'workspace': str(tmp_path / 'ws'), 'endpoint': 'test'}]}, 'overlap'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'parent'), 'endpoint': 'test', 'resume': True},
+                               {'workspace': str(tmp_path / 'parent' / 'child'), 'endpoint': 'test'}]}, 'overlap'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'existing'), 'endpoint': 'test'}]}, 'resume'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'missing'), 'endpoint': 'test', 'resume': True}]},
+         'Cannot resume'),
+        ({**base, 'episodes': [{'endpoint': 'test'}]}, 'missing workspace'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'resume': 'false'}]}, 'boolean'),
+        ({'dependencies': DEPS, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test'}]}, 'missing sdk_root'),
+        ({'sdk_root': str(SDK), 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test'}]}, 'missing dependencies'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'lane': 'unknown'}]}, 'invalid lane'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'first_frame': 'all'}]}, 'invalid first_frame'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'interaction_page': 'optional'}]}, 'invalid interaction_page'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'h3_mode': 'hybrid'}]}, 'invalid h3_mode'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'viewpoint': 'third-person'}]}, 'invalid viewpoint'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'wall_seconds': 0}]}, 'wall_seconds'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'max_model_requests': -1}]}, 'max_model_requests'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'lane': 'FastH3-Omni'}]}, 'fasth3_endpoint'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'lane': 'FastH3-Omni',
+                                'fasth3_endpoint': 'http://127.0.0.1:30027', 'first_frame': 'required'}]}, 'incompatible'),
+    ]
+    for data, match in cases:
+        manifest = tmp_path / 'batch.json'
+        manifest.write_text(json.dumps(data))
+        with pytest.raises(ValueError, match=match):
+            starter.run_batch(manifest)
+        assert not (manifest.parent / 'batch-state.json').exists()
+
+
+def test_batch_invalid_second_episode_prevents_all_init_and_run(tmp_path, monkeypatch):
+    calls = []
+
+    def fake_init(*args, **kwargs):
+        calls.append('init')
+        return args[0]
+
+    def fake_run(*args, **kwargs):
+        calls.append('run')
+        return 0
+
+    monkeypatch.setattr(starter, 'initialize', fake_init)
+    monkeypatch.setattr(starter, 'run', fake_run)
+    manifest = tmp_path / 'batch.json'
+    manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'workers': 2,
+        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test'},
+                     {'workspace': str(tmp_path / 'b'), 'endpoint': 'test', 'lane': 'unknown'}]}))
+    with pytest.raises(ValueError, match='invalid lane'):
+        starter.run_batch(manifest)
+    assert calls == []
+    assert not (manifest.parent / 'batch-state.json').exists()
+
+
+def test_batch_run_exception_does_not_block_other_episode(tmp_path, monkeypatch):
+    barrier = threading.Barrier(2)
+
+    def fake_init(workspace, *args, **kwargs):
+        Path(workspace).mkdir()
+        return Path(workspace)
+
+    def fake_run(workspace, **kwargs):
+        barrier.wait(timeout=5)
+        if Path(workspace).name == 'a':
+            raise RuntimeError('simulated run crash')
+        return 0
+
+    monkeypatch.setattr(starter, 'initialize', fake_init)
+    monkeypatch.setattr(starter, 'run', fake_run)
+    manifest = tmp_path / 'batch.json'
+    manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'workers': 2,
+        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test'},
+                     {'workspace': str(tmp_path / 'b'), 'endpoint': 'test'}]}))
+    result = starter.run_batch(manifest)
+    assert [row['returncode'] for row in result['episodes']] == [2, 0]
+    assert result['episodes'][0]['error'] == 'RuntimeError: simulated run crash'
+    state = json.loads((manifest.parent / 'batch-state.json').read_text())
+    assert [e['returncode'] for e in state['episodes']] == [2, 0]
+
+
+def test_batch_directory_lock_rejects_concurrent_batch(tmp_path, monkeypatch):
+    def fake_init(*args, **kwargs):
+        raise AssertionError('initialize should not be called while lock is held by another batch')
+
+    def fake_run(*args, **kwargs):
+        raise AssertionError('run should not be called while lock is held by another batch')
+
+    monkeypatch.setattr(starter, 'initialize', fake_init)
+    monkeypatch.setattr(starter, 'run', fake_run)
+    manifest = tmp_path / 'batch.json'
+    manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS,
+        'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test'}]}))
+    lock_path = manifest.with_name('batch-state.lock')
+    fd = os.open(str(lock_path), os.O_CREAT | os.O_RDWR)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        with pytest.raises(ValueError, match='already running'):
+            starter.run_batch(manifest)
+    finally:
+        fcntl.flock(fd, fcntl.LOCK_UN)
+        os.close(fd)
+    assert not (manifest.parent / 'batch-state.json').exists()
+
+
+def test_batch_default_workers_equals_episode_count(tmp_path, monkeypatch):
+    def fake_init(workspace, *args, **kwargs):
+        Path(workspace).mkdir()
+        return Path(workspace)
+
+    monkeypatch.setattr(starter, 'initialize', fake_init)
+    monkeypatch.setattr(starter, 'run', lambda *args, **kwargs: 0)
+    manifest = tmp_path / 'batch.json'
+    manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'episodes': [
+        {'workspace': str(tmp_path / 'a'), 'endpoint': 'test'},
+        {'workspace': str(tmp_path / 'b'), 'endpoint': 'test'},
+        {'workspace': str(tmp_path / 'c'), 'endpoint': 'test'},
+    ]}))
+    result = starter.run_batch(manifest)
+    assert result['workers'] == 3
+
+
+
+def test_batch_init_failure_keeps_error_and_does_not_run_that_episode(tmp_path, monkeypatch):
+    calls = []
+
+    def fake_init(workspace, *args, **kwargs):
+        if Path(workspace).name == 'bad':
+            raise RuntimeError('simulated init failure')
+        Path(workspace).mkdir()
+        calls.append(('init', Path(workspace).name))
+        return Path(workspace)
+
+    def fake_run(workspace, **kwargs):
+        calls.append(('run', Path(workspace).name))
+        return 0
+
+    monkeypatch.setattr(starter, 'initialize', fake_init)
+    monkeypatch.setattr(starter, 'run', fake_run)
+    manifest = tmp_path / 'batch.json'
+    manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'workers': 2,
+        'episodes': [{'workspace': str(tmp_path / 'bad'), 'endpoint': 'test'},
+                     {'workspace': str(tmp_path / 'ok'), 'endpoint': 'test'}]}))
+    result = starter.run_batch(manifest)
+    assert calls == [('init', 'ok'), ('run', 'ok')]
+    assert result['episodes'][0]['returncode'] == 2
+    assert result['episodes'][0]['error'] == 'RuntimeError: simulated init failure'
+    assert result['episodes'][1]['returncode'] == 0
+    state = json.loads((manifest.parent / 'batch-state.json').read_text())
+    assert state['episodes'][0]['returncode'] == 2
+    assert state['episodes'][0]['error'] == 'RuntimeError: simulated init failure'
+    assert state['episodes'][1]['returncode'] == 0

@@ -32,6 +32,14 @@ H3：`action="h3"`，显式给 `endpoint`（现有池名/地址，如 `"pool"`�
 {"action":"h3","endpoint":"pool","prompt":"subject_definitions … <Picture 1> … <Audio 1> … summary … detailed_description … Planned duration: 7 seconds.","references":["input/知遥-身份基准-v1.1.png","input/知遥-综合视觉卡-v1.1.png"],"purposes":["face identity","body and clothing"],"audios":["media/voices/zhiyao-anchor-a.wav"],"seconds":7,"ratio":"9:16","output":"media/test-h3-v1.mp4"}
 ```
 
+FastH3-Omni（可选 UniServe lane）：`action="fasth3"`，lane 也固定为 `FastH3-Omni`。init 必须显式传 `--fasth3-endpoint`，或在请求中显式给 `endpoint`；没有机器默认值，`h3_mode` 不影响这条路线。请求中的 endpoint 规范化后必须与冻结值完全相等，不能换服务；含 userinfo/query/fragment 的 URL 会在写 config/request 前拒绝。此版只接受**无需 Bearer 的内部 UniServe 端点**，不增加密钥配置。UniServe 服务须另行启动，本脚本不启停服务。
+
+```json
+{"action":"fasth3","endpoint":"http://127.0.0.1:30027","prompt":"原样保留当前 H3 英文提示词","references":["input/corridor.png"],"audios":[],"seconds":5,"ratio":"9:16","short_edge":768,"seed":2101,"output":"media/fasth3-take-v1.mp4"}
+```
+
+Fast 请求使用 `model=FastH3-Omni`、`task=ref2va` 和原 prompt；图片/音频按给定顺序以原字节 data URI 发送，不隐藏缩放或换格式。只接受普通 `reference`：显式 `first_frame` 会拒绝，`first_frame_policy=required` 不兼容；`selective` 只表示由 Agent 选择，不等于已验证 keyframe。实际 target、seed、附件 SHA、task id、状态历史和耗时写入 `.task.json` 与 `.wire/`。相同 request SHA 且已有 task id 时只查询/下载原任务；404 表示任务过期，不能隐式再 POST。服务重启会清 jobs/content，过期后如决定新 take 必须换输出名并受原任务预算约束。Fast 不表示普遍优于 Turbo。
+
 H3 实测风险与硬约束（2026-10-29，W30/W33/W36）：
 
 - `summary` 是导演备注，不是口播稿。只写场景和动作概述；不要放可朗读的台词、角色名、牌面文字、英文标题、选项名或完整英文句子。模型会把 `summary` 里的英文直接念出来。

@@ -134,9 +134,11 @@ def record_submission(client, output, refs, kind, first_frame=False, audio_refs=
         if kind == 'image':
             images = payload.get('base64Files') or ([payload['base64File']] if payload.get('base64File') else [])
             roles = ['reference'] * len(images)
-        elif kind == 'h3':
+        elif kind in {'h3', 'fasth3'}:
             images = [x['uri'] for x in payload['conditions'] if x['type'] == 'image' and x['role'] == 'reference']
             roles = [x['role'] for x in payload['conditions'] if x['type'] == 'image']
+            if kind == 'fasth3' and any(role != 'reference' for role in roles):
+                raise ValueError('FastH3-Omni accepts ordinary references only, not keyframes.')
             if first_frame and not any(x.get('frame_index') == 0 and x.get('role') == 'keyframe'
                                        and x.get('uri') == images[0] for x in payload['conditions']):
                 raise ValueError('Actual H3 payload is missing its requested zero keyframe.')
@@ -149,7 +151,7 @@ def record_submission(client, output, refs, kind, first_frame=False, audio_refs=
         if len(images) != len(refs):
             raise ValueError('Actual attachment count differs from requested references.')
         actual_audios = ([x['uri'] for x in payload.get('conditions', []) if x.get('type') == 'audio']
-                         if kind == 'h3' else [x['audio_url']['url'] for x in payload.get('content', []) if x.get('type') == 'audio_url'])
+                         if kind in {'h3', 'fasth3'} else [x['audio_url']['url'] for x in payload.get('content', []) if x.get('type') == 'audio_url'])
         if len(actual_audios) != len(audio_refs):
             raise ValueError('Actual audio attachments differ from requested reference audio files.')
         folder.mkdir(parents=True, exist_ok=True)
@@ -183,7 +185,10 @@ def record_submission(client, output, refs, kind, first_frame=False, audio_refs=
             'prompt': payload.get('prompt') or next((x.get('text') for x in payload.get('content', []) if x.get('type') == 'text'), ''),
             'attachments': attached, 'image_roles': roles, 'first_frame_bound': bool(first_frame),
             'audio_attachments': attached_audio,
-            'duration': payload.get('duration', payload.get('seconds'))})
+            'duration': payload.get('duration', payload.get('seconds', payload.get('target', {}).get('duration_seconds'))),
+            **({'target': payload.get('target'), 'seed': payload.get('seed'), 'endpoint': endpoint,
+                'request_sha256': hashlib.sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True).encode('utf-8')).hexdigest()}
+               if kind == 'fasth3' else {})})
         response = original(url, *args, **kwargs)
         # Task id is kept independently of the SDK's disposable polling sidecar.
         try:
@@ -283,12 +288,18 @@ def execute(request):
     action = request['action']
     lane = CONFIG.get('media_lane') or ''
     first_frame_policy = CONFIG.get('first_frame_policy') or 'selective'
-    if lane.startswith('sd2.0') and action == 'h3':
-        raise ValueError(f'Pinned video lane is {lane}; action=h3 is disabled. '
+    if lane.startswith('sd2.0') and action in {'h3', 'fasth3'}:
+        raise ValueError(f'Pinned video lane is {lane}; action={action} is disabled. '
                          'Use action=video or change media_lane explicitly in local.json.')
-    if lane == 'MiniMax-H3' and action == 'video':
+    if lane == 'MiniMax-H3' and action in {'video', 'fasth3'}:
         raise ValueError('Pinned video lane is MiniMax-H3; action=video is disabled. '
                          'Use action=h3 or change media_lane explicitly in local.json.')
+    if lane == 'FastH3-Omni' and action in {'video', 'h3'}:
+        raise ValueError('Pinned video lane is FastH3-Omni; use action=fasth3 or change media_lane explicitly in local.json.')
+    if action == 'fasth3' and request.get('first_frame'):
+        raise ValueError('FastH3-Omni accepts ordinary references only; explicit first_frame is not supported.')
+    if action == 'fasth3' and first_frame_policy == 'required':
+        raise ValueError('first_frame_policy=required is incompatible with FastH3-Omni; selective does not verify a keyframe.')
     if first_frame_policy == 'none' and request.get('first_frame'):
         raise ValueError('first_frame_policy=none: first frames are disabled for this production.')
     if first_frame_policy == 'required' and action in {'video', 'h3'} and not request.get('first_frame'):
@@ -372,7 +383,8 @@ def execute(request):
             provider._references()._await_active(sidecar, receipt)
             return {'path': str(source), 'asset_uri': uri,
                     'status': read_json(sidecar)['status'], 'receipt_file': str(sidecar)}
-        prompt, refs = references(request['prompt'], request.get('references', []), request.get('purposes', []))
+        original_prompt = request['prompt']
+        prompt, refs = references(original_prompt, request.get('references', []), request.get('purposes', []))
         audio_names = request.get('reference_audios', request.get('audios', []))
         audios = tuple(file(name) for name in audio_names)
         for audio in audios:
@@ -390,14 +402,32 @@ def execute(request):
             raise ValueError('Current SD first-frame SDK accepts exactly one image. Use references=[first_frame].')
         output = file(request['output'])
         output.parent.mkdir(parents=True, exist_ok=True)
+        if action == 'fasth3':
+            from novel_manga.providers.fast_h3 import normalize_endpoint
+            frozen_endpoint = normalize_endpoint(CONFIG.get('fasth3_endpoint') or '')
+            fasth3_endpoint = normalize_endpoint(request.get('endpoint') or frozen_endpoint)
+            if fasth3_endpoint != frozen_endpoint:
+                raise ValueError('FastH3 request endpoint differs from the frozen local.json endpoint; use a new workspace for a different service.')
         recorded_request(output, request)
-        if output.exists():
+        if output.exists() and action != 'fasth3':
             raise ValueError('Output already exists. Inspect it or choose a new filename; no cached output is silently returned.')
+        if output.exists() and action == 'fasth3' and not output.with_suffix(output.suffix + '.task.json').is_file():
+            raise ValueError('FastH3 output exists without a task receipt. Inspect it or choose a new filename.')
         if action == 'image':
             record_submission(provider.client, output, refs, 'image')
             provider.create_image(prompt, output, refs[0] if refs else None, tuple(refs[1:]), aspect_ratio=request.get('ratio', '9:16'))
-        elif action in {'video', 'h3'}:
-            if action == 'h3':
+        elif action in {'video', 'h3', 'fasth3'}:
+            if action == 'fasth3':
+                from novel_manga.providers.fast_h3 import FastH3MediaProvider
+                fast = FastH3MediaProvider(settings(), fasth3_endpoint, ratio=request.get('ratio', '9:16'))
+                try:
+                    record_submission(fast.fast_client, output, refs, 'fasth3', False, audios)
+                    fast.create_video(original_prompt, None, output, request['seconds'],
+                        additional_images=tuple(refs), reference_audios=audios,
+                        seed=request.get('seed'), short_edge=int(request.get('short_edge', 768)))
+                finally:
+                    fast.close()
+            elif action == 'h3':
                 if CONFIG.get('h3_mode') == 'cloud':
                     cloud = replace(settings(), video_model='MiniMax-H3',
                         phanrouter_api_key=os.getenv('PHANROUTER_H3CLOUD_API_KEY'),
