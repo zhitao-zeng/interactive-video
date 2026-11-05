@@ -143,9 +143,18 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                         job={**job,'result':{**outcome,'changed':[]}}
                 if (progress_rules.applied_repair(job)
                         and (time.monotonic() < state.deadline or config.get('complete_started_repairs'))):
-                    bridge.handle('render', {})
-                    bridge.update_state(phase='tool_running')
-                    continue
+                    # An accepted source/input change can invalidate the approved
+                    # opening. Render only when the host reports it as legal.
+                    from .readiness import next_action
+                    ready = next_action(ctx, bridge.handle('status', {}))
+                    result['next_action'] = ready
+                    bridge.update_state(next_action=ready)
+                    if ready['action'] == 'render':
+                        bridge.handle('render', {})
+                        bridge.update_state(phase='tool_running')
+                        continue
+                    # first_frames/agent: the saved session must author the missing
+                    # work; fall through to the normal invocation below.
                 if (result.get('upstream_recovery')or{}).get('proposals',0)>=2:
                     finished=bridge.tools.dispatch('finish',{})
                     if finished.get('passed'):
@@ -197,19 +206,27 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                         break
                 else:
                     resume = (ctx.work_dir / SESSION_FILE).is_file()
-                    prompt = prompts.continuation_prompt() if resume or (ctx.run_dir/'prepared.json').is_file() else prompts.initial_prompt(ctx)
+                    prompt = (None if resume else
+                              prompts.continuation_prompt() if (ctx.run_dir/'prepared.json').is_file()
+                              else prompts.initial_prompt(ctx))
                 resume = (ctx.work_dir / SESSION_FILE).is_file()
-                if config.get('agent_instructions'):
-                    prompt += '\nTask-specific instructions:\n' + str(config['agent_instructions'])
+                compact_resume = resume and not native_mode
+                if not compact_resume:
+                    prompt += '\n'+prompts.task_instructions(ctx)
+                    if config.get('agent_instructions'):
+                        prompt += '\nTask-specific instructions:\n' + str(config['agent_instructions'])
                 diagnosis = recovery.diagnose(ctx, status)
                 atomic_write_json(ctx.run_dir/'recovery-diagnosis.json', diagnosis)
                 memories = recovery.recall(ctx, diagnosis)
                 from .current_task import prepare as current_task
                 status['upstream_route']=recovery.upstream_route(ctx,status)
                 task=current_task(ctx,status,diagnosis,memories)
-                prompt += ('\nCurrent task (input/current-task.json); full state is in input/current-status.json. '
-                           'Use current targets and exact choices, not historical instructions:\n'
-                           +json.dumps(task,ensure_ascii=False))
+                if compact_resume:
+                    prompt = prompts.resume_prompt(task, agent_instructions=config.get('agent_instructions'))
+                else:
+                    prompt += ('\nCurrent task (input/current-task.json); full state is in input/current-status.json. '
+                               'Use current targets and exact choices, not historical instructions:\n'
+                               +json.dumps(task,ensure_ascii=False))
                 attempt, session_timeout, remaining = invoke(ctx, bridge, state, config, prompt, resume, remaining)
                 result['attempts'].append(str(attempt.directory))
                 bridge.update_state(attempts=result['attempts'], phase='tool_running',
@@ -229,7 +246,15 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                     fallbacks = result['fallback_invocations']
                     bridge.update_state(model_switch=result['model_switch'], no_progress=0)
                     continue
-                if config.get('complete_started_repairs') and progress_rules.applied_repair(status.get('job') or {}):
+                current_job = status.get('job') or {}
+                prior_job = before_status.get('job') or {}
+                repair_finished_this_turn = (
+                    current_job.get('id') != prior_job.get('id')
+                    or current_job.get('status') != prior_job.get('status')
+                    or current_job.get('result') != prior_job.get('result')
+                )
+                if (config.get('complete_started_repairs') and repair_finished_this_turn
+                        and progress_rules.applied_repair(current_job)):
                     # The submitted repair is already validated and published.
                     # Let the host close its media chain even if the author CLI
                     # ended at its timeout while handing off that operation.

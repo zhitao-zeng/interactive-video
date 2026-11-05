@@ -488,6 +488,9 @@ def test_configured_started_repair_can_finish_after_agent_window_without_new_tur
             if action=='render':result['quality_passed']=True
             return result
     monkeypatch.setattr(flow,'EpisodeTools',Tools)
+    if changed:
+        monkeypatch.setattr('novel_manga.application.agents.episode.readiness.next_action',
+                            lambda *_:{'action':'render','reason':'current authorized repair requires a render'})
     turns=[]
     def run(work,prompt,**kwargs):
         turns.append(kwargs)
@@ -497,7 +500,7 @@ def test_configured_started_repair_can_finish_after_agent_window_without_new_tur
     monkeypatch.setattr(episode_turns,'run_session',run)
     result=flow.run_episode(ctx,config={**config,'complete_started_repairs':True})
     assert len(turns)==1
-    assert result['passed'] is changed
+    assert result['passed'] is changed, result
     assert calls.count('render')==calls.count('finish')==int(changed)
     assert read_json(ctx.work_dir/'episode-session.json')['session_id']=='same-session'
 
@@ -536,6 +539,8 @@ def test_pause_during_completed_repair_survives_author_timeout_and_resumes_same_
             if action=='render':result['quality_passed']=True
             return result
     monkeypatch.setattr(flow,'EpisodeTools',Tools)
+    monkeypatch.setattr('novel_manga.application.agents.episode.readiness.next_action',
+                        lambda *_:{'action':'render','reason':'the saved accepted repair is ready for normal render'})
     def author(work,prompt,**kwargs):
         atomic_write_json(work/'episode-session.json',{'session_id':'same-session'})
         bridges[-1].handle('apply',{})
@@ -747,15 +752,49 @@ def test_slow_cli_yields_at_slice_timeout_without_resetting_episode_budget(ctx, 
 
 def test_repeated_time_slices_without_saved_work_stop_instead_of_requeueing_forever(ctx, config, monkeypatch):
     install_fake_runtime(monkeypatch, ctx)
+    calls, prompts = [], []
     def run(work, prompt, **kw):
+        calls.append(kw)
+        prompts.append(prompt)
         atomic_write_json(work/'episode-session.json', {'session_id': 'same-session'})
         return fake_attempt(ctx, 1, exit_code=124)
     monkeypatch.setattr(episode_turns, 'run_session', run)
     first = flow.run_episode(ctx, config={**config, 'agent_slice_seconds': 5})
-    assert first['status'] == 'deferred'
+    assert first['status'] == 'deferred' and first['no_progress'] == 1
+    assert calls[0]['resume'] is False
     second = flow.run_episode(ctx, config={**config, 'agent_slice_seconds': 5})
     assert second['status'] == 'blocked' and second['no_progress'] == 2
     assert 'without operation or output progress' in second['reason']
+    assert calls[1]['resume'] is True and len(prompts) == 2
+    assert prompts[0].startswith(episode_prompts.initial_prompt(ctx))
+    assert prompts[1].startswith('Continue this same saved episode session.')
+    assert len(prompts[1].encode()) < len(prompts[0].encode())
+    assert (ctx.work_dir/'input/current-task.json').is_file()
+    assert (ctx.work_dir/'input/current-status.json').is_file()
+
+
+def test_old_completed_partial_apply_does_not_mask_read_only_timeout_slices(ctx, config, monkeypatch):
+    install_fake_runtime(monkeypatch, ctx)
+    old_job={'id':'job-1','action':'apply','status':'completed',
+        'result':{'ok':False,'changed':['clip_19'],
+                  'blocked':{'clip_24':'one sibling remains blocked'}}}
+    atomic_write_json(ctx.run_dir/'agent-run.json', {'status':'running','deadline':time.time()+60,
+        'attempts':[],'no_progress':0,'fallback_invocations':0,'agent_seconds':0,'job':old_job})
+    calls=[]
+    def run(work,prompt,**kw):
+        calls.append(kw)
+        atomic_write_json(work/'episode-session.json',{'session_id':'same-session'})
+        return fake_attempt(ctx,len(calls),exit_code=124)
+    monkeypatch.setattr(episode_turns,'run_session',run)
+    settings={**config,'complete_started_repairs':True,'agent_slice_seconds':5}
+
+    first=flow.run_episode(ctx,config=settings)
+    assert first['status']=='deferred' and first['no_progress']==1
+    assert first['job']['id']==old_job['id'] and first['job']['result']['changed']==old_job['result']['changed']
+    second=flow.run_episode(ctx,config=settings)
+    assert second['status']=='blocked' and second['no_progress']==2 and len(calls)==2
+    assert calls[0]['resume'] is False and calls[1]['resume'] is True
+    assert second['job']['id']==old_job['id'] and second['job']['result']['blocked']==old_job['result']['blocked']
 
 
 @pytest.mark.parametrize('prepared', [False, True])

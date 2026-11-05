@@ -6,6 +6,20 @@ from novel_manga.application.agents.episode.tools import EpisodeTools
 from support.upstream_recovery import ctx_pair,approved_source,fake_image,row
 
 
+@pytest.mark.parametrize('h3',[None,'subject_definitions: source-bound H3'])
+def test_source_fidelity_check_receives_the_actual_sd_or_h3_request(monkeypatch,h3):
+    import json
+    from novel_manga.application.repair import upstream
+    from novel_manga.llm import client
+    seen=[]
+    def check(parts,*args,**kwargs):
+        seen.append(json.loads(parts[0]['text'].split('\n',1)[1]));return {'consistent':True,'problems':[]}
+    monkeypatch.setattr(client,'ask_json',check)
+    upstream.check_compilation([],{'prompt':'实际SD请求与原台词','prompt_h3':h3})
+    assert seen[0]['actual_request']==(h3 or'实际SD请求与原台词')
+    assert seen[0]['request_dialect']==('H3'if h3 else'SD')
+
+
 def test_candidate_only_is_not_episode_accepted(ctx_pair,approved_source,fake_image):
     ctx=ctx_pair[0];atomic_write_json(ctx.work_dir/'output/repair.json',{'decisions':[row()]})
     checked=EpisodeTools(ctx).check({'file':'output/repair.json'})
@@ -71,7 +85,8 @@ def test_finished_host_job_is_saved_after_proposal_limit(ctx_pair,approved_sourc
     assert read_json(ctx.run_dir/'agent-run.json')['job']['id']=='job-4'
 
 
-def test_assets_recovery_hands_back_to_pipeline_then_formal_review(ctx_pair,approved_source,fake_image,monkeypatch):
+@pytest.mark.parametrize('fast',[False,True])
+def test_assets_recovery_hands_back_to_pipeline_then_formal_review(ctx_pair,approved_source,fake_image,monkeypatch,fast):
     """Actual source compiler and host adoption; external translation/review simulated."""
     import shutil
     from novel_manga.application.profiles import h3_stamp
@@ -92,7 +107,11 @@ def test_assets_recovery_hands_back_to_pipeline_then_formal_review(ctx_pair,appr
             shots.append('The person remains in the room. '+ ' '.join(f'<DIALOGUE_{i}>'for i in range(1,len(lines)+1)))
         clip['prompt_h3']=compose_request(clip,{'shots':shots,'soundscape':'Natural room sounds.'})
         clip['prompt_h3_of']=h3_stamp(clip,'')
-    monkeypatch.setattr('novel_manga.application.rendering.h3.convert',translated)
+    if fast:
+        profile=read_json(ctx.novel_dir/'profile.json',{});profile['sd_input_mode']='first-frame'
+        atomic_write_json(ctx.novel_dir/'profile.json',profile)
+        monkeypatch.setattr('novel_manga.application.rendering.h3.convert',lambda *a,**k:pytest.fail('Fast source repair must not call H3 translation'))
+    else:monkeypatch.setattr('novel_manga.application.rendering.h3.convert',translated)
     monkeypatch.setattr('novel_manga.application.preparation.request_check.request_consistency',lambda *a,**k:{'consistent':True,'problems':[]})
     monkeypatch.setattr('novel_manga.application.preparation.wearer_cards.check_references',lambda *a:None)
     atomic_write_json(ctx.work_dir/'output/repair.json',{'decisions':[row()]})

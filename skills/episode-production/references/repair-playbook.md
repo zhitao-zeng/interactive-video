@@ -39,6 +39,15 @@ for base cards; local location/prop support does not move characters to that rou
 
 Write the required file, call `check`, correct its specific report and submit
 `apply`, `adopt` or `render` as appropriate. JSON in a reply is not execution.
+
+For an explicitly authorized picture-only cutaway, submit one `action: "cutaway"`
+decision through `apply`, naming the selected source and target clips, exact
+25 fps frame-aligned source/target intervals of equal length, and the reason.
+The host derives only the target clip picture, copies its selected target audio,
+and passes that ephemeral row through the ordinary assembler. The recorded
+selected takes, audio, repair counts and review history remain the source of
+truth; the final assembled film still needs current technical, content, delivery
+and audio acceptance.
 If the host requires `review`, complete that step before `finish`; do not treat
 missing review as a content defect. A yielded job is already submitted: end the
 turn with its ID and continue when the host returns its result.

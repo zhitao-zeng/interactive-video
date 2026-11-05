@@ -19,7 +19,8 @@ def test_completed_old_pending_receipt_is_presented_as_remaining_work(tmp_path):
 
 def test_brief_contains_only_current_targets_and_exact_operation_choices(tmp_path):
     from novel_manga.application.agents.episode.current_task import prepare
-    ctx=SimpleNamespace(work_dir=tmp_path / 'sandbox', episode_dir=tmp_path / 'book/book_1', run_dir=tmp_path)
+    ctx=SimpleNamespace(work_dir=tmp_path / 'sandbox', episode_dir=tmp_path / 'book/book_1',
+                        novel_dir=tmp_path / 'book', run_dir=tmp_path)
     atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':[
         {'clip_id':'clip_02','shot_indexes':[2]}, {'clip_id':'clip_07','shot_indexes':[9,10],
          'references':[{'name':'甲','role':'character','image':'input/refs/a.jpeg'}]}]})

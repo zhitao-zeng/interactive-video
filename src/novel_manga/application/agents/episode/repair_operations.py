@@ -30,6 +30,19 @@ class RepairOperations:
             raise ValueError('each repair decision requires an object and clip_id')
         if len({row['clip_id'] for row in answer['decisions']}) != len(answer['decisions']):
             raise ValueError('repair decision must name each eligible clip at most once')
+        if any(row.get('action') == 'cutaway' for row in answer['decisions']):
+            if len(answer['decisions']) != 1:
+                raise ValueError('submit one post-production cutaway separately from clip repairs')
+            from .postproduction import record_cutaway
+            result = record_cutaway(self.ctx, answer['decisions'][0])
+            result.update(changed=[], accepted=[], blocked={},
+                          submission_id=payload.get('submission_id'),
+                          submitted_decisions=answer['decisions'],
+                          generation_counts=history.generation_counts(self.ctx.episode_dir))
+            path = self.ctx.run_dir/'tool-repair-decisions.json'
+            rounds = read_json(path, []); rounds.append(result); atomic_write_json(path, rounds)
+            record_state(self.ctx, 'cutaway_prepared', target=answer['decisions'][0]['clip_id'])
+            return {'ok': True, **result}
         if any(row.get('action') in {'repair_assets','repack'} for row in answer['decisions']):
             if len(answer['decisions'])!=1:raise ValueError('submit one upstream operation separately')
             row=answer['decisions'][0]
@@ -103,11 +116,25 @@ class RepairOperations:
         input_changed, input_handled, input_blocked, repaired = [], set(), {}, []
         input_reused = []
         input_argument_errors = {}
+        service_stopped = None
         if input_rows:
-            from .input_repair import repair, effects, normalize_arguments
+            from .input_repair import repair, effects, normalize_arguments, service_interruption
+            from .input_repair import repair_status
+            from .input_records import service_blocker
+            existing_blocker = service_blocker({'input_repairs': repair_status(self.ctx)})
+            if existing_blocker:
+                permitted = [row for row in input_rows
+                             if row['clip_id'] == existing_blocker['clip_id'] and row.get('resume') is True]
+                if permitted:
+                    # Resume only the interrupted candidate.  Do not replay its
+                    # peers from the batch that stopped at the shared failure.
+                    input_rows = permitted
+                else:
+                    service_stopped = {**existing_blocker, 'unattempted_clip_ids': [r['clip_id'] for r in input_rows]}
+                    input_rows = []
             handled_effects = []
             reused_effects = []
-            for row in input_rows:
+            for position, row in enumerate(input_rows):
                 cid = row['clip_id']
                 if cid in input_handled:
                     raise ValueError('input decision must name each eligible clip at most once')
@@ -133,6 +160,11 @@ class RepairOperations:
                     input_blocked[cid] = str(error)
                     if isinstance(error, RepairArgumentError):
                         input_argument_errors[cid] = str(error)
+                    outage = service_interruption(error)
+                    if outage:
+                        service_stopped = {'clip_id': cid, **outage,
+                            'unattempted_clip_ids': [r['clip_id'] for r in input_rows[position + 1:]]}
+                        break
         deferred = [row['clip_id'] for row in answer['decisions']
                     if row.get('action') != 'input' and row['clip_id'] in input_changed]
         ordinary = {'decisions': [row for row in answer['decisions']
@@ -153,6 +185,8 @@ class RepairOperations:
         if input_rows:
             from .input_repair import repair_status
             outcome['input_repairs'] = repair_status(self.ctx)
+        if service_stopped:
+            outcome['service_interrupted'] = service_stopped
         if deferred:
             outcome['deferred'] = deferred
             outcome['deferred_reason'] = 'Input repair changed these requests; inspect the updated evidence before editing their old prompts.'

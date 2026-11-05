@@ -39,7 +39,7 @@ class CandidateRejected(ValueError):
 
 
 def enabled(directory: Path) -> bool:
-    return (os.environ.get('NOVEL_INTERACTIVE_REPAIR_LANE') in {'h3','sd25'}
+    return (os.environ.get('NOVEL_INTERACTIVE_REPAIR_LANE') in {'h3','sd25','sd20-fast','sd20-mini'}
             or read_json(directory.parent/'profile.json', {}).get('repair_backend') == 'sandbox_agent')
 
 
@@ -50,13 +50,13 @@ def request_lane(clip):
 
 def check_request(clip, novel_dir):
     from novel_manga.application.preparation.request_check import request_consistency
-    if request_lane(clip) == 'sd25':
+    if request_lane(clip) != 'h3':
         clip = {**clip, 'prompt_h3': ''}
     return request_consistency(clip, novel_dir)
 
 
 def validate_request(clip, prompt):
-    if request_lane(clip) == 'sd25':
+    if request_lane(clip) != 'h3':
         from novel_manga.application.repair.sd_request import validate
         validate(clip, prompt)
     else:
@@ -208,9 +208,14 @@ def export_final_cut(directory, inputs, clip, verdict):
 
 def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejections=None):
     """No production writes. Container sees evidence copies, never the production directory."""
-    config = config or load_config()
+    explicit_config = config is not None
+    if config is None:
+        config = load_config()
+    else:
+        config = dict(config)
+        explicit_config = bool(config.pop('_agent_config_explicit', explicit_config))
     profile = read_json(directory.parent/'profile.json', {})
-    if endpoint := profile.get('repair_agent_endpoint'):
+    if not explicit_config and (endpoint := profile.get('repair_agent_endpoint')):
         from novel_manga.llm.config import ENDPOINTS
         selected = ENDPOINTS[endpoint]
         base = selected['QWEN38_LOCAL_BASE_URL']
@@ -219,7 +224,7 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
         config = {**config, 'base_url':base.removesuffix('/v1'),
                   'model':selected['QWEN38_LOCAL_MODEL'],
                   'key_var':selected['QWEN38_LOCAL_API_KEY_VAR']}
-    model = profile.get('repair_agent_model')
+    model = None if explicit_config else profile.get('repair_agent_model')
     if model:
         config = {**config, 'model': str(model)}
     if config.get('repair_extra_body'):
@@ -233,7 +238,8 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
     config = {**config, 'extra_body':{**(config.get('extra_body') or {}),
                 'tool_choice':(config.get('extra_body') or {}).get('tool_choice') or
                               {'type':'auto','disable_parallel_tool_use':True}},
-              'extra_args': [*config.get('extra_args', []), '--tools', 'Read,Bash,Write', '--include-partial-messages']}
+              'extra_args': [*config.get('extra_args', []), '--tools', 'Read,Bash,Write', '--include-partial-messages',
+                             '--max-turns', '20']}
     lane=request_lane(clip)
     field='prompt_h3' if lane=='h3' else 'prompt'
     if lane=='h3':sections(clip.get(field, ''))
@@ -253,6 +259,8 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
             rejected['prompt_path'] = str(target.relative_to(work))
     atomic_write_json(inputs/'rejections.json',feedback)
     script = read_json(directory/'chapter_script.json', {})
+    from novel_manga.media.retained import silent_insert_seconds
+    retained_seconds=silent_insert_seconds(clip,profile,script)
     indexes = clip.get('shot_indexes') or []
     near = {i+d for i in indexes for d in (-1,0,1)}
     shots = [s for i,s in enumerate(script.get('shots', []),1) if s.get('index',i) in near]
@@ -368,6 +376,8 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
         'request_rules': evidence['request_rules'],
         'actual_request': clip[field],
         'current_request': current.get('request'),
+        'retained_video_window':({'start':0,'end':retained_seconds,'requested_seconds':clip['request_seconds']}
+                                 if retained_seconds is not None else None),
         'request': 'input/prompt.txt',
         'shots_and_neighbours': shots,
         'source_passages': [row for row in evidence['segments']
@@ -387,6 +397,10 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
                                  'This compact file contains the current request, local shots, relevant source passages, references and verdict. '
                                  'Actual current-take image paths: '+frame_paths+'. '
                                  'Read .claude/skills/video-repair/SKILL.md. Diagnose this failed clip from input/. '
+                                 'When primary.retained_video_window is present, the delivered movie uses only that native window. '
+                                 'A source event that appears only in discarded padding is still missing from delivery. '
+                                 'A source-backed request timing correction may put all prescribed events inside the retained window; '
+                                 'keep the requested and delivered durations fixed, and verify the actual take before deciding. '
                                  'Read input/upstream.json for reviewed alternative assets, source correction suggestions, audio candidates and current permissions. '
                                  'Choose input for source/reference corrections, asset for a necessary missing corrected reference, audio for interaction ambience assembly, '
                                  'edit only for a proven final-English-only defect, retake only for already-correct input with unused video permission, keep or stop. '
@@ -398,6 +412,8 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
                                  'input/evidence.json retains complete history and whole-episode evidence; read it only to resolve a specific remaining question. '
                                  'Read history or whole-episode documents only when they resolve a specific contradiction; do not exhaust the file list. '
                                  'Once current frames, request and selected reference support a decision, write the final output immediately. '
+                                 'This invocation has at most 20 turns: reserve the last two for writing the final decision and prompt. '
+                                 'Do not spend that window auditing unrelated source documents or listing the workspace. '
                                  'For edit, write the complete prompt.txt and decision.json, then finish immediately. Use one tool call per response; sequential Write calls are allowed. '
                                  'Read any host rejection in primary.rejections: each contains the exact failed validation, '
                                  'the prior decision and, for edits, an input/rejected-candidate-N.txt file with the complete rejected request. '

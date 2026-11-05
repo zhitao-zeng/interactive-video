@@ -5,6 +5,7 @@ import copy
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -13,10 +14,40 @@ from novel_manga.application.identity.phases import LOOK_FIELDS, chapter_of
 from novel_manga.application.repair import history
 from novel_manga.util import atomic_write_json, read_json
 from .arguments import RepairArgumentError, UnsupportedInput, CompileConflict, validate_resume
+
+_SERVICE_STATUS = re.compile(r'\bHTTP[:\s]+([45]\d\d)\b')
+# A payment, credential, quota or outage answer is about the shared service,
+# never about this candidate's content.  It must not spend a content revision,
+# a media take or an input attempt, and the rest of the batch must not be sent
+# to a service already known to be unusable.
+_SERVICE_STATUSES = {401, 402, 403, 407, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524}
+_SERVICE_WORDS = ('quota_not_enough', 'insufficient', 'payment required', 'credential',
+                  'unauthorized', 'api key', 'rate limit', 'service unavailable')
+
+
+def service_interruption(error):
+    """The HTTP status/text of an outage or account failure, or None.
+
+    Task submission wraps its answer in RuntimeError texts such as
+    ``task submission returned HTTP 402: ...``; direct httpx errors carry the
+    response.  Content rejections never match here.
+    """
+    if isinstance(error, UnsupportedInput):
+        return None
+    response = getattr(error, 'response', None)
+    status = getattr(response, 'status_code', None)
+    detail = getattr(response, 'text', None) or str(error)
+    if status is None:
+        match = _SERVICE_STATUS.search(str(error))
+        status = int(match.group(1)) if match else None
+    lowered = str(detail).lower()
+    if status in _SERVICE_STATUSES or any(word in lowered for word in _SERVICE_WORDS):
+        return {'http_status': status, 'detail': str(detail).strip().replace('\n', ' ')[:500]}
+    return None
 from .input_records import (INPUT_LIMIT, SOURCE_REVIEW_POLICY, _phase_groups, effects,
                            remaining_input_attempts, input_receipt, source_review_recoverable,
                            latest_input_records)
-from .input_records import asset_configuration_recoverable, posture_protocol_recoverable
+from .input_records import asset_configuration_recoverable, posture_protocol_recoverable, first_frame_recoverable
 
 from .input_contracts import normalize_arguments, expand_shared_scope, SHOT_NAMES, SHOT_FIELDS
 from .input_compilation import compile_input
@@ -36,8 +67,14 @@ def repair_status(ctx):
         if not cid or record.get('operation')=='upstream_asset':
             continue
         row = {key: record.get(key) for key in ('status', 'step', 'error', 'error_kind', 'resume_count', 'revision_count', 'changed')}
+        if record.get('service_interruption'):
+            row['service_interruption'] = record['service_interruption']
+            row['next_action'] = ('Stop this batch: the shared service rejected the request. No content revision, '
+                                  'take or input attempt was spent. Resume the same saved candidates once the '
+                                  'service or credential is fixed.')
         if record.get('error_details'):row['error_details']=record['error_details']
-        if record.get('decision') and (source_review_recoverable(record) or record.get('status') in {'checking', 'published'} or (
+        if record.get('decision') and (record.get('error_kind') == 'service_interrupted'
+                or source_review_recoverable(record) or record.get('status') in {'checking', 'published'} or (
                 record.get('status') == 'incomplete' and int(record.get('resume_count', 0)) < 1)):
             row['resume_action'] = {'clip_id': cid, 'action': 'input', 'resume': True,
                                     'reason': 'Continue the saved input repair using its existing assets'}
@@ -65,6 +102,12 @@ def repair_status(ctx):
     for cid, remaining in remaining_input_attempts(ctx, states, records=records).items():
         row = states[cid]
         row['remaining_attempts'] = remaining
+        if row.get('error_kind') == 'service_interrupted':
+            row['resume_action'] = {'clip_id': cid, 'action': 'input', 'resume': True,
+                                    'reason': 'Resume the same candidate after the shared service is available.'}
+            row['next_action'] = ('The shared service interrupted this candidate. Resume it unchanged after the '
+                                  'service is available; no content revision, take, or input attempt was spent.')
+            continue
         if row.get('status') == 'tool_error':
             row['next_action'] = ('This historical tool_error is not counted as an input attempt. '
                                   'Use the current allowances, not the old blocked message.')
@@ -84,6 +127,10 @@ def repair_status(ctx):
             row['resume_action'] = {'clip_id': cid, 'action': 'input', 'resume': True,
                 'reason': 'Continue the unchanged saved candidate after the posture protocol correction'}
             row['next_action'] = 'Resume this candidate once with schema-owned stage/person keys; reuse completed assets and preserve input/video counts.'
+        if first_frame_recoverable(ctx,record):
+            row['resume_action']={'clip_id':cid,'action':'input','resume':True,
+                'reason':'Continue the same source-checked correction into fresh first-frame preparation.'}
+            row['next_action']='Resume this unchanged candidate once after the host ordering fix; all image/video limits and earlier resume counts remain.'
     from .input_records import input_operations
     for cid, row in states.items():
         operations = input_operations(ctx, cid, records=records)
@@ -99,6 +146,60 @@ def repair_status(ctx):
 
 
 from novel_manga.application.repair.source_support import source_check
+
+
+def _source_review_shot_context(before_shots, after_shots, affected_indexes):
+    """Approved before-state, host diff and native siblings for source review.
+
+    ``before_shots`` is the script the current plan was approved from;
+    ``after_shots`` is the candidate.  Review sees only the actual changes and
+    the source-shot siblings they were split from, so untouched dialogue in a
+    sibling cannot be read as this repair deleting it.
+    """
+    old = ({s.get('index', i): s for i, s in enumerate(before_shots, 1)}
+           if isinstance(before_shots, (list, tuple)) else dict(before_shots))
+    new = ({s.get('index', i): s for i, s in enumerate(after_shots, 1)}
+           if isinstance(after_shots, (list, tuple)) else dict(after_shots))
+
+    def changed_fields(left, right):
+        fields = []
+        for key in sorted((set(left) | set(right)) - {'index'}):
+            if key == 'turns':
+                lturns, rturns = left.get(key) or [], right.get(key) or []
+                for n in range(max(len(lturns), len(rturns))):
+                    a = lturns[n] if n < len(lturns) else {}
+                    b = rturns[n] if n < len(rturns) else {}
+                    for turn_key in sorted(set(a) | set(b)):
+                        if a.get(turn_key) != b.get(turn_key):
+                            fields.append(f'turns[{n}].{turn_key}')
+            elif left.get(key) != right.get(key):
+                fields.append(key)
+        return fields
+
+    groups = {}
+    for index, shot in old.items():
+        if shot.get('source_shot') is not None and shot.get('source_kind') is not None:
+            groups.setdefault((shot['source_shot'], shot['source_kind']), []).append(index)
+    review = []
+    for index in sorted(affected_indexes):
+        before, after = old.get(index, {}), new.get(index, {})
+        key = (before.get('source_shot'), before.get('source_kind'))
+        sibling_indexes = groups.get(key, [index]) if all(v is not None for v in key) else [index]
+        review.append({
+            **copy.deepcopy(after),
+            'index': index,
+            'before': copy.deepcopy(before),
+            'after': copy.deepcopy(after),
+            'changed_fields': changed_fields(before, after),
+            'reason': '',
+            'source_group': [
+                {'index': sibling, 'source_shot': old[sibling].get('source_shot'),
+                 'source_kind': old[sibling].get('source_kind'),
+                 'shot': copy.deepcopy(new.get(sibling, {}))}
+                for sibling in sorted(sibling_indexes)
+            ],
+        })
+    return review
 
 
 from .input_assets import local_phases
@@ -177,6 +278,7 @@ def repair(ctx, row, *, check_only=False):
         latest = latest_input_records(directory).get(row['clip_id'])
         saved = latest[1] if latest else {}
         if (not saved.get('decision') or not (saved.get('status') in {'checking', 'incomplete', 'published'}
+                                             or saved.get('error_kind') == 'service_interrupted'
                                              or source_review_recoverable(saved))):
             raise ValueError('no incomplete input repair is available to resume')
         row = {**saved['decision'], 'reason': row.get('reason') or saved.get('reason') or 'Resume saved input repair'}
@@ -280,9 +382,14 @@ def repair(ctx, row, *, check_only=False):
             record['source_review_policy'] = SOURCE_REVIEW_POLICY
             atomic_write_json(receipt, record)
             affected_indexes={i for c in plan['clips'] if c['clip_id'] in targets for i in c.get('shot_indexes',[])}
-            scoped_shots = [shots[i] for i in sorted(affected_indexes)]
+            scoped_shots = _source_review_shot_context(script['shots'], shots, affected_indexes)
+            review_options = {}
+            if row.get('reason'):
+                review_options['review_reason'] = row['reason']
+            if characters:
+                review_options['characters'] = characters
             record['source'] = source_check(source, quote, patches, phases, locations, scoped_shots,
-                                            **({'characters': characters} if characters else {}))
+                                            **review_options)
             atomic_write_json(receipt, record)
         if characters:
             from .draft_assets import _asset
@@ -353,13 +460,18 @@ def repair(ctx, row, *, check_only=False):
         if isinstance(error,CompileConflict):record['error_details']=error.details
         if isinstance(error, UnsupportedInput) and hasattr(error, 'review'):
             record['source_review'] = error.review
+        outage = service_interruption(error)
         kind = ('source_rejected' if isinstance(error, UnsupportedInput) else
                 'tool_error' if isinstance(error, (KeyError, AttributeError, TypeError)) else
-                'service_interrupted' if isinstance(error, (OSError, TimeoutError, subprocess.TimeoutExpired)) else
+                'service_interrupted' if outage or isinstance(error, (OSError, TimeoutError, subprocess.TimeoutExpired)) else
                 'input_validation')
         record.update(status='rejected' if kind == 'source_rejected' else
-                      'tool_error' if kind == 'tool_error' else 'incomplete',
+                      'tool_error' if kind in {'tool_error', 'service_interrupted'} else 'incomplete',
                       step=stage, error=f'{type(error).__name__}: {error}', error_kind=kind)
+        if kind == 'service_interrupted':
+            # This is the shared service, not this candidate: keep the saved
+            # decision and every count for an unchanged continuation.
+            record['service_interruption'] = outage or {'http_status': None, 'detail': str(error)[:500]}
         atomic_write_json(receipt, record)
         raise
     finally:

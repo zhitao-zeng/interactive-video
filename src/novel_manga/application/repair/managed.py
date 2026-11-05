@@ -62,6 +62,8 @@ def input_state(directory: Path, clip: dict, verdict: dict, takes: dict, *, inpu
     runtime=load_config() if enabled(directory) else None
     profile = read(directory.parent/'profile.json', {})
     execution = {}
+    if profile.get('sd_input_mode')=='first-frame':
+        execution['input_compilation_policy']='fast-native-source-repair-v1'
     if runtime is not None:
         options = {**(runtime.get('extra_body') or {}), **(runtime.get('repair_extra_body') or {})}
         execution['repair_agent_max_output_tokens'] = options.get('max_tokens')
@@ -175,7 +177,7 @@ def reframe_candidate(directory: Path, cid: str, issue: str):
     return result, request_checks
 
 
-def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> dict:
+def prepare_agent_batch(directory: Path, targets: list[str], blocked=None, *, agent_config=None) -> dict:
     """Bounded candidate feedback replaces the old route, under the same video budget."""
     from novel_manga.application.repair import agent
     from novel_manga.application.preparation.request_check import request_consistency
@@ -255,7 +257,9 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
                 proposal_log['candidates'].append(candidate_row)
                 atomic_write_json(audit_path,proposal_log)
                 try:
-                    decision = agent.propose(directory,clip,verdict,**({'rejections':rejections} if rejections else {}))
+                    options = {'config':agent_config} if agent_config is not None else {}
+                    if rejections:options['rejections']=rejections
+                    decision = agent.propose(directory,clip,verdict,**options)
                     candidate_row.update(candidate=copy.deepcopy(decision),status='proposed')
                     atomic_write_json(audit_path,proposal_log)
                     # Guard both sandbox time and request-check time before any write/adoption.
@@ -381,13 +385,14 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
     return result
 
 
-def prepare_request_conflicts(directory: Path, report: dict) -> dict:
+def prepare_request_conflicts(directory: Path, report: dict, *, agent_config=None) -> dict:
     """A rejected first request has no video to review, but can use the existing rewrite path."""
     from novel_manga.application.preparation.request_check import current_request
     from novel_manga.application.repair import agent
     if agent.enabled(directory):
         return prepare_agent_batch(directory, [cid for cid, reasons in report.get("blocked_clips", {}).items()
-                                              if any(r.startswith("request:") for r in reasons)])
+                                              if any(r.startswith("request:") for r in reasons)],
+                                   agent_config=agent_config)
     changed, blocked, checks = [], {}, []
     counts = generated_counts(history.load(directory))
     decisions = read(directory / 'repair_routing.json', {})
@@ -438,7 +443,7 @@ def prepare_request_conflicts(directory: Path, report: dict) -> dict:
             'request_checks': checks, 'stage': 'input_repair'}
 
 
-def prepare(directory: Path, targets: list[str] | None = None) -> dict:
+def prepare(directory: Path, targets: list[str] | None = None, *, agent_config=None) -> dict:
     from novel_manga.application.repair.diagnosis import clip_context, diagnose_numbered
     from novel_manga.application.repair.flow import repair_episode
     from novel_manga.application.repair.source_recheck import prepare_source_recheck
@@ -451,7 +456,7 @@ def prepare(directory: Path, targets: list[str] | None = None) -> dict:
     wanted = [cid for cid in eligible if targets is None or cid in targets]
     from novel_manga.application.repair import agent
     if agent.enabled(directory):
-        return prepare_agent_batch(directory, wanted, blocked)
+        return prepare_agent_batch(directory, wanted, blocked, agent_config=agent_config)
     decisions = read(directory/'repair_routing.json',{})
     initial_count = len(history.load(directory)['trials'])
     changed,accepted = [],[]

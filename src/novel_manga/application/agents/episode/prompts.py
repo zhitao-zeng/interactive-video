@@ -1,6 +1,7 @@
 """Run one episode agent while its existing host tools execute media operations."""
 from __future__ import annotations
 
+import json
 
 from novel_manga.util import read_json
 
@@ -17,8 +18,25 @@ def initial_prompt(ctx):
         'Prefer structured H3 shot bodies: the host composes all fixed syntax. '
         'Use the retained production profile, '
         'speech rules, source evidence and remaining generation budgets. '
-        'Commands are python3 /work/tools/episode.py check, render, apply, review, finish. '
+        'Commands are python3 /work/tools/episode.py check, render, apply, review, mix_audio, select_music, finish. '
+        'status.music_selection exposes optional SoulTuner search and explicit adoption. Search returns unreviewed local candidates; '
+        'rank1 is not acceptance. Read supplied audio evidence and its coverage, keep uncertain/rejected candidates unapplied, '
+        'and use select_music action=apply only with an accepted reason, source quote, source interval and gain. '
+        'Keep no-music source constraints. Music adoption preserves native dialogue/video and requires actual mixed-movie review; '
+        'sampled audio analysis does not certify full-song or full-film listening. '
+        'For story-timed music, follow status.music_selection.authored_plan and use action=apply_timeline with shot start/end anchors, '
+        'source intervals, cue fades/gains and explicit silence windows. Reassembly resolves these anchors to actual cut timings. '
+        'Music gaps mute only the added music, never native dialogue or environment sound. Assembly music failures go back to select_music; '
+        'they do not themselves justify video retakes. Postmix clips keep native non_diegetic_music=None; assess the added music on the assembled film. '
+        'audio_mix in current status lists source-reviewed speech-free environmental assets. '
+        'For an assembly sound defect, mix_audio output/audio-mix.json can adopt an additive room-tone bed '
+        'with candidate_id, gain_db, verbatim source_quote and reason. The host source-checks it, keeps native speech, '
+        'copies the video stream and reruns media QC. This is an acoustic design decision, not permission to add arbitrary noise just to pass a meter. '
+        'Use supported audio assembly for genuine ambience gaps; preserve passed native takes. '
         'check/render take an optional file; apply defaults to output/repair.json. '
+        'A user-authorized picture cutaway is one apply action=cutaway with source_clip_id, target_clip_id, '
+        'exact 25 fps source/target frame-aligned intervals, and reason. The host derives only the target clip picture, '
+        'copies its selected audio, and passes that ephemeral row into the ordinary assembly; native selected takes and counts remain recorded. '
         'Use doctor to request host service diagnostics when an endpoint fails; '
         'yield for its result like other host jobs. Diagnostics do not prove content acceptance. '
         'Use these commands to check, render, review, apply supported repairs, '
@@ -35,7 +53,10 @@ def initial_prompt(ctx):
         'and all-clip summary for adjacent context; explicit review exports all clips. '
         'When render returns clips_ready with assembly_pending=true, use its clip evidence '
         'to repair or finish; whole-episode encoding waits for repairs, so a missing movie '
-        'alone is not a reason to render again. Finish assembles the final candidate and '
+        'alone is not a reason to render again. Batch known supported repairs before finish; '
+        'do not finish between independent clip patches just to request another whole-film review. '
+        'A deliberate stopped candidate remains allowed without spending every remaining take. '
+        'Finish assembles the final candidate and '
         'runs technical QC; content_passed alone does not mean final acceptance. '
         'If a prepared plan or previous takes exist, reuse that plan and media; '
         'Follow status.retry_policy and remaining_takes: once an allowed correction or recheck '
@@ -161,6 +182,7 @@ def continuation_prompt():
         'result are supplied below; continue directly from them. Read the saved evidence '
         'when making a creative or repair decision. Render already exports its independent '
         'review evidence; call review again only for missing/stale evidence or when full media context is needed. '
+        'Current status.audio_mix exposes mix_audio for a source-backed additive environmental bed while preserving native speech/video and rerunning media checks. '
         'Current repair API: an edit may use h3={shots:[English bodies with <DIALOGUE_n> slots], '
         'soundscape:English} instead of prompt_h3. Prefer this short form; the host preserves '
         'reference bindings, original speech, durations, cuts and music. Read only the evidence '
@@ -168,7 +190,10 @@ def continuation_prompt():
         'retained_clips need no decision or repeated inspection. '
         'For episode_technical_issues, use the inspection targets to locate and repair only responsible clips; '
         'do not submit keep decisions merely to cover all technical inspection targets. '
-        'Batch independent decisions in one apply. A clip with no remaining take allowance '
+        'Batch independent decisions in one apply, then render/review the changed clips before finish. '
+        'Complete known supported repairs together instead of finishing after each patch; '
+        'finish still reports a deliberate stopped candidate without requiring all allowances to be spent. '
+        'A clip with no remaining take allowance '
         'does not cancel eligible repairs for other clips. '
         'Current remaining_input_attempts, remaining_rechecks, conditional_extra_takes and input_repairs override historical blocked messages. '
         'repair_actions lists apply operations permitted NOW, including edit/retake/input preparation for a pending extra. '
@@ -206,3 +231,126 @@ def continuation_prompt():
         'and input authority. Run finish when accepted or when the episode must stop, and '
         'end this turn after its acceptance; the host will complete it.\n'
     )
+
+
+def resume_prompt(task, *, agent_instructions=None):
+    """Resume with current executable state, not another full serialization of it."""
+    targets = task.get('targets') or []
+    target_ids = {row.get('clip_id') for row in targets if row.get('clip_id')}
+    next_action = task.get('next_action') or {}
+    action = next_action.get('action')
+    next_state = {key:next_action[key] for key in
+                  ('action','reason','blocked','service_interrupted','audio_review')
+                  if key in next_action}
+    state = {key:task[key] for key in
+             ('phase','mode','upstream_route','repair_capabilities','targets','issues',
+              'last_operation','related_history','evidence_files','full_status','reference_catalog')
+             if key in task}
+    if task.get('postproduction'):
+        state['postproduction'] = task['postproduction']
+    if next_state:
+        state['next_action'] = next_state
+    if action == 'first_frames':
+        frames = task.get('first_frames') or {}
+        blocked = next_action.get('blocked') or {}
+        blocked_ids = (set(blocked) if isinstance(blocked,dict) else
+                       set(blocked) if isinstance(blocked,(list,tuple,set)) else set())
+        relevant = target_ids | blocked_ids
+        state['first_frames'] = {
+            **{key:frames[key] for key in ('mode','extra_reference_policy','command','schema') if key in frames},
+            'clips':{cid:row for cid,row in (frames.get('clips') or {}).items() if cid in relevant},
+        }
+    elif action == 'select_music' and task.get('music_selection'):
+        state['music_selection'] = task['music_selection']
+    elif action == 'mix_audio' and task.get('audio_mix'):
+        state['audio_mix'] = task['audio_mix']
+
+    prompt = (
+        'Continue this same saved episode session. The first turn already established the user task and workflow rules; '
+        'keep them in force. This message carries only the current actionable state. Use the exact actions, counters, '
+        'input permissions, and blockers below; consult /work/input/current-task.json or '
+        '/work/input/current-status.json only when a needed detail is absent here. Those full files remain current and intact. '
+        'Successful reads and assessments from earlier turns remain in this saved session. Check the current task and last operation first, '
+        'then take one legal next action or report the concrete blocker; do not rescan all prior images, requests, and budgets. '
+        'Do not repeat a rejected/no-op action. If a host command returns yield=true, end this CLI turn '
+        'so the host can finish it. When accepted or deliberately blocked, call finish and end the turn.\n'
+    )
+    if agent_instructions:
+        prompt += '\nCurrent task-specific user instructions (preserve exactly):\n' + str(agent_instructions) + '\n'
+    if task.get('postproduction'):
+        prompt += ('A user-authorized cutaway plan is already registered. Read the published '
+                   'input/postproduction-plan.json; do not change or re-authorize it. Continue review, '
+                   'then call finish so the host performs normal assembly with this plan.\n')
+    return prompt + '\nCurrent actionable state:\n' + json.dumps(state, ensure_ascii=False)
+
+
+def task_instructions(ctx):
+    """Attached by the controller once on every initial or resumed production turn."""
+    return native_speech_instructions(ctx)+first_frame_instructions(ctx)
+
+
+def first_frame_instructions(ctx):
+    from novel_manga.media.first_frames import enabled
+    if not enabled(ctx) and read_json(getattr(ctx,'source_novel_dir',ctx.novel_dir)/'profile.json',{}).get('h3_input_mode')!='first-frame':return ''
+    speech=native_speech_instructions(ctx)
+    return (
+        'This edition uses OPTIONAL FIRST-FRAME MODE. Every authored shot needs a newly API-generated opening image. '
+        'Use the existing first_frames host command BEFORE render. Do not use old video frames or derived pictures. '
+        'For creator-authored opening_frame, use its image_prompt and visible_characters directly; omit those fields in the tool row to inherit them. '
+        'Your production job is binding actual registered cards, executing the image API, reviewing and repairing. '
+        'The host appends the selected style rules to the image request and supplies them to image review; '
+        'keep the creator opening_frame.image_prompt unchanged and correct source conflicts through input repair. '
+        'If the opening needs a creative change, update source opening_frame through input repair first; do not silently replace the creator prompt. '
+        'Read first_frames in input/current-status.json for the exact schema, per-clip remaining image candidates and current/stale state. '
+        'Write output/first-frames.json with frames:[{clip_id,image_prompt,image_references,visible_characters,extra_references,h3,source_quote}]. '
+        'PREFER h3={shots:[English body with <DIALOGUE_1>, <DIALOGUE_2> in original order],soundscape:English environment sound}; '
+        +('the existing host compiler fills protected dialogue, Subject definitions, actual Picture mapping and timing. 'if speech else
+          'the existing host compiler fills protected dialogue, Subject/Audio definitions, actual Picture mapping and timing. ') +
+        'Each clip has exactly one shot here, so h3.shots is a one-item array. Do not spend turns reconstructing fixed six-section syntax or auditing source code. '
+        'Call python3 /work/tools/episode.py first_frames output/first-frames.json; end the turn on yield=true. '
+        'For the user-selected per-shot image-to-video stream, set top-level render_ready:true in that file. '
+        'Then each accepted opening immediately queues its first H3 take while later images continue; '
+        'rejected openings block only their own clips. Existing videos, including failed takes, are never automatically reshot by this stream. '
+        'When the streamed batch returns, use review on existing videos and apply confirmed repairs within retained budgets; '
+        'do not run render merely to collect the same first takes again. Normal render remains available after an approved repair. '
+        'image_references are registered ORIGINAL source image paths from input/catalog.json, ordered to match your image prompt; '
+        'Use creator opening_frame.reference_subjects to decide which cards are needed to paint frame zero; '
+        'do not mechanically copy every clip reference. An offscreen voice does not require a portrait in an empty POV image. '
+        'For visible hands, feet or clothing, choose the relevant appearance view. Future entrants belong in extra video references. '
+        'inspect the actor/scene cards and source/layout before authoring. Keep the face, stable clothing, readable geometry and opening camera/held props correct. '
+        'Make one single cinematic frame, never a collage or storyboard. New image for each shot, not a crop/reuse of another generated shot. '
+        'visible_characters lists people actually visible at time zero, not merely present or speaking offscreen. '
+        'extra_references selects only original clip image paths for new people/content NOT covered by the opening; empty is normal when all needed content is visible. '
+        'The actual H3 Picture 1 is ALWAYS the complete generated opening, also native keyframe at frame_index=0. '
+        +('Extra video pictures follow in listed order as Picture 2 onward. Preserve logical Subject and speaker IDs; no Audio IDs are supplied. 'if speech else
+          'Extra video pictures follow in listed order as Picture 2 onward. Preserve the ORIGINAL logical Subject IDs and Audio IDs. ') +
+        'All subjects covered by the opening bind to Picture 1; a new actor absent at time zero binds to its supplied extra picture. '
+        'An offscreen source speaker absent from the frame and not supplied an extra card must have a Subject definition without a Picture tag; do not invent their face in the frame. '
+        'Alternatively a complete six-section prompt_h3 is supported with that ACTUAL image numbering, exact original Chinese <d> speech/speaker IDs and existing shot timing; '
+        'all direction outside <d> is English. Preserve source events and do not copy obsolete card Picture numbers. '
+        'The opening image need not contain future actions; video moves from its stated opening. Reference retention must respect the opening composition. '
+        'Batch all independent shot candidates in one first_frames call. Rejected images and supplier receipts remain; revise only the failed opening image_prompt/source inputs. '
+        'Identical image inputs reuse/resume the original candidate, never spend another paid attempt; the default is three image candidates per clip. '
+        'Use the image_candidate_limit and remaining_image_candidates in current status for explicit clip-specific image grants; these never grant extra video takes. '
+        'The host independently checks actual pixels and refuses video until the accepted opening is current. '
+        'A source opening/camera/asset repair requires first_frames again. A motion/dialogue-only repair keeps the current opening. '
+        'After successful frames, render without a requests file to retain the adopted source-bound plan. Review and repair through the existing tools; '
+        'whole-film independent failures returned by finish must be repaired through apply/first_frames/render within retained limits. '
+        'Old versions/counts stay unchanged. A 3-second authored shot gets a 4-second native request while retaining its 3-second source timing. '
+        'Read input/latest-first-frames.json for actual image review evidence and per-clip next actions. '
+    )
+
+
+def native_speech_instructions(ctx):
+    from novel_manga.story.voice_delivery import native_speech_selected
+    profile=read_json(ctx.novel_dir/'profile.json',{})or read_json(getattr(ctx,'source_novel_dir',ctx.novel_dir)/'profile.json',{})
+    if not native_speech_selected(profile):return ''
+    return ('TASK SPEECH POLICY: no audio reference, with performance before each dialogue. '
+        'Voice files in the asset library do not authorize sending them. The actual native audio-reference list must be empty. '
+        'Keep dialogue, picture references and speaker IDs; omit Audio definitions, retention and audio-reference labels. '
+        'For every source turn, emotion must hold one usable ENGLISH performance direction tied to that event and utterance: '
+        'useful pitch, pace, volume, breath, emphasis or change after a discovery. Ordinary lines need only the detail that matters. '
+        'A repeated age/gender/words-per-minute specification is not per-line performance. '
+        'The host binds this emotion direction immediately before its unchanged utterance; do not duplicate it in h3.shots or put it in soundscape. '
+        'If the adopted screenplay has only generic or untranslated emotion, correct its source turns through the existing input tool before first_frames/render. '
+        'Retain words, owners, timing and music/physical-sound plan. No ASR or picture check certifies natural acting; listening remains a separate acceptance scope. ')

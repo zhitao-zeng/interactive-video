@@ -33,6 +33,39 @@ def finding_result(answer):
                         or '；'.join(c.get('evidence', '') for c in checks)}
 
 
+def _out_of_target_visual_checks(answer, instruction, review_criteria=()):
+    targets = [str(instruction or ''), *(str(item) for item in review_criteria)]
+    terminal_punctuation = ' \t\r\n。！？；，、,.!?;:'
+
+    def quoted_in_targets(criterion):
+        # Only trim sentence-final punctuation from the quoted criterion. Internal
+        # punctuation, word order, negation, digits and numbers remain exact.
+        core = str(criterion).strip().rstrip(terminal_punctuation)
+        return bool(core) and any(core in target for target in targets)
+
+    return [c for c in answer.get('checks', [])
+            if c.get('scope', 'visual') == 'visual'
+            and (not c.get('criterion') or not quoted_in_targets(c['criterion']))]
+
+
+def _complete_finding_answer(answer):
+    if not isinstance(answer, dict):
+        return False
+    if (not isinstance(answer.get('observations'), list) or not answer['observations']
+            or not all(isinstance(item, str) for item in answer['observations'])
+            or not (answer.get('premise_valid') is True or answer.get('premise_valid') is False
+                    or answer.get('premise_valid') is None)
+            or not isinstance(answer.get('premise_evidence'), str)
+            or not isinstance(answer.get('checks'), list) or not answer['checks']):
+        return False
+    return all(isinstance(check, dict)
+               and isinstance(check.get('criterion'), str) and bool(check['criterion'].strip())
+               and check.get('scope') in {'visual', 'audio', 'source'}
+               and (check.get('met') is True or check.get('met') is False or check.get('met') is None)
+               and isinstance(check.get('evidence'), str)
+               for check in answer['checks'])
+
+
 def resolved_on_take(claim, video, take):
     check = claim.get('check') or {}
     return check.get('video') == str(video) and check.get('take') == take and check.get('result') == 'resolved'
@@ -71,11 +104,18 @@ def apply_claim(verdict, claim, video, take):
         verdict['defect_kind'] = 'review_premise_conflict'
         verdict['required_action'] = 'source_or_asset_recheck'
     if not resolved:
+        current_claim = claim.get('video') == str(video) and claim.get('take') == take
+        current_check = check.get('video') == str(video) and check.get('take') == take
+        current_failure = current_check and check.get('result') == 'unresolved'
+        defect_issue = (claim['issue'] if current_claim else
+                        (check.get('evidence') or claim['instruction']) if current_failure else
+                        f"旧take确认的问题（当前take尚未通过目标复核）：{claim['issue']}")
         verdict.update(severity='fail', tier='must_fix', scripted=False,
-                       defect_issue=claim['issue'], feedback=claim['instruction'])
+                       defect_issue=defect_issue, feedback=claim['instruction'])
         # This is confirmed evidence, including defects the broad verifier does not measure.
-        verdict['verify'] = {**(verdict.get('verify') or {}), 'verdict': 'obvious',
-                             'evidence': claim['issue'], 'instruction': claim['instruction']}
+        verdict['verify'] = {**(verdict.get('verify') or {}),
+                             'verdict': 'obvious' if current_claim or current_failure else 'uncertain',
+                             'evidence': defect_issue, 'instruction': claim['instruction']}
     return verdict
 
 
@@ -115,7 +155,7 @@ def judge_finding(clip, video, claim, work, novel_dir=None, review_criteria=()):
         '参考图、原文、目标及对白中的正确文字不能替代当前画面的文字，也不能用它们补字或把近形错字纠正后再声称字形正确。'
         '能猜到规则大意不等于醒目文字无错字或伪字；正常字体、字大小和书写风格差异本身不构成失败。'
         'scope标明visual（画面）、audio（声音）或source（原文）。本调用只验画面，听不到台词或无法核对原文不是画面失败，分别标audio/source和null；只在visual项中判断画面是否满足要求。'
-        '不另写总判定，也不猜测旧版本出了什么错。不要添加目标没有要求的条件。'
+        '不另写总判定，也不猜测旧版本出了什么错。不要添加目标没有要求的条件。每条visual check的criterion必须逐字引用下方验收目标或宿主逐镜验收标准中的一段；分镜、原文和设备状态只作上下文，不能变成新的画面失败/不确定条件。目标没要求的状态不得因画面看不清记null。不得臆测第二台拍摄设备，把目标要求画外的可见手机解释成另一设备来绕过目标。'
         '角色可以只露背影、半身或戴闭合头盔；看不到脸并不表示独立空甲或额外角色。'
         '肩背属于同一身体时不多计；同一个身体在不同帧转身、改变姿势也不多计。'
         '只有同一帧里在不同位置同时出现两个独立身体/空甲，才是数量增加。'
@@ -127,11 +167,24 @@ def judge_finding(clip, video, claim, work, novel_dir=None, review_criteria=()):
         ('\n本次由宿主提供的逐镜验收标准（仅这些明确容差覆盖较严格的旧判词；不覆盖原文明确事实，也不豁免身份、座位或道具空间关系的实际错误）：\n- ' + '\n- '.join(review_criteria) if review_criteria else '') +
         '\n对应原文：' + (passage or '本次未提供，不能推断原文事实。') +
         '\n当前采用分镜的可见状态、动作与穿戴（依据，非新的重拍条件）：' +
-        json.dumps([{k:s[k] for k in ('index','motion_prompt','visual_prompt','wears','props','in_frame','scene_time') if k in s} for s in stages],ensure_ascii=False) +
+        json.dumps([{k:s[k] for k in ('index','camera','motion_prompt','visual_prompt','wears','props','in_frame','scene_time','start_state','end_state','device_state') if k in s} for s in stages],ensure_ascii=False) +
         '\n本次原确认缺陷（用于确定验收范围，不当作新视频事实）：' + claim.get('issue','') +
         '\n待核对的验收目标：' + claim['instruction'] + '\n只输出JSON。')})
     answer = ask_json(parts, SCHEMA, name='confirmed_picture_check', max_tokens=1800,
                       settings=judge_settings())
+    if _out_of_target_visual_checks(answer, claim.get('instruction'), review_criteria):
+        correction = parts + [{'type': 'text', 'text':
+            '首答：' + json.dumps(answer, ensure_ascii=False) +
+            '\n只纠正协议范围，不抹去首答历史。请重新输出完整JSON；visual criterion必须逐字引用验收目标或宿主逐镜验收标准中的子句，其他状态删去或标为source/audio，不得用null阻塞。不得臆测第二台拍摄设备来解释目标明确要求画外的手机。'}]
+        corrected = ask_json(correction, SCHEMA, name='confirmed_picture_check', max_tokens=1800,
+                             settings=judge_settings())
+        if _out_of_target_visual_checks(corrected, claim.get('instruction'), review_criteria):
+            return {'result': 'uncertain', 'checked_scope': 'visual', 'error_kind': 'review_scope_violation',
+                    'evidence': '一次协议纠正后仍有未引用验收目标的visual检查',
+                    'observations': answer.get('observations', []), 'checks': answer.get('checks', []),
+                    'correction': corrected, 'correction_history': [answer, corrected]}
+        corrected['correction_history'] = [copy.deepcopy(answer), copy.deepcopy(corrected)]
+        answer = corrected
     return finding_result(answer)
 
 
@@ -156,10 +209,32 @@ def enforce(directory, report, previous, *, verify=False, review_criteria=None):
         criteria_changed = (bool(criteria) and check.get('review_criteria') != criteria
                             or not criteria and bool(check.get('review_criteria'))
                             and check.get('result') == 'resolved')
+        cached_correction = check.get('correction')
+        if (check.get('error_kind') == 'review_scope_violation'
+                and check.get('scope_recovery_attempted') is True
+                and check.get('result') == 'uncertain'
+                and check.get('video') == video and check.get('take') == take
+                and (claim.get('video') != video or claim.get('take') != take)
+                and not criteria_changed
+                and _complete_finding_answer(cached_correction)
+                and not _out_of_target_visual_checks(cached_correction, claim.get('instruction'), criteria)):
+            history = list(check.get('check_history', []))
+            history.append(copy.deepcopy(check))
+            check = {**finding_result(cached_correction), 'video': video, 'take': take,
+                     'reparsed': True, 'reparsed_from': 'review_scope_violation',
+                     'scope_recovery_attempted': True, 'check_history': history,
+                     **({'review_criteria': criteria} if criteria else {})}
+            claim['check'] = check
+        legacy_scope_drift = (check.get('result') == 'uncertain'
+                              and check.get('video') == video and check.get('take') == take
+                              and (claim.get('video') != video or claim.get('take') != take)
+                              and bool(_out_of_target_visual_checks(check, claim.get('instruction'), criteria)))
+        recover_scope_error = ((check.get('error_kind') == 'review_scope_violation' or legacy_scope_drift)
+                               and not check.get('scope_recovery_attempted'))
         if claim.get('video') == video and claim.get('take') == take and not criteria_changed:
             if (criteria and check.get('video') == video and check.get('take') == take
                     and check.get('review_criteria') == criteria):
-                checked = True
+                checked = not recover_scope_error
             else:
                 # Confirmed on this very take: not re-judged on it, and no check written on it clears it.  A model
                 # reading the same frames cleared two human-confirmed findings (ch12-1 clip_19/20, 2026-09-26).
@@ -167,7 +242,7 @@ def enforce(directory, report, previous, *, verify=False, review_criteria=None):
                 checked = True
         else:
             checked = (check.get('video') == video and check.get('take') == take
-                       and not criteria_changed)
+                       and not criteria_changed and not recover_scope_error)
         if criteria_changed:
             claim.pop('check', None)
         if verify and not checked:
@@ -179,11 +254,21 @@ def enforce(directory, report, previous, *, verify=False, review_criteria=None):
                 else:
                     answer = judge_finding(plan[cid], video, claim,
                                            directory / 'work/confirmed_review' / cid, directory.parent)
+                history = list(check.get('check_history', []))
+                if check:
+                    history.append({k: v for k, v in check.items() if k != 'check_history'})
                 claim['check'] = {**answer, 'video': video, 'take': take,
+                                  **({'check_history': history} if history else {}),
+                                  **({'scope_recovery_attempted': True} if recover_scope_error else {}),
                                   **({'review_criteria': criteria} if criteria else {})}
             except Exception as error:
+                history = list(check.get('check_history', []))
+                if check:
+                    history.append({k: v for k, v in check.items() if k != 'check_history'})
                 claim['check'] = {'result': 'uncertain', 'video': video, 'take': take,
                                   'evidence': f'检查未完成：{type(error).__name__}',
+                                  **({'check_history': history} if history else {}),
+                                  **({'scope_recovery_attempted': True} if recover_scope_error else {}),
                                   **({'review_criteria': criteria} if criteria else {})}
         row = apply_claim(row, claim, video, take)
         result['clips'][cid] = row

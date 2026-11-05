@@ -217,7 +217,11 @@ class ThinMediaRunner:
         from novel_manga.application.repair.delivery import assembly_directory
         output_dir = assembly_directory(self.context.episode_dir)
         started = time.monotonic()
-        assembly = postprocess.assemble(self.context, results, output_dir)
+        from novel_manga.application.agents.episode.postproduction import assembly_inputs
+        assembly_rows, visual_inserts = assembly_inputs(self.context, {'clips': results})
+        assembly = postprocess.assemble(self.context, assembly_rows, output_dir)
+        if visual_inserts:
+            assembly['postproduction'] = {'visual_inserts': visual_inserts}
         encoded = time.monotonic()
         needs_subtitles = any(c.get('spoken_text') or c.get('lines') for c in self.context.clip_plan.get('clips', []))
         needs_subtitles |= any(t.get('text') and t.get('delivery_mode') in {'visible_dialogue', 'offscreen_dialogue', 'singing'}
@@ -234,9 +238,8 @@ class ThinMediaRunner:
                 'timing': {'postprocess_s': round(encoded-started, 3),
                            'media_qc_s': round(time.monotonic()-encoded, 3)}}
 
-    def run(self, *, assemble: bool = True) -> dict:
-        started = time.monotonic()
-        clips = [clip for clip in self.context.clip_plan["clips"] if clip["kind"] == "video"]
+    def prepare_clips(self, clips) -> None:
+        """Run the existing preflight for the clips this invocation may submit."""
         self.context.state.blocked_clips = {}
         self.context.state.approved_cached = {}
         if not self.context.options.cache_only:  # cached clips need no cards built (and none redrawn)
@@ -276,6 +279,11 @@ class ThinMediaRunner:
             for cid, reasons in render_risk_report(self.context.episode_dir, self.context.clip_plan).items():
                 if cid not in self.context.state.approved_cached:
                     self.context.state.blocked_clips.setdefault(cid, []).extend(reasons)
+
+    def run(self, *, assemble: bool = True) -> dict:
+        started = time.monotonic()
+        clips = [clip for clip in self.context.clip_plan["clips"] if clip["kind"] == "video"]
+        self.prepare_clips(clips)
         with ThreadPoolExecutor(max_workers=self.context.options.workers) as pool:
             results = list(pool.map(self.process_clip, clips))
         errored = [r["clip_id"] for r in results if r.get("error") or not r.get("selected")]

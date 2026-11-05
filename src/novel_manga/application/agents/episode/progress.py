@@ -13,7 +13,8 @@ def file_stamp(path):
 def progress(ctx, status):
     paths = [ctx.work_dir / name for name in (
         'output/episode.json', 'output/requests.json', 'output/repair.json',
-        'input/latest-render.json', 'input/latest-review.json', 'input/latest-finish.json')]
+        'input/latest-render.json', 'input/latest-review.json', 'input/latest-finish.json',
+        'input/latest-music-search.json','input/latest-music-apply.json')]
     paths.extend(ctx.run_dir / name for name in ('prepared.json', 'tool-repair-decisions.json'))
     # These small JSON outputs carry actual progress. Equal-size edits can keep
     # the same timestamp, and touching an unchanged draft is not progress.
@@ -44,6 +45,12 @@ def made_progress(ctx, before, before_status, status):
     prior = before_status.get('job') or {}
     outcome = job.get('result') or {}
     if job.get('id') != prior.get('id') and job.get('status') in {'completed', 'failed'}:
+        if job.get('action')=='mix_audio' and outcome.get('assembly_changed') and outcome.get('ok'):
+            return before[0] != progress(ctx,status)[0] or outcome != (prior.get('result')or{})
+        if job.get('action')=='select_music'and outcome.get('ok'):
+            return before[0]!=progress(ctx,status)[0]and(not outcome.get('music_declined')or outcome.get('assessment_added'))
+        if job.get('action')=='first_frames' and (outcome.get('reviewed_candidates') or outcome.get('video_progress')):
+            return True
         if (outcome.get('changed') or outcome.get('assets_added')
                 or set(outcome.get('input_repaired') or []) - set(outcome.get('input_reused') or [])):
             return True
@@ -79,6 +86,13 @@ def stop_details(status):
     outcome = job.get('result') or {}
     repairs = status.get('input_repairs') or {}
     states = {r.get('status') for r in repairs.values()}
+    from .input_records import service_blocker
+    if blocker := service_blocker(status):
+        return {'kind': 'service_interrupted', 'service': blocker,
+                'last_operation': job.get('action'),
+                'blocked': outcome.get('blocked') or {}, 'input_repairs': repairs,
+                'remaining_takes': status.get('remaining_takes') or {},
+                'remaining_rechecks': status.get('remaining_rechecks') or {}}
     kind = ('argument_error' if outcome.get('argument_errors') else
             'tool_error' if 'tool_error' in states else
             'source_rejected' if 'rejected' in states else

@@ -28,7 +28,7 @@ def test_subtitles_move_after_card_and_do_not_show_over_card(tmp_path):
 @pytest.mark.parametrize('has_speech', [False, True])
 def test_world_card_does_not_replay_spoken_tail_but_keeps_wordless_ambience(tmp_path, has_speech):
     from novel_manga.config import Settings
-    from novel_manga.interactive.packaging import package_body
+    from novel_manga.interactive.packaging import prepare_publication,publication_graph
     font = Settings.from_env().font_path
     if not shutil.which('ffmpeg') or not font.is_file():
         pytest.skip('ffmpeg and a local font are required for the audio splice check')
@@ -38,8 +38,16 @@ def test_world_card_does_not_replay_spoken_tail_but_keeps_wordless_ambience(tmp_
                     '-c:v','libx264','-c:a','aac',str(source)],check=True)
     publication={'world_card':{'after_clip_id':'clip_01','seconds':3,'series_title':'旅行',
                                'episode':'01','title':'世界','premise':'规则'}}
-    output,_=package_body(source,publication,[{'unit_id':'clip_01','end':1}],tmp_path,font,160,284,
-                          boundary_has_speech=has_speech)
+    prepared=prepare_publication(publication,[{'unit_id':'clip_01','end':1}],tmp_path,font,160,284,
+                                 boundary_has_speech=has_speech)
+    output=tmp_path/'published.mp4'
+    graph=('[0:v]setsar=1[body_video];[0:a]aresample=48000,aformat=channel_layouts=stereo[body_audio];'
+           +publication_graph(prepared,1,2))
+    subprocess.run(['ffmpeg','-y','-v','error','-i',str(source),'-loop','1','-framerate','25',
+                    '-i',str(tmp_path/'world-introduction.jpeg'),'-loop','1','-framerate','25',
+                    '-i',str(tmp_path/'series-watermark.png'),'-filter_complex',graph,
+                    '-map','[published_video]','-map','[published_audio]',
+                    '-c:v','libx264','-c:a','aac',str(output)],check=True)
     # Sample inside the inserted card. AAC boundary bleed is excluded.
     pcm=subprocess.check_output(['ffmpeg','-v','error','-ss','1.1','-t','0.1','-i',str(output),
                                  '-vn','-ac','1','-ar','16000','-f','s16le','-'])

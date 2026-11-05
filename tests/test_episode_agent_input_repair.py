@@ -267,13 +267,15 @@ def test_source_recovery_reservation_survives_interrupted_judge(setup, monkeypat
     with pytest.raises(TimeoutError):
         input_repair.repair(ctx, {'clip_id': 'clip_01', 'action': 'input', 'resume': True})
     saved = read_json(path)
-    assert saved['status'] == 'incomplete' and saved['resume_count'] == 0
+    assert saved['status'] == 'tool_error' and saved['error_kind'] == 'service_interrupted'
+    assert saved['resume_count'] == 0
+    assert input_repair.remaining_input_attempts(ctx, ['clip_01'])['clip_01'] == 2
     assert not input_repair.source_review_recoverable(saved)
     assert _pending_input_continuations(ctx)
     monkeypatch.setattr(input_repair, 'source_check', lambda *a, **kw: {'consistent': True, 'problems': []})
     input_repair.repair(ctx, {'clip_id': 'clip_01', 'action': 'input', 'resume': True})
     saved = read_json(path)
-    assert saved['status'] == 'prepared' and saved['resume_count'] == saved['revision_count'] == 1
+    assert saved['status'] == 'prepared' and saved['resume_count'] == 0 and saved['revision_count'] == 1
 
 
 @pytest.mark.parametrize('resume', [True, False])
@@ -369,11 +371,27 @@ def test_dialogue_correction_argument_retains_inner_voice_and_new_words(setup):
 
 
 @pytest.mark.parametrize('correct_owner',[False,True])
-def test_source_checked_dialogue_revision_runs_real_compilation_and_preserves_other_clips(setup,monkeypatch,correct_owner):
+@pytest.mark.parametrize('frame_seconds',[None,15,3])
+def test_source_checked_dialogue_revision_runs_real_compilation_and_preserves_other_clips(setup,monkeypatch,correct_owner,frame_seconds):
     from novel_manga.application.agents.episode.requests import compose_request
     from novel_manga.application.profiles import h3_stamp
     from novel_manga.story.voice_delivery import visual_request
     ctx,before,shared=setup
+    frame=None
+    if frame_seconds is not None:
+        from novel_manga.media.first_frames import opening_contract
+        clip=before['clips'][0]
+        clip['first_frame']={'path':'opening.png','extra_references':[],'visible_characters':['甲'],
+            'source_contract':opening_contract(clip,[]),'review':{'consistent':True,'problems':[]}}
+        frame=copy.deepcopy(clip['first_frame'])
+        script=read_json(ctx.episode_dir/'chapter_script.json')
+        script['shots'][0]['duration_seconds']=frame_seconds
+        clip['request_seconds']=max(4,frame_seconds)
+        clip['shot_timing']=[{'seconds':frame_seconds,'cut':''}]
+        clip['seconds_estimate']=frame_seconds
+        atomic_write_json(ctx.episode_dir/'chapter_script.json',script)
+        atomic_write_json(ctx.episode_dir/'clip_plan.json',before)
+        atomic_write_json(ctx.novel_dir/'profile.json',{'h3_input_mode':'first-frame'})
     atomic_write_json(ctx.novel_dir/'story_bible.json',{'novel_title':'Book','genre':'fantasy',
         'visual_style':'3d','palette':'natural','style_fingerprint':'fixture','locations':['房间'],
         'characters':[{'name':n,'appearance':'adult','wardrobe':'robe'} for n in ('乙','甲')]})
@@ -411,6 +429,7 @@ def test_source_checked_dialogue_revision_runs_real_compilation_and_preserves_ot
     result=input_repair.repair(ctx,decision(shots=[{'index':1,'turns':[new_turn]}]))
     after=read_json(ctx.episode_dir/'clip_plan.json')
     assert result['changed']==['clip_01']
+    if frame is not None:assert after['clips'][0]['first_frame']==frame
     assert after['clips'][0]['lines'][0]['text'].rstrip('。.')==new_turn['text'].rstrip('。.')
     assert after['clips'][0]['lines'][0]['speaker_name']==new_turn['speaker_name']
     assert bool(after['clips'][0]['lines'][0].get('inner_monologue'))==bool(new_turn.get('inner_monologue'))
@@ -485,6 +504,86 @@ def test_cast_patch_recomputes_membership_and_passes_scoped_source_evidence(setu
     assert seen['shots'][0]['in_frame'] == ['甲']
     assert read_json(ctx.episode_dir/'clip_plan.json')['clips'][1:] == before['clips'][1:]
     assert history.generation_counts(ctx.episode_dir) == {}
+
+
+def test_real_repair_scopes_source_review_with_before_after_and_native_siblings(setup, monkeypatch):
+    ctx, before, _ = setup
+    script = read_json(ctx.episode_dir/'chapter_script.json')
+    # Two host shots were split from one native source shot; only shot 1 is edited.
+    for shot in script['shots'][:2]:
+        shot['source_shot'] = 7
+        shot['source_kind'] = 'dialogue'
+    atomic_write_json(ctx.episode_dir/'chapter_script.json', script)
+    seen = {}
+    def source_check(source, quote, patches, phases, locations=None, scoped_shots=None, **kwargs):
+        seen['shots'] = copy.deepcopy(scoped_shots)
+        return {'consistent': True, 'problems': []}
+    monkeypatch.setattr(input_repair, 'source_check', source_check)
+    result = input_repair.repair(ctx, decision(shots=[{'index': 1, 'location': '宿舍'}]))
+    assert result['changed'] == ['clip_01']
+    scoped = seen['shots']
+    assert [row['index'] for row in scoped] == [1]
+    entry = scoped[0]
+    assert entry['before']['location'] == '房间' and entry['after']['location'] == '宿舍'
+    assert 'location' in entry['changed_fields']
+    assert entry['after']['turns'] == entry['before']['turns']  # untouched dialogue stays evidence
+    # Siblings keep the native source grouping and the untouched sibling text.
+    assert [(row['index'], row['source_shot'], row['source_kind']) for row in entry['source_group']] == [
+        (1, 7, 'dialogue'), (2, 7, 'dialogue')]
+    assert entry['source_group'][1]['shot']['location'] == '房间'
+    assert entry['source_group'][1]['shot']['turns'] == script['shots'][1]['turns']
+    # The receipt keeps the exact review payload that was judged.
+    receipt = read_json(next((ctx.episode_dir/'work/input_repairs').glob('clip_01-*.json')))
+    assert receipt['source'] == {'consistent': True, 'problems': []}
+    assert receipt['source_review_policy'] == input_repair.SOURCE_REVIEW_POLICY
+
+
+def test_source_review_scoping_accepts_the_approved_list_and_host_dict_shapes():
+    from novel_manga.application.agents.episode.input_repair import _source_review_shot_context
+    rows = [{'index': 1, 'location': '房间', 'source_shot': 3, 'source_kind': 'dialogue'},
+            {'index': 2, 'location': '房间', 'source_shot': 3, 'source_kind': 'dialogue'}]
+    after = [{'index': 1, 'location': '宿舍', 'source_shot': 3, 'source_kind': 'dialogue'},
+             {'index': 2, 'location': '房间', 'source_shot': 3, 'source_kind': 'dialogue'}]
+    as_list = _source_review_shot_context(rows, after, {1})
+    as_dict = _source_review_shot_context({r['index']: r for r in rows},
+                                          {r['index']: r for r in after}, {1})
+    assert as_dict == as_list
+    assert as_list[0]['changed_fields'] == ['location']
+    assert [row['index'] for row in as_list[0]['source_group']] == [1, 2]
+
+
+def test_shared_service_402_stops_batch_and_resumes_only_the_same_candidate(setup, monkeypatch):
+    ctx, _, _ = setup
+    calls = []
+    def source_check(*args, **kwargs):
+        calls.append(args[0])
+        if len(calls) == 1:
+            raise RuntimeError('task submission returned HTTP 402: quota_not_enough')
+        return {'consistent': True, 'problems': []}
+    monkeypatch.setattr(input_repair, 'source_check', source_check)
+    first, peer = decision(), decision(clip_id='clip_02')
+    atomic_write_json(ctx.work_dir/'output/repair.json', {'decisions': [first, peer]})
+
+    failed = EpisodeTools(ctx).dispatch('apply')
+    assert failed['ok'] is False
+    assert failed['service_interrupted']['clip_id'] == 'clip_01'
+    assert failed['service_interrupted']['unattempted_clip_ids'] == ['clip_02']
+    assert len(calls) == 1
+    assert not list((ctx.episode_dir/'work/input_repairs').glob('clip_02-*.json'))
+    assert input_repair.remaining_input_attempts(ctx, ['clip_01', 'clip_02']) == {
+        'clip_01': 2, 'clip_02': 2}
+    status = EpisodeTools(ctx).dispatch('status')
+    assert status['next_action']['service_interrupted']['clip_id'] == 'clip_01'
+
+    atomic_write_json(ctx.work_dir/'output/repair.json', {
+        'decisions': [{'clip_id': 'clip_01', 'action': 'input', 'resume': True,
+                       'reason': '恢复相同候选'}, decision(clip_id='clip_02')]})
+    resumed = EpisodeTools(ctx).dispatch('apply')
+    assert resumed['input_repaired'] == ['clip_01']
+    assert len(calls) == 2
+    assert not list((ctx.episode_dir/'work/input_repairs').glob('clip_02-*.json'))
+    assert input_repair.remaining_input_attempts(ctx, ['clip_01', 'clip_02']) == {
+        'clip_01': 1, 'clip_02': 2}
 
 
 @pytest.mark.parametrize('translation_fails', [False, True])
@@ -821,7 +920,7 @@ def test_source_compression_rebuilds_only_checked_words_without_changing_owner(s
     assert history.generation_counts(ctx.episode_dir)=={}
 
 
-@pytest.mark.parametrize('change', [{'source_quote': '捏造的原文'}, {'shots': [{'index': 1, 'camera': '全景'}]},
+@pytest.mark.parametrize('change', [{'source_quote': '捏造的原文'}, {'shots': [{'index': 1, 'request_seconds': 6}]},
                                     {'shots': [{'index': 2, 'location': '宿舍'}]}])
 def test_bad_source_or_protected_edits_do_not_call_a_model_or_write_plan(setup, monkeypatch, change):
     ctx, before, _ = setup
@@ -829,6 +928,70 @@ def test_bad_source_or_protected_edits_do_not_call_a_model_or_write_plan(setup, 
     with pytest.raises(ValueError):
         input_repair.repair(ctx, decision(**change))
     assert read_json(ctx.episode_dir/'clip_plan.json') == before
+
+
+@pytest.mark.parametrize('field,value',[
+    ('camera','稳定自拍，机位与取景保持不动。'),
+    ('shot_scale','脚踝浅水近景')])
+def test_source_camera_and_scale_repair_reach_real_compiler_without_changing_other_media(setup,monkeypatch,field,value):
+    from novel_manga.application.agents.episode.requests import compose_request
+    from novel_manga.application.profiles import h3_stamp
+    ctx,before,shared=setup
+    original_script=read_json(ctx.episode_dir/'chapter_script.json')
+    atomic_write_json(ctx.novel_dir/'story_bible.json',{'novel_title':'Book','genre':'fantasy',
+        'visual_style':'3d','palette':'natural','style_fingerprint':'fixture','locations':['房间'],
+        'characters':[{'name':n,'appearance':'adult','wardrobe':'robe'}for n in ('乙','甲')]})
+    for rel in ('characters/character_001/turnaround.jpeg','characters/character_002/turnaround.jpeg',
+                'locations/location_001/establishing.jpeg'):
+        path=shared/rel;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(b'existing card')
+    grants=ctx.episode_dir/'repair_budget_grants.json'
+    atomic_write_json(grants,{'*':{'limit':3,'input_limit':1,'reason':'existing authority'}})
+    grants_before=grants.read_bytes()
+    history.save(ctx.episode_dir,{'prior_generation_counts':{'clips':{'clip_01':1,'clip_02':1}},'trials':[]})
+    counts=history.generation_counts(ctx.episode_dir)
+    retained=ctx.episode_dir/'work/clips/clip_02/attempt_01/clip.mp4'
+    retained.parent.mkdir(parents=True);retained.write_bytes(b'existing selected take')
+    reviewed=[];translated=[]
+    def source_check(source,quote,patches,phases,locations=None,scoped_shots=None,**kwargs):
+        reviewed.append(copy.deepcopy(patches))
+        assert [s['index']for s in scoped_shots]==[1]
+        assert scoped_shots[0][field]==value
+        return {'consistent':True,'problems':[]}
+    def translate(clip,**kwargs):
+        assert value in clip['prompt']
+        assert kwargs['source_script']['shots'][0][field]==value
+        translated.append(clip['clip_id'])
+        clip['prompt_h3']=compose_request(clip,{'shots':['The seated person speaks. <DIALOGUE_1>'],
+                                               'soundscape':'Quiet room tone.'})
+        clip['prompt_h3_of']=h3_stamp(clip,'')
+    monkeypatch.setattr(input_repair,'source_check',source_check)
+    monkeypatch.setattr('novel_manga.application.repair.flow.rebuild_clips',real_rebuild_clips)
+    monkeypatch.setattr('novel_manga.application.rendering.h3.convert',translate)
+    row=decision(clip_ids=['clip_01'],shots=[{'index':1,field:value}])
+    atomic_write_json(ctx.work_dir/'output/repair.json',{'decisions':[row]})
+    assert EpisodeTools(ctx).check({'file':'output/repair.json'})['valid']
+    assert not reviewed and not list((ctx.episode_dir/'work/input_repairs').glob('*.json'))
+    result=input_repair.repair(ctx,row)
+    after=read_json(ctx.episode_dir/'clip_plan.json')
+    expected=copy.deepcopy(original_script);expected['shots'][0][field]=value
+    assert read_json(ctx.episode_dir/'chapter_script.json')==expected
+    assert result['changed']==translated==['clip_01'] and reviewed==[row['shots']]
+    assert after['clips'][1:]==before['clips'][1:]
+    assert after['clips'][0]['generation_seed']==before['clips'][0]['generation_seed']
+    for key in ('request_seconds','shot_indexes','shot_timing','lines'):
+        assert after['clips'][0][key]==before['clips'][0][key]
+    assert history.generation_counts(ctx.episode_dir)==counts
+    assert retained.read_bytes()==b'existing selected take' and grants.read_bytes()==grants_before
+
+
+@pytest.mark.parametrize('field',['camera','shot_scale'])
+def test_camera_and_scale_patch_require_text_before_any_input_work(setup,monkeypatch,field):
+    ctx,before,_=setup
+    monkeypatch.setattr(input_repair,'source_check',lambda *a,**k:pytest.fail('invalid text reached source model'))
+    with pytest.raises(input_repair.RepairArgumentError,match=field+' must be text'):
+        input_repair.repair(ctx,decision(shots=[{'index':1,field:[]}]))
+    assert read_json(ctx.episode_dir/'clip_plan.json')==before
+    assert not list((ctx.episode_dir/'work/input_repairs').glob('*.json'))
 
 
 @pytest.mark.parametrize('change,field', [
@@ -989,7 +1152,7 @@ def test_input_reuses_registered_character_state_without_changing_its_design(set
     card.parent.mkdir();card.write_bytes(b'existing registered image')
     original = card.read_bytes()
     seen = []
-    monkeypatch.setattr(input_repair, 'source_check', lambda source, quote, shots, phases, *a:
+    monkeypatch.setattr(input_repair, 'source_check', lambda source, quote, shots, phases, *a, **kwargs:
                         seen.append(phases) or {'consistent':True,'problems':[]})
     def build(context, names):
         current=read_json(context.novel_dir/'series_assets/phases.json')['characters']['甲'][0]
@@ -1140,7 +1303,7 @@ def test_connection_failure_resumes_existing_images_and_translations_once(setup,
     from novel_manga.application.profiles import h3_stamp
     ctx, before, shared = setup
     source_calls, drawn, translated, checks = [], [], [], []
-    monkeypatch.setattr(input_repair, 'source_check', lambda *a: source_calls.append(1) or {'consistent': True})
+    monkeypatch.setattr(input_repair, 'source_check', lambda *a, **kwargs: source_calls.append(1) or {'consistent': True})
     def draw(ctx, names):
         phases = read_json(ctx.novel_dir/'series_assets/phases.json')['characters']
         for name in names:
@@ -1165,7 +1328,8 @@ def test_connection_failure_resumes_existing_images_and_translations_once(setup,
         input_repair.repair(ctx, row)
     assert read_json(ctx.episode_dir/'clip_plan.json') == before
     state = input_repair.repair_status(ctx)['clip_01']
-    assert state['status'] == 'incomplete' and state['step'] == 'check:clip_01'
+    assert state['status'] == 'tool_error' and state['error_kind'] == 'service_interrupted'
+    assert state['step'] == 'check:clip_01' and state['resume_action']['resume'] is True
     result = input_repair.repair(ctx, state['resume_action'])
     assert len(result['changed']) == 8 and len(drawn) == len(source_calls) == 1
     assert len(translated) == 8  # the first translated request was kept across the connection error
@@ -1214,7 +1378,7 @@ def test_wearing_checks_without_edits_keep_their_clip_scope():
 def test_rejected_owner_gets_one_changed_proposal_without_repeating_rejection(setup, monkeypatch):
     ctx, _, _ = setup
     calls = []
-    def reject(*a):
+    def reject(*a, **kwargs):
         calls.append(1)
         raise input_repair.UnsupportedInput('garment belongs to another person')
     monkeypatch.setattr(input_repair, 'source_check', reject)
@@ -1335,7 +1499,7 @@ def test_scoped_costume_repair_does_not_require_another_take_of_an_earlier_accep
     atomic_write_json(ctx.episode_dir/'repair_budget_grants.json', {'*': {'limit': 2}})
     monkeypatch.setattr(history, 'generation_counts', lambda *a: {'clip_01': 2})
     scopes = []
-    monkeypatch.setattr(input_repair, 'source_check', lambda *a: scopes.append(a[-1]) or {'consistent': True})
+    monkeypatch.setattr(input_repair, 'source_check', lambda *a, **kwargs: scopes.append(a[-1]) or {'consistent': True})
     def draw(ctx, names):
         phase = read_json(ctx.novel_dir/'series_assets/phases.json')['characters']['甲'][0]
         card = ctx.novel_dir/'series_assets/characters'/phase['asset_id']/'turnaround.jpeg'
@@ -1456,3 +1620,232 @@ def test_input_operations_follow_the_same_granted_new_candidate_route(setup):
     changed = decision(shots=[{'index':1,'light':'日光'}])
     path, _ = input_repair.input_receipt(ctx, 'clip_01', changed, check_only=True)
     assert path.name == 'clip_01-2.json'
+
+
+def pending_opening(setup):
+    from novel_manga.media.first_frames import opening_contract
+    ctx,plan,_=setup
+    atomic_write_json(ctx.novel_dir/'profile.json',{'h3_input_mode':'first-frame'})
+    shots=read_json(ctx.episode_dir/'chapter_script.json')['shots']
+    c=plan['clips'][0]
+    c['first_frame']={'path':'opening.png','extra_references':[],'visible_characters':[],
+        'source_contract':opening_contract(c,[],shots=[shots[0]]),'review':{'consistent':True,'problems':[]}}
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',plan)
+    return ctx,plan,decision(shots=[{'index':1,'start_state':'站在积水台面，灰鞋尖可见'}])
+
+
+@pytest.mark.parametrize('patch',[{'start_state':'站在积水台面，灰鞋尖可见'}, {'camera':'稳定自拍，机位与取景保持不动。'},
+                                  {'shot_scale':'脚部近景'}])
+def test_source_opening_change_waits_for_agent_frame_before_any_translation(setup,monkeypatch,patch):
+    from novel_manga.media.first_frames import require_current
+    ctx,before,row=pending_opening(setup)
+    if 'shot_scale'in patch:
+        script=read_json(ctx.episode_dir/'chapter_script.json');script['shots'][0]['shot_scale']='广角全景'
+        atomic_write_json(ctx.episode_dir/'chapter_script.json',script)
+        atomic_write_json(ctx.episode_dir/'clip_plan.json',before)
+    row=decision(shots=[{'index':1,**patch}])
+    def forbidden(*a,**kw):raise AssertionError('obsolete opening must not invoke translation')
+    monkeypatch.setattr('novel_manga.application.rendering.h3.convert',forbidden)
+    result=input_repair.repair(ctx,row)
+    after=read_json(ctx.episode_dir/'clip_plan.json')
+    assert result['changed']==['clip_01']
+    assert after['clips'][0]['first_frame']==before['clips'][0]['first_frame']
+    if 'shot_scale'in patch:assert after['clips'][0]['first_frame_opening'][0]['shot_scale']=='广角全景'
+    assert not after['clips'][0].get('prompt_h3') and after['clips'][0].get('prompt_h3_skip')
+    assert after['clips'][1:]==before['clips'][1:]
+    with pytest.raises(ValueError,match='stale'):
+        require_current(ctx,after['clips'][0])
+    assert history.generation_counts(ctx.episode_dir)=={}
+
+
+@pytest.mark.parametrize('legacy',[False,True])
+def test_source_shot_scale_change_invalidates_current_and_legacy_accepted_frame(tmp_path,monkeypatch,legacy):
+    from PIL import Image
+    from test_first_frame_review_facts import character_case
+    from novel_manga.media.first_frames import current_contract,require_current
+    ctx,clip,row,_=character_case(tmp_path,monkeypatch)
+    shot=copy.deepcopy(clip['shots'][0]);shot['shot_scale']='wide shot'
+    clip['first_frame_opening']=[copy.deepcopy(shot)]
+    atomic_write_json(ctx.episode_dir/'chapter_script.json',{'shots':[shot]})
+    contract=current_contract(ctx,clip,row['image_references'])
+    if legacy:contract['opening'].pop('shot_scale',None)
+    Image.new('RGB',(8,16)).save(ctx.novel_dir/'accepted.png')
+    clip['first_frame']={'path':'accepted.png','source_contract':contract,'review':{'consistent':True,'problems':[]}}
+    require_current(ctx,clip)  # Adding the field does not expire unchanged historical images.
+    shot['shot_scale']='close-up of feet'
+    atomic_write_json(ctx.episode_dir/'chapter_script.json',{'shots':[shot]})
+    with pytest.raises(ValueError,match='stale'):require_current(ctx,clip)
+
+
+def test_legacy_scale_cache_reuses_only_unchanged_opening_then_explicitly_reviews_changed_framing(tmp_path,monkeypatch):
+    from PIL import Image
+    from test_first_frame_review_facts import character_case
+    from novel_manga.application.agents.episode.first_frames import FirstFrameOperations
+    from novel_manga.media.first_frames import require_current
+    ctx,clip,row,_=character_case(tmp_path,monkeypatch)
+    clip['shots'][0]['shot_scale']='wide shot'
+    clip['first_frame_opening']=[copy.deepcopy(clip['shots'][0])]
+    atomic_write_json(ctx.episode_dir/'chapter_script.json',{'shots':clip['shots']})
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':[clip]})
+    calls=[]
+    def checker(ctx,path,row,contract):
+        calls.append(contract['opening']['shot_scale'])
+        return {'observations':['mocked framing check'],'findings':[]}
+    FirstFrameOperations(ctx,builder=lambda ctx,row,path:Image.new('RGB',(8,16)).save(path),checker=checker).prepare({})
+    root=ctx.novel_dir/'first_frames/book_1/clip_01';saved=root/'candidate_01/input.json'
+    old=read_json(saved);old['source_contract']['opening'].pop('shot_scale',None);atomic_write_json(saved,old)
+    original=saved.read_bytes();image=(saved.parent/'opening.png').read_bytes()
+    for i in (2,3):atomic_write_json(root/f'candidate_{i:02d}'/'input.json',{'old_variant':i})
+    def no_build(*a):pytest.fail('preserve paid image and capacity')
+    op=lambda:FirstFrameOperations(ctx,builder=no_build,checker=checker).prepare({})
+    assert op()['ok'] and calls==['wide shot']
+    script=read_json(ctx.episode_dir/'chapter_script.json');script['shots'][0]['shot_scale']='close-up of feet'
+    atomic_write_json(ctx.episode_dir/'chapter_script.json',script)
+    assert not op()['ok'] and calls==['wide shot']  # Ordinary matching cannot erase a framing change.
+    row['reuse_candidate']='candidate_01'
+    atomic_write_json(ctx.work_dir/'output/first-frames.json',{'frames':[row]})
+    assert op()['ok'] and calls==['wide shot','close-up of feet']
+    current=read_json(ctx.episode_dir/'clip_plan.json')['clips'][0]
+    require_current(ctx,current)
+    assert current['first_frame']['source_contract']['opening']['shot_scale']=='close-up of feet'
+    assert len(list(root.glob('candidate_*')))==3
+    assert saved.read_bytes()==original and (saved.parent/'opening.png').read_bytes()==image
+
+
+def test_observed_old_opening_translation_failure_has_one_same_candidate_recovery(setup):
+    from novel_manga.application.agents.episode import input_records
+    ctx,_,row=pending_opening(setup)
+    p=ctx.episode_dir/'work/input_repairs/clip_01-1.json'
+    record={'clip_id':'clip_01','decision':row,'source':{'consistent':True,'problems':[]},
+        'status':'incomplete','step':'translate:clip_01','resume_count':1,
+        'error':'ValueError: input repair H3 translation rejected clip_01: shots requires exactly 1 items; received 2.'}
+    atomic_write_json(p,record)
+    path,continued=input_records.input_receipt(ctx,'clip_01',row)
+    assert path==p and continued['resume_count']==1
+    assert continued['first_frame_recovery']['previous_error']==record['error']
+    assert len(list(p.parent.glob('clip_01-*.json')))==1
+    continued['status']='incomplete';atomic_write_json(p,continued)
+    with pytest.raises(ValueError,match='continuation allowance used'):
+        input_records.input_receipt(ctx,'clip_01',row)
+
+
+def test_non_frame_input_does_not_gain_opening_recovery(setup):
+    from novel_manga.application.agents.episode import input_records
+    ctx,_,row=pending_opening(setup)
+    atomic_write_json(ctx.novel_dir/'profile.json',{})
+    p=ctx.episode_dir/'work/input_repairs/clip_01-1.json'
+    atomic_write_json(p,{'clip_id':'clip_01','decision':row,'source':{'consistent':True,'problems':[]},
+        'status':'incomplete','step':'translate:clip_01','resume_count':1,
+        'error':'ValueError: input repair H3 translation rejected clip_01: invalid response'})
+    with pytest.raises(ValueError,match='continuation allowance used'):
+        input_records.input_receipt(ctx,'clip_01',row)
+
+
+def test_opening_only_edit_publishes_source_without_waiting_for_nonexistent_request_effect(setup,monkeypatch):
+    ctx,before,_=setup
+    atomic_write_json(ctx.novel_dir/'profile.json',{'h3_input_mode':'first-frame'})
+    opening={'image_prompt':'One source-backed empty room before the action.',
+             'visible_characters':[],'reference_subjects':['宿舍']}
+    row=decision(shots=[{'index':1,'opening_frame':opening}])
+    monkeypatch.setattr('novel_manga.application.repair.flow.rebuild_clips',
+        lambda *a,**kw:(copy.deepcopy(before),[]))
+    monkeypatch.setattr('novel_manga.application.rendering.h3.convert',
+        lambda *a,**kw:pytest.fail('no translation before the new opening exists'))
+    result=input_repair.repair(ctx,row)
+    after=read_json(ctx.episode_dir/'clip_plan.json')
+    assert result['changed']==['clip_01']
+    assert read_json(ctx.episode_dir/'chapter_script.json')['shots'][0]['opening_frame']==opening
+    assert after['clips'][0]['first_frame_opening'][0]['opening_frame']==opening
+    assert after['clips'][0]['prompt_h3_skip'] and not after['clips'][0].get('prompt_h3')
+    assert after['clips'][1:]==before['clips'][1:]
+    assert history.generation_counts(ctx.episode_dir)=={}
+
+
+def test_current_style_does_not_turn_motion_only_repair_into_new_opening(setup,monkeypatch):
+    from novel_manga.style_packs import frame_style
+    from novel_manga.application.profiles import h3_stamp
+    ctx,before,_=pending_opening(setup)
+    before['clips'][0]['first_frame']['source_contract']['style']=frame_style(ctx.novel_dir)
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',before)
+    calls=[]
+    def translate(clip,**kw):
+        calls.append(clip['clip_id']);clip['prompt_h3_of']=h3_stamp(clip,'')
+    monkeypatch.setattr('novel_manga.application.rendering.h3.convert',translate)
+    input_repair.repair(ctx,decision(shots=[{'index':1,'motion_prompt':'原地抬手'}]))
+    after=read_json(ctx.episode_dir/'clip_plan.json')
+    assert calls==['clip_01'] and not after['clips'][0].get('prompt_h3_skip')
+    assert after['clips'][0]['first_frame']==before['clips'][0]['first_frame']
+
+
+@pytest.mark.parametrize('legacy',[False,True])
+def test_event_only_repair_compares_the_complete_recorded_first_frame_basis(setup,monkeypatch,legacy):
+    from PIL import Image
+    from novel_manga.media.first_frames import current_contract,require_current
+    from novel_manga.application.profiles import h3_stamp
+    from novel_manga.style_packs import frame_style
+    ctx,before,_=pending_opening(setup)
+    bible={'characters':[{'name':name,'appearance':'adult','wardrobe':'grey long trousers'}for name in ('乙','甲')]}
+    atomic_write_json(ctx.novel_dir/'story_bible.json',bible)
+    script=read_json(ctx.episode_dir/'chapter_script.json')
+    script['shots'][0].update(device_state='phone remains on its mount outside the frame',shot_scale='wide shot')
+    before['clips'][0]['first_frame_opening']=[copy.deepcopy(script['shots'][0])]
+    atomic_write_json(ctx.episode_dir/'chapter_script.json',script)
+    clip=before['clips'][0]
+    if legacy:
+        clip['first_frame']['source_contract']['opening'].pop('shot_scale',None)
+        clip['first_frame']['source_contract']['style']=frame_style(ctx.novel_dir)
+    else:
+        clip['first_frame']['source_contract']=current_contract(ctx,clip,[],include_style=True)
+        assert clip['first_frame']['source_contract']['character_facts']
+    Image.new('RGB',(8,16)).save(ctx.novel_dir/'opening.png')
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',before)
+    frame=copy.deepcopy(clip['first_frame']);counts=history.generation_counts(ctx.episode_dir);translated=[]
+    require_current(ctx,clip)
+    def translate(clip,**kw):
+        translated.append(clip['clip_id']);clip['prompt_h3_of']=h3_stamp(clip,'')
+        assert kw['source_script']['shots'][0]['event']=='甲抬眼后保持站位。'
+    monkeypatch.setattr('novel_manga.application.rendering.h3.convert',translate)
+    result=input_repair.repair(ctx,decision(shots=[{'index':1,'event':'甲抬眼后保持站位。'}]))
+    after=read_json(ctx.episode_dir/'clip_plan.json')
+    assert result['changed']==translated==['clip_01']
+    assert after['clips'][0]['prompt_h3'] and not after['clips'][0].get('prompt_h3_skip')
+    assert after['clips'][0]['first_frame']==frame and after['clips'][1:]==before['clips'][1:]
+    require_current(ctx,after['clips'][0])
+    assert history.generation_counts(ctx.episode_dir)==counts
+    assert not (ctx.novel_dir/'first_frames').exists()
+
+
+def test_event_repair_cannot_recertify_changed_current_character_facts(setup,monkeypatch):
+    from novel_manga.media.first_frames import current_contract
+    ctx,before,_=pending_opening(setup)
+    bible={'characters':[{'name':name,'wardrobe':'grey long trousers'}for name in ('乙','甲')]}
+    atomic_write_json(ctx.novel_dir/'story_bible.json',bible)
+    before['clips'][0]['first_frame']['source_contract']=current_contract(ctx,before['clips'][0],[])
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',before)
+    bible['characters'][1]['wardrobe']='blue long trousers'
+    atomic_write_json(ctx.novel_dir/'story_bible.json',bible)
+    monkeypatch.setattr('novel_manga.application.rendering.h3.convert',
+        lambda *a,**k:pytest.fail('changed current facts require a reviewed first frame'))
+    input_repair.repair(ctx,decision(shots=[{'index':1,'event':'甲抬眼后保持站位。'}]))
+    after=read_json(ctx.episode_dir/'clip_plan.json')['clips'][0]
+    assert after.get('prompt_h3_skip') and not after.get('prompt_h3')
+    assert after['first_frame']==before['clips'][0]['first_frame']
+
+
+def test_opening_compile_failure_resumes_same_checked_candidate_once_without_new_allowance(setup):
+    from novel_manga.application.agents.episode import input_records
+    ctx,_,_=setup
+    atomic_write_json(ctx.novel_dir/'profile.json',{'h3_input_mode':'first-frame'})
+    row=decision(shots=[{'index':1,'opening_frame':{'image_prompt':'A source-backed empty room.','visible_characters':[]}}])
+    path=ctx.episode_dir/'work/input_repairs/clip_01-1.json'
+    record={'clip_id':'clip_01','decision':row,'source':{'consistent':True,'problems':[]},
+        'status':'incomplete','step':'compile','resume_count':1,
+        'error':'ValueError: input correction did not reach the compiled request'}
+    atomic_write_json(path,record)
+    assert input_repair.repair_status(ctx)['clip_01']['resume_action']['resume']
+    reused,continued=input_records.input_receipt(ctx,'clip_01',row)
+    assert reused==path and continued['resume_count']==1 and continued['first_frame_recovery']
+    assert len(list(path.parent.glob('clip_01-*.json')))==1
+    continued['status']='incomplete';atomic_write_json(path,continued)
+    with pytest.raises(ValueError,match='continuation allowance used'):
+        input_records.input_receipt(ctx,'clip_01',row)

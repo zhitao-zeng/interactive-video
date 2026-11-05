@@ -27,12 +27,13 @@ def pending_input_continuations(ctx):
         if first_pending is not None and record.get('clip_id') not in first_pending:
             continue
         resume = available.get(record.get('clip_id'), {}).get('resume_action')
+        service_resume = record.get('error_kind') == 'service_interrupted'
         timing_fix = (ctx.input_mode == 'source' and record.get('step') == 'compile'
                       and 'input repair changed protected timing or shot addresses' in str(record.get('error') or ''))
         if not resume:
             continue
         reserved_source = record.get('step') == 'source' and bool(record.get('previous_source_review'))
-        if not (source_review_recoverable(record) or reserved_source) and (
+        if not service_resume and not (source_review_recoverable(record) or reserved_source) and (
                 (record.get('source') or {}).get('consistent') is not True or not (
                     record.get('step') == 'assets'
                     or str(record.get('step') or '').startswith(('translate:', 'check:')) or timing_fix)):

@@ -5,11 +5,23 @@ import time
 
 
 from .session import SESSION_FILE
+from novel_manga.util import atomic_write_json, read_json
 from novel_manga.application.production.artifacts import media_started
 
 
 from . import resume_inputs as resume_inputs
 from . import lifecycle as lifecycle
+
+def _render_ready(ctx, bridge):
+    """Render only when the current artifacts make it the legal next action."""
+    from .readiness import next_action as ready_action
+    status = bridge.handle('status', {})
+    ready = ready_action(ctx, status)
+    bridge.update_state(next_action=ready)
+    state = read_json(ctx.run_dir / 'agent-run.json', {})
+    atomic_write_json(ctx.run_dir / 'agent-run.json', {**state, 'next_action': ready})
+    return ready
+
 
 def prepare_operations(ctx, bridge, state):
     config=state.config
@@ -37,20 +49,23 @@ def prepare_operations(ctx, bridge, state):
         applied = (continuation.get('job') or {}).get('result') or {}
         continued_inputs = True
         if (time.monotonic() < state.deadline and (applied.get('changed') or applied.get('input_repaired'))
-                and (not native_mode or media_started(ctx.episode_dir))):
+                and (not native_mode or media_started(ctx.episode_dir))
+                and _render_ready(ctx, bridge)['action'] == 'render'):
             bridge.handle('render', {})
             bridge.update_state(phase='tool_running')
     if (not continued_inputs and (bridge.handle('status', {}).get('job') or {}).get('status')
             not in {'accepted', 'running'} and not lifecycle.paused() and time.monotonic() < state.deadline):
         if resume_inputs.stale_request_blocks(ctx) and (not native_mode or media_started(ctx.episode_dir)):
-            bridge.handle('render', {})
-            bridge.update_state(phase='tool_running')
+            if _render_ready(ctx, bridge)['action'] == 'render':
+                bridge.handle('render', {})
+                bridge.update_state(phase='tool_running')
             continued_inputs = True
         elif resume_inputs.pending_structured_repairs(ctx):
             bridge.handle('apply', {'file': 'output/resume-structured-repairs.json'})
             bridge.update_state(phase='tool_running')
             continued_inputs = True
-    if not native_mode and not continued_inputs and (not saved or saved.get('status') == 'retrying') and not lifecycle.paused():
+    from novel_manga.media.first_frames import enabled as first_frame_mode
+    if not first_frame_mode(ctx) and not native_mode and not continued_inputs and (not saved or saved.get('status') == 'retrying') and not lifecycle.paused():
         bridge.update_state(phase='preparing_requests')
         if ((remaining := state.deadline-time.monotonic()) > 0 and not
                 (ctx.input_mode == 'source' and config.get('agent_instructions')
