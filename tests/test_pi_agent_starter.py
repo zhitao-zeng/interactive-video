@@ -35,6 +35,34 @@ def workspace(tmp_path):
     return work
 
 
+def test_normal_init_advertises_the_existing_music_catalogue(workspace, tmp_path, monkeypatch):
+    from novel_manga.application import music_selection
+    catalog = tmp_path / 'catalog.json'
+    catalog.write_text(json.dumps([{'song_id': 'BGM-001'}, {'song_id': 'BGM-002'}]))
+    monkeypatch.setattr(music_selection, 'configuration', lambda root: {
+        'catalog': str(catalog), 'catalogue_scope': 'existing local catalogue'})
+    work = starter.initialize(tmp_path / 'with-music', SDK, DEPS)
+    capability = json.loads((work / 'CAPABILITIES.json').read_text())['music_selection']
+    assert capability['configured'] is True
+    assert capability['tracks'] == 2
+    assert capability['catalog'] == str(catalog)
+    assert capability['action'] == 'music'
+    assert capability['requires_explicit_adoption'] is True
+    assert 'action=music' in (work / 'CAPABILITIES.md').read_text()
+
+
+def test_normal_init_does_not_invent_an_unconfigured_music_library(workspace, tmp_path, monkeypatch):
+    from novel_manga.application import music_selection
+    def missing(root):
+        raise ValueError('SoulTuner runtime is not configured; see docs/music-selection.md')
+    monkeypatch.setattr(music_selection, 'configuration', missing)
+    work = starter.initialize(tmp_path / 'without-music', SDK, DEPS)
+    capability = json.loads((work / 'CAPABILITIES.json').read_text())['music_selection']
+    assert capability['configured'] is False
+    assert capability['tracks'] == 0
+    assert '跳过 BGM' in (work / 'CAPABILITIES.md').read_text()
+
+
 def module_at(name, path):
     spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)

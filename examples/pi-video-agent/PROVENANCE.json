@@ -48,19 +48,19 @@
       "path": "starter.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/starter.py",
       "source_sha256": "8b057e04ed564a8297b7368b5cb10b25bd9e60ac2b2ecf1466146ea65e3efc17",
-      "merged_sha256": "0b1d906f52e792a739d9bf8ef3f9a1878918ec6e8ed318a3e70c94936fe843a1"
+      "merged_sha256": "0ae1401c0afc620ec4c50881e034e7d7e4cf93e31f4a4a4d2920130d110d1939"
     },
     {
       "path": "template/CAPABILITIES.md",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/CAPABILITIES.md",
       "source_sha256": "078280fbfb2f5b9ee936b84877a1b980814997985a481d0129eead72e8b2a369",
-      "merged_sha256": "e93b2336f0e0362abcc12451438b51476168be527e49ce165b5ce6a1174e3d05"
+      "merged_sha256": "62ea89f5a7d79cb6e9c3b031b97f716f1754b349ccd87092ebcbba03296f58d2"
     },
     {
       "path": "template/REVIEWER-SYSTEM.md",
       "source": null,
       "source_sha256": null,
-      "merged_sha256": "60239984f0e7e0daea11ee0cd418cc79ebfefa0d1fc74d3bd34c89c670dba850",
+      "merged_sha256": "bb865982aca4f78d5246cbfc1fe1ac4b470b427693cc866a7c1a37f8b9d89dac",
       "note": "New in this project: reviewer role system prompt. No upstream source."
     },
     {

@@ -140,6 +140,8 @@ class Reviews:
         self.claimed = set()
         self.paused = False
         self.entry = self.c.root / 'reviewer-code-snapshot-v3/scripts/pi_video_agent.py'
+        if not self.entry.is_file():
+            self.entry = self.c.entry
 
     def seed(self):
         path = self.c.root / 'review-seeds.json'
@@ -219,7 +221,7 @@ class Reviews:
                 '新时间位置以实际新片为准，旧秒数只是线索。可复用未受影响的真实证据，写明复用范围；'
                 '不因已经修过就默认通过，也不必重复整片所有技术取证。')
         command = [str(self.c.python), str(self.entry), 'init', str(directory),
-                   '--sdk-root', str(self.c.root / 'frozen-main'),
+                   '--sdk-root', str(self.c.sdk_root),
                    '--dependencies', str(self.c.dependencies),
                    '--role', 'reviewer', '--review-film', job['movie'],
                    '--review-baseline', str(baseline), '--review-brief', brief,

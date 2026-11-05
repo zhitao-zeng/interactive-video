@@ -159,6 +159,18 @@ Fast 使用 UniServe 的 `model=FastH3-Omni`、`task=ref2va`，保留原 prompt�
 
 UniServe 服务必须另行启动，本代码不启停服务。请求保存 request SHA、实际 target、task id、状态历史、附件 SHA、耗时和 HTTP 错误正文；下载先写 `.partial` 再替换。相同 request SHA 且已有 task id 时只轮询原任务，服务重启会清 jobs/content，404 只表示过期并停止，不隐式重新 POST。Agent 若决定新 take，必须使用新输出名并受原任务预算约束。Fast 不代表普遍优于 Turbo；music_selection 不变。
 
+## 2026-11-05 已运行改进的主线入口
+
+- 普通 `init` 会读取同一个 SDK 的现有 `music_selection` 配置，把实际曲库路径、数量和是否配置写入 `CAPABILITIES.json`。导演使用已有 `tools/media.py action=music` 检索并自主选择、试听和混音；没有配置时如实跳过，不搜索全盘、不下载曲库、不自动采用音乐。配置方式见 [music-selection.md](music-selection.md)。曲库和服务配置仍只放本地，不随 GitHub 发布。
+- `AUDIO_SERVICE_URL` 在 init 时写入任务；声检支持可选 `question`。常驻服务沿原 job 查询，不因超时再起一个本地模型。CPU 回退限制线程并隔离视频 GPU；所属 Agent 结束后仅清理其遗留音检进程，原请求和已有结果保留。
+- 当前已准备批次的唯一调度入口是 `python scripts/pi_episode_lanes.py /path/to/batch-run`。它读取已有 `state.json`，并行调度三路制作和独立审片；不是把 `pi_video_agent.py batch` 的进程退出状态当作审片结果。不要为同一批次同时启动两个生产调度器。
+- 调度脚本会优先使用该批次原来的 `frozen-main`、`frozen-tools-v2` 和 reviewer snapshot；没有这些历史目录时，使用本主线的 starter 和模板，不要求复制旧批次目录。运行中的任务仍用自己的工具副本与原会话；合并代码不会热换它们。
+- 独立审片只拒绝影响观看的问题。通过必须绑定当前实际导出；轻微问题写建议；不完整证据或审核工具错误不等于内容拒绝或通过。修好后的新导出优先复审，不重新付费审同一份被拒字节；已核实只改声音时可复用未变画面的证据和限制。
+- 内容拒绝交原导演 `--resume`，保留原始会话、素材、回执、请求数、take 限额与旧版。LLM 连接中断只做一次有原预算余额的续接；不会用新会话代替原任务。
+- 已成片的阻塞回修，只有该批次存在人类明确批准的 `repair-time-policy.json`，且 episode 在 `eligible_episode_ids` 内，才可在原墙钟耗尽后写一次待消费 `window-grant.json`。本批授权是一次 900 秒，不写成全局默认；待实际修复启动才消费，不在排队期间计时。原请求与媒体次数上限不增加；无片旧失败、已用过加时或请求已耗尽都不会被自动续期。
+
+本次整合包含本地回归与真实初始化，不重新提交媒体或重审旧片。之前真实的 BGM 混音与独审、原导演回修后复审通过记录仍保留在原批次，不能把代码合并称为新一轮从头无人验证。
+
 ## 验证边界
 
 原生工具测试、MockTransport 和 FFmpeg 只证明接口与本地执行。W24 和后续短片证明自主路线的局部可行性，不代表所有题材、整集质量或运动能力已通过。正式交付仍需实际媒体检查、正式音画终审和可核实发布；会话退出、候选文件或 ASR 都不是整集成功。

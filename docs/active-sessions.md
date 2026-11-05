@@ -469,3 +469,5 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | Codex 本批尾部任务均衡20261105 | 用户授权GPU52多分任务；既有一次15min政策覆盖排队超时 | codex/batch-concurrency-20261105 | scripts/pi_episode_lanes.py与定向回归、Gen8冻结队列、仅冷任务配置 | 2026-11-05 | 17:10上线：12A/13A/14A改Fast，前两条实际启动；4在途制作和2独审PID/会话/原额度不变，6制作+2独审。排队过期同claim应用已授权单次900s，32相关回归、独立delta无Important，真实过期分支未触发。当前34完整视频16独审通过，05C/07C/08C/10B修复复审accepted，10C排原导演云位。源未提交/push，历史保留；详Gen8/REPORT.md。 |
 
 | Codex 全代码提交与私有GitHub备份20261105 | 用户明确授权各工作树代码全部commit并新建个人repo上传 | 各原分支＋codex/snapshot-20261105/* | 只提交既有代码/Skill/文档与测试；不合并、不改生产或媒体 | 已完成 2026-11-05 17:23 | 80棵有代码改动工作副本已分别提交；95分支/7标签保存在私有zhitao-zeng/interactive-video，默认main，远端refs逐项匹配。独立clean旧main额外保存在codex/archive-clean-studio-20261028，旧remote未写。密钥/媒体/会话/环境/本地数据链接留本地，生产Gen8继续6制作+2独审。完整记录archive/code-backup-20261105/README.md和complete-history.bundle；这是代码快照而非所有历史代码通过验收或合并发布。 |
+
+| Codex 当前生产改进合主线与公开20261105 | 用户明确授权运行中BGM/独审/原导演回修/单次加时整合并公开GitHub | codex/production-integration-20261105 | Pi starter/template、两份现有队列脚本与相关回归、文档 | 2026-11-05 | 在独立工作树整合reviewer和batch分支，对照Gen8/v3；补普通init音乐能力与主线入口，保留旧冻结选择。相关回归与独立代码复核后快进main并推送、公开repo，不热换在途实例。 |

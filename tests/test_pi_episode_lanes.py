@@ -23,6 +23,31 @@ def state(root, jobs):
     return lanes.Controller(root)
 
 
+def test_mainline_dispatch_uses_merged_starter_without_batch_owned_snapshots(tmp_path):
+    import pi_episode_review as reviewing
+    controller = state(tmp_path, [])
+    sdk = Path(__file__).resolve().parents[1]
+    assert controller.sdk_root == sdk
+    assert controller.entry == sdk / 'scripts/pi_video_agent.py'
+    assert controller.grant_entry == controller.entry
+    assert reviewing.Reviews(controller).entry == controller.entry
+    assert controller.runtime == sdk / 'examples/pi-video-agent/template/tools'
+
+
+def test_historical_dispatch_keeps_its_frozen_starter_and_tools(tmp_path):
+    import pi_episode_review as reviewing
+    for folder in ['frozen-main', 'frozen-tools-v2', 'reviewer-code-snapshot-v2', 'reviewer-code-snapshot-v3']:
+        target = tmp_path / folder / 'scripts'
+        target.mkdir(parents=True)
+        (target / 'pi_video_agent.py').write_text('historical pinned entry')
+    controller = state(tmp_path, [])
+    assert controller.sdk_root == tmp_path / 'frozen-main'
+    assert controller.entry == tmp_path / 'frozen-main/scripts/pi_video_agent.py'
+    assert controller.grant_entry == tmp_path / 'reviewer-code-snapshot-v2/scripts/pi_video_agent.py'
+    assert reviewing.Reviews(controller).entry == tmp_path / 'reviewer-code-snapshot-v3/scripts/pi_video_agent.py'
+    assert controller.runtime == tmp_path / 'frozen-tools-v2'
+
+
 def test_original_runner_survives_parent_and_is_adopted_without_another_run(tmp_path):
     work = tmp_path / 'episode'
     (work / 'output').mkdir(parents=True)

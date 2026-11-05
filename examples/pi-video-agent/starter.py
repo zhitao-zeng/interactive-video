@@ -421,6 +421,20 @@ def initialize(workspace, sdk_root, dependencies, inputs=None, skills=None, prev
     if fasth3_endpoint:
         capabilities['fasth3'] = {'model': 'FastH3-Omni', 'endpoint': config['fasth3_endpoint'],
                                   'restart_clears_jobs_and_content': True}
+    if role == 'producer':
+        # Describe the same local catalogue that media.py action=music actually reads.
+        # Discovery performs no retrieval, model call, service start or music adoption.
+        from novel_manga.application.music_selection import configuration
+        music = {'configured': False, 'tracks': 0, 'action': 'music',
+                 'requires_explicit_adoption': True}
+        try:
+            runtime = configuration(sdk_root)
+            tracks = json.loads(Path(runtime['catalog']).read_text())
+            music.update(configured=True, tracks=len(tracks), catalog=runtime['catalog'],
+                         catalogue_scope=runtime.get('catalogue_scope', 'local catalogue; popularity not verified'))
+        except (OSError, ValueError):
+            pass
+        capabilities['music_selection'] = music
     (workspace/'CAPABILITIES.json').write_text(json.dumps(capabilities,ensure_ascii=False,indent=2)+'\n')
     shutil.copy2(Path(__file__), workspace / 'starter.py')
     (workspace / 'owner').write_text('Pi editable starter / user-owned experiment; no generation launched by init.\n')

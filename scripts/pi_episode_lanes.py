@@ -69,9 +69,16 @@ class Controller:
         self.condition = threading.Condition(self.mutex)
         self.claimed = set()
         self.paused = set()
+        self.sdk_root = self.root / 'frozen-main'
+        if not self.sdk_root.is_dir():
+            self.sdk_root = Path(__file__).resolve().parents[1]
         self.runtime = self.root / 'frozen-tools-v2'
-        self.entry = self.root / 'frozen-main/scripts/pi_video_agent.py'
+        if not self.runtime.is_dir():
+            self.runtime = self.sdk_root / 'examples/pi-video-agent/template/tools'
+        self.entry = self.sdk_root / 'scripts/pi_video_agent.py'
         self.grant_entry = self.root / 'reviewer-code-snapshot-v2/scripts/pi_video_agent.py'
+        if not self.grant_entry.is_file():
+            self.grant_entry = self.entry
         self.python = PROJECT / 'runtime/python/bin/python'
         self.dependencies = PROJECT / 'runtime/pi/node_modules'
         self.reviews = None
