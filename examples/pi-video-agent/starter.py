@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict
 from datetime import datetime, timezone
 import fcntl
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -27,6 +28,11 @@ LANES = ('sd2.0-fast', 'sd2.0-mini', 'MiniMax-H3', 'FastH3-Omni')
 FIRST_FRAME_POLICIES = ('none', 'selective', 'required')
 INTERACTION_PAGE_POLICIES = ('required', 'none')
 H3_MODES = ('local', 'cloud')
+ROLES = ('producer', 'reviewer')
+# A reviewer judges one finished export; it keeps frame extraction, ASR and Eureka audio
+# perception, and the media entry refuses everything that would produce or publish media.
+REVIEWER_MEDIA_ACTIONS = ('inspect', 'audio')
+REVIEWER_SKILL_PATH = 'skills/episode-review'
 
 
 def _seed_assets(workspace, cache):
@@ -136,10 +142,159 @@ def _expose_previous(workspace, previous):
     return len(media)
 
 
+def _sha256(path):
+    digest = hashlib.sha256()
+    with Path(path).open('rb') as stream:
+        for block in iter(lambda: stream.read(1 << 20), b''):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _media_seconds(path):
+    """Container duration when ffprobe is available; the reviewer re-probes anyway."""
+    try:
+        out = subprocess.check_output(['ffprobe', '-v', 'error', '-show_entries',
+                                       'format=duration', '-of',
+                                       'default=noprint_wrappers=1:nokey=1', str(path)],
+                                      text=True, timeout=60).strip()
+        return float(out)
+    except (OSError, subprocess.SubprocessError, ValueError):
+        return None
+
+
+def _reviewer_task(film, digest, timeline=None, baseline=None, brief=None, film_duration=None):
+    """A reviewer task is complete on arrival: the export, its hash and what may be judged."""
+    film = Path(film).resolve()
+    lines = [
+        '# 独立审片任务',
+        '',
+        '你要判断的是下面这一份已经完成的成片。你不是本片创作者，产出是判断，不是成片。',
+        '',
+        '## 审看对象（只审这一个文件）',
+        '',
+        f'- 成片：`{film}`',
+        f'- SHA256：`{digest}`',
+        '- 审前用 `sha256sum` 复核；不一致就停止，并说明文件已变。判词只对上面这个哈希有效。',
+    ]
+    if timeline:
+        lines += [
+            f'- 剪辑时间表：`{Path(timeline).resolve()}`',
+            '  镜头号以时间表 `clips[].path`（如 `media/takes/s01a-v2.mp4` → s01a）为准，不要自己编号。',
+            '  尾卡段通常不在时间表内，按"选项页"描述即可。',
+        ]
+    if baseline:
+        lines += [
+            f'- 源剧本/基准：`{Path(baseline).resolve()}`',
+            '  用于核对台词、人物、事件顺序是否被破坏；基准是判断依据之一，不是逐字照搬的模板。',
+        ]
+    if timeline and film_duration:
+        lines += [
+            f'- 成片总长 `{float(film_duration):.2f}` 秒；时间表只覆盖正片。',
+            '  正片与尾卡的边界以时间表 `duration` 为准，尾卡按选项页描述，不要用正片镜头号称呼它。',
+        ]
+    lines += [
+        '',
+        '## 授权边界',
+        '',
+        brief or '本片在既有制作授权内完成；允许合理改编与取舍，不要把"和原文措辞不同"当成缺陷。',
+        '',
+        '## 判定标准',
+        '',
+        '- **只有影响观看的问题才拒绝**：观众会看错、看不懂、被破坏沉浸，或关键因果/人物/物件被混淆。',
+        '- 轻微瑕疵（个别镜头的服饰细节、轻微面部年龄感、构图偏好）写入建议，不阻塞通过。',
+        '- 合理改编不算偏离原文。',
+        '- 证据不足（没看到、没听到、工具失败）记为未完成，不得写成通过，也不得写成内容失败。',
+        '',
+        '## 严重程度与修复方是两件事',
+        '',
+        '- **严重程度**决定 verdict：有没有影响观看。',
+        '- **修复方**决定派给谁：本集能修，还是工具/系列层面才能修。',
+        '',
+        '两者独立。一条问题可以「严重」且「由工具修」——那这一版仍然 rejected，',
+        '只是修复落在工具维护者身上。**不要因为本集修不了就降级，也不要因为它是共享工具行为就自动升格。**',
+        '',
+        '| severity | 判据 | 后果 |',
+        '|---|---|---|',
+        '| `blocking` | 影响观看：会看错、看不懂、被破坏沉浸，或关键因果/人物/物件被混淆 | verdict=rejected |',
+        '| `advisory` | 轻微瑕疵，不影响观看 | 不影响 verdict |',
+        '',
+        '| owner | 判据 | 去向 |',
+        '|---|---|---|',
+        '| `episode` | 本集范围内可修（重拍、重剪、重混、改字幕） | 派回原导演 |',
+        '| `tool` | 由 `tools/` 里的共享脚本产生，换一集也会出现 | 交工具维护者 |',
+        '| `series` | 系列约定/固定规格造成 | 交维护者，与用户确认是否改约定 |',
+        '',
+        '改工具或改约定**不会改变已经导出的这一份 MP4**；判词只判当前这份文件，修复后是新导出、新哈希、需重审。',
+        '',
+        '## 怎么查（你自己决定）',
+        '',
+        '`tools/media.py` 的 `inspect` 抽帧（可给 times 与 max_side），`audio` 做音频感知（Eureka），',
+        '`tools/transcribe.py` 做 ASR。ffmpeg/ffprobe 可直接用。生成类动作在本角色被拒绝，你也用不到。',
+        '',
+        '建议：先全片每秒网格过一遍，再对可疑段加密抽帧，逐句核对台词与画面，',
+        '并确实取得完整音轨的声音证据（不是只看字幕文本）。',
+        '',
+        '**判词落盘优先于清理和补充查看。** 每次工具返回都带 `Run facts: n/限额`；证据足以支撑判断就',
+        '立刻写 `output/review.md` 与 `output/review.json`。剩余请求进入个位数后停止取证，全部用于写盘。',
+        '临时目录和中间帧不必清理。没覆盖到的秒数写进 coverage/limits 作为未确认范围即可，',
+        '不要用额度去换覆盖。硬停会让判词一个字都留不下。',
+        '',
+        '**覆盖声明要按实际证据写**：Eureka 按窗口（写实际合并区间与未覆盖秒数）、ASR 是否整轨、',
+        '电平测量是否整轨，三类分开写，不能合并成一句「覆盖完整音轨」。',
+        '',
+        '**基频（F0）不是说话人识别器**：F0 同档不能证明同一说话人，也不能单独排除男声替换。',
+        '要判断身份或替换需要声纹级比较；没做就写进 limits 作为未确认范围，不要拿 F0 当通过证明。',
+        '',
+        '## 产出',
+        '',
+        '在 `output/` 写两份，内容一致：',
+        '',
+        '- `review.md`：给人看的判断。',
+        '- `review.json`：机器可读，至少包含 film、sha256、verdict、findings、coverage、limits。',
+        '  `findings` 每条带 `severity`（blocking/advisory）与 `owner`（episode/tool/series）。',
+        '',
+        '`verdict` 只能是 `accepted` / `rejected` / `incomplete`，由有没有 `severity=blocking` 决定，',
+        '与 `owner` 无关。每条 findings 要能定位（镜头号或秒数）、说明现象、给出证据；',
+        '`blocking` 还要写清对观看的影响。不要另外输出 `blocking` / `advisory` 顶层数组。',
+        '',
+        '## 不要做',
+        '',
+        '- 不要读生产方的 `self-review.md`、`delivery.json` 结论、`production.log`、`events.jsonl`、`inspection/`。',
+        '  只依据成片本身、上面的基准材料，以及你自己的抽帧与声音证据。',
+        '- 不冒充人耳听审。ASR 和 Eureka 是证据，不是听审。',
+        '- 不改剧本、不改剪辑、不重拍。发现的问题交给导演。',
+    ]
+    return '\n'.join(lines) + '\n'
+
+
 def initialize(workspace, sdk_root, dependencies, inputs=None, skills=None, previous=None, asset_cache=None,
                lane=None, first_frame='selective', interaction_page='required', h3_mode='local',
-               wall_seconds=14400, max_model_requests=256, viewpoint='auto', fasth3_endpoint=None):
+               wall_seconds=14400, max_model_requests=256, viewpoint='auto', fasth3_endpoint=None,
+               role='producer', review_film=None, review_timeline=None, review_baseline=None,
+               review_brief=None, task=None, task_file=None):
     workspace, sdk_root = Path(workspace).resolve(), Path(sdk_root).resolve()
+    if task is not None and task_file is not None:
+        raise ValueError('give task or task_file, not both')
+    if task_file is not None:
+        task = Path(task_file).read_text(encoding='utf-8')
+    if task is not None and not _task_is_authorised(task):
+        raise ValueError('task text is still the blank template; write the authorised task')
+    if role not in ROLES:
+        raise ValueError(f'role must be one of {ROLES}, got {role!r}')
+    if role == 'reviewer':
+        if not review_film:
+            raise ValueError('role=reviewer requires a finished export (--review-film)')
+        if not Path(review_film).is_file():
+            raise ValueError(f'review target is not a file: {review_film}')
+        if lane is not None:
+            raise ValueError('role=reviewer cannot pin a video lane; it produces no media')
+        if review_timeline and not Path(review_timeline).is_file():
+            raise ValueError(f'review timeline is not a file: {review_timeline}')
+        if review_baseline and not Path(review_baseline).is_file():
+            raise ValueError(f'review baseline is not a file: {review_baseline}')
+    if role == 'producer' and any(v is not None for v in
+                                  (review_film, review_timeline, review_baseline, review_brief)):
+        raise ValueError('review_* options belong to role=reviewer only')
     viewpoint_instruction = VIEWPOINTS[viewpoint]
     sys.path.insert(0, str(sdk_root / 'src'))
     from novel_manga.providers.fast_h3 import normalize_endpoint
@@ -154,20 +309,40 @@ def initialize(workspace, sdk_root, dependencies, inputs=None, skills=None, prev
     template = Path(__file__).resolve().parent / 'template'
     shutil.copytree(template, workspace, dirs_exist_ok=True, ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
     (workspace / 'tools/node_modules').symlink_to(Path(dependencies).resolve(), target_is_directory=True)
-    target = workspace / 'skills/episode-production'
-    shutil.copytree(skills or sdk_root / 'skills/episode-production', target)
-    (target / 'host-workflow-background.md').write_text((target / 'SKILL.md').read_text())
-    extra = template / 'skill-extra'
-    if extra.is_dir():
-        shutil.copytree(extra, target, dirs_exist_ok=True)
-    (target / 'SKILL.md').write_text((workspace / 'SKILL.md').read_text())
-    (workspace / 'SKILL.md').unlink()
+    if role == 'reviewer':
+        # Reviewer gets its own system prompt and skill; the producer skill is not installed.
+        (workspace / 'SYSTEM.md').write_text(
+            (template / 'REVIEWER-SYSTEM.md').read_text(encoding='utf-8'), encoding='utf-8')
+        target = workspace / REVIEWER_SKILL_PATH
+        shutil.copytree(template / 'reviewer-skill', target, dirs_exist_ok=True)
+        if (workspace / 'skills/episode-production').exists():
+            shutil.rmtree(workspace / 'skills/episode-production')
+        # The producer SKILL.md is the top-level copy that becomes the producer skill body.
+        (workspace / 'SKILL.md').unlink()
+        # Drop template-only leftovers: the reviewer must not read producer craft references,
+        # and a second copy of the review skill would shadow the installed one.
+        for leftover in ('REVIEWER-SYSTEM.md', 'reviewer-skill', 'skill-extra'):
+            path = workspace / leftover
+            if path.is_dir():
+                shutil.rmtree(path)
+            elif path.exists():
+                path.unlink()
+    else:
+        target = workspace / 'skills/episode-production'
+        shutil.copytree(skills or sdk_root / 'skills/episode-production', target)
+        (target / 'host-workflow-background.md').write_text((target / 'SKILL.md').read_text())
+        extra = template / 'skill-extra'
+        if extra.is_dir():
+            shutil.copytree(extra, target, dirs_exist_ok=True)
+        (target / 'SKILL.md').write_text((workspace / 'SKILL.md').read_text())
+        (workspace / 'SKILL.md').unlink()
     sys.path.insert(0, str(sdk_root / 'src'))
     from novel_manga.util import load_dotenv
     load_dotenv(sdk_root / '.env')
     from novel_manga.planning.methods import METHODS
-    (target / 'creation-methods.json').write_text(json.dumps(
-        [asdict(method) for method in METHODS.values()], ensure_ascii=False, indent=2) + '\n')
+    if role == 'producer':
+        (target / 'creation-methods.json').write_text(json.dumps(
+            [asdict(method) for method in METHODS.values()], ensure_ascii=False, indent=2) + '\n')
     if inputs:
         shutil.copytree(Path(inputs).resolve(), workspace / 'input')
     else:
@@ -194,27 +369,45 @@ def initialize(workspace, sdk_root, dependencies, inputs=None, skills=None, prev
               'first_frame_policy': first_frame,
               'interaction_page': interaction_page,
               'h3_mode': h3_mode, 'viewpoint': viewpoint,
-              'max_request_bytes': 10485760, 'keep_recent_images': 4}
+              'max_request_bytes': 10485760, 'keep_recent_images': 4,
+              # A native bash call without an explicit timeout gets this bound; the runtime also
+              # caps any timeout at the wall clock this run has left (see bash_limits.mjs).
+              'bash_timeout_seconds': int(os.getenv('PI_BASH_TIMEOUT_SECONDS', '900') or 900)}
+    if role == 'reviewer':
+        config.update({'media_actions': list(REVIEWER_MEDIA_ACTIONS),
+                       'skill_path': REVIEWER_SKILL_PATH,
+                       'media_lane': '', 'first_frame_policy': 'none'})
     (workspace / 'local.json').write_text(json.dumps(config, indent=2) + '\n')
-    (workspace / 'PRODUCTION.md').write_text(
-        '# 生产选项（启动时由用户选择）\n\n'
-        f'- 视频路线：{lane or "未锁定（agent 可自行选择）"}\n'
-        f'- 首帧策略：{first_frame}\n'
-        f'- 片尾选项页：{interaction_page}\n'
-        f'- H3 模式：{h3_mode}\n\n'
-        '路线、首帧、片尾选项页和 H3 模式是用户选项，不由 agent 自行切换；'
-        '`tools/media.py` 会拒绝与路线/首帧策略不符的请求。\n'
-        '- `none`：不允许首帧；`selective`：由 agent 决定哪些镜头需要首帧；`required`：每个视频请求都必须带首帧。\n'
-        '- 路线 `sd2.0-fast`、`sd2.0-mini` 只接受 `action=video`；路线 `MiniMax-H3` 只接受 `action=h3`；'
-        '路线 `FastH3-Omni` 只接受 `action=fasth3`。\n'
-        '- `FastH3-Omni` 只使用普通 reference，不支持显式 first_frame；required 与其不兼容，selective 不等于 keyframe 已验证。\n'
-        '- `sd2.0-fast` 是 720P；`sd2.0-mini` 是约 480P（样片 864×496，竖屏约 496×864）。\n'
-        '- `interaction_page=required`：成片最后必须用 `tools/interaction.py` 追加一个正好 3 秒的 A/B/C 选项页，'
-        '并保持到最后一帧；`none`：不做独立选项页。\n'
-        '- `h3_mode=local`：H3 走本地池；`h3_mode=cloud`：H3 走 PhanRouter 云端（768×1344/24fps，共享图片 key 配额）。\n'
-        f'\n## 视角选择：{viewpoint}\n\n{viewpoint_instruction}\n\n'
-        '视角是交给创作 Agent 的拍法要求，遵循人类 TASK 和后续明确要求；启动选项不覆盖它们。\n'
-    )
+    if role == 'reviewer':
+        (workspace / 'PRODUCTION.md').write_text(
+            '# 审片模式（启动时确定）\n\n'
+            '- 角色：独立审片人。产出是判断，不是成片。\n'
+            f'- 允许的媒体动作：{", ".join(REVIEWER_MEDIA_ACTIONS)}（抽帧、音频感知）。\n'
+            '- 生成/上传类动作在 `tools/media.py` 入口被拒绝；本任务不需要它们。\n'
+            '- 判定只对 TASK.md 里那个 SHA256 对应的导出生效；文件变了就重审。\n'
+            '- 只有影响观看的问题才拒绝；轻微瑕疵写建议；证据不足写未完成。\n'
+            '- 不读生产方的自审、日志与结论，不冒充人耳听审。\n'
+        )
+    else:
+        (workspace / 'PRODUCTION.md').write_text(
+            '# 生产选项（启动时由用户选择）\n\n'
+            f'- 视频路线：{lane or "未锁定（agent 可自行选择）"}\n'
+            f'- 首帧策略：{first_frame}\n'
+            f'- 片尾选项页：{interaction_page}\n'
+            f'- H3 模式：{h3_mode}\n\n'
+            '路线、首帧、片尾选项页和 H3 模式是用户选项，不由 agent 自行切换；'
+            '`tools/media.py` 会拒绝与路线/首帧策略不符的请求。\n'
+            '- `none`：不允许首帧；`selective`：由 agent 决定哪些镜头需要首帧；`required`：每个视频请求都必须带首帧。\n'
+            '- 路线 `sd2.0-fast`、`sd2.0-mini` 只接受 `action=video`；路线 `MiniMax-H3` 只接受 `action=h3`；'
+            '路线 `FastH3-Omni` 只接受 `action=fasth3`。\n'
+            '- `FastH3-Omni` 只使用普通 reference，不支持显式 first_frame；required 与其不兼容，selective 不等于 keyframe 已验证。\n'
+            '- `sd2.0-fast` 是 720P；`sd2.0-mini` 是约 480P（样片 864×496，竖屏约 496×864）。\n'
+            '- `interaction_page=required`：成片最后必须用 `tools/interaction.py` 追加一个正好 3 秒的 A/B/C 选项页，'
+            '并保持到最后一帧；`none`：不做独立选项页。\n'
+            '- `h3_mode=local`：H3 走本地池；`h3_mode=cloud`：H3 走 PhanRouter 云端（768×1344/24fps，共享图片 key 配额）。\n'
+            f'\n## 视角选择：{viewpoint}\n\n{viewpoint_instruction}\n\n'
+            '视角是交给创作 Agent 的拍法要求，遵循人类 TASK 和后续明确要求；启动选项不覆盖它们。\n'
+        )
     capabilities={'python':sys.executable,'sdk_root':str(sdk_root),
         'image_model':'gpt-image-2','video_models':['sd2.0-fast','sd2.0-mini','MiniMax-H3'],
         'h3_endpoint':'pool:'+str(sdk_root/'configs/h3_pool.json'),
@@ -231,14 +424,82 @@ def initialize(workspace, sdk_root, dependencies, inputs=None, skills=None, prev
     (workspace/'CAPABILITIES.json').write_text(json.dumps(capabilities,ensure_ascii=False,indent=2)+'\n')
     shutil.copy2(Path(__file__), workspace / 'starter.py')
     (workspace / 'owner').write_text('Pi editable starter / user-owned experiment; no generation launched by init.\n')
+    if role == 'reviewer':
+        # The reviewer task is complete on arrival: target, hash, baseline and judging boundary.
+        if review_baseline:
+            baseline_src = Path(review_baseline).resolve()
+            baseline_copy = workspace / 'input' / f'review-baseline{baseline_src.suffix or ".md"}'
+            shutil.copy2(baseline_src, baseline_copy)
+            review_baseline = baseline_copy
+        (workspace / 'TASK.md').write_text(
+            _reviewer_task(review_film, _sha256(review_film), review_timeline,
+                           review_baseline, review_brief, _media_seconds(review_film)),
+            encoding='utf-8')
+        (workspace / 'owner').write_text(
+            'Pi reviewer workspace; judges one finished export only, produces no media.\n')
+    elif task is not None:
+        (workspace / 'TASK.md').write_text(task.rstrip() + '\n', encoding='utf-8')
     return workspace
+
+
+def _task_is_authorised(text):
+    """A TASK is usable once it is no longer the shipped blank template."""
+    text = (text or '').strip()
+    return bool(text) and not text.startswith('# 待填写的制作任务') and '尚未授权付费生成' not in text
+
+
+def _consume_window_grant(workspace, budget_path, deadline):
+    """User-authorized renewal of an exhausted wall window, consumed exactly once.
+
+    `window-grant.json` in the workspace: {"seconds": N, "authorized_by": "...", "reason": "..."}.
+    A grant only extends time; the request limit is never raised. Reusing the same file after it
+    has `consumed_at` is a no-op, so a repeated --resume cannot mint extra time.
+    """
+    grant_path = workspace / 'window-grant.json'
+    if not grant_path.is_file():
+        return deadline
+    lock_path = workspace / 'window-grant.lock'
+    with lock_path.open('a') as handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        try:
+            grant = json.loads(grant_path.read_text(encoding='utf-8'))
+        except (OSError, ValueError):
+            return deadline
+        if grant.get('consumed_at'):
+            return deadline
+        try:
+            seconds = int(grant.get('seconds') or 0)
+        except (TypeError, ValueError):
+            return deadline
+        if seconds <= 0:
+            raise ValueError(f'window-grant.json needs a positive seconds value, got {grant.get("seconds")!r}')
+        if not str(grant.get('authorized_by') or '').strip():
+            raise ValueError('window-grant.json needs authorized_by (who approved the renewal)')
+        grant['consumed_at'] = datetime.now(timezone.utc).astimezone().isoformat()
+        grant['applied_to_budget'] = str(budget_path)
+        grant['previous_deadline_at'] = deadline
+        budget_path.parent.mkdir(parents=True, exist_ok=True)
+        _atomic_write_json(grant_path, grant)
+        deadline = max(deadline, time.time()) + seconds
+        if budget_path.is_file():
+            budget = json.loads(budget_path.read_text(encoding='utf-8'))
+            budget['deadline_at'] = deadline * 1000
+            budget['window_grants'] = list(budget.get('window_grants') or []) + [{
+                'seconds': seconds,
+                'authorized_by': grant.get('authorized_by'),
+                'reason': grant.get('reason'),
+                'consumed_at': grant['consumed_at'],
+            }]
+            budget['ended_at'] = None
+            _atomic_write_json(budget_path, budget)
+    print(f'[window-grant] +{seconds}s by {grant.get("authorized_by", "authorized user")}', flush=True)
+    return deadline
 
 
 def run(workspace, endpoint=None, resume=False, prompt=None):
     workspace = Path(workspace).resolve()
     config = json.loads((workspace / 'local.json').read_text())
-    task_text = (workspace / 'TASK.md').read_text(encoding='utf-8').strip()
-    if not task_text or task_text.startswith('# 待填写的制作任务') or '尚未授权付费生成' in task_text:
+    if not _task_is_authorised((workspace / 'TASK.md').read_text(encoding='utf-8')):
         raise ValueError('Fill the workspace TASK.md with the authorized task before run.')
     for name in ('wall_seconds', 'max_model_requests'):
         if type(config.get(name)) is not int or config[name] <= 0:
@@ -254,6 +515,7 @@ def run(workspace, endpoint=None, resume=False, prompt=None):
         env['NOVEL_ASSET_PUBLISH_DIR'] = config['novel_asset_publish_dir']
     previous_budget = workspace / 'run-budget.json'
     deadline = json.loads(previous_budget.read_text())['deadline_at'] / 1000 if previous_budget.exists() else time.time() + config.get('wall_seconds',14400)
+    deadline = _consume_window_grant(workspace, previous_budget, deadline)
     env['PI_DEADLINE_EPOCH'] = str(deadline)
     if endpoint:
         from novel_manga.llm.config import endpoint_settings
@@ -413,9 +675,29 @@ def run_batch(manifest):
             'max_model_requests': max_model_requests,
             'viewpoint': viewpoint,
             'fasth3_endpoint': fasth3_endpoint,
+            'task': item.get('task'),
+            'task_file': item.get('task_file'),
         }
         validated.append({'item': item, 'workspace': workspace, 'resume': resume,
                           'index': idx, 'init_kwargs': init_kwargs})
+
+    # A fresh episode is initialized from the blank template and run immediately, and run()
+    # refuses that template. Without a task the batch could only fail after creating a workspace
+    # it cannot start, so stop before any init side effect. Checked last so that specific
+    # manifest errors (workers, overlap, resume, lane, ...) keep their existing priority.
+    for v in validated:
+        if v['resume']:
+            continue
+        item, idx = v['item'], v['index']
+        task_text = item.get('task')
+        if task_text is None and item.get('task_file'):
+            task_text = Path(item['task_file']).read_text(encoding='utf-8')
+        if task_text is None:
+            raise ValueError(
+                f'episode {idx} needs task or task_file: init leaves a blank TASK.md and run() '
+                'refuses it, so a fresh batch episode would never start')
+        if not _task_is_authorised(task_text):
+            raise ValueError(f'episode {idx} task is still the blank template')
 
     with _batch_lock(manifest):
         state_path = manifest.with_name('batch-state.json')
@@ -519,6 +801,19 @@ def main():
     init.add_argument('--max-model-requests', type=int, default=256)
     init.add_argument('--viewpoint', choices=tuple(VIEWPOINTS), default='auto',
                       help='Camera viewpoint: first-person throughout, mixed by scene, or director-selected (default)')
+    init.add_argument('--role', choices=ROLES, default='producer',
+                      help='producer builds an episode; reviewer judges one finished export and produces no media')
+    init.add_argument('--review-film', type=Path,
+                      help='role=reviewer: the exact finished export to judge; its sha256 is frozen into TASK.md')
+    init.add_argument('--review-timeline', type=Path,
+                      help='role=reviewer: assemble.py timeline json; shot ids come from clips[].path')
+    init.add_argument('--review-baseline', type=Path,
+                      help='role=reviewer: source script or baseline the film is judged against')
+    init.add_argument('--review-brief',
+                      help='role=reviewer: current authorization (what may be adapted) and what still blocks')
+    init.add_argument('--task-file', type=Path,
+                      help='role=producer: authorized task text written into TASK.md at init, '
+                           'so the workspace is runnable without a manual edit')
     launch = sub.add_parser('run')
     launch.add_argument('workspace', type=Path)
     launch.add_argument('--endpoint')
@@ -534,7 +829,12 @@ def main():
                          lane=args.lane, first_frame=args.first_frame,
                          interaction_page=args.interaction_page, h3_mode=args.h3_mode,
                          wall_seconds=args.wall_seconds, max_model_requests=args.max_model_requests,
-                         viewpoint=args.viewpoint, fasth3_endpoint=args.fasth3_endpoint))
+                         viewpoint=args.viewpoint, fasth3_endpoint=args.fasth3_endpoint,
+                         role=args.role, review_film=args.review_film,
+                         review_timeline=args.review_timeline,
+                         review_baseline=args.review_baseline,
+                         review_brief=args.review_brief,
+                         task_file=args.task_file))
     elif args.command == 'run':
         raise SystemExit(run(args.workspace, args.endpoint, args.resume, args.prompt))
     else:

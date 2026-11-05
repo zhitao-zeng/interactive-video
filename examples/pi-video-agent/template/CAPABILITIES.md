@@ -14,4 +14,12 @@
 
 参考素材的公开目录已经配置；需要排障时先看 CAPABILITIES.json 和实际 HTTP 错误。请求会由客户端读取凭据，不要把密钥打印到命令输出或写入制作稿。
 
-耗时命令可给原生 bash 足够的 timeout；不要为等自己的 ffmpeg 写 pgrep/sleep 轮询。直接等待当前子进程或使用 batch.py。报告文件不表示内容已验收。
+耗时命令可给原生 bash 足够的 timeout；不给 timeout 的命令会按本 run 剩余墙钟被限制在一个有限默认值
+（本批 900 秒），显式 timeout 也会被压到不超剩余墙钟。所以长操作要自己写明需要多久；
+不要为等自己的 ffmpeg 写 pgrep/sleep 轮询。直接等待当前子进程或使用 batch.py。报告文件不表示内容已验收。
+
+**音乐未配置时怎么做。** 若 `music_selection` 明确报 `SoulTuner runtime is not configured`
+或本地目录缺失，就**跳过 BGM 继续交付**：用原生对白、现场声和你已有的音频证据完成混音。
+不要全盘 `find` 找 music-selection、不要猜环境路径、不要安装任何东西、不要为此重启服务——
+一次明确错误就是结论。没有 BGM 不是交付阻塞项，在 self-review 里如实写明"未使用配乐"即可。
+若本集能力说明另有说明（例如本批统一不带配乐），以本集说明为准。

@@ -548,6 +548,9 @@ def test_init_records_explicit_budget(tmp_path):
     assert config['max_model_requests'] == 7
 
 
+AUTHORISED_TASK = '离线批次测试任务：使用模拟模型和媒体，不授权真实生产。'
+
+
 def test_batch_initializes_and_runs_episodes(tmp_path, monkeypatch):
     calls = []
 
@@ -566,7 +569,7 @@ def test_batch_initializes_and_runs_episodes(tmp_path, monkeypatch):
     (tmp_path / 'second').mkdir()
     manifest = tmp_path / 'batch.json'
     manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'episodes': [
-        {'workspace': str(tmp_path / 'first'), 'endpoint': 'test'},
+        {'workspace': str(tmp_path / 'first'), 'endpoint': 'test', 'task': AUTHORISED_TASK},
         {'workspace': str(tmp_path / 'second'), 'endpoint': 'test', 'resume': True},
     ]}))
     result = starter.run_batch(manifest)
@@ -776,7 +779,7 @@ def test_fasth3_batch_passes_explicit_endpoint(tmp_path, monkeypatch):
     manifest = tmp_path / 'batch.json'
     manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS,
         'fasth3_endpoint': 'http://127.0.0.1:30027',
-        'episodes': [{'workspace': str(tmp_path / 'episode'), 'lane': 'FastH3-Omni'}]}))
+        'episodes': [{'workspace': str(tmp_path / 'episode'), 'lane': 'FastH3-Omni', 'task': AUTHORISED_TASK}]}))
     assert starter.run_batch(manifest)['ok'] is True
     assert captured['fasth3_endpoint'] == 'http://127.0.0.1:30027'
 
@@ -839,8 +842,8 @@ def test_batch_runs_episodes_in_parallel(tmp_path, monkeypatch):
     monkeypatch.setattr(starter, 'run', fake_run)
     manifest = tmp_path / 'batch.json'
     manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'workers': 2,
-        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test'},
-                     {'workspace': str(tmp_path / 'b'), 'endpoint': 'test'}]}))
+        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test', 'task': AUTHORISED_TASK},
+                     {'workspace': str(tmp_path / 'b'), 'endpoint': 'test', 'task': AUTHORISED_TASK}]}))
     result = starter.run_batch(manifest)
     assert [row['returncode'] for row in result['episodes']] == [0, 0]
     starts = {name for kind, name in events if kind == 'start'}
@@ -867,8 +870,8 @@ def test_batch_results_stay_in_manifest_order_and_failure_does_not_block(tmp_pat
     monkeypatch.setattr(starter, 'run', fake_run)
     manifest = tmp_path / 'batch.json'
     manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'workers': 2,
-        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test'},
-                     {'workspace': str(tmp_path / 'b'), 'endpoint': 'test'}]}))
+        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test', 'task': AUTHORISED_TASK},
+                     {'workspace': str(tmp_path / 'b'), 'endpoint': 'test', 'task': AUTHORISED_TASK}]}))
     result = starter.run_batch(manifest)
     assert [row['workspace'] for row in result['episodes']] == [str(tmp_path / 'a'), str(tmp_path / 'b')]
     assert [row['returncode'] for row in result['episodes']] == [1, 0]
@@ -895,8 +898,8 @@ def test_batch_state_updated_when_single_episode_finishes(tmp_path, monkeypatch)
     monkeypatch.setattr(starter, 'run', fake_run)
     manifest = tmp_path / 'batch.json'
     manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'workers': 2,
-        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test'},
-                     {'workspace': str(tmp_path / 'b'), 'endpoint': 'test'}]}))
+        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test', 'task': AUTHORISED_TASK},
+                     {'workspace': str(tmp_path / 'b'), 'endpoint': 'test', 'task': AUTHORISED_TASK}]}))
     state_path = manifest.parent / 'batch-state.json'
 
     def target():
@@ -937,7 +940,7 @@ def test_batch_pre_check_errors_never_call_run(tmp_path, monkeypatch):
     monkeypatch.setattr(starter, 'initialize', fake_init)
     monkeypatch.setattr(starter, 'run', fake_run)
     base = {'sdk_root': str(SDK), 'dependencies': DEPS,
-            'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test'}]}
+            'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'task': AUTHORISED_TASK}]}
     cases = [
         ({**base, 'workers': 0}, 'workers'),
         ({**base, 'workers': -2}, 'workers'),
@@ -951,10 +954,10 @@ def test_batch_pre_check_errors_never_call_run(tmp_path, monkeypatch):
          'Cannot resume'),
         ({**base, 'episodes': [{'endpoint': 'test'}]}, 'missing workspace'),
         ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'resume': 'false'}]}, 'boolean'),
-        ({'dependencies': DEPS, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test'}]}, 'missing sdk_root'),
-        ({'sdk_root': str(SDK), 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test'}]}, 'missing dependencies'),
+        ({'dependencies': DEPS, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'task': AUTHORISED_TASK}]}, 'missing sdk_root'),
+        ({'sdk_root': str(SDK), 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'task': AUTHORISED_TASK}]}, 'missing dependencies'),
         ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'lane': 'unknown'}]}, 'invalid lane'),
-        ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'first_frame': 'all'}]}, 'invalid first_frame'),
+        ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'task': AUTHORISED_TASK, 'first_frame': 'all'}]}, 'invalid first_frame'),
         ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'interaction_page': 'optional'}]}, 'invalid interaction_page'),
         ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'h3_mode': 'hybrid'}]}, 'invalid h3_mode'),
         ({**base, 'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'viewpoint': 'third-person'}]}, 'invalid viewpoint'),
@@ -987,7 +990,7 @@ def test_batch_invalid_second_episode_prevents_all_init_and_run(tmp_path, monkey
     monkeypatch.setattr(starter, 'run', fake_run)
     manifest = tmp_path / 'batch.json'
     manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'workers': 2,
-        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test'},
+        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test', 'task': AUTHORISED_TASK},
                      {'workspace': str(tmp_path / 'b'), 'endpoint': 'test', 'lane': 'unknown'}]}))
     with pytest.raises(ValueError, match='invalid lane'):
         starter.run_batch(manifest)
@@ -1012,8 +1015,8 @@ def test_batch_run_exception_does_not_block_other_episode(tmp_path, monkeypatch)
     monkeypatch.setattr(starter, 'run', fake_run)
     manifest = tmp_path / 'batch.json'
     manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'workers': 2,
-        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test'},
-                     {'workspace': str(tmp_path / 'b'), 'endpoint': 'test'}]}))
+        'episodes': [{'workspace': str(tmp_path / 'a'), 'endpoint': 'test', 'task': AUTHORISED_TASK},
+                     {'workspace': str(tmp_path / 'b'), 'endpoint': 'test', 'task': AUTHORISED_TASK}]}))
     result = starter.run_batch(manifest)
     assert [row['returncode'] for row in result['episodes']] == [2, 0]
     assert result['episodes'][0]['error'] == 'RuntimeError: simulated run crash'
@@ -1032,7 +1035,7 @@ def test_batch_directory_lock_rejects_concurrent_batch(tmp_path, monkeypatch):
     monkeypatch.setattr(starter, 'run', fake_run)
     manifest = tmp_path / 'batch.json'
     manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS,
-        'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test'}]}))
+        'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'task': AUTHORISED_TASK}]}))
     lock_path = manifest.with_name('batch-state.lock')
     fd = os.open(str(lock_path), os.O_CREAT | os.O_RDWR)
     try:
@@ -1054,9 +1057,9 @@ def test_batch_default_workers_equals_episode_count(tmp_path, monkeypatch):
     monkeypatch.setattr(starter, 'run', lambda *args, **kwargs: 0)
     manifest = tmp_path / 'batch.json'
     manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'episodes': [
-        {'workspace': str(tmp_path / 'a'), 'endpoint': 'test'},
-        {'workspace': str(tmp_path / 'b'), 'endpoint': 'test'},
-        {'workspace': str(tmp_path / 'c'), 'endpoint': 'test'},
+        {'workspace': str(tmp_path / 'a'), 'endpoint': 'test', 'task': AUTHORISED_TASK},
+        {'workspace': str(tmp_path / 'b'), 'endpoint': 'test', 'task': AUTHORISED_TASK},
+        {'workspace': str(tmp_path / 'c'), 'endpoint': 'test', 'task': AUTHORISED_TASK},
     ]}))
     result = starter.run_batch(manifest)
     assert result['workers'] == 3
@@ -1081,8 +1084,8 @@ def test_batch_init_failure_keeps_error_and_does_not_run_that_episode(tmp_path, 
     monkeypatch.setattr(starter, 'run', fake_run)
     manifest = tmp_path / 'batch.json'
     manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS, 'workers': 2,
-        'episodes': [{'workspace': str(tmp_path / 'bad'), 'endpoint': 'test'},
-                     {'workspace': str(tmp_path / 'ok'), 'endpoint': 'test'}]}))
+        'episodes': [{'workspace': str(tmp_path / 'bad'), 'endpoint': 'test', 'task': AUTHORISED_TASK},
+                     {'workspace': str(tmp_path / 'ok'), 'endpoint': 'test', 'task': AUTHORISED_TASK}]}))
     result = starter.run_batch(manifest)
     assert calls == [('init', 'ok'), ('run', 'ok')]
     assert result['episodes'][0]['returncode'] == 2
@@ -1092,3 +1095,276 @@ def test_batch_init_failure_keeps_error_and_does_not_run_that_episode(tmp_path, 
     assert state['episodes'][0]['returncode'] == 2
     assert state['episodes'][0]['error'] == 'RuntimeError: simulated init failure'
     assert state['episodes'][1]['returncode'] == 0
+
+
+def _fake_film(tmp_path, name='film-v1.mp4'):
+    film = tmp_path / name
+    film.write_bytes(b'finished-export-bytes')
+    return film
+
+
+def test_reviewer_role_installs_review_skill_and_task(tmp_path):
+    if not DEPS:
+        pytest.skip('Set PI_STARTER_NODE_MODULES to existing Pi dependencies; no install is performed.')
+    film = _fake_film(tmp_path)
+    timeline = tmp_path / 'film-v1.mp4.timeline.json'
+    timeline.write_text(json.dumps({'duration': 12.0, 'fps': 25, 'clips': [
+        {'path': 'media/takes/s01a-v2.mp4', 'start': 0.0, 'end': 6.0}]}))
+    baseline = tmp_path / 'script.md'
+    baseline.write_text('# 源剧本\n\n一句台词。\n')
+    work = starter.initialize(tmp_path / 'rev', SDK, DEPS, role='reviewer',
+                              review_film=film, review_timeline=timeline,
+                              review_baseline=baseline, review_brief='允许合理改编；只有影响观看才拒绝。')
+    # Reviewer system prompt and skill, and no producer skill.
+    assert '独立审片人' in (work / 'SYSTEM.md').read_text()
+    assert (work / 'skills/episode-review/SKILL.md').is_file()
+    assert not (work / 'skills/episode-production').exists()
+    assert not (work / 'SKILL.md').exists()
+    # local.json narrows the media entry and points the loader at the review skill.
+    config = json.loads((work / 'local.json').read_text())
+    assert config['media_actions'] == ['inspect', 'audio']
+    # Untimed bash calls are bounded; the value is frozen at init so a resume cannot drift.
+    assert config['bash_timeout_seconds'] == 900
+    assert config['skill_path'] == 'skills/episode-review'
+    assert config['media_lane'] == ''
+    assert config['first_frame_policy'] == 'none'
+    # TASK.md is complete on arrival, so run() accepts it without manual editing.
+    task = (work / 'TASK.md').read_text()
+    assert str(film.resolve()) in task
+    assert starter._sha256(film) in task
+    assert 's01a' in task                      # shot id source is the timeline
+    assert '允许合理改编' in task                 # authorization travels with the task
+    assert not task.startswith('# 待填写的制作任务')
+    assert '尚未授权付费生成' not in task
+    # Baseline is copied into the reviewer's own input, not read from the producer tree.
+    assert (work / 'input/review-baseline.md').read_text() == baseline.read_text()
+
+
+def test_reviewer_role_rejects_production_options(tmp_path):
+    film = _fake_film(tmp_path)
+    with pytest.raises(ValueError):
+        starter.initialize(tmp_path / 'r1', SDK, DEPS, role='reviewer')
+    with pytest.raises(ValueError):
+        starter.initialize(tmp_path / 'r2', SDK, DEPS, role='reviewer',
+                           review_film=film, lane='FastH3-Omni')
+    with pytest.raises(ValueError):
+        starter.initialize(tmp_path / 'r3', SDK, DEPS, role='reviewer',
+                           review_film=tmp_path / 'missing.mp4')
+    with pytest.raises(ValueError):
+        starter.initialize(tmp_path / 'r4', SDK, DEPS, role='reviewer',
+                           review_film=film, review_timeline=tmp_path / 'missing.json')
+    with pytest.raises(ValueError):
+        starter.initialize(tmp_path / 'r5', SDK, DEPS, role='producer', review_film=film)
+    with pytest.raises(ValueError):
+        starter.initialize(tmp_path / 'r6', SDK, DEPS, role='nonsense', review_film=film)
+
+
+def test_reviewer_media_entry_refuses_generation_actions(tmp_path):
+    if not DEPS:
+        pytest.skip('Set PI_STARTER_NODE_MODULES to existing Pi dependencies; no install is performed.')
+    film = _fake_film(tmp_path)
+    work = starter.initialize(tmp_path / 'rev', SDK, DEPS, role='reviewer', review_film=film)
+    media = module_at('review_media', work / 'tools/media.py')
+    for action in ('image', 'video', 'h3', 'fasth3', 'upload'):
+        with pytest.raises(ValueError, match='media_actions'):
+            media.execute({'action': action})
+
+
+def test_reviewer_native_launch_loads_system_task_and_review_skill(tmp_path):
+    """Offline: the reviewer really loads REVIEWER-SYSTEM, its TASK and episode-review.
+
+    The three install-only tests above prove file placement and entry refusal. This one runs the
+    native Pi session against a fake SSE server and inspects the first request body, so a broken
+    skill path or a TASK that never reaches the model would fail here.
+    """
+    if not DEPS:
+        pytest.skip('Set PI_STARTER_NODE_MODULES to existing Pi dependencies; no install is performed.')
+    film = tmp_path / 'film-v1.mp4'
+    subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-f', 'lavfi', '-i',
+                    'color=c=navy:s=64x96:d=2', '-f', 'lavfi', '-i', 'anullsrc=r=48000:cl=mono',
+                    '-shortest', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-c:a', 'aac',
+                    str(film)], check=True, timeout=120)
+    timeline = tmp_path / 'film-v1.mp4.timeline.json'
+    timeline.write_text(json.dumps({'duration': 2.0, 'fps': 25, 'clips': [
+        {'path': 'media/takes/s01a-v2.mp4', 'start': 0.0, 'end': 1.5}]}))
+    baseline = tmp_path / '02-script.json'
+    baseline.write_text(json.dumps({'flow': [{'speaker': '知遥', 'line': '一句台词。'}]},
+                                   ensure_ascii=False))
+    work = starter.initialize(
+        tmp_path / 'rev', SDK, DEPS, role='reviewer', review_film=film,
+        review_timeline=timeline, review_baseline=baseline,
+        review_brief='本轮 46 句对白逐字保留、9 场事件与因果不改；固定 A/B/C 选项。')
+
+    preload = tmp_path / 'fake-fetch.mjs'
+    preload.write_text('''import fs from 'node:fs';
+let calls=0;
+globalThis.fetch=async(url,options={})=>{
+ if(!String(url).startsWith('http://127.0.0.1:1/'))throw new Error('Offline test forbids network');
+ const body=JSON.parse(options.body);calls++;
+ fs.writeFileSync(process.env.PI_RUN_DIR+'/first-request.json',JSON.stringify(body));
+ const common={id:'offline',object:'chat.completion.chunk',model:body.model,created:1};
+ const chunks=[{...common,choices:[{index:0,delta:{role:'assistant',content:'offline review done'},finish_reason:null}]},
+ {...common,choices:[{index:0,delta:{},finish_reason:'stop'}],usage:{prompt_tokens:10,completion_tokens:10,total_tokens:20}}];
+ return new Response(chunks.map(x=>'data: '+JSON.stringify(x)+'\\n\\n').join('')+'data: [DONE]\\n\\n',
+   {headers:{'content-type':'text/event-stream'}});
+};''')
+    env = dict(os.environ, PI_RUN_DIR=str(work), PI_PROBE_MODEL='offline-model',
+               PI_PROBE_BASE='http://127.0.0.1:1/v1', PI_PROBE_API_KEY='offline',
+               BUN_OPTIONS='--preload ' + str(preload))
+    result = subprocess.run([sys.executable, str(work / 'starter.py'), 'run', str(work)],
+                            cwd=work, env=env, capture_output=True, text=True, timeout=120)
+    assert result.returncode == 0, result.stdout + result.stderr
+    body = json.loads((work / 'first-request.json').read_text())
+    sent = json.dumps(body, ensure_ascii=False)
+
+    # The reviewer system prompt is what the session actually runs under.
+    assert '独立审片人' in sent
+    assert '创作者、导演和制作人' not in sent
+    # The review skill is loaded (config.skill_path), not the producer skill.
+    assert 'episode-review' in sent
+    assert 'episode-production' not in sent
+    # TASK reaches the model: target, hash, shot-id source, brief and the page boundary.
+    assert str(film.resolve()) in sent
+    assert starter._sha256(film) in sent
+    assert 's01a' in sent
+    assert '46 句对白逐字保留' in sent
+    assert '尾卡' in sent
+    # Severity and owner are taught as separate axes, and coverage must be split by evidence type.
+    assert 'severity' in sent and 'owner' in sent
+    assert '不会改变已经导出的这一份 MP4' in sent
+    assert '覆盖声明要按实际证据写' in sent
+    # F0 is taught as non-identifying: no pass and no rejection from pitch alone.
+    assert '基频（F0）不是说话人识别器' in sent
+
+    # A real 96/96 run died before writing anything while tidying temp dirs. The contract must
+    # tell the reviewer that the verdict, not the cleanup, is what has to land first.
+    for source in ('SYSTEM.md', 'TASK.md', 'skills/episode-review/SKILL.md'):
+        text = (work / source).read_text(encoding='utf-8')
+        assert 'Run facts' in text, source
+    system_text = (work / 'SYSTEM.md').read_text(encoding='utf-8')
+    assert '先落盘' in system_text or '判词落盘优先' in system_text
+    assert '证据够了就立刻写' in (work / 'skills/episode-review/SKILL.md').read_text()
+
+    # SYSTEM, TASK and Skill must state the same review.json contract. SYSTEM outranks the others,
+    # so a stale top-level blocking/advisory schema there would win and split the output shape.
+    for source in ('SYSTEM.md', 'TASK.md', 'skills/episode-review/SKILL.md'):
+        text = (work / source).read_text(encoding='utf-8')
+        assert 'findings' in text, source
+        assert 'severity' in text and 'owner' in text, source
+        assert '"blocking": [' not in text, source
+        assert '"advisory": [' not in text, source
+        assert 'tool_defect' not in text, source
+        assert 'fixable_in_episode' not in text, source
+    # SYSTEM must not still ask for the retired top-level field list.
+    system = (work / 'SYSTEM.md').read_text(encoding='utf-8')
+    assert '`blocking`、`advisory`、`coverage`' not in system
+    # And the contract as sent to the model names findings, not the old arrays.
+    assert 'findings' in sent
+    assert '"blocking": [' not in sent
+
+    # Generation tools stay available to the shell, but the media entry is started as reviewer.
+    config = json.loads((work / 'local.json').read_text())
+    assert config['media_actions'] == ['inspect', 'audio']
+    # Untimed bash calls are bounded; the value is frozen at init so a resume cannot drift.
+    assert config['bash_timeout_seconds'] == 900
+
+
+def _budget(work, deadline, limit=96, used=10):
+    (work / 'run-budget.json').write_text(json.dumps({
+        'started_at': 1, 'deadline_at': deadline * 1000, 'request_limit': limit,
+        'provider_requests': used, 'assistant_messages': used,
+        'automatic_continuations': 0, 'body_compactions': 0, 'ended_at': 1}))
+
+
+def test_window_grant_extends_deadline_once(tmp_path):
+    work = tmp_path / 'w'
+    work.mkdir()
+    past = time.time() - 3600
+    _budget(work, past)
+    (work / 'window-grant.json').write_text(json.dumps(
+        {'seconds': 600, 'authorized_by': '用户批准修 A 的 blocking', 'reason': '审片 rejected'}))
+    deadline = starter._consume_window_grant(work, work / 'run-budget.json', past)
+    assert abs(deadline - (time.time() + 600)) < 5
+    budget = json.loads((work / 'run-budget.json').read_text())
+    assert budget['deadline_at'] == deadline * 1000
+    assert budget['ended_at'] is None
+    assert budget['window_grants'][0]['authorized_by'] == '用户批准修 A 的 blocking'
+    # Same request limit: a grant buys time, never paid calls.
+    assert budget['request_limit'] == 96 and budget['provider_requests'] == 10
+    grant = json.loads((work / 'window-grant.json').read_text())
+    assert grant['consumed_at'] and grant['previous_deadline_at'] == past
+    # Second resume with the same file must not mint more time.
+    assert starter._consume_window_grant(work, work / 'run-budget.json', deadline) == deadline
+    assert json.loads((work / 'run-budget.json').read_text())['deadline_at'] == deadline * 1000
+
+
+def test_window_grant_requires_authorization_and_positive_seconds(tmp_path):
+    work = tmp_path / 'w'
+    work.mkdir()
+    past = time.time() - 60
+    _budget(work, past)
+    (work / 'window-grant.json').write_text(json.dumps({'seconds': 600}))
+    with pytest.raises(ValueError, match='authorized_by'):
+        starter._consume_window_grant(work, work / 'run-budget.json', past)
+    (work / 'window-grant.json').write_text(json.dumps(
+        {'seconds': 0, 'authorized_by': 'someone'}))
+    with pytest.raises(ValueError, match='positive seconds'):
+        starter._consume_window_grant(work, work / 'run-budget.json', past)
+    # No grant file: deadline passes through untouched.
+    (work / 'window-grant.json').unlink()
+    assert starter._consume_window_grant(work, work / 'run-budget.json', past) == past
+
+
+def test_batch_rejects_fresh_episode_without_task_before_creating_workspace(tmp_path, monkeypatch):
+    """The real gap: init writes a blank TASK, run() refuses it, so the batch could never start."""
+    calls = []
+
+    def fake_init(*args, **kwargs):
+        calls.append('init')
+        return args[0]
+
+    def fake_run(*args, **kwargs):
+        calls.append('run')
+        return 0
+
+    monkeypatch.setattr(starter, 'initialize', fake_init)
+    monkeypatch.setattr(starter, 'run', fake_run)
+    manifest = tmp_path / 'batch.json'
+    manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS,
+        'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test'}]}))
+    with pytest.raises(ValueError, match='needs task or task_file'):
+        starter.run_batch(manifest)
+    assert calls == []
+    assert not (tmp_path / 'batch-state.json').exists()
+
+    # A blank template handed in explicitly is rejected the same way.
+    template = (Path(starter.__file__).parent / 'template/TASK.md').read_text()
+    manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS,
+        'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'task': template}]}))
+    with pytest.raises(ValueError, match='blank template'):
+        starter.run_batch(manifest)
+    assert calls == []
+
+    # Resume entries are left alone: their TASK.md was already authorised by an earlier run.
+    (tmp_path / 'ws').mkdir()
+    manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS,
+        'episodes': [{'workspace': str(tmp_path / 'ws'), 'endpoint': 'test', 'resume': True}]}))
+    assert starter.run_batch(manifest)['episodes'][0]['returncode'] == 0
+    assert calls == ['run']
+
+
+def test_initialize_writes_authorised_task_so_run_accepts_it(tmp_path):
+    if not DEPS:
+        pytest.skip('Set PI_STARTER_NODE_MODULES to existing Pi dependencies; no install is performed.')
+    work = starter.initialize(tmp_path / 'ep', SDK, DEPS, task=AUTHORISED_TASK)
+    assert (work / 'TASK.md').read_text().strip() == AUTHORISED_TASK
+    assert starter._task_is_authorised((work / 'TASK.md').read_text())
+    # task_file is the same thing from disk, and both together is ambiguous.
+    task_path = tmp_path / 'task.md'
+    task_path.write_text(AUTHORISED_TASK + '\n', encoding='utf-8')
+    second = starter.initialize(tmp_path / 'ep2', SDK, DEPS, task_file=task_path)
+    assert (second / 'TASK.md').read_text().strip() == AUTHORISED_TASK
+    with pytest.raises(ValueError, match='not both'):
+        starter.initialize(tmp_path / 'ep3', SDK, DEPS, task=AUTHORISED_TASK, task_file=task_path)
+    with pytest.raises(ValueError, match='blank template'):
+        starter.initialize(tmp_path / 'ep4', SDK, DEPS, task='# 待填写的制作任务\n\n尚未授权付费生成。')

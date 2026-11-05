@@ -5,6 +5,7 @@ import { createProvider, envApiKeyAuth, InMemoryCredentialStore } from '@earendi
 import { openAICompletionsApi } from '@earendil-works/pi-ai/api/openai-completions.lazy';
 import { createAgentSession, DefaultResourceLoader, ModelRuntime, SessionManager, SettingsManager } from '@earendil-works/pi-coding-agent';
 import { applyRequestBudget } from './request_budget.mjs';
+import { resolveBashTimeout, remainingSeconds, timeoutSource } from './bash_limits.mjs';
 
 export async function makeSession({ directory, config, budget, systemPrompt, mechanical = false, maxTokens = config.max_output_tokens,
   onResponseModel = () => {}, onRequest = () => {}, sessionFile } = {}) {
@@ -21,7 +22,7 @@ export async function makeSession({ directory, config, budget, systemPrompt, mec
   const settingsManager = SettingsManager.inMemory({ compaction: { enabled: true },
     retry: { enabled: true, maxRetries: 2, provider: { maxRetries: 0 } }, cacheWarming: 'off' });
   const resourceLoader = new DefaultResourceLoader({ cwd: directory, agentDir: directory, settingsManager,
-    systemPrompt, noExtensions: true, noSkills: true, additionalSkillPaths: [path.join(directory,'skills/episode-production')], noPromptTemplates: true, noThemes: true, noContextFiles: true });
+    systemPrompt, noExtensions: true, noSkills: true, additionalSkillPaths: [path.join(directory, config.skill_path ?? 'skills/episode-production')], noPromptTemplates: true, noThemes: true, noContextFiles: true });
   await resourceLoader.reload();
   const sessionManager = sessionFile
     ? SessionManager.open(path.resolve(sessionFile), directory, directory)
@@ -32,9 +33,28 @@ export async function makeSession({ directory, config, budget, systemPrompt, mec
   const secrets=Object.entries(process.env).filter(([name,value])=>/KEY|TOKEN|PASSWORD|SECRET/.test(name)&&value.length>=12).map(([,value])=>value);
   const originalAfter=agent.afterToolCall;
   const originalBefore=agent.beforeToolCall;
+
+  // The native bash tool installs no timer when `timeout` is absent, so one careless command can
+  // outlive the whole run: S2E03A lost 3h19m to a single `find /` with no timeout and stopped at
+  // the wall deadline with no film. Bound every bash call here -- untimed calls get a default, and
+  // no call may exceed the wall clock this run has left. Long media steps keep working because
+  // they pass their own explicit timeout, which is only ever shortened when the run is ending.
   agent.beforeToolCall=async(context,signal)=>{
     if(budget&&Date.now()>=budget.state.deadline_at)return {block:true,terminate:true,reason:'Original run deadline reached; no new tool dispatch.'};
-    return await originalBefore?.(context,signal);
+    const blocked=await originalBefore?.(context,signal);
+    if(blocked?.block)return blocked;
+    if(context?.toolCall?.name==='bash'&&context.args&&typeof context.args==='object'){
+      const requested=context.args.timeout;
+      const bounded=resolveBashTimeout({requested,remainingSeconds:remainingSeconds(budget?.state?.deadline_at??Infinity),
+        defaultSeconds:Number(config.bash_timeout_seconds)||undefined});
+      if(bounded!==requested){
+        const source=timeoutSource(requested);
+        const why=source==='default'?'no timeout given; bounded default':'requested timeout exceeds the remaining wall clock';
+        context.args.timeout=bounded;
+        console.error(`[bash-timeout] ${source} ${requested??'(none)'}s -> ${bounded}s (${why})`);
+      }
+    }
+    return blocked;
   };
   agent.afterToolCall=async(context,signal)=>{
     const override=await originalAfter?.(context,signal);

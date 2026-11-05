@@ -288,6 +288,11 @@ def execute(request):
     action = request['action']
     lane = CONFIG.get('media_lane') or ''
     first_frame_policy = CONFIG.get('first_frame_policy') or 'selective'
+    # A role may narrow which actions this entry accepts (a reviewer keeps inspect/audio only).
+    # Absent key means unrestricted, so producer workspaces are unchanged.
+    allowed_actions = CONFIG.get('media_actions')
+    if allowed_actions is not None and action not in allowed_actions:
+        raise ValueError(f'media_actions={allowed_actions} for this role; action={action} is not permitted.')
     if lane.startswith('sd2.0') and action in {'h3', 'fasth3'}:
         raise ValueError(f'Pinned video lane is {lane}; action={action} is disabled. '
                          'Use action=video or change media_lane explicitly in local.json.')
