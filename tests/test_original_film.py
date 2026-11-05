@@ -39,3 +39,15 @@ def test_unsupported_world_card_is_rejected_before_spending_author_budget(tmp_pa
     monkeypatch.setattr(creation,'run',lambda *a,**k:pytest.fail('do not accept a card that cannot be delivered'))
     with pytest.raises(ValueError,match='world.card'):
         film.run(tmp_path,source,tmp_path/'run','new')
+
+
+@pytest.mark.parametrize('error,retryable',[(TimeoutError('poll timed out'),True),
+    (RuntimeError('task submission returned HTTP 502: gateway unavailable'),True),
+    (RuntimeError('task submission returned HTTP 402: quota_not_enough'),False),
+    (ValueError('source actor mismatch'),False)])
+def test_formal_produce_distinguishes_transient_service_from_content_or_quota(tmp_path,monkeypatch,error,retryable):
+    source=task(tmp_path)
+    def failed(*a,**k):raise error
+    monkeypatch.setattr(creation,'run',failed)
+    result=film.run(tmp_path,source,tmp_path/'run','new')
+    assert result['status']=='blocked' and result['retryable'] is retryable

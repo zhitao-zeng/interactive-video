@@ -181,10 +181,17 @@ def write_adaptation_material(episode, manifest, destination, *, series_material
     scenes={s.get('scene_id'):s for s in (episode.get('spatial_plan') or {}).get('scenes',[])}
     bible=copy.deepcopy(base['bible'])
     known={loc.split('：',1)[0] for loc in bible['locations']}
+    shots_by_scene={}
+    for s in (episode.get('chapter_script') or {}).get('shots',[]):
+        sid=s.get('scene_id')
+        if sid and s.get('location'): shots_by_scene.setdefault(sid,s['location'])
     for scene in (episode.get('spatial_plan') or {}).get('scenes',[]):
-        name=scene.get('location')
+        name=scene.get('location') or shots_by_scene.get(scene.get('scene_id'),'')
         if name and name not in known:
-            bible['locations'].append(f"{name}：{'；'.join(scene.get('anchors') or []) or name}")
+            a=scene.get('anchors') or []
+            desc='；'.join(x if isinstance(x,str) else json.dumps(x,ensure_ascii=False)
+                          for x in (a if isinstance(a,list) else [a])) or name
+            bible['locations'].append(f"{name}：{desc}")
     script=_normalize_adaptation_script(copy.deepcopy(episode['chapter_script']),scenes)
     shots={s['index']:s for s in script['shots']}
     groups=[]
@@ -198,7 +205,8 @@ def write_adaptation_material(episode, manifest, destination, *, series_material
     profile=copy.deepcopy(base['profile'])
     profile.update(manifest.get('profile') or {})
     profile.setdefault('h3_speech_policy','no_reference_performance_first')
-    profile.setdefault('h3_input_mode','first-frame'); profile.setdefault('h3_extra_reference_policy','needed')
+    # Lane mode (h3_input_mode) is chosen by the caller, not the material: baking
+    # first-frame in here made SD editions refuse to start (2026-10-23).
     interaction=copy.deepcopy(episode['interaction']);interaction.setdefault('seconds',3)
     segments=[{'segment_id':f'seg_{i}','text':'\n'.join(filter(None,[s.get('start_state'),s.get('event'),
         *[f"{t.get('speaker') or t.get('speaker_name','')}：{t['text']}" for t in s.get('turns',[])],s.get('end_state')]))}

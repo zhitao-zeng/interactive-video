@@ -23,8 +23,9 @@ def prepare(task_path, run_dir):
     if task.get('mode') not in {'adaptation', 'original'} or not task.get('brief'):
         raise ValueError('task requires mode adaptation/original and a complete brief')
     project = task.get('project', 'adventure')
-    if project not in {'adventure', 'romance', 'suspense'}:
-        raise ValueError('project must be adventure, romance or suspense')
+    from .intake import PROJECTS
+    if project not in PROJECTS:
+        raise ValueError(f'project must be one of {PROJECTS}')
     previous = read_json(run_dir / 'sandbox/input/manifest.json', {})
     if previous:
         if previous['task'] != task:
@@ -76,7 +77,10 @@ def prepare(task_path, run_dir):
                       [{k: m[k] for k in ('key', 'name', 'strategy')} for m in methods])
     skill, refs = _install_skill(SimpleNamespace(work_dir=work))
     genre = {'adventure': 'travel_authoring', 'romance': 'romance_authoring',
-             'suspense': 'suspense_authoring'}[project]
+             'suspense': 'suspense_authoring',
+             # Zhiyao fixed-branch fairy-tale adventures share the travel/exploration
+             # authoring guidance until the series earns its own genre file.
+             'zhiyao': 'travel_authoring'}[project]
     selected_style = None
     style_reads = []
     if task.get('style'):
@@ -118,12 +122,23 @@ def prepare(task_path, run_dir):
     return manifest
 
 
+def spent_seconds(state, recorded_seconds, now):
+    used=float(state.get('seconds_used',0))
+    pending=state.get('inflight') or {}
+    if pending:
+        used+=min(float(pending['timeout']),max(0,now-float(pending['started_at'])))
+    return max(used,recorded_seconds)
+
+
 def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
     run_dir = Path(run_dir).resolve()
     manifest = prepare(task_path, run_dir)
     work = run_dir / 'sandbox'
     state_path = run_dir / 'creator-state.json'
     state = read_json(state_path, {})
+    if (resume and not (work/SESSION_FILE).exists() and not (work/'output/episode.json').exists()
+            and not any((work/'attempts').glob('*'))):
+        resume=False  # Host preflight stopped before the first provider session existed.
     if state.get('status') == 'creative_candidate' and feedback is None:
         return state
     # A real continuation reads current guidance; completed/no-op tasks returned above.
@@ -139,13 +154,37 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
         if dialogue not in manifest['required_reads']:
             manifest['required_reads'].append(dialogue)
         atomic_write_json(work/'input/manifest.json', manifest)
+    explicit_config = config is not None
     config = load_config() if config is None else config
+    route_path = run_dir/'creator-agent-route.json'
+    if not explicit_config and (resume or state) and route_path.is_file():
+        config = {**config, **read_json(route_path, {})}
+    elif not explicit_config and (resume or state):
+        prior_session = read_json(work/SESSION_FILE, {})
+        if prior_session.get('backend') == 'codex' and state.get('model'):
+            config = {**config, 'backend':'codex', 'model':state['model'],
+                      'base_url':'codex://local', 'key_var':'H3_PROMPT_NO_KEY'}
+    from novel_manga.llm.catalog import select_agent
+    config = select_agent(config, explicit=explicit_config, resumed=resume or bool(state))
+    if explicit_config or not route_path.exists() and not (resume or state):
+        fields = ('backend','model','base_url','key_var','provider','resource_id','resource_billing',
+                  'effort','extra_body','repair_extra_body','max_thinking_tokens','task_reasoning',
+                  'codex_parallel','codex_slots_reserved_for_tools','codex_inflight_dir','codex_transport','refusal_fallback')
+        stored = {k:config[k] for k in fields if k in config}
+        if config.get('backend') == 'codex':
+            stored.setdefault('refusal_fallback', None)
+        atomic_write_json(route_path, stored)
     execute = run_session
     slice_seconds = int(config.get('source_agent_slice_seconds', 1200))
-    allowance = int(config.get('timeout_seconds', slice_seconds))
+    allowance = int(state.get('allowance_seconds',config.get('timeout_seconds', slice_seconds)))
     recorded_seconds=sum(float(read_json(path,{}).get('seconds',0))
                          for path in (work/'attempts').glob('*/attempt.json'))
-    used = max(float(state.get('seconds_used', 0)),recorded_seconds)
+    accounting=state
+    inflight=state.get('inflight') or {}
+    attempts_started=len(list((work/'attempts').glob('*')))
+    if inflight and attempts_started==int(inflight.get('attempts_before',0)):
+        accounting={k:v for k,v in state.items() if k!='inflight'}
+    used = spent_seconds(accounting,recorded_seconds,time.time())
     revision = resume and (work/'output/episode.json').is_file()
     previous_issues = read_json(work/'input/creative-validation.json', {}).get('issues')
     prompt = ('Read input/manifest.json, its complete required_reads and the creation-only contract. '
@@ -249,16 +288,45 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
             call_config['max_turns'] = 16 if turns is None else min(int(turns), 16)
         draft_path = work / 'output/episode.json'
         draft_before = (draft_path.stat().st_mtime_ns, draft_path.stat().st_size) if draft_path.is_file() else None
-        attempt = execute(work, prompt, resume=resume, timeout=min(remaining, slice_seconds), config=call_config,
-                              expected_output='episode.json', enable_tools=False)
-        used += time.monotonic() - started
+        atomic_write_json(state_path,{**state,'status':'running','seconds_used':used,'allowance_seconds':allowance,
+            'inflight':{'started_at':time.time(),'timeout':min(remaining,slice_seconds),
+                        'attempts_before':len(list((work/'attempts').glob('*')))}})
+        try:
+            attempt = execute(work, prompt, resume=resume, timeout=min(remaining, slice_seconds), config=call_config,
+                                  expected_output='episode.json', enable_tools=False)
+        except Exception as error:
+            stopped={**state,'status':'agent_failed','seconds_used':used,'allowance_seconds':allowance,
+                     'host_error':type(error).__name__}
+            stopped.pop('inflight',None)
+            atomic_write_json(state_path,stopped)
+            raise
+        # The executor starts its clock after acquiring the shared model slot.
+        # Other episodes' queue time is not this author's execution allowance.
+        used += float(attempt.seconds)
         draft_after = (draft_path.stat().st_mtime_ns, draft_path.stat().st_size) if draft_path.is_file() else None
         draft_changed = draft_after != draft_before
         reads = read_evidence(work)
         seen = {r['path'] for r in reads}
         missing = [p for p in manifest['required_reads'] if p not in seen]
-        candidate = read_json(work / 'output/episode.json', {})
-        issues = validate(candidate, manifest, work) if candidate else ['Complete output/episode.json is missing']
+        draft_file = work / 'output/episode.json'
+        json_error = None
+        candidate = {}
+        if not draft_file.is_file():
+            json_error = None  # reported below as missing
+        else:
+            import json as _json
+            try:
+                candidate = _json.loads(draft_file.read_text(encoding='utf-8'))
+            except _json.JSONDecodeError as error:
+                # util.read_json swallows decode errors into {}; a 100KB draft with
+                # one broken symbol must report the exact position instead (EP04A
+                # line 999 col 7, 2026-10-23).
+                json_error = (f'{error.msg} (line {error.lineno}, column {error.colno})')
+                candidate = {}
+        issues = validate(candidate, manifest, work) if candidate else (
+            ['Complete output/episode.json is missing'] if json_error is None
+            else [f'output/episode.json is not valid JSON: {json_error}; '
+                  'fix only the JSON syntax at that line/column and keep the complete story content'])
         notes = work / 'output/creative-notes.md'
         if not notes.is_file() or not notes.read_text().strip():
             issues.append('Write output/creative-notes.md with the actual camera/cut choices and shot numbers')

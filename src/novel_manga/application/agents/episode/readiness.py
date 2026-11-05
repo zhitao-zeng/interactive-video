@@ -41,6 +41,22 @@ def review_is_current(ctx, review):
     return not EpisodeEvidence.unreviewed_clips(media, review)
 
 
+def automatic_action(ctx, status, *, first_pass_only=False):
+    """Dispatch deterministic stages once; failed unchanged work returns to the Agent."""
+    if status.get('adopted') is not True:
+        return None
+    job = status.get('job') or {}
+    if job.get('status') in {'accepted', 'running'}:
+        return None
+    action = next_action(ctx, status)['action']
+    allowed = {'render'} if first_pass_only else {'render', 'review', 'finish'}
+    if action not in allowed:
+        return None
+    if job.get('action') == action and job.get('status') in {'completed','failed'}:
+        return None
+    return action
+
+
 def next_action(ctx, status=None):
     """The precise legal next host action and its evidence.
 
@@ -71,7 +87,7 @@ def next_action(ctx, status=None):
     from novel_manga.application.review.execution import media_matches
     notes = read_json(ctx.episode_dir / 'review_feedback.json', {})
     videos = [c for c in plan.get('clips', []) if c.get('kind') == 'video']
-    if videos and not media_started(ctx.episode_dir):
+    if videos and (not media_started(ctx.episode_dir) or not media):
         return {'action': 'render', 'reason': 'opening and request inputs are current; no video has started'}
     if media and not media_matches(plan, media, notes=notes):
         return {'action': 'render', 'reason': 'current requests are newer than the selected takes'}
@@ -79,6 +95,9 @@ def next_action(ctx, status=None):
         return {'action': 'review', 'reason': 'review evidence is from an older policy or take'}
     if media.get('clips') and not review.get('clips'):
         return {'action': 'review', 'reason': 'selected takes have no current independent review'}
+    if (review.get('feedback') or media.get('failed_clips') or media.get('gate_failed_clips')
+            or any(row.get('severity') in {'fail','review_error'} for row in (review.get('clips') or {}).values())):
+        return {'action':'agent','reason':'current findings require an authored repair decision before acceptance'}
     from novel_manga.application.music_selection import episode_music_errors
     if errors := episode_music_errors(ctx.episode_dir, media):
         return {'action': 'select_music', 'reason': '; '.join(errors), 'blocked': errors}

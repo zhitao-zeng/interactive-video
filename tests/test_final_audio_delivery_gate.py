@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+import pytest
 
 from novel_manga.interactive import delivery
 from novel_manga.util import atomic_write_json, read_json
@@ -53,14 +54,15 @@ def _finish_with_final_gate(tmp_path, monkeypatch, *, visual_passed, audio_revie
     return completion.EpisodeCompletion(ctx,media,evidence).finish({}), work, saved_reports
 
 
-def test_cached_delivery_cannot_finish_without_audio_for_the_same_export(tmp_path, monkeypatch):
+@pytest.mark.parametrize('visual_issues',[[],[{'severity':'minor','problem':'brief nonblocking jitter'}]])
+def test_cached_delivery_cannot_finish_without_audio_for_the_same_export(tmp_path, monkeypatch, visual_issues):
     movie = tmp_path/'versions/export-008/episode01.mp4'
     movie.parent.mkdir(parents=True); movie.write_bytes(b'final exported movie')
     episode = tmp_path/'episode'; episode.mkdir()
     destination = tmp_path/'delivery'; destination.mkdir()
     ctx = SimpleNamespace(episode_dir=episode)
     runner = SimpleNamespace(context=ctx)
-    final = {'movie':str(movie),'complete':True,'passed':True,'issues':[],'errors':[]}
+    final = {'movie':str(movie),'complete':True,'passed':True,'issues':visual_issues,'errors':[]}
     report = {'assembly':{'final_video':'/native/assembly.mp4','thin_passed':True},
         'quality_review':{'passed':True,'content_passed':True},
         'final_cut_review':final,'final_audio_review_required':True}

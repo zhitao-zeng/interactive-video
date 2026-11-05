@@ -192,7 +192,8 @@ def test_phanthy_transport_is_kept_for_agent_host_tools(ctx,monkeypatch):
     monkeypatch.setattr(resolved_settings,'environment',lambda root:{'NOVEL_LOCAL_H3_URL':'pool'})
     env=resolved_settings.resolve_agent_environment(ctx,{'base_url':'http://127.0.0.1:8789',
         'model':'glm-5.3-flash','key_var':'PHANTHY_API_KEY'})
-    assert env['SECOND_REVIEW_JUDGE']=='phanthy'
+    assert env['SECOND_REVIEW_JUDGE']=='codex-luna-6'
+    assert env['NOVEL_REVIEW_VIDEO_JUDGE']==''
     assert env['QWEN38_LOCAL_STREAM']=='1' and env['QWEN38_LOCAL_MIN_MAX_TOKENS']=='16000'
 
 
@@ -616,3 +617,17 @@ def test_assigned_multi_endpoint_judge_is_resolved_from_actual_runtime(ctx, monk
     settings = {'base_url': 'http://one.model:9000', 'model': 'qa-model', 'key_var': 'QA_KEY'}
     env = resolved_settings.resolve_agent_environment(ctx, settings)
     assert env['SECOND_REVIEW_JUDGE'] == env['NOVEL_REVIEW_VIDEO_JUDGE'] == 'group-qa'
+
+
+def test_sol6_agent_profile_does_not_claim_unqualified_image_or_native_video_roles(ctx,monkeypatch):
+    monkeypatch.setattr(resolved_settings,'environment',lambda root:{'NOVEL_LOCAL_H3_URL':'pool'})
+    settings={'base_url':'codex://local','model':'gpt-6-sol','key_var':'H3_PROMPT_NO_KEY','backend':'codex'}
+    env=resolved_settings.resolve_agent_environment(ctx,settings)
+    assert env['QWEN38_LOCAL_MODEL']=='gpt-6-sol'
+    assert env['SECOND_REVIEW_JUDGE']=='codex-luna-6'
+    assert env['NOVEL_REVIEW_VIDEO_JUDGE']==''
+    monkeypatch.setenv('SECOND_REVIEW_JUDGE','codex-luna')
+    monkeypatch.setenv('NOVEL_REVIEW_VIDEO_JUDGE','flashnext')
+    env=resolved_settings.resolve_agent_environment(ctx,settings)
+    assert env['SECOND_REVIEW_JUDGE']=='codex-luna'
+    assert env['NOVEL_REVIEW_VIDEO_JUDGE']=='flashnext'

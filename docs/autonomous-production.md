@@ -1,5 +1,30 @@
 # 自动诊断、修复与经验复用
 
+2026-10-23：互动剧完整制作新增正式 `produce-batch` 入口，沿用 `produce`、持续制作 Agent 和现有质量门：
+
+```bash
+python scripts/interactive_video.py produce-batch --batch /absolute/batch.json --output-dir /absolute/run
+```
+
+`batch.json` 包含 `parallel`、`max_launches` 和 `episodes`；每项为 `edition`、`task`，可选 `lane` 与 `config`。
+未传 lane 时沿用 task 的 video_lane；任务和配置首次冻结后不可原地更换。每集独立进程，恢复从原回执、
+原会话、原媒体和剩余时间继续。可恢复的连接/超时/临时 HTTP 故障有界重试；内容否决、额度耗尽和
+未知程序错误保持真实停止状态。持续 Agent 的确定性阶段由宿主推进，现有失败审查先交回 Agent 修复。
+标准旧生产模式的调度顺序保持原有约定。
+
+批次锁由正在执行的子进程共同持有；仅重启监督进程不会复制仍在运行的任务。以 systemd 托管时使用
+`Restart=on-failure`、`RestartSec=30`、`SuccessExitStatus=2` 和 `KillMode=process`：业务停止不无限重启，
+监督进程退出时原 worker 继续写回执，重启后等待它释放锁再对账。不要在活跃任务上替换代码。
+
+可选 `publication` 声明 `python`（既有 ModelScope SDK 环境）、`repository`、`visibility`、`title` 和
+`episodes`（edition/title/receipt）。发布只消费当前 accepted、技术与内容均通过的 delivery 导出。
+上传意图和成功回执先落盘，索引延迟只续查，不重复上传大文件；结果不明且无法对账时明确停止发布。
+公开索引仅含剧集、视频、封面及配乐署名，运行诊断留在本地。原二十集数据集不受此验证入口影响。
+
+验证证据：`autonomous-production-20261023` 工作树的 `.runtime/autonomous-production-20261023/`。
+该任务先完成通用故障回放与主线整合，再启动三个原始素材包的新 edition；真实结果单独记账，
+离线通过不代表三集内容已通过。新发现的宿主故障修进共用代码，失败轮与后续恢复轮分别保留。
+
 当前运行方式（2026-10-07后续确认）：正常生产采用 main 的 `standard` 批量路径，
 Agent 使用独立的 `batch_review` 队列。以下早期章节宿主策略保留作为历史记录。
 

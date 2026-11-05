@@ -127,3 +127,25 @@ def test_interactive_endpoint_recovery_is_process_local(tmp_path,monkeypatch):
         assert os.environ['SECOND_REVIEW_JUDGE']=='qwen-gpu52-current'
         assert os.environ['NOVEL_H3_SHORT_EDGE']=='768'
     assert (tmp_path/'configs/interactive.json').read_bytes()==original
+
+
+def test_catalogue_text_and_image_defaults_are_separate_for_real_project_entries(tmp_path,monkeypatch):
+    from unittest.mock import patch
+    from novel_manga.interactive import runtime
+    from novel_manga.application import configuration
+    from novel_manga.review.endpoints import judge_settings
+    (tmp_path/'configs').mkdir()
+    (tmp_path/'configs/interactive.json').write_text(json.dumps({'services':{'text_endpoint':'phanthy-ds41'}}))
+    monkeypatch.setattr(runtime,'environment',lambda *a:{})
+    monkeypatch.setattr(configuration,'model_resources_environment',lambda *a:{})
+    for project in ['adventure','suspense','romance']:
+        with patch.dict(os.environ,{},clear=True):
+            runtime.configure(tmp_path,'h3',project=project)
+            assert os.environ['NOVEL_PLANNER_ENDPOINT']=='phanthy-dsv4'
+            assert os.environ['SECOND_REVIEW_JUDGE']=='codex-luna-6'
+            assert judge_settings().model=='gpt-6-luna'
+            assert os.environ['NOVEL_REVIEW_VIDEO_JUDGE']==''
+    with patch.dict(os.environ,{'SECOND_REVIEW_JUDGE':'codex-luna','NOVEL_REVIEW_VIDEO_JUDGE':'flashnext'},clear=True):
+        runtime.configure(tmp_path,'h3',project='suspense')
+        assert judge_settings().model=='gpt-5.6-luna'
+        assert os.environ['NOVEL_REVIEW_VIDEO_JUDGE']=='flashnext'

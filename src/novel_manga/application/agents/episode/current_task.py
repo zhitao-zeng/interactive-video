@@ -1,6 +1,8 @@
 """A current repair view; complete state and history remain available on disk."""
 from __future__ import annotations
 
+import os
+
 from novel_manga.util import atomic_write_json,read_json
 from .memory_summary import summarize_case
 
@@ -74,7 +76,9 @@ def prepare(ctx,status,diagnosis,memories):
             for cid,row in (outcome.get('clips')or{}).items()if cid in selected and row.get('ok')is False}
         last['result']['video_input_failures']={cid:row['error']
             for cid,row in (outcome.get('video_stream')or{}).items()if cid in selected and row.get('error')}
+    first_pass = os.environ.get('NOVEL_FIRST_PASS_ONLY') == '1'
     brief={'phase':read_json(ctx.work_dir/'input/manifest.json',{}).get('agent_phase'),
+        'workflow_scope':'first_pass' if first_pass else 'full_production',
         'mode':'adopted_repair' if adopted else 'provisional_draft',
         'next_action':status.get('next_action'),
         'author_session':read_json(ctx.work_dir/'episode-session.json',{}).get('session_id'),
@@ -86,7 +90,11 @@ def prepare(ctx,status,diagnosis,memories):
         'targets':targets,'issues':issues,'last_operation':last,'evidence_files':files,
         'full_status':'input/current-status.json','reference_catalog':'input/catalog.json','related_history':recent,
         'tool_source':'/opt/novel-code/novel_manga/application/agents/episode',
-        'execution_rules':([
+        'execution_rules':[
+            ('This phase only prepares and generates missing first videos; film review and finish wait for the next phase.'
+             if first_pass else
+             'Full scope: obey host review/music/mix/finish.')
+        ]+([
             'Only these current targets need work. Old errors on other clips are history, not new tasks.',
             'Write output/repair.json and call check, then apply. Replying with JSON alone executes nothing.'] if adopted else [
             'No adopted plan exists. Repair the saved provisional output/episode.json using the planner failure and source; call check, then adopt.',

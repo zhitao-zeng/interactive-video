@@ -108,9 +108,15 @@ def validate(episode, manifest, work_dir):
             if row['label'] not in str(actual.get(row['id'], {}).get('label', '')):
                 issues.append(f'interaction {row["id"]}: retain destination {row["label"]}')
     scenes = (episode.get('spatial_plan') or {}).get('scenes') or []
+    if not isinstance(scenes, list):
+        issues.append('spatial_plan.scenes must be a list of scene objects; keep each scene_id and its complete blockout')
+        scenes = []
     if not scenes:
         issues.append('spatial_plan.scenes needs a source-backed blockout design')
     for number, scene in enumerate(scenes, 1):
+        if not isinstance(scene, dict):
+            issues.append(f'spatial scene {number}: must be a scene object, got {type(scene).__name__}')
+            continue
         label = f'spatial scene {scene.get("scene_id", number)!r} (shots {scene.get("shot_indexes", [])})'
         if not scene.get('anchors'):
             issues.append(f'{label}: missing anchors')
@@ -131,10 +137,24 @@ def validate(episode, manifest, work_dir):
     if not episode.get('self_review'):
         issues.append('self_review of the complete creative draft is required')
     music_plan=(episode.get('chapter_script')or{}).get('music_plan')
-    if task.get('music_mode')=='timeline'or music_plan is not None:
+    # Music timing indexes duration_seconds directly; a draft whose shots have not
+    # yet cleared the basic duration check must keep the per-shot feedback instead
+    # of crashing the validator (EP03B 2026-10-23: one missing duration killed the
+    # whole validation, the author never saw which shot was broken).
+    durations_ok=(all(s.get('index')==number for number,s in enumerate(shots,1))
+                  and all(isinstance(s.get('duration_seconds'),(int,float))
+                          and s['duration_seconds']>0 for s in shots))
+    if (task.get('music_mode')=='timeline'or music_plan is not None) and durations_ok:
         from novel_manga.story.timing import music_plan_issues
         issues.extend(music_plan_issues(music_plan,shots))
-    if task.get('production_handoff') and not issues:
+    if manifest.get('mode')=='adaptation' and not issues:
+        # Adaptation authors get the shot↔scene coverage feedback in-session, but
+        # only once the basic per-shot checks are clean: adaptation_issues indexes
+        # shot fields directly and must not crash on drafts that already carry
+        # explicit basic errors (EP03C 2026-10-23: missing index).
+        from .creative_material import adaptation_issues
+        issues.extend(adaptation_issues(episode,manifest))
+    elif task.get('production_handoff') and not issues:
         from .creative_material import design_issues
         issues.extend(design_issues(episode,manifest))
     return issues
