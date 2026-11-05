@@ -32,6 +32,10 @@ turning an animal, armor or environment object into an available human actor.
 
 Inspect the actual selected images. Ordinary character cards supply identity and
 stable design; the authored shot supplies pose, camera, crop and current state.
+For a director name or stylized camera request, use
+[director camera styles](director-camera-styles.md) to choose a motivated design
+and write its visible path or focus relationship, ending composition and stop.
+A named style is optional and does not authorize changing protected script decisions.
 Multiple views of the same person define one Subject: explain which picture
 supplies face/hair and which supplies body proportions, clothing or another view.
 Picture count and Subject count are not body counts.

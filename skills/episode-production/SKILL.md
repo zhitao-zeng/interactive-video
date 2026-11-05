@@ -65,6 +65,12 @@ Use [authoring](references/authoring.md) when creating shots or resolving identi
 wearing, visibility, action, sound or continuity. Use [review and repair](references/review-and-repair.md)
 when executing tools or assessing a take. Read [case lessons](references/case-lessons.md)
 only when a matching failure needs explanation.
+For shot design, read [camera language](references/camera-language.md).
+For director-associated styles or named camera requests, also consult
+[director camera styles](references/director-camera-styles.md). Choose by story,
+state the crop, trigger, separate actor/camera paths, endpoint and stop, and
+preserve approved script-mode camera decisions. Distinguish existing H3
+observations from untested combinations.
 
 For semantic input repair or post-render review, use the
 [repair playbook](references/repair-playbook.md) to choose a remedy from current

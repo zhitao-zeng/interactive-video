@@ -27,6 +27,7 @@ SKILL_REFERENCES = {
     'authoring': 'references/authoring.md',
     'dialogue_craft': 'references/dialogue-craft.md',
     'camera_language': 'references/camera-language.md',
+    'director_camera_styles': 'references/director-camera-styles.md',
     'spatial_blockout': 'references/spatial-blockout.md',
     'creative_authoring': 'references/creative-authoring.md',
     'travel_authoring': 'references/genres/travel.md',
