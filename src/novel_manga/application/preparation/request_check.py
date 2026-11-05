@@ -196,8 +196,7 @@ def request_consistency(clip: dict, novel_dir: Path, *, request=None) -> dict:
     return result
 
 
-def cached_consistency(novel_dir, work, clip, request, *, require_cached=False):
-    """Same request and reference contents reuse this expensive check; a seed change alone does not rerun it."""
+def check_inputs(clip, request):
     inputs = {'policy': POLICY, 'chinese': clip.get('prompt', ''), 'english': request['prompt'],
               'references': request['references'], 'reference_sha256': request.get('reference_sha256'),
               'roles': [{k: r.get(k) for k in ('name', 'role', 'view', 'wearers')}
@@ -205,6 +204,21 @@ def cached_consistency(novel_dir, work, clip, request, *, require_cached=False):
     scopes=[reference_scope(p) for p in request['references']]
     if any(scopes):
         inputs['reference_scopes']=scopes
+    return inputs
+
+
+def confirmed_rejection(answer):
+    scope=answer.get('scope_check') or {}
+    if scope.get('error') or any(row.get('scope')=='uncertain' or row.get('relation')=='uncertain'
+                                 for row in scope.get('checks',[])):
+        return False
+    return (answer.get('consistent') is False and bool(answer.get('problems'))
+            and any(row.get('relation')=='contradiction' for row in answer.get('findings',[])))
+
+
+def cached_consistency(novel_dir, work, clip, request, *, require_cached=False):
+    """Same request and reference contents reuse this expensive check; a seed change alone does not rerun it."""
+    inputs=check_inputs(clip,request)
     path = work / 'request_checks' / (clip['clip_id'] + '.json')
     saved = read_json(path, {})
     answer = saved.get('answer') if saved.get('inputs') == inputs else None
@@ -243,6 +257,23 @@ def current_request(directory, clip):
     return cached_consistency(directory.parent, directory / 'work', clip, request)
 
 
+def cached_current_rejection(directory, clip):
+    """Read-only proof for an unsubmitted request; never run or rewrite a check."""
+    saved=read_json(directory/'work/request_checks'/(clip['clip_id']+'.json'),{})
+    answer=saved.get('answer') or {}
+    if not confirmed_rejection(answer):return None
+    from novel_manga.media.common import reference_digests
+    from novel_manga.media.generation import image_paths
+    from types import SimpleNamespace
+    try:
+        refs=image_paths(SimpleNamespace(novel_dir=directory.parent),clip)
+        request={'prompt':clip.get('prompt_h3',''),'references':[str(p) for p in refs],
+                 'reference_sha256':reference_digests(refs)}
+        return answer if saved.get('inputs')==check_inputs(clip,request) else None
+    except (OSError,ValueError,KeyError):
+        return None
+
+
 def before_generation(ctx, clip, request):
     from novel_manga.story.voice_delivery import require_native_speech
     require_native_speech(ctx,clip,request)
@@ -251,5 +282,10 @@ def before_generation(ctx, clip, request):
     if answer.get('consistent') is not True or answer.get('problems'):
         problems = answer.get('problems') or ['请求与参考图未得到一致结论']
         ctx.state.blocked_clips[clip['clip_id']] = ['request: ' + p for p in problems]
+        if confirmed_rejection(answer):
+            from novel_manga.service_errors import UnsupportedInput
+            error=UnsupportedInput('H3 request/reference mismatch: '+'；'.join(problems))
+            error.request_check=answer
+            raise error
         raise ValueError('H3 request/reference mismatch: ' + '；'.join(problems))
     return answer

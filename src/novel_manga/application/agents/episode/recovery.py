@@ -330,13 +330,23 @@ def resume_protocol(run_dir,episode_dir,saved, *, validate_input=None, allow_tim
     if kind is None:return None
     remaining=remaining_at_stop(saved)
     marker={'kind':kind,'at':time.time()}
-    atomic_write_json(run_dir/'protocol-recovery.json',{'previous':saved,'recovery':marker})
     resumed={**saved,'status':'deferred','phase':'ready_agent','protocol_recovery':marker,
         'reason':'Continue with corrected repair interface and current task evidence',
         'remaining_seconds':remaining,'deadline':time.time()+remaining,'no_progress':0,
         'fallback_invocations':0,'job':None,'updated_at':time.strftime('%F %T')}
-    atomic_write_json(run_dir/'agent-run.json',resumed)
     return resumed
+
+
+def _fallback_route(config, result, attempt, reason):
+    fallback = config.get('refusal_fallback')
+    if not fallback or result.get('model_switch') or not reason:
+        return None
+    if not all(fallback.get(k) for k in ('model', 'base_url', 'key_var')):
+        return None
+    record = {'from_model':config.get('model'),'to_model':fallback['model'],
+              'attempt':str(attempt.directory),'reason':reason,
+              'deadline':result.get('deadline'),'at':time.time()}
+    return {**config,'model_slots_reserved_for_tools':0,**fallback}, record
 
 
 def protocol_fallback(ctx,config,saved):
@@ -345,9 +355,10 @@ def protocol_fallback(ctx,config,saved):
     from types import SimpleNamespace
     candidate={**saved,'idle_turns':1}
     attempt=SimpleNamespace(record={'exit':0,'produced':[]},directory=Path(saved['attempts'][-1]))
-    replacement=switch_for_refusal(ctx,config,candidate,attempt,{}, {})
-    if replacement is None:return config,saved
-    atomic_write_json(ctx.run_dir/'agent-run.json',candidate)
+    planned=_fallback_route(config,candidate,attempt,'Two turns without changed output or a host operation')
+    if planned is None:return config,saved
+    replacement, record = planned
+    candidate.update(model_switch=record,no_progress=0,fallback_invocations=0,summary_only_turns=0,idle_turns=0)
     return replacement,candidate
 
 
@@ -372,8 +383,6 @@ def resume_source_review(run_dir, episode_dir, saved):
                'no_progress': 0, 'fallback_invocations': 0, 'stop_detail': None, 'job': None,
                'remaining_seconds': remaining, 'deadline': time.time()+remaining,
                'updated_at': time.strftime('%F %T')}
-    atomic_write_json(run_dir/'source-review-recovery.json', {**marker, 'previous': saved})
-    atomic_write_json(run_dir/'agent-run.json', resumed)
     return resumed
 
 
@@ -407,13 +416,14 @@ def resume_summary_loop(ctx, config, saved):
     from types import SimpleNamespace
     resumed = {**saved, 'summary_only_turns': 1}
     attempt = SimpleNamespace(record={'summary_only': True}, directory=Path(saved['attempts'][-1]))
-    replacement = switch_for_refusal(ctx, config, resumed, attempt, {}, {})
-    if replacement is None:
+    planned = _fallback_route(config,resumed,attempt,'Repeated summary-only completions without a host operation')
+    if planned is None:
         return None
+    replacement, record = planned
     remaining = remaining_at_stop(saved)
-    resumed.update(status='deferred', reason=None, stop_detail=None,
-                   remaining_seconds=remaining, deadline=time.time()+remaining)
-    atomic_write_json(ctx.run_dir/'agent-run.json', resumed)
+    resumed.update(model_switch=record,no_progress=0,fallback_invocations=0,summary_only_turns=0,idle_turns=0,
+                   status='deferred',reason=None,stop_detail=None,
+                   remaining_seconds=remaining,deadline=time.time()+remaining)
     return replacement, resumed
 
 
@@ -427,23 +437,80 @@ def switch_for_refusal(ctx, config, result, attempt, before, after):
         'Repeated summary-only completions without a host operation'
         if result['summary_only_turns'] >= 2 else
         'Two turns without changed output or a host operation' if result['idle_turns']>=2 else '')
-    fallback = config.get('refusal_fallback')
-    if not fallback or result.get('model_switch') or not reason or handed_off:
+    if handed_off:
         return None
-    if not all(fallback.get(k) for k in ('model', 'base_url', 'key_var')):
+    planned = _fallback_route(config,result,attempt,reason)
+    if planned is None:
         return None
+    replacement, record = planned
     archive = ctx.run_dir/'model-switch'
     archive.mkdir(parents=True, exist_ok=True)
     session = ctx.work_dir/'episode-session.json'
     if session.exists():
         session.rename(archive/'episode-session.json')
-    record = {'from_model': config.get('model'), 'to_model': fallback['model'],
-              'attempt': str(attempt.directory), 'reason': reason,
-              'deadline': result.get('deadline'), 'at': time.time()}
     atomic_write_json(archive/'switch.json', record)
     result.update(model_switch=record, no_progress=0, fallback_invocations=0, summary_only_turns=0,idle_turns=0)
-    return {**config, 'model_slots_reserved_for_tools': 0, **fallback}
+    return replacement
 
+
+def plan_window_grant(ctx, saved):
+    grant = read_json(ctx.run_dir/'window-grant.json', {})
+    seconds = int(grant.get('seconds') or 0)
+    if (not grant or grant.get('consumed_at') or not seconds or saved.get('upstream_recovery') or saved.get('passed')):
+        return None
+    remaining = max(0.0, float(saved.get('remaining_seconds') or 0)) + seconds
+    resumed = {**saved,'remaining_seconds':remaining,
+               'window_grant':{'seconds':seconds,'authorized_by':grant.get('authorized_by')}}
+    if saved.get('status') == 'blocked':
+        resumed.update(status='deferred',reason=None,stop_detail=None)
+    return resumed, {'kind':'window_grant','seconds':seconds,'authorized_by':grant.get('authorized_by')}
+
+
+def plan_resume(ctx, saved, config, retry_issues):
+    from copy import deepcopy
+    saved = deepcopy(saved)
+    config = deepcopy(config)
+    actions = []
+    handoff = read_json(ctx.run_dir/'upstream-handoff.json', {})
+    if (handoff.get('id') and saved.get('upstream_handoff') != handoff['id']
+            and (saved.get('job') or {}).get('status') not in {'accepted','running'}):
+        saved['job'] = deepcopy(handoff['job'])
+        saved['upstream_handoff'] = handoff['id']
+    before = saved
+    resumed = resume_source_review(ctx.run_dir,ctx.episode_dir,saved)
+    if resumed is not None:
+        saved = resumed
+        if saved.get('source_review_recovery'):
+            actions.append({'kind':'source_review','previous':before,'recovery':saved['source_review_recovery']})
+    before = saved
+    resumed = resume_protocol(ctx.run_dir,ctx.episode_dir,saved,
+        validate_input=lambda _ctx,row,**_: {'clip_ids':[row['clip_id']]})
+    if resumed is not None:
+        saved = resumed
+        if saved.get('protocol_recovery'):
+            actions.append({'kind':'protocol','previous':before,'recovery':saved['protocol_recovery'],
+                            'validate':True})
+    before = saved
+    config,saved = protocol_fallback(ctx,config,saved)
+    if saved.get('model_switch') != before.get('model_switch'):
+        actions.append({'kind':'fallback','record':saved['model_switch']})
+    if retry_issues:
+        before = saved
+        recovered = resume_summary_loop(ctx,config,saved)
+        if recovered is not None:
+            config,saved = recovered
+            if saved.get('model_switch') != before.get('model_switch'):
+                actions.append({'kind':'fallback','record':saved['model_switch']})
+    from .bounded_recovery import plan_window
+    recovered = plan_window(ctx,saved)
+    if recovered is not None:
+        saved, action = recovered
+        actions.append(action)
+    recovered = plan_window_grant(ctx,saved)
+    if recovered is not None:
+        saved, action = recovered
+        actions.append(action)
+    return {'saved':saved,'config':config,'actions':actions}
 
 
 def upstream_route(ctx,status):

@@ -40,6 +40,24 @@ def frame_style(novel_dir: Path) -> dict:
     return result
 
 
+def style_example_references(novel_dir):
+    """Read only this edition's frozen style attachments, in their authored order."""
+    path=Path(novel_dir)/'style.json'
+    if not path.is_file():return []
+    style=json.loads(path.read_text(encoding='utf-8'));result=[]
+    for index,example in enumerate(style.get('examples') or [],1):
+        if (example.get('kind') not in {'original_style_board','historical_style_frame'}
+                or not example.get('path') or example.get('status') in {'pending','blocked_quota','needs_revision'}):
+            continue
+        row={'path':example['path'],'role':'style-reference',
+             'name':example.get('name') or f"{style.get('name','Selected style')} example {index}",
+             'reference_scope':'style_only_not_character_identity','view':'style_example'}
+        for key in ('hash','sha256'):
+            if example.get(key):row[key]=example[key]
+        result.append(row)
+    return result
+
+
 def opening_appearance(style: dict) -> dict:
     # The full pack remains available to the author/reviewer. The image request
     # gets appearance cues, not episode-wide staging, future shots or asset tasks.
@@ -112,3 +130,45 @@ def freeze_selected_style(key: str, work: Path) -> tuple[dict, list[dict]]:
     return {'id': key, 'version': style.get('pack_version', 'legacy'),
             'file': 'input/style.json',
             'scope': 'Visual rules only. Source identities, story facts, wardrobe and authored POV remain authoritative.'}, references
+
+
+def _style_source_file(style_source, relative):
+    relative=Path(relative)
+    if relative.is_absolute():return relative
+    if style_source.parent.name=='input':
+        bases=(style_source.parent.parent,style_source.parent)
+    else:
+        bases=(style_source.parent,style_source.parent.parent)
+    for base in bases:
+        candidate=base/relative
+        if candidate.is_file():return candidate
+    return bases[0]/relative
+
+
+def normalized_style(style_source):
+    style_source=Path(style_source)
+    style=json.loads(style_source.read_text())
+    attachments={}
+    for example in style.get('examples',[]):
+        if example.get('kind') in {'original_style_board','historical_style_frame'} and example.get('path'):
+            source=_style_source_file(style_source,example['path'])
+            relative=Path('style-examples')/source.name
+            attachments[relative.as_posix()]=source
+            example['path']=relative.as_posix()
+        for field in ('review','evidence'):
+            if example.get(field):
+                source=_style_source_file(style_source,example[field])
+                relative=Path('style-examples')/source.name
+                attachments[relative.as_posix()]=source
+                example[field]=relative.as_posix()
+    return style,attachments
+
+
+def export_style(style_source, destination):
+    import shutil
+    destination=Path(destination);style,attachments=normalized_style(style_source)
+    destination.mkdir(parents=True,exist_ok=True)
+    for relative,source in attachments.items():
+        target=destination/relative;target.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copy2(source,target)
+    (destination/'style.json').write_text(json.dumps(style,ensure_ascii=False,indent=2)+'\n')

@@ -14,9 +14,11 @@ def prompt_rows(catalog, passage: str, chapter: int, names=()):
     rows = []
     for r in catalog.candidates(passage, names):
         c = r['design']
+        phase = phase_for(catalog.phases, r['name'], chapter)
+        effective = {**c, **(phase or {})}
         rows.append({'entity_id': r['id'], 'name': r['name'], 'known_forms': sorted(r['forms']),
-                     'design_reference_only': {k: str(c.get(k, ''))[:120] for k in ['role', 'gender', 'age', 'appearance']},
-                     'appearance_phase': phase_for(catalog.phases, r['name'], chapter)})
+                     'design_reference_only': {k: str(effective.get(k, ''))[:120] for k in ['role', 'gender', 'age', 'appearance']},
+                     'appearance_phase': phase})
     return rows
 
 

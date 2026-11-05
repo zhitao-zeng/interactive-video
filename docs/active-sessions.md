@@ -280,3 +280,19 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | ZCode #12+会话退化修复 | ①create_context目录发现:无显式output_root时探测firstframes/music/agent三约定既有run,CLI retry续真状态(冒烟已验:verify edition解析到firstframes真实目录);②默认作者配置切快速档(thinking off+effort low+16k,修复线同款),传导链有测试;2新测试,全量4053连两轮绿 | main(783b0c4) | context.py、configs/agent_sandbox.json、tests/test_agent_run_discovery.py | 2026-10-22 | 已提交;verify edition下次resume即用快速档;并行瞬态(一轮11败)已定位为与sd线资源竞争,复跑全绿 |
 
 | Codex 10小时协助ZCODE20261023 | 用户授权给原ZCODE会话指令并协助完成今早10点前知遥20集成片；协助窗口至11:56 | codex/zcode-supervision-20261023 | 仅自有协调runtime/必要独立诊断；生产单写者ZCODE，旧恋综暂不处理 | 2026-10-23 01:56 | 在途：原ZCODE已收到指令并ACK，34项相关独立回归过；定位原会话session_7acef82aafd79b10dac6e5f434e1cf08，核对真实隔离产线；不清额度/历史，不把candidate或blocked误称accepted；以20个完整导出文件验收。 |
+
+| Codex Pi DS/K3 从头无人对照 | 修真实参考绑定，短片对照已交片 | codex/pi-video-model-ab-20261027 | .runtime/pi-model-ab-20261027/REPORT.md | 完成 | DS从头31.26分钟交30.278秒；K3原14轮断流，保留原失败，通用恢复后交33.622秒，活跃37.78分钟／实际64.78分钟。未来新任务宽松观看标准已接；未commit/push/upload。 |
+
+| Codex Pi整集原生会话 2026-10-28 | 初版缺少完整Skill，按用户选择退役 | codex/pi-video-model-ab-20261027 | .runtime/pi-full-episode-20261028/operator-stop.json | 已停止并留证 | 7图7视频0整集；先停派发再等待已接受请求完成，原日志/回执/结果保留。用户选择补齐Skill后从头，当前任务移至pi-full-episode-skills-20261028，不复用旧稿/旧片。 |
+
+| Codex Pi完整Skill整集 2026-10-28 | 原16k输出被思考占满，原失败留证；128k新入口另列 | codex/pi-video-model-ab-20261027 | .runtime/pi-full-episode-skills-20261028 | 已结束 | 8轮129秒、0媒体，非上下文撑满；32k只做隔离资格重放，随后按用户明确128k从头新开，不复用资格稿。 |
+
+| Codex Pi双路线整集128k 2026-10-28 | 两组从头完成Agent自审及技术解码，已本地交片 | codex/pi-video-model-ab-20261027 | .runtime/pi-full-episode-skills128-20261028/ROUTE-COMPARISON.md | 已收工 | H3 2小时44分26秒交301.646秒24段（28图34视频）；SD 3小时29分37秒交310.646秒24段（0生图46回片47POST），47次真实素材引用均核实。原9场60句请求覆盖/24采用源视听/全片解码过，无人工创作接续/扩额/热改。保留自审视觉差异，非主线formal accepted；统计compact漏记0，按原生日记3/5更正报告。无在产，未合主线/commit/push/成片外传。 |
+
+| Codex Pi双片质量只读评价20261028 | 两版独立评价已完成：可看AI样片，本次H3整片连贯性更稳 | codex/pi-video-model-ab-20261027 | .runtime/pi-full-episode-skills128-20261028/quality-review-20261028/QUALITY-SUMMARY.md | 已收工 | 两位Agent各看最终24cuts的72帧及关键动作序列；H3动作信息偏靠对白/红光歧义，SD旧灯主体形变更明显；共同节奏情绪偏匀。声音仅既有Eureka，未独立耳听/口型确认。无生产改动、新生成/听审API/上传/提交推送。 |
+
+| Codex Pi与旧pipeline同题质量对比20261028 | 旧已上传W10 export003与新Pi H3/SD实际成片对比完成 | codex/pi-video-model-ab-20261027 | .runtime/pi-full-episode-skills128-20261028/pipeline-quality-comparison-20261028/COMPARISON.md | 已收工 | 本次优先PiH3物件/时空更稳；旧反应近景与字幕/配乐/尾卡完整；PiSD有增有减未全面超过旧。旧544p/PiH3768/PiSD720，不能归因仅架构；声音未独立听审。无生产修改、新生成/听审API、上传、提交推送。 |
+
+| Codex 旧pipeline与Pi生成轨迹分析20261028 | 实际旧W10与PiH3/SD全过程取证已完成 | codex/pi-video-model-ab-20261027 | .runtime/pi-full-episode-skills128-20261028/trajectory-comparison-20261028/TRAJECTORY-COMPARISON.md | 已收工 | 旧DS58镜29组→SD额度中断→外部补请求/新H3准备→Luna与宿主交替render/review→音乐长度错→外层恢复导出；Pi同会话直接生成/观察/取舍。H3回喂真实帧；SD句组变动且制作稿晚同步，24成片段来自21源ID。未改生产或新增任何模型/上传操作，计数/时间不同口径已说明。 |
+
+| Codex Pi完整轨迹漏洞审计20261028 | 异常路径补查完成：两类代码缺口及恢复边界已留证 | codex/pi-video-model-ab-20261027 | .runtime/pi-full-episode-skills128-20261028/trajectory-audit-20261028/AUDIT.md | 已收工，产品代码未改 | H3图片/视频同attempt重复POST及未知提交换池重发已离线复现；SD/H3剪辑清单可改致旧片配新清单finish已复现；普通提前stop无续接、入口未接进程resume。当前真实两片未发现触发前两类，真实API/模型调用0。先补工具提交/版本边界，未重拍/扩额/上传/部署。 |

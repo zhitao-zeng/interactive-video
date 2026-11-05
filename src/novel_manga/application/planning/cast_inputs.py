@@ -18,7 +18,7 @@ import novel_manga.application.planning.context as planner_context
 from .run_types import ChapterSource, ChapterCast
 
 
-def prepare_cast(args, ctx: PlannerContext, source: ChapterSource) -> ChapterCast:
+def prepare_cast(args, ctx: PlannerContext, source: ChapterSource, *, allow_exception_growth=False) -> ChapterCast:
     episode = source.episode
     novel_dir = source.novel_dir
     episode_dir = source.episode_dir
@@ -32,6 +32,7 @@ def prepare_cast(args, ctx: PlannerContext, source: ChapterSource) -> ChapterCas
     if not args.dry_run and not args.replay:
         from novel_manga.application.identity.flow import resolve_chapter
         context = resolve_chapter(episode_dir, data=identity_data)
+    if allow_exception_growth and not args.dry_run and not args.replay:
         # Anyone on stage that the reading calls a character and the bible has no entry for: build them
         # now, then read the chapter again against the larger catalogue.  Re-reading costs no model call
         # (resolve_chapter reuses the saved source actors while the segments are unchanged) and it is the
@@ -188,3 +189,7 @@ def prepare_cast(args, ctx: PlannerContext, source: ChapterSource) -> ChapterCas
     volumes = json.loads(volumes_path.read_text(encoding="utf-8")) if volumes_path.is_file() else []
     previous_volumes = [row for row in volumes if int(row.get("to", 0)) < episode.index][-2:]
     return ChapterCast(full_bible, bible, names, everyone, location_map, grammar, ledger_snapshot, identity_data, props_added_at, source_places, recap_path, previous_recap, previous_ending, previous_volumes, sliced_characters, sliced_locations)
+
+
+def repair_cast(args, ctx: PlannerContext, source: ChapterSource) -> ChapterCast:
+    return prepare_cast(args, ctx, source, allow_exception_growth=True)

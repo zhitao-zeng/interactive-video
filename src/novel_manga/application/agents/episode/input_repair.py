@@ -15,43 +15,27 @@ from novel_manga.application.repair import history
 from novel_manga.util import atomic_write_json, read_json
 from .arguments import RepairArgumentError, UnsupportedInput, CompileConflict, validate_resume
 
-_SERVICE_STATUS = re.compile(r'\bHTTP[:\s]+([45]\d\d)\b')
-# A payment, credential, quota or outage answer is about the shared service,
-# never about this candidate's content.  It must not spend a content revision,
-# a media take or an input attempt, and the rest of the batch must not be sent
-# to a service already known to be unusable.
-_SERVICE_STATUSES = {401, 402, 403, 407, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524}
-_SERVICE_WORDS = ('quota_not_enough', 'insufficient', 'payment required', 'credential',
-                  'unauthorized', 'api key', 'rate limit', 'service unavailable')
+from .arguments import service_interruption
 
-
-def service_interruption(error):
-    """The HTTP status/text of an outage or account failure, or None.
-
-    Task submission wraps its answer in RuntimeError texts such as
-    ``task submission returned HTTP 402: ...``; direct httpx errors carry the
-    response.  Content rejections never match here.
-    """
-    if isinstance(error, UnsupportedInput):
-        return None
-    response = getattr(error, 'response', None)
-    status = getattr(response, 'status_code', None)
-    detail = getattr(response, 'text', None) or str(error)
-    if status is None:
-        match = _SERVICE_STATUS.search(str(error))
-        status = int(match.group(1)) if match else None
-    lowered = str(detail).lower()
-    if status in _SERVICE_STATUSES or any(word in lowered for word in _SERVICE_WORDS):
-        return {'http_status': status, 'detail': str(detail).strip().replace('\n', ' ')[:500]}
-    return None
 from .input_records import (INPUT_LIMIT, SOURCE_REVIEW_POLICY, _phase_groups, effects,
                            remaining_input_attempts, input_receipt, source_review_recoverable,
                            latest_input_records)
-from .input_records import asset_configuration_recoverable, posture_protocol_recoverable, first_frame_recoverable
+from .input_records import asset_configuration_recoverable, posture_protocol_recoverable, first_frame_recoverable, asset_image_recoverable
 
-from .input_contracts import normalize_arguments, expand_shared_scope, SHOT_NAMES, SHOT_FIELDS
+from .input_contracts import (normalize_arguments, expand_shared_scope, SHOT_NAMES, SHOT_FIELDS,
+                              opening_grant, validate_grant, evidence_fingerprint)
 from .input_compilation import compile_input
-from .input_candidate import prepare_candidate
+from .input_candidate import prepare_candidate, resolve_input_scope
+
+
+def current_repair_grant(ctx,row,plan):
+    from .first_frames import current_frame_grant
+    target=next(c for c in plan['clips'] if c['clip_id']==row['clip_id'])
+    from .input_contracts import RepairGrant
+    saved=current_frame_grant(ctx,target)
+    if not saved:return None
+    return RepairGrant(saved['operation'],saved.get('shot_indexes') or [],
+                       frozenset(saved.get('shot_fields') or []),saved.get('evidence') or {})
 
 
 
@@ -131,6 +115,10 @@ def repair_status(ctx):
             row['resume_action']={'clip_id':cid,'action':'input','resume':True,
                 'reason':'Continue the same source-checked correction into fresh first-frame preparation.'}
             row['next_action']='Resume this unchanged candidate once after the host ordering fix; all image/video limits and earlier resume counts remain.'
+        if asset_image_recoverable(record):
+            row['resume_action']={'clip_id':cid,'action':'input','resume':True,
+                'reason':'Continue source-approved asset image repair within the new three-picture bound; text and video counts are unchanged.'}
+            row['next_action']='Resume the saved source/design at the picture stage; failed old picture is attempt one, at most three pictures total.'
     from .input_records import input_operations
     for cid, row in states.items():
         operations = input_operations(ctx, cid, records=records)
@@ -269,7 +257,7 @@ def refresh_inputs(ctx, plan, script):
         shutil.copy2(phases, ctx.work_dir/'input/phases.json')
 
 
-def repair(ctx, row, *, check_only=False):
+def repair(ctx, row, *, check_only=False, request_receipt=None, grant=None):
     from novel_manga.application.repair.publication import publish_candidate
 
     directory = ctx.episode_dir
@@ -279,7 +267,8 @@ def repair(ctx, row, *, check_only=False):
         saved = latest[1] if latest else {}
         if (not saved.get('decision') or not (saved.get('status') in {'checking', 'incomplete', 'published'}
                                              or saved.get('error_kind') == 'service_interrupted'
-                                             or source_review_recoverable(saved))):
+                                             or source_review_recoverable(saved)
+                                             or asset_image_recoverable(saved))):
             raise ValueError('no incomplete input repair is available to resume')
         row = {**saved['decision'], 'reason': row.get('reason') or saved.get('reason') or 'Resume saved input repair'}
     row = normalize_arguments(row)
@@ -292,6 +281,8 @@ def repair(ctx, row, *, check_only=False):
     if scope is not None and (cid not in scope
             or any(key not in {c['clip_id'] for c in plan['clips']} for key in scope)):
         raise RepairArgumentError('clip_ids must include the target and only current episode clips')
+    grant=grant or current_repair_grant(ctx,row,plan)
+    validate_grant(row,grant)
     source = (ctx.run_dir/'source.txt').read_text(encoding='utf-8')
     quote = str(row.get('source_quote') or '').strip()
     if not quote or quote not in source:
@@ -302,37 +293,51 @@ def repair(ctx, row, *, check_only=False):
                      if (record := read_json(path, {})).get('decision')
                      and (effects(record['decision']) == effects(row)
                           or (record.get('submitted_decision') and effects(record['submitted_decision']) == effects(row)))), None)
+    scope_info = resolve_input_scope(ctx,row,plan,script,target)
+    reuse_fingerprint=evidence_fingerprint({'policy':SOURCE_REVIEW_POLICY,'source':source,
+        'quote':quote,'decision':effects(row),'script':script})
+    def recheck_reused_source(receipt,record,*,compiled):
+        if compiled:
+            review_shots=shots;review_patches=patches;review_phases=phases
+            review_locations=locations;review_characters=characters;after_script=candidate_script
+        else:
+            review_shots=script['shots'];review_patches=row.get('shots') or []
+            review_phases=(row.get('phases') or {}).get('characters',{})
+            review_locations=row.get('locations') or {};review_characters=row.get('characters') or {};after_script=script
+        scoped_shots=_source_review_shot_context(script['shots'],review_shots,set(scope_info.source_review_indexes))
+        options={}
+        if row.get('reason'):options['review_reason']=row['reason']
+        if review_characters:options['characters']=review_characters
+        if 'music_plan' in row:
+            options['music_plans']={'before':script.get('music_plan'),'after':after_script.get('music_plan')}
+        if record.get('reuse_source_fingerprint')==reuse_fingerprint and record.get('reuse_source_review'):
+            review=record['reuse_source_review']
+        else:
+            try:
+                review=source_check(source,quote,review_patches,review_phases,review_locations,scoped_shots,**options)
+            except UnsupportedInput as error:
+                review={'consistent':False,'problems':[str(error)]}
+        record['reuse_source_fingerprint']=reuse_fingerprint
+        record['reuse_source_review']=review
+        atomic_write_json(receipt,record)
+        if review.get('consistent') is False or review.get('problems'):
+            return {'ok':False,'error':'source_rejected','changed':[],'accepted':[],
+                    'input_repaired':[],'input_reused':[cid],'reused':True,
+                    'blocked':{cid:'; '.join(review.get('problems') or ['current source review rejected the candidate'])}}
+        return None
     if matching and matching[1].get('published'):
-        # Publication already applied speaker/cast changes. Finish its bookkeeping
-        # against the current plan, without replaying guards on the old identities.
-        path, recorded = matching
         if check_only:return {'valid':True,'resume_published':True}
-        refresh_inputs(ctx, plan, script)
-        changed = recorded.get('changed', []) if recorded.get('status') != 'prepared' else []
-        recorded.update(status='prepared', step='complete')
-        recorded.pop('error', None)
-        recorded.pop('error_kind', None)
-        atomic_write_json(path, recorded)
-        return {'changed': changed, 'accepted': [], 'input_repaired': [cid], 'blocked': {}, 'reused': True}
-    addresses = set(target.get('shot_indexes') or [])
-    media = read_json(directory/'thin_media_report.json', {})
-    blocked_inputs = set(media.get('blocked_clips') or {}) | set(media.get('failed_clips') or [])
-    for clip in plan['clips']:
-        if clip['clip_id'] in blocked_inputs:
-            addresses.update(clip.get('shot_indexes') or [])
-    # A shared costume/location correction must be able to correct the source fields
-    # in the same dependent clips that this operation will recompile.
-    raw_phases = row.get('phases') or {}
-    affected_people = set(raw_phases.get('characters') or {}) if isinstance(raw_phases, dict) else set()
-    affected_locations = set(row.get('locations') or {})
-    for clip in plan['clips']:
-        if any((ref.get('role') == 'character' and ref.get('name') in affected_people)
-               or (ref.get('role') == 'location' and ref.get('name') in affected_locations)
-               for ref in clip.get('references', [])):
-            addresses.update(clip.get('shot_indexes') or [])
-    if scope is not None:
-        addresses = {i for clip in plan['clips'] if clip['clip_id'] in scope for i in clip.get('shot_indexes', [])}
-    prepared = prepare_candidate(ctx, row, plan, script, target, addresses, scope, matching)
+        receipt,record=matching
+        if failure:=recheck_reused_source(receipt,record,compiled=False):return failure
+        refresh_inputs(ctx,plan,script)
+        changed=record.get('changed',[]) if record.get('status')!='prepared' else []
+        record.update(status='prepared',step='complete')
+        record.pop('error',None);record.pop('error_kind',None)
+        atomic_write_json(receipt,record)
+        return {'changed':changed,'accepted':[],'input_repaired':[cid],'blocked':{},'reused':True}
+    addresses = set(scope_info.allowed_indexes)
+    prepared = prepare_candidate(ctx, row, plan, script, target, addresses, scope, matching,
+                                 scope_info=scope_info)
     case = prepared.compilation
     row = case.row
     candidate_script = case.candidate_script
@@ -352,17 +357,25 @@ def repair(ctx, row, *, check_only=False):
     if check_only:
         input_receipt(ctx,cid,row,check_only=True)
         return {'valid':True,'clip_ids':sorted(targets),'allowed_shot_indexes':sorted(addresses)}
-    receipt, record = input_receipt(ctx, cid, row)
+    if request_receipt is None:
+        receipt, record = input_receipt(ctx, cid, row)
+    else:
+        receipt, record = request_receipt
+        if (effects(record.get('decision') or {}) != effects(row)
+                or (record.get('source') or {}).get('consistent') is not True):
+            raise ValueError('request correction must continue the exact source-approved input')
     if row != submitted_row:
         record['submitted_decision'] = submitted_row
     if record.get('status') in {'prepared', 'checked_existing_wearing'}:
+        if failure:=recheck_reused_source(receipt,record,compiled=True):return failure
         refresh_inputs(ctx, plan, script)
         return {'changed': [], 'accepted': [], 'input_repaired': [cid], 'blocked': {}, 'reused': True}
     if record.get('published'):
+        if failure:=recheck_reused_source(receipt,record,compiled=True):return failure
         refresh_inputs(ctx, plan, script)
         record.update(status='prepared', step='complete')
         atomic_write_json(receipt, record)
-        return {'changed': record.get('changed', []), 'accepted': [], 'input_repaired': [cid], 'blocked': {}}
+        return {'changed': record.get('changed', []), 'accepted': [], 'input_repaired': [cid], 'blocked': {}, 'reused':True}
     phase_path = None
     old_phases = None
     bible_path = ctx.novel_dir/'story_bible.json'
@@ -381,13 +394,16 @@ def repair(ctx, row, *, check_only=False):
         if not record.get('source'):
             record['source_review_policy'] = SOURCE_REVIEW_POLICY
             atomic_write_json(receipt, record)
-            affected_indexes={i for c in plan['clips'] if c['clip_id'] in targets for i in c.get('shot_indexes',[])}
-            scoped_shots = _source_review_shot_context(script['shots'], shots, affected_indexes)
+            scoped_shots = _source_review_shot_context(
+                script['shots'],shots,set(scope_info.source_review_indexes))
             review_options = {}
             if row.get('reason'):
                 review_options['review_reason'] = row['reason']
             if characters:
                 review_options['characters'] = characters
+            if 'music_plan' in row:
+                review_options['music_plans']={'before':script.get('music_plan'),
+                                              'after':candidate_script['music_plan']}
             record['source'] = source_check(source, quote, patches, phases, locations, scoped_shots,
                                             **review_options)
             atomic_write_json(receipt, record)
@@ -457,17 +473,24 @@ def repair(ctx, row, *, check_only=False):
         atomic_write_json(receipt, record)
         return {'changed': changed, 'accepted': [], 'input_repaired': [cid], 'blocked': {}}
     except Exception as error:
+        from novel_manga.application.assets.candidates import AssetImageRejected
         if isinstance(error,CompileConflict):record['error_details']=error.details
-        if isinstance(error, UnsupportedInput) and hasattr(error, 'review'):
+        if isinstance(error, UnsupportedInput) and not isinstance(error, AssetImageRejected) and hasattr(error, 'review'):
             record['source_review'] = error.review
         outage = service_interruption(error)
-        kind = ('source_rejected' if isinstance(error, UnsupportedInput) else
+        kind = ('asset_image_rejected' if isinstance(error, AssetImageRejected) else
+                'source_rejected' if isinstance(error, UnsupportedInput) else
                 'tool_error' if isinstance(error, (KeyError, AttributeError, TypeError)) else
                 'service_interrupted' if outage or isinstance(error, (OSError, TimeoutError, subprocess.TimeoutExpired)) else
                 'input_validation')
-        record.update(status='rejected' if kind == 'source_rejected' else
-                      'tool_error' if kind in {'tool_error', 'service_interrupted'} else 'incomplete',
+        image_outage = (kind == 'service_interrupted' and stage in {'character_assets', 'assets'}
+                        and (record.get('source') or {}).get('consistent') is True)
+        record.update(status='rejected' if kind in {'source_rejected', 'asset_image_rejected'} else
+                      'tool_error' if kind in {'tool_error', 'service_interrupted'} and not image_outage else 'incomplete',
                       step=stage, error=f'{type(error).__name__}: {error}', error_kind=kind)
+        if isinstance(error, AssetImageRejected):
+            record['asset_image_review']={'exhausted':error.exhausted,'asset_id':error.asset_id,
+                                          'review':error.image_review}
         if kind == 'service_interrupted':
             # This is the shared service, not this candidate: keep the saved
             # decision and every count for an unchanged continuation.

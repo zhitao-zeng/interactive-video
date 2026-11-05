@@ -41,6 +41,8 @@ def prepare_authored(project: Path, output: Path, *, family: str = 'adventure') 
     for name in ('performance_en.json','style.json','layout.json'):
         if (project/name).is_file():
             shutil.copy2(project/name,output/name)
+    if (project/'style-examples').is_dir():
+        shutil.copytree(project/'style-examples',output/'style-examples')
     segments=[{'segment_id':s['segment_id'],'text':s['source_quote']} for s in shots]
     for name,value in [('chapter_script',script),('segments',segments),('authored_groups',material['groups']),
                        ('interaction',material['interaction']),('overlays',material['overlays']),
