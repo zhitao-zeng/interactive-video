@@ -134,6 +134,14 @@ def _reference_bindings(clip, blocks):
                 for name, own in character_pictures(clip).items()
                 for number in [subjects[name]]}
     expected.update({number: {picture} for number, picture, _ in asset_subjects(clip)})
+    from novel_manga.media.first_frames import picture_map
+    mapping = picture_map(clip)
+    if clip.get('first_frame'):
+        visible = set(clip['first_frame'].get('visible_characters', []))
+        for number, pictures in expected.items():
+            owner = next((name for name, n in subjects.items() if n == number), None)
+            expected[number] = {mapping[p] for p in pictures
+                                if not owner or owner in visible or mapping[p] != 1}
     definitions = blocks["subject_definitions"]
     rows = list(re.finditer(r"(?m)^<(Subject|Audio) (\d+)>[^\n]*", definitions))
     declared = {}
@@ -154,11 +162,11 @@ def _reference_bindings(clip, blocks):
         allowed = set(pictures)
         owner = next((name for name, n in subjects.items() if n == number), None)
         if owner:
-            allowed.update(p for p, ref in enumerate((r for r in clip["references"] if r["role"] != "voice"), 1)
+            allowed.update(mapping[p] for p, ref in enumerate((r for r in clip["references"] if r["role"] != "voice"), 1)
                            if owner in ref.get("wearers", []))
         if not pictures <= actual or not actual <= allowed:
             raise ValueError("Subject/Picture binding disagrees with selected reference order")
-    for kind, count in (("Picture", sum(r["role"] != "voice" for r in clip["references"])),
+    for kind, count in (("Picture", 1+len(clip["first_frame"].get("extra_references", [])) if clip.get("first_frame") else sum(r["role"] != "voice" for r in clip["references"])),
                         ("Audio", len(voices)), ("Subject", len(expected))):
         actual = {int(n) for n in re.findall(r"<" + kind + r" (\d+)>", clip["prompt_h3"])}
         if actual != set(range(1, count+1)):

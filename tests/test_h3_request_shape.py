@@ -175,3 +175,38 @@ def test_binding_emotion_is_given_to_the_writer_without_changing_the_words(monke
     assert h3.convert(clip)
     assert clip['prompt_h3'].count('delivery is quiet')==1
     assert not request_issues(clip)
+
+
+def test_cached_reference_rejection_recompiles_with_feedback_without_changing_source(tmp_path, monkeypatch):
+    import json
+    from novel_manga.application.rendering import h3
+    from novel_manga.application.preparation import request_check
+    from support.h3_translation import with_dialogue_slots
+    clip = scene_clip(clip_id='clip_01', prompt=PROMPT)
+    clip['prompt_h3'] = compose(clip, ['<Subject 1> stands by the door.'], stages_of(PROMPT))
+    old_english = clip['prompt_h3']
+    clip['prompt_h3_of'] = h3_stamp(clip)
+    work = tmp_path/'episode/work/request_checks'; work.mkdir(parents=True)
+    rejection = 'Picture 1 is female; the request uses masculine pronouns for Subject 1.'
+    (work/'clip_01.json').write_text(json.dumps({'inputs':{'english':old_english},
+        'answer':{'consistent':False,'problems':[rejection]}}))
+    checked = []
+    def current(directory, candidate):
+        checked.append(candidate['prompt_h3'])
+        return {'consistent':False,'problems':[rejection]} if candidate['prompt_h3']==old_english else {'consistent':True,'problems':[]}
+    def translate(parts, schema, **kwargs):
+        assert rejection in parts[0]['text']
+        return {'shots':with_dialogue_slots(parts,['<Subject 1> waits beside the door, looking toward its opening.']),
+                'soundscape':'None.','conflicts':[]}
+    monkeypatch.setattr(h3,'request_context',lambda *args, **kwargs: ({}, []))
+    monkeypatch.setattr(request_check,'current_request',current)
+    monkeypatch.setattr(h3,'ask_json',translate)
+    assert h3.convert(clip,episode_dir=tmp_path/'episode') is True
+    assert clip['prompt']==PROMPT and clip['prompt_h3'] != old_english
+    assert clip['prompt_h3_of']==h3_stamp(clip)
+    assert checked==[old_english,clip['prompt_h3']]
+    # The corrected cached clip does not get translated again or alter its source.
+    (work/'clip_01.json').write_text(json.dumps({'inputs':{'english':clip['prompt_h3']},
+        'answer':{'consistent':True,'problems':[]}}))
+    assert h3.convert(clip,episode_dir=tmp_path/'episode') is False
+    assert len(checked)==2

@@ -28,7 +28,10 @@ def cli(monkeypatch, work, *, identity=None, outputs=None, exit_code=0, handoff=
     calls = []
     def call(command, *, stdin, stdout, stderr, env):
         calls.append(command)
-        assert stdin.read().startswith('You are the whole-episode production Agent.')
+        delivered = stdin.read()
+        assert delivered.startswith('For text reads, including SKILL.md and the manifest, use python3')
+        assert '/work/.claude/skills/episode-production/scripts/read-text.py' in delivered
+        assert 'You are the whole-episode production Agent.' in delivered
         events = [{'type': 'thread.started', 'thread_id': identity}]
         if handoff:
             events.append({'type': 'item.completed', 'item': {'type': 'command_execution', 'exit_code': 0,
