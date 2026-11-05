@@ -59,6 +59,9 @@ def prepare(ctx,status,diagnosis,memories):
         'mode':'adopted_repair' if adopted else 'provisional_draft',
         'author_session':read_json(ctx.work_dir/'episode-session.json',{}).get('session_id'),
         'upstream_route':status.get('upstream_route'),
+        **({'first_frames':status['first_frames']} if status.get('first_frames') else {}),
+        **({'music_selection':status['music_selection']} if status.get('music_selection') else {}),
+        **({'audio_mix':status['audio_mix']} if status.get('audio_mix') else {}),
         'targets':targets,'issues':issues,'last_operation':last,'evidence_files':files,
         'full_status':'input/current-status.json','reference_catalog':'input/catalog.json','related_history':recent,
         'tool_source':'/opt/novel-code/novel_manga/application/agents/episode',
@@ -70,6 +73,7 @@ def prepare(ctx,status,diagnosis,memories):
             'Empty adopted targets do not mean the draft is complete. Read the saved draft/check evidence.'])+[
             'resume:true executes the saved decision unchanged; do not combine it with new shots/assets/source_quote.',
             'remaining_attempts does not renew a spent revision of the same pending candidate.',
+            'For an assembly ambience/silence problem with passed native takes, inspect audio_mix and source evidence before proposing new video.',
             'Use exact risk_choices values. Accepted tool job means submitted; inspect its completed result.',
             'unresolved_clips (pending in old completed apply receipts) are remaining repair targets, not running jobs. When busy=false and '
             'job.status=completed, take the next legal action or finish; do not wait for these clips to change on their own.',

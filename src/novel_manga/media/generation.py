@@ -134,10 +134,15 @@ def h3_sampling(ctx) -> dict | None:
     return dict(sampler()) if sampler is not None else None
 
 
+def image_paths(ctx, clip):
+    from .first_frames import video_metadata
+    return tuple(ctx.novel_dir/ref['path'] for ref in video_metadata(clip))
+
+
 def build_request(ctx, clip, attempt):
     retry = retry_suffix(ctx, clip, attempt)
     prompt = clip_prompt(ctx, clip) + retry + (COMPLIANCE_SUFFIX if ctx.state.clip(clip['clip_id']).compliance else '')
-    references = tuple(ctx.novel_dir / ref['path'] for ref in clip.get('references', []) if ref.get('role') != 'voice')
+    references = image_paths(ctx, clip)
     digests = reference_digests(references)
     request = {'clip_id': clip['clip_id'], 'attempt': attempt, 'duration': clip['request_seconds'],
                'prompt': prompt, 'references': [str(p) for p in references], 'reference_sha256': digests,
@@ -146,6 +151,13 @@ def build_request(ctx, clip, attempt):
         voices = tuple(path for _, path in chosen_voices(ctx, clip)[0])
         request['reference_audios'] = [str(path) for path in voices]
         request['reference_audio_sha256'] = reference_digests(voices)
+    from novel_manga.story.voice_delivery import native_speech_selected
+    if native_speech_selected(clip):
+        request['h3_speech_policy']=clip['h3_speech_policy']
+        request['reference_audios']=[]
+        request['reference_audio_sha256']={}
+    if clip.get('first_frame'):
+        request['first_frame']=str(ctx.novel_dir/clip['first_frame']['path'])
     if ctx.settings.local_h3_base_url:
         request['seed_variant'] = int(clip.get('repair_take', 0))*100 + attempt - 1
         sampling = h3_sampling(ctx)
@@ -164,7 +176,8 @@ def submit(ctx, clip, request, output, references):
               else reference_voices(ctx, clip))
     result = ctx.provider.create_video(request['prompt'], None, output, duration=float(clip['request_seconds']),
             additional_images=references, reference_audios=voices,
-            **({'seed_variant': request['seed_variant']} if ctx.settings.local_h3_base_url else {}))
+            **({'seed_variant': request['seed_variant']} if ctx.settings.local_h3_base_url else {}),
+            **({'first_frame': ctx.novel_dir/clip['first_frame']['path']} if ctx.settings.local_h3_base_url and clip.get('first_frame') else {}))
     if ctx.settings.local_h3_base_url:
         actual = read_json(output.with_suffix(output.suffix + '.task.json'), {}).get('h3_sampling')
         if isinstance(actual, dict) and actual != request.get('h3_sampling'):

@@ -141,6 +141,17 @@ def compile_input(case: InputCompilation, receipt, record, progress) -> Compiled
         if 'generation_seed' in before:
             clip['generation_seed'] = before['generation_seed']
         clip['repair_take'] = int(before.get('repair_take', 0)) + 1
+        from novel_manga.media.first_frames import enabled, opening_contract
+        frame=clip.get('first_frame')
+        opening=[s for s in candidate_script['shots'] if s.get('index') in clip['shot_indexes']]
+        if (enabled(ctx) and frame and
+                opening_contract(clip,frame['source_contract']['image_references'],shots=opening)!=frame['source_contract']):
+            # Source is checked, but the old pixels cannot certify the new opening.
+            # first_frames will supply the Agent's complete new image/request pair.
+            clip.pop('prompt_h3',None)
+            clip.pop('prompt_h3_of',None)
+            clip['prompt_h3_skip']='Opening changed; generate and review its fresh first frame before rendering.'
+            continue
         progress('translate:'+key)
         from novel_manga.application.profiles import h3_stamp
         cached = translations.get(key) or {}

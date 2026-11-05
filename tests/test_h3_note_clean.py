@@ -160,7 +160,7 @@ def test_failed_translation_returns_final_format_reason_to_the_repair_caller(mon
     monkeypatch.setattr(h3,'ask_json',lambda *a,**k:{'shots':[],'soundscape':'','conflicts':[]})
     problems=[]
     assert not h3.convert(clip,tries=1,problems=problems)
-    assert problems==['ValueError: one nonempty direction is required for each shot']
+    assert len(problems)==1 and 'exactly 1 items' in problems[0] and 'received 0' in problems[0]
     assert not clip.get('prompt_h3')
 
 
