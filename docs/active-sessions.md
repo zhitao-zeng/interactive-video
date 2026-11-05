@@ -473,3 +473,5 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | Codex 当前生产改进合主线与公开20261105 | 用户明确授权运行中BGM/独审/原导演回修/单次加时整合并公开GitHub | codex/production-integration-20261105 | Pi starter/template、两份现有队列脚本与相关回归、文档 | 2026-11-05 | 本地整合完成：两分支已合、Gen8/v3运行修复无遗漏；普通init真读95曲，审片限制/音频问题透传保留，原导演回修与单次已授权加时不增次数。159相关回归及Bun原生检查通过；独立复核1项batch互斥漏检已红绿修复，无遗留Important。仓库已公开，当前执行主线快进推送；最终回执见media/runs/mainline-integration-validation-20261105/integration-result.json。在途不热换。 |
 
 | Codex README结构接口功能重写20261105 | 用户要求重写仓库首页，介绍当前结构/接口/功能 | codex/readme-structure-20261105 | README.md、维护记录；不改生产代码 | 2026-11-05 | 已完成README重写：组件关系图、源码/部署目录、功能、init/run/resume/batch/独审接口、路线/首帧能力、JSON工具与产物；26链接和锚点、Bash/JSON示例语法、CLI帮助核对通过。仅README及维护记录，无生产代码/任务修改；合入main发布。 |
+
+| Codex 独审并发提升20261105 | 用户要求提高本批独立审片并发，先2→4 | codex/review-concurrency-20261105 | pi_episode_lanes.py、调度回归、入口文档；只换父调度不换在途Agent | 2026-11-05 | 主机128核load18、声检队列0；新增可配置审片位，定向回归后单锁接管，保留两场在途审片和全部制作PID/会话/额度。 |

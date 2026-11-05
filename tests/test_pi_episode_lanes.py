@@ -23,6 +23,46 @@ def state(root, jobs):
     return lanes.Controller(root)
 
 
+def test_review_concurrency_controls_the_pool_workers_and_reported_capacity(tmp_path, monkeypatch):
+    leases = tmp_path / 'leases'
+    leases.mkdir()
+    controller = state(tmp_path, [])
+    controller.review_workers = 4
+    original_path = lanes.Path
+    monkeypatch.setattr(lanes, 'Path', lambda p: leases if str(p).endswith('172.28.4.52_30022') else original_path(p))
+    class Reviews:
+        def __init__(self, c): pass
+        def seed(self): pass
+        def recheck_protocol_reports(self): pass
+        def worker(self): pass
+    monkeypatch.setattr(lanes, 'Reviews', Reviews)
+    observed = []
+    class Future:
+        def result(self): pass
+    class Pool:
+        def __init__(self, max_workers):
+            assert max_workers == sum(lanes.CAPACITY.values()) + 4
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+        def submit(self, function, *args):
+            observed.append((function, args))
+            return Future()
+    monkeypatch.setattr(lanes.concurrent.futures, 'ThreadPoolExecutor', Pool)
+    controller.run()
+    assert sum(isinstance(fn.__self__, Reviews) for fn, _ in observed) == 4
+    assert len(observed) == sum(lanes.CAPACITY.values()) + 4
+    assert controller.state['review_queue']['capacity'] == 4
+
+
+def test_review_concurrency_can_be_selected_without_changing_production_slots(tmp_path):
+    (tmp_path / 'state.json').write_text('{"pid":1,"jobs":[],"lanes":{}}')
+    controller = lanes.Controller(tmp_path, review_workers=4)
+    assert controller.review_workers == 4
+    assert lanes.CAPACITY == {'cloud-h3': 2, 'gpu52-fast': 3, 'gpu16-h3': 1}
+    with pytest.raises(ValueError, match='positive integer'):
+        lanes.Controller(tmp_path, review_workers=0)
+
+
 def test_mainline_dispatch_uses_merged_starter_without_batch_owned_snapshots(tmp_path):
     import pi_episode_review as reviewing
     controller = state(tmp_path, [])

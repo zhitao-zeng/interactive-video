@@ -173,6 +173,8 @@ python scripts/pi_video_agent.py batch /absolute/path/to/batch.json
 python scripts/pi_episode_lanes.py /absolute/path/to/prepared-batch-run
 ```
 
+独立审片默认 2 路，可在启动协调器时加 `--review-workers 4` 单独提高审片并发，不改变制作通道并发或单集额度。
+
 该目录需要已经准备好的 `state.json`、各集工作区及相应本地服务配置，与上面的 `batch.json` 不同。协调器读取这些状态，管理各通道、独立审片、原导演回修及复审。`batch` 的成功退出只表示进程完成，不表示内容通过；同一批任务只由一个协调入口管理。
 
 ### 4. 独立审一部成片

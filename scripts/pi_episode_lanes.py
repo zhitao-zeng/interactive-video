@@ -62,7 +62,10 @@ def prepare_pending(workspace, runtime):
 
 
 class Controller:
-    def __init__(self, root):
+    def __init__(self, root, review_workers=2):
+        if type(review_workers) is not int or review_workers <= 0:
+            raise ValueError('review_workers must be a positive integer')
+        self.review_workers = review_workers
         self.root = Path(root)
         self.state = json.loads((self.root / 'state.json').read_text())
         self.mutex = threading.RLock()
@@ -314,7 +317,7 @@ class Controller:
                                for lane, count in CAPACITY.items()}
         self.reviews = Reviews(self)
         self.reviews.seed()
-        self.state['review_queue'] = {'status': 'running', 'capacity': 2}
+        self.state['review_queue'] = {'status': 'running', 'capacity': self.review_workers}
         self.reviews.recheck_protocol_reports()
         for job in self.all_jobs():
             if job['state'] == 'needs_attention' and not job.get('movie'):
@@ -325,13 +328,14 @@ class Controller:
         (self.root / 'controller.json').write_text(json.dumps({
             'pid': os.getpid(), 'previous_controller_pid': previous,
             'script': str(Path(__file__).resolve()), 'capacity': CAPACITY,
+            'review_capacity': self.review_workers,
             'switched_at': now(), 'adopted_runners': [
                 {'id': j['id'], 'pid': j['pid']} for j in self.state['jobs'] if j['state'] == 'running'],
         }, ensure_ascii=False, indent=2) + '\n')
-        with concurrent.futures.ThreadPoolExecutor(max_workers=sum(CAPACITY.values()) + 2) as pool:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=sum(CAPACITY.values()) + self.review_workers) as pool:
             futures = [pool.submit(self.worker, lane)
                        for lane, count in CAPACITY.items() for _ in range(count)]
-            futures += [pool.submit(self.reviews.worker) for _ in range(2)]
+            futures += [pool.submit(self.reviews.worker) for _ in range(self.review_workers)]
             for future in futures:
                 future.result()
         for lane in CAPACITY:
@@ -349,8 +353,10 @@ class Controller:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('run_root', type=Path)
+    parser.add_argument('--review-workers', type=int, default=2,
+                        help='Independent review concurrency; production lane capacities are unchanged')
     args = parser.parse_args()
     # This is the same lock as the original dispatcher. No new worker starts before ownership moves.
     with (args.run_root / 'controller.lock').open('a+') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
-        Controller(args.run_root).run()
+        Controller(args.run_root, review_workers=args.review_workers).run()
