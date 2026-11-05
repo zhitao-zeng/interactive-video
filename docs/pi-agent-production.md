@@ -30,6 +30,79 @@ PYTHONPATH=src .venv/bin/python scripts/pi_video_agent.py run /path/to/new-works
 
 使用工作副本自己的代码、原生会话和已冻结预算。恢复不重置请求计数或媒体额度。模型、输入、通道、首帧策略和互动页在启动前确定，不由 Agent 在运行中自行切换。
 
+### Bash 等待上限
+
+原生 bash 工具的 `timeout` 参数是可选的，缺省时**不装任何定时器**。S2E03A 因此付过代价：
+一条无 timeout 的 `find /` 单次跑了 11960.6 秒（3 小时 19 分），直接把 4 小时墙钟耗尽，
+48 条 take 与 `build/cuts-v1.json` 都在，但没有合成，整路后续停派。
+
+`template/tools/runtime.mjs` 在既有的 `beforeToolCall` 里钳制每次 bash 调用
+（`template/tools/bash_limits.mjs` 提供纯函数）：
+
+- 没写 `timeout` → 用 `local.json` 的 `bash_timeout_seconds`，init 时冻结，默认 900 秒。
+- 写了但超过本 run 剩余墙钟 → 压到剩余值，永不超过。
+- 写了且装得下 → 原样保留，长媒体操作不受影响。
+- 只向下钳制，且返回值不小于 1，已过期时仍能让命令报告而不是挂住。
+
+每次钳制都会往 stderr 打一行 `[bash-timeout] <explicit|default> <old>s -> <new>s (<原因>)`。
+复用的是 `run-budget.json` 已有的 `deadline_at`，没有第二个截止时间来源。
+
+回归：`template/tools/test_bash_limits.mjs`（纯函数）与
+`template/tools/test_bash_timeout_wiring.mjs`（真实原生 Pi 会话 + 假 SSE）。
+后者同时支持 Node 与生产运行时 bun：Bun 忽略 `NODE_OPTIONS=--import`，必须显式
+`--preload`，脚本按 `process.versions.bun` 自行选择；Node < 22 无法加载 SDK 时打印 skip
+而不是失败。两个运行时都已实际跑过同一组三例。
+
+### 窗口续期
+
+墙钟耗尽后 `run` 会在第一次请求前抛 `RUN_BUDGET_EXHAUSTED`，此时需要用户授权的续期文件。
+在该 workspace 写：
+
+```json
+{"seconds": 3600, "authorized_by": "用户批准修 S2E02A 的 blocking", "reason": "独立审片 rejected"}
+```
+
+再 `--resume` 即生效。规则：
+
+- **一次性**：生效后文件写入 `consumed_at`，同一份文件再 resume 不会加时间。
+- **只加时间，不加次数**：`request_limit` 不变；请求数用完仍需另批。
+- 必须带 `authorized_by`，否则拒绝执行。该字段只是**审计记录**，不是授权来源：
+  谁批准、批了多少，由用户在主控会话决定；生产 Agent 不自行写这个文件。
+- 续期记录写入 `run-budget.json` 的 `window_grants`，含授权人、原因与旧 deadline。
+- 续期不改变请求数、限额、`ended_at` 以外的原结束记录、历史回执与已有的失败记录；
+  也不会让旧任务自动获得续跑资格——过期任务仍停在明确未补证状态。
+
+独立审片判 `rejected` 后派回原导演修复时，通常就是靠这个文件把窗口接上。
+
+## 独立审片
+
+`init --role reviewer` 起一个只出判词的审片 Agent：加载 `template/REVIEWER-SYSTEM.md` 与
+`skills/episode-review`，`media.py` 只接受 `inspect` 与 `audio`（抽帧、Eureka 音频感知），
+生成与上传动作在入口被拒绝。它在 init 时就写完整 `TASK.md`（成片路径、SHA256、剪辑时间表、
+基准剧本、授权边界），因此可直接 `run`。
+
+**严重程度与修复方分开**，不要合成一档：
+
+- `severity`（`blocking` / `advisory`）决定 `verdict`。有实际观看阻塞就 `rejected`。
+- `owner`（`episode` / `tool` / `series`）决定派给谁修。
+
+一条问题可以既严重又由工具修——那一版仍是 `rejected`，只是修复落在工具维护者身上；
+反过来，共享工具的轻微行为也不因"是共用代码"就自动升级成阻塞。按实际观看影响判断。
+
+改工具或改系列约定不会改变已经导出的那份 MP4：判词只判当前文件，修复后是新导出、新哈希、需重审。
+
+判词必须绑定成片 SHA256。声音覆盖要按证据分开写：Eureka 按窗口（写出实际合并区间与
+未覆盖秒数）、ASR 是否整轨、电平测量是否整轨——三类不能合并成一句"覆盖完整音轨"。
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/pi_video_agent.py init /path/to/review-workspace \
+  --sdk-root /path/to/frozen-sdk --dependencies /path/to/node_modules \
+  --role reviewer --review-film /path/to/movie.mp4 \
+  --review-timeline /path/to/movie.mp4.timeline.json \
+  --review-baseline /path/to/02-script.json --review-brief "受保护内容与授权边界" \
+  --wall-seconds 7200 --max-model-requests 96
+```
+
 ## 批量生产
 
 `batch` 先完整校验整个 manifest，任何错误在任何 init 或生产调用前报错，且不生成 workspace 或 `batch-state.json`。校验范围包括：
@@ -40,6 +113,9 @@ PYTHONPATH=src .venv/bin/python scripts/pi_video_agent.py run /path/to/new-works
 - workspace 解析后不能重叠（相同、父子目录均拒绝），siblings 允许。
 - `lane`、`first_frame`、`interaction_page`、`h3_mode`、`viewpoint`、`wall_seconds`、`max_model_requests` 等 init 选项均须合法。
 - `FastH3-Omni` 必须显式提供 `fasth3_endpoint`，且 `first_frame=required` 与其不兼容；endpoint 按 SDK 规则规范化。
+- **非 resume 集必须提供 `task` 或 `task_file`。** `init` 复制的是空白 `TASK.md`，`run()` 会拒绝它；
+  没有任务文本的批次注定在 init 之后失败，所以在任何 init 副作用前就报错。`resume` 集不检查这一项，
+  它们的 TASK 在更早的一轮已经授权过。这一项最后检查，其他具体 manifest 错误保持原有优先顺序。
 
 校验通过后，batch 获取 manifest 同级目录 `batch-state.lock` 的排他文件锁；第二个同目录批次在 init/run 前即被拒绝，锁在批次结束时释放。状态文件写入失败属于批次基础设施错误，不会冒充 accepted 或完整结果。
 
@@ -51,10 +127,20 @@ PYTHONPATH=src .venv/bin/python scripts/pi_video_agent.py run /path/to/new-works
   "dependencies": "/path/to/existing/pi/node_modules",
   "workers": 2,
   "episodes": [
-    {"workspace": "/path/to/episode-A", "input": "/path/to/input-A", "endpoint": "official-ds41"},
-    {"workspace": "/path/to/episode-B", "input": "/path/to/input-B", "endpoint": "official-ds41"}
+    {"workspace": "/path/to/episode-A", "input": "/path/to/input-A", "endpoint": "official-ds41",
+     "task": "授权任务文本（写入 TASK.md）"},
+    {"workspace": "/path/to/episode-B", "input": "/path/to/input-B", "endpoint": "official-ds41",
+     "task_file": "/path/to/episode-B-task.md"}
   ]
 }
+```
+
+单集 init 也可以直接带上任务文本，省掉手工编辑 `TASK.md`：
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/pi_video_agent.py init /path/to/episode \
+  --sdk-root /path/to/sdk --dependencies /path/to/node_modules \
+  --input /path/to/input --task-file /path/to/task.md
 ```
 
 ```bash

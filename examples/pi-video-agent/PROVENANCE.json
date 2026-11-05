@@ -48,13 +48,20 @@
       "path": "starter.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/starter.py",
       "source_sha256": "8b057e04ed564a8297b7368b5cb10b25bd9e60ac2b2ecf1466146ea65e3efc17",
-      "merged_sha256": "b0541f82e1bf00c2c55f715f217f34dfbd32210149cac0a2bba5f6ff1d40429e"
+      "merged_sha256": "0b1d906f52e792a739d9bf8ef3f9a1878918ec6e8ed318a3e70c94936fe843a1"
     },
     {
       "path": "template/CAPABILITIES.md",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/CAPABILITIES.md",
       "source_sha256": "078280fbfb2f5b9ee936b84877a1b980814997985a481d0129eead72e8b2a369",
-      "merged_sha256": "078280fbfb2f5b9ee936b84877a1b980814997985a481d0129eead72e8b2a369"
+      "merged_sha256": "e93b2336f0e0362abcc12451438b51476168be527e49ce165b5ce6a1174e3d05"
+    },
+    {
+      "path": "template/REVIEWER-SYSTEM.md",
+      "source": null,
+      "source_sha256": null,
+      "merged_sha256": "60239984f0e7e0daea11ee0cd418cc79ebfefa0d1fc74d3bd34c89c670dba850",
+      "note": "New in this project: reviewer role system prompt. No upstream source."
     },
     {
       "path": "template/SKILL.md",
@@ -66,7 +73,7 @@
       "path": "template/SYSTEM.md",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/SYSTEM.md",
       "source_sha256": "bef71c9a0cf0342402435f9b1665c6727f03f296254fc40f589cece78836b85f",
-      "merged_sha256": "bef71c9a0cf0342402435f9b1665c6727f03f296254fc40f589cece78836b85f"
+      "merged_sha256": "61d553764c079c6c2b1d7fc3d39fe82fddab09f7694f81a4145a58f5e700e593"
     },
     {
       "path": "template/TASK.md",
@@ -85,6 +92,13 @@
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/audio-runtime.example.json",
       "source_sha256": "44459bdf7f57efc661bbf37651e6ad3484901834bbb5aa6d29fab6231557e238",
       "merged_sha256": "44459bdf7f57efc661bbf37651e6ad3484901834bbb5aa6d29fab6231557e238"
+    },
+    {
+      "path": "template/reviewer-skill/SKILL.md",
+      "source": null,
+      "source_sha256": null,
+      "merged_sha256": "3677e7b6d3cb37f39a50a56f6d629caf508961e6b1e7bf4870f25d0e31fea81d",
+      "note": "New in this project: independent review skill. No upstream source."
     },
     {
       "path": "template/skill-extra/references/director-feedback.md",
@@ -153,6 +167,13 @@
       "merged_sha256": "c8847e0422444d73ba5810dd074c4916106aa3607425c8b92a2a0a4af65bc4a2"
     },
     {
+      "path": "template/tools/bash_limits.mjs",
+      "source": null,
+      "source_sha256": null,
+      "merged_sha256": "40eb54ae889e71607ddcf244cdd06b4aa8f342be78e7a76c69803aed4130cbfe",
+      "note": "New in this project: bounded bash wait wiring and its regressions. No upstream source."
+    },
+    {
       "path": "template/tools/batch.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/tools/batch.py",
       "source_sha256": "c4b8cd27ed055eb49ee17d1ff49bd4e9ab27191ae6d4215f68eabe557595208f",
@@ -174,7 +195,7 @@
       "path": "template/tools/media.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/tools/media.py",
       "source_sha256": "0307bf9b1beda097f4fb66b03bd1c015356be26f5a5260fa98e6c8ac5402e3ff",
-      "merged_sha256": "dfc7e483bdf6fc2a6ea0784ad160c39fbec63daa69029aa8828acc7878da56f0"
+      "merged_sha256": "7beae667f6d470b8e6cae2d35484dbb43ae5e988356924ae9be061c7d0b037c1"
     },
     {
       "path": "template/tools/plan.example.py",
@@ -204,7 +225,21 @@
       "path": "template/tools/runtime.mjs",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/tools/runtime.mjs",
       "source_sha256": "fe6ad02a140c59b71741496ffd60a41fadc5b743a109ec312e1672b21414dce5",
-      "merged_sha256": "fe6ad02a140c59b71741496ffd60a41fadc5b743a109ec312e1672b21414dce5"
+      "merged_sha256": "0196579c892821d3ef0043216128be5ede0a5cd32cee6442822a1db134f73f69"
+    },
+    {
+      "path": "template/tools/test_bash_limits.mjs",
+      "source": null,
+      "source_sha256": null,
+      "merged_sha256": "88dacb053d6a8c5eef2398c8abc02fd3cb25a27fcf17454e56e608e3a3854fd6",
+      "note": "New in this project: bounded bash wait wiring and its regressions. No upstream source."
+    },
+    {
+      "path": "template/tools/test_bash_timeout_wiring.mjs",
+      "source": null,
+      "source_sha256": null,
+      "merged_sha256": "73edf1c2476cdcc9d715b428de5a05272a377c920e9c824bb830cc21049e8d38",
+      "note": "New in this project: bounded bash wait wiring and its regressions. No upstream source."
     },
     {
       "path": "template/tools/test_request_budget.mjs",
@@ -218,5 +253,10 @@
       "source_sha256": "136f5ae8f33565208c1aff95a94412652d6d3430fa140b1bba01652c433ef1c7",
       "merged_sha256": "136f5ae8f33565208c1aff95a94412652d6d3430fa140b1bba01652c433ef1c7"
     }
-  ]
+  ],
+  "updated_at": "2026-11-04",
+  "roles": {
+    "producer": "default; unchanged behaviour",
+    "reviewer": "judges one finished export; media_actions=[inspect,audio]; skill_path=skills/episode-review"
+  }
 }
