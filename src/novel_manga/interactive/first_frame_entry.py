@@ -39,14 +39,14 @@ def select_mode(novel,mode):
         budget['video_units']=len(indexes);atomic_write_json(budget_path,budget)
 
 
-def run(root,novel,*,project,destination,resume=False,config=None):
+def run(root,novel,*,project,destination,resume=False,config=None,lane='h3'):
     from novel_manga.application.agents.episode.context import create_context
     from novel_manga.application.agents.episode.flow import run_episode
     from novel_manga.application.agents.sandbox import load_config
     from .runtime import configure,runner_for
-    configure(root,'h3',project=project)
+    configure(root,lane,project=project)
     profile=read_json(novel/'profile.json',{})
-    first_frame=profile.get('h3_input_mode')=='first-frame'
+    first_frame=profile.get('h3_input_mode')=='first-frame' or profile.get('sd_input_mode')=='first-frame'
     import os
     if profile.get('native_h3_short_edge'):os.environ['NOVEL_H3_SHORT_EDGE']=str(profile['native_h3_short_edge'])
     ctx=create_context(novel,novel.name+'_1',output_root=root/('outputs/episode-agent-firstframes'if first_frame else'outputs/episode-agent-music'),input_mode='script')
@@ -66,14 +66,20 @@ def run(root,novel,*,project,destination,resume=False,config=None):
     options={}
     if resume:
         config['resume_session_on_retry']=True
-        # An explicit resume authorization is the existing bounded retry path:
-        # lifecycle.start_run archives the stopped run and establishes a current
-        # repair window while keeping cumulative agent_seconds and attempts.
-        # Do not intercept it here with the old (already spent) deadline; only a
-        # scheduler continuation of a deferred slice keeps its saved remainder.
         saved=read_json(ctx.run_dir/'agent-run.json',{})
-        if saved.get('status')=='deferred':
+        if saved:
             remaining=int(saved.get('remaining_seconds') or 0)
+            if saved.get('status') in {'running','retrying'} and saved.get('deadline'):
+                import time
+                deadline_remaining=max(0,int(float(saved['deadline'])-time.time()))
+                remaining=min(remaining,deadline_remaining) if saved.get('remaining_seconds') is not None else deadline_remaining
+            if remaining<=0:
+                if saved.get('passed') is True:
+                    receipt=read_json(Path(destination)/'delivery.json',{})
+                    if Path(receipt.get('final_video') or '/nonexistent').is_file():return receipt
+                from novel_manga.application.agents.episode.bounded_recovery import resume_window
+                recovered=resume_window(ctx,saved)
+                remaining=int((recovered or {}).get('remaining_seconds') or 0)
             if remaining<=0:return {'status':'blocked','reason':'original Agent operation time budget exhausted','run_dir':str(ctx.run_dir)}
             options['timeout']=remaining
     result=run_episode(ctx,config=config,retry_issues=resume,**options)
@@ -86,6 +92,6 @@ def run(root,novel,*,project,destination,resume=False,config=None):
     if not report.get('assembly'):
         return {'status':'blocked','agent':result,'run_dir':str(ctx.run_dir)}
     from .delivery import finish_reviewed_delivery
-    runner=runner_for(root,ctx.novel_dir,'h3',project=project)
+    runner=runner_for(root,ctx.novel_dir,lane,project=project)
     receipt=finish_reviewed_delivery(runner,report,destination)
     return {**receipt,'agent_run_dir':str(ctx.run_dir),'agent_status':result.get('status')}

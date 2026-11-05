@@ -27,12 +27,17 @@ def expand_shared_scope(row, plan):
 def normalize_arguments(row):
     """Reject malformed interface values before receipts, models or asset work."""
     validate_resume(row)
-    allowed = {'clip_id','action','reason','source_quote','clip_ids','shots','phases','locations','characters','resume'}
+    allowed = {'clip_id','action','reason','source_quote','clip_ids','shots','phases','locations','characters','resume','music_plan'}
     unknown = set(row)-allowed
+    if 'input' in unknown:
+        raise RepairArgumentError("unsupported 'input' wrapper; put speaker_map and other source patch fields in "
+                                  "shots:[{index: <current shot index>, ...}] with no nested input object")
     if unknown:
         raise RepairArgumentError(f'unsupported input fields: {sorted(unknown)}; '
                                   'use shots, characters, phases.characters and locations for adopted input repairs')
     row = copy.deepcopy(row)
+    if 'music_plan' in row and not isinstance(row['music_plan'],dict):
+        raise RepairArgumentError('music_plan must be an authored postmix plan object')
     scope = row.get('clip_ids')
     if scope is not None and (not isinstance(scope, list) or not scope
             or any(not isinstance(key, str) or not key.strip() for key in scope)):

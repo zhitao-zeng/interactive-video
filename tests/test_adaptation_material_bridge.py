@@ -80,3 +80,45 @@ def test_adaptation_bridge_rejects_uncovered_or_sceneless_drafts(tmp_path):
     with pytest.raises(ValueError, match='spatial_plan has no scene'):
         creative_material.write_adaptation_material(ghost, manifest(), tmp_path/'m2',
             series_material=base, package_script=script)
+
+
+def test_adaptation_keeps_supplied_identities_and_adopts_authored_new_designs(tmp_path):
+    base=series_base(tmp_path);source=tmp_path/'source.md';source.write_text('原稿中的小兽出现。')
+    value=draft();value['chapter_script']['shots'][1]['characters']=['小兽']
+    value['chapter_script']['shots'][1]['in_frame']=['小兽']
+    value['production_design']={'characters':[
+        {'name':'弥夏','appearance':'must not replace supplied identity','wardrobe':'different'},
+        {'name':'小兽','appearance':'source-supported small animal','wardrobe':'natural fur'}],
+        'props':[{'name':'纸袋','appearance':'plain paper bag'}]}
+    out=creative_material.write_adaptation_material(value,manifest(),tmp_path/'out',series_material=base,package_script=source)
+    actual=json.loads((out/'material.json').read_text())['bible']
+    assert actual['characters'][0]=={'name':'弥夏'}
+    assert actual['characters'][1]['name']=='小兽'
+    assert actual['props'][0]['name']=='纸袋'
+    assert json.loads((base/'material.json').read_text())['bible']['characters']==[{'name':'弥夏'}]
+
+
+def test_unknown_actor_without_design_is_returned_to_creator_before_handoff(tmp_path):
+    base=series_base(tmp_path);value=draft();value['chapter_script']['shots'][1]['characters']=['小兽']
+    issues=creative_material.adaptation_issues(value,{**manifest(),'task':{'series_material':str(base)}})
+    assert any('小兽' in issue and 'production_design.characters' in issue for issue in issues)
+
+
+def test_two_scenes_in_one_new_place_create_one_location_reference(tmp_path):
+    base=series_base(tmp_path);source=tmp_path/'s.md';source.write_text('source')
+    value=draft();scenes=value['spatial_plan']['scenes']
+    scenes[1]['location']=scenes[0]['location'];scenes[1]['anchors']=scenes[0]['anchors']
+    out=creative_material.write_adaptation_material(value,manifest(),tmp_path/'out',series_material=base,package_script=source)
+    locations=json.loads((out/'material.json').read_text())['bible']['locations']
+    assert sum(s.startswith('池室·干平台：') for s in locations)==1
+
+
+def test_authored_location_design_reaches_reference_generation_with_spatial_anchors(tmp_path):
+    base=series_base(tmp_path);source=tmp_path/'s.md';source.write_text('source')
+    value=draft();value['production_design']={'locations':[
+        {'name':'日光公园外缘','description':'Open daylight path beside a glass-roofed indoor potting table.'}]}
+    out=creative_material.write_adaptation_material(value,manifest(),tmp_path/'out',series_material=base,package_script=source)
+    locations=json.loads((out/'material.json').read_text())['bible']['locations']
+    row=next(s for s in locations if s.startswith('日光公园外缘：'))
+    assert 'glass-roofed indoor potting table' in row
+    assert '步道与指示牌' in row
