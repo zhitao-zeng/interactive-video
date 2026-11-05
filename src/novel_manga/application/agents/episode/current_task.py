@@ -38,7 +38,7 @@ def prepare(ctx,status,diagnosis,memories):
     files=[f'input/{name}' for name in ('source.txt','segments.json','chapter_script.json',
         'clip_plan.json','catalog.json','latest-preparation.json','latest-render.json','latest-review.json',
         'preparation/exception.json','source-draft-check.json','request-draft.json','manifest.json',
-        'reading/identity_binding_review.json')
+        'reading/identity_binding_review.json','spatial_plan.json','production_handoff.json','publication.json')
         if (ctx.work_dir/'input'/name).is_file()]
     if not adopted and (ctx.work_dir/'output/episode.json').is_file():files.append('output/episode.json')
     recent=[summarize_case(memory) for memory in memories[:2]]
@@ -77,6 +77,34 @@ def prepare(ctx,status,diagnosis,memories):
         brief['repair_playbook']=playbook
         brief['execution_rules'].append('For review/input repair, read repair_playbook if it is new to this session; '
             'then use the section matching current evidence and capabilities. A resumed old conversation also receives this route.')
+    if adopted and targets:
+        # Resolve one target before touring the episode. Full evidence remains
+        # available for actual cross-cut questions; it is not another reading list.
+        focus = targets[0]
+        cid = focus['clip_id']
+        evidence = read_json(ctx.work_dir/'input/latest-review.json', {})
+        current = next((row for row in evidence.get('targets', [])
+                        if row.get('clip', {}).get('clip_id') == cid), {})
+        indexes = set(by_id.get(cid, {}).get('shot_indexes', []))
+        script = read_json(ctx.episode_dir/'chapter_script.json', {})
+        shots = script.get('shots', [])
+        adjacent = {i + delta for i in indexes for delta in (-1, 0, 1)}
+        spatial = read_json(ctx.work_dir/'input/spatial_plan.json', {})
+        atomic_write_json(ctx.work_dir/'input/current-target.json', {
+            'target': focus, 'clip': by_id.get(cid, {}), 'current_evidence': current,
+            'adjacent_shots': [s for number, s in enumerate(shots, 1)
+                               if s.get('index', number) in adjacent],
+            'spatial_scenes': [s for s in spatial.get('scenes', [])
+                               if indexes.intersection(s.get('shot_indexes', []))],
+            'scope': 'Current target only; neighbouring shots establish context, not additional repairs.'})
+        brief['focus'] = {'clip_id': cid, 'evidence_file': 'input/current-target.json',
+                          'frames': current.get('frames', []), 'save_to': 'output/repair.json'}
+        brief['execution_rules'].extend([
+            'Read focus.evidence_file and its actual frames first. Resolve this target and save output/repair.json '
+            'before inspecting unrelated targets. Full source and history remain available for a specific unresolved fact.',
+            'A supported single-clip decision may be checked and applied now; other pending clips do not veto it. '
+            'After the completed host receipt, continue the remaining targets in this same episode session. '
+            'Do not finish the episode merely because this one target is resolved.'])
     atomic_write_json(ctx.work_dir/'input/current-status.json',status)
     atomic_write_json(ctx.work_dir/'input/current-task.json',brief)
     return brief

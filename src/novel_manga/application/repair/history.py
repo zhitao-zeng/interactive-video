@@ -282,10 +282,18 @@ def generation_request(directory: Path, output: Path, request: dict, *, expected
         # cache recovery, not a new submission by the current managed trial.
         return {**request, **{field: copy.deepcopy(previous[field])
                             for field in (GENERATION_FIELD, '_repack_budget') if previous.get(field)}}
-    owner = next((trial for trial in reversed(load(directory).get("trials", []))
+    trials = load(directory).get('trials', [])
+    owner = next((trial for trial in reversed(trials)
                   if trial.get("managed") and request["clip_id"] in trial.get("clips", [])
                   and trial.get("expected_plan") == expected_plan
                   and trial.get("expected_notes") == expected_notes), None)
+    if owner is None and any(t.get('managed') and t.get('expected_plan') == expected_plan
+                             and t.get('expected_notes') == expected_notes for t in trials):
+        # A full rerender can fill an earlier missing clip while repairing a
+        # different one. Charge that new submission to its original managed
+        # scope even though another clip changed the episode-wide plan stamp.
+        owner = next((t for t in reversed(trials) if t.get('managed')
+                      and request['clip_id'] in t.get('clips', [])), None)
     if owner is None and source_budget(directory,request['clip_id'])['roots']:
         owner=next((t for t in reversed(load(directory).get('trials',[])) if t.get('managed')
                     and request['clip_id'] in t.get('clips',[])),None)

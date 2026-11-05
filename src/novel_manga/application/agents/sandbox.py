@@ -139,6 +139,14 @@ def container_running(name: str) -> bool:
     return name in result.stdout.split()
 
 
+def thinking_budget(config: dict) -> int | None:
+    if config.get('max_thinking_tokens') is not None:
+        return int(config['max_thinking_tokens'])
+    if ((config.get('extra_body') or {}).get('thinking') or {}).get('type') == 'disabled':
+        return 0
+    return None
+
+
 def provider_container_args(config: dict) -> list[str]:
     """Provider-specific network/request options; credentials stay in the environment."""
     args = []
@@ -146,11 +154,19 @@ def provider_container_args(config: dict) -> list[str]:
         args.extend(['--network', str(config['docker_network'])])
     if config.get('context_window'):
         args.extend(['-e', f"CLAUDE_CODE_MAX_CONTEXT_TOKENS={int(config['context_window'])}"])
+    if config.get('max_retries') is not None:
+        args.extend(['-e', f"CLAUDE_CODE_MAX_RETRIES={int(config['max_retries'])}"])
+    if config.get('disable_nonstreaming_fallback'):
+        args.extend(['-e', 'CLAUDE_CODE_DISABLE_NONSTREAMING_FALLBACK=1'])
     body = dict(config.get('extra_body') or {})
     if config.get('chat_template_kwargs') is not None:
         body['chat_template_kwargs'] = config['chat_template_kwargs']
     if body:
         args.extend(['-e', 'CLAUDE_CODE_EXTRA_BODY='+json.dumps(body)])
+    budget = thinking_budget(config)
+    if budget is not None:
+        args.extend(['-e', f'MAX_THINKING_TOKENS={budget}',
+                     '-e', 'CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1'])
     return args
 
 
@@ -209,6 +225,16 @@ def run_agent(run: str, *, skills: str = "", config: dict | None = None, model: 
     started = time.time()
     before = {p: p.stat().st_mtime_ns for p in output.rglob("*") if p.is_file()}
     attempt = unique_attempt(run_dir / "attempts", f"{time.strftime('%Y%m%d-%H%M%S')}-{skills or 'none'}")
+    from .image_read_progress import settings as image_read_settings
+    tools = run_dir / 'tools'
+    tools.mkdir(exist_ok=True)
+    shutil.copy2(Path(__file__).with_name('image_read_progress.py'), tools / '_sandbox_image_read_progress.py')
+    hook_settings = attempt / 'image-read-settings.json'
+    hook_settings.write_text(json.dumps(image_read_settings(
+        f'/work/attempts/{attempt.name}/image-read-progress.json',
+        '/work/tools/_sandbox_image_read_progress.py',
+        '/work/input/execution-deadline.json' if (run_dir/'input/execution-deadline.json').is_file() else None)), encoding='utf-8')
+    command.extend(['--settings', f'/work/attempts/{attempt.name}/image-read-settings.json'])
     log(f"[{time.strftime('%T')}] {run}: {model} @ {config['base_url']}，上限 {seconds}s，本次 {attempt.name}")
     with open(attempt / "session.jsonl", "w") as session, open(attempt / "stderr.log", "w") as errors:
         code = subprocess.call(command, stdout=session, stderr=errors, env=environment)
@@ -225,7 +251,8 @@ def run_agent(run: str, *, skills: str = "", config: dict | None = None, model: 
               "model": model, "base_url": config["base_url"], "image": config["image"],
               "timeout_seconds": seconds, "started": time.strftime("%F %T", time.localtime(started)),
               "seconds": elapsed, "exit": code, "produced": produced,
-              "kept_from_earlier_attempts": kept}
+              "kept_from_earlier_attempts": kept,
+              "image_read_settings": str(hook_settings.relative_to(run_dir))}
     (attempt / "attempt.json").write_text(json.dumps(record, ensure_ascii=False, indent=1), encoding="utf-8")
     latest = run_dir / "latest"
     if latest.is_symlink() or latest.exists():

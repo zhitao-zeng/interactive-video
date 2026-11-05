@@ -18,6 +18,13 @@ def main() -> int:
     p = sub.add_parser("bible"); p.add_argument("--novel-dir", type=Path, required=True); p.add_argument("--source", type=Path); p.add_argument("--fill", action="store_true")
     p = sub.add_parser("cards"); p.add_argument("--novel-dir", type=Path, required=True); p.add_argument("--include-backups", action="store_true")
     p = sub.add_parser("episode"); p.add_argument("--episode-dir", type=Path, required=True); p.add_argument("--video-name", default="clip.mp4")
+    p.add_argument('--resume-review', action='store_true', help='Continue interrupted native session within original deadline')
+    p.add_argument('--backend', choices=['workflow', 'sandbox_agent'])
+    p.add_argument('--clips', help='Comma-separated current clip IDs')
+    p.add_argument('--context-clips', default='', help='Source/state context only; no decisions requested')
+    p.add_argument('--report-dir', type=Path, help='Independent read-only Agent output; preserves production reports')
+    p.add_argument('--agent-config', type=Path)
+    p.add_argument('--take-overrides', type=Path, help='Historical take selection JSON; no budget reset')
     p = sub.add_parser("volume"); p.add_argument("--novel-dir", type=Path, required=True); p.add_argument("--first", type=int, required=True); p.add_argument("--last", type=int, required=True)
     p = sub.add_parser("grow"); p.add_argument("--novel-dir", type=Path, required=True); p.add_argument("--source", type=Path); p.add_argument("--chapter", type=int, required=True)
     args = parser.parse_args()
@@ -40,7 +47,20 @@ def main() -> int:
         report = review_cards(args.novel_dir.resolve(), args.include_backups)
         print(json.dumps({"flags": report["flags"]}, ensure_ascii=False, indent=1))
     else:
-        report = review_only(args.episode_dir.resolve(), video_name=args.video_name)
+        if args.backend == 'sandbox_agent':
+            if args.report_dir is None:
+                parser.error('sandbox_agent CLI requires --report-dir to preserve existing episode reports')
+            from novel_manga.application.review.episode import review_episode
+            report = review_episode(args.episode_dir.resolve(), video_name=args.video_name,
+                backend='sandbox_agent', targets=args.clips.split(',') if args.clips else None,
+                contexts=[c for c in args.context_clips.split(',') if c], report_dir=args.report_dir.resolve(),
+                config=read_json(args.agent_config, {}) if args.agent_config else None,
+                video_overrides=read_json(args.take_overrides, {}) if args.take_overrides else None,
+                resume=args.resume_review)
+            print(json.dumps({'agent_execution': report['agent_execution'], 'flags': report['flags'],
+                              'feedback': report['feedback']}, ensure_ascii=False, indent=1))
+            return 0 if report['agent_execution']['status'] == 'complete' else 2
+        report = review_only(args.episode_dir.resolve(), video_name=args.video_name, **({'backend': args.backend} if args.backend else {}))
         summary = {"flags": report["flags"], "feedback": report["feedback"]}
         if args.video_name == 'clip.mp4':
             summary['quality_review'] = read_json(args.episode_dir.resolve() / 'episode_execution.json', {})

@@ -109,6 +109,18 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
         shutil.copytree(skill_source, skill_dir, dirs_exist_ok=True)
         shutil.copytree(skill_dir, attempt / "skill-current")
     (attempt / "prompt.txt").write_text(prompt_text, encoding="utf-8")
+    if enable_tools:
+        from novel_manga.application.agents.image_read_progress import settings
+        tools = work_dir / 'tools'
+        tools.mkdir(exist_ok=True)
+        shutil.copy2(Path(__file__).parents[1] / 'image_read_progress.py',
+                     tools / '_sandbox_image_read_progress.py')
+        _write_json(attempt / 'execution-deadline.json',
+                    {'deadline_at': time.time() + timeout, 'phase': 'episode'})
+        _write_json(attempt / 'image-read-settings.json', settings(
+            f'/work/attempts/{attempt.name}/image-read-progress.json',
+            '/work/tools/_sandbox_image_read_progress.py',
+            f'/work/attempts/{attempt.name}/execution-deadline.json'))
     before = {p.relative_to(output): (p.stat().st_mtime_ns, p.stat().st_size)
               for p in output.rglob("*") if p.is_file()}
     _snapshot(output, attempt / "output-before")
@@ -126,9 +138,6 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
     for name in ("ANTHROPIC_MODEL", "ANTHROPIC_SMALL_FAST_MODEL", "ANTHROPIC_DEFAULT_OPUS_MODEL",
                  "ANTHROPIC_DEFAULT_SONNET_MODEL", "ANTHROPIC_DEFAULT_HAIKU_MODEL"):
         command.extend(["-e", f"{name}={model}"])
-    if config.get('max_thinking_tokens') is not None:
-        command.extend(['-e', f"MAX_THINKING_TOKENS={int(config['max_thinking_tokens'])}",
-                        '-e', 'CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1'])
     direct_draft = ((work_dir/'output/episode.json').is_file()
                     and read_json(work_dir.parent/'source-draft-call.json', {}).get('status') == 'candidate')
     role = ('Repair the existing production draft using the reported check results and original source. '
@@ -141,6 +150,11 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
                 'Reuse completed production stages. '
                 'Consult only relevant episode-production skill sections and shared repair cases; '
                 'do not create a replacement screenplay or repeat the production pipeline.')
+    if enable_tools and read_json(work_dir/'input/current-task.json', {}).get('mode') == 'adopted_repair':
+        role = ('Resolve input/current-task.json and its focus target using the adopted source, '
+                'actual request and current evidence. Save the bounded decision and execute the permitted host tools. '
+                'Read only the relevant repair playbook/contract sections. Do not rewrite the screenplay, '
+                'tour unrelated frames before saving, or repeat completed production stages.')
     command.extend([
         "-e", "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS=1",
         "-e", f"CLAUDE_CODE_EFFORT_LEVEL={config.get('effort', 'medium')}",
@@ -152,6 +166,8 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
         "--setting-sources", "", "--output-format", "stream-json", "--verbose",
         "--append-system-prompt", role,
     ])
+    if enable_tools:
+        command.extend(['--settings', f'/work/attempts/{attempt.name}/image-read-settings.json'])
     if config.get('max_turns') is not None:
         turns = int(config['max_turns'])
         if turns <= 0:
@@ -199,6 +215,8 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
         "expected_output": expected_output, "expected_output_produced": expected_output in produced,
         'turn_limit_reached': completion.get('subtype') == 'error_max_turns',
         'num_turns': completion.get('num_turns'),
+        'api_error_status': completion.get('api_error_status'),
+        'sdk_error': bool(completion.get('is_error')),
         'refusal': refusal_reason(completion.get('result') or last_text) or (
             # GLM cuts violent chapters off with a sensitive stop and no text; that is a
             # refusal by another name, and the model fallback exists for it (358, 2026-10-10).
@@ -206,6 +224,8 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
         'summary_only': summary_ending(completion.get('result') or last_text),
         **({'context_rotation':context_rotation} if context_rotation else {}),
     }
+    if enable_tools:
+        record['image_read_settings'] = str((attempt / 'image-read-settings.json').relative_to(work_dir))
     _write_json(attempt / "attempt.json", record)
     state["last_attempt"] = attempt.name
     _write_json(state_path, state)

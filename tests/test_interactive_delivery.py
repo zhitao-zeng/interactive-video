@@ -1,5 +1,6 @@
 from novel_manga.interactive.delivery import delivery_status, interaction_window, evidence_events, video_seconds
 from novel_manga.interactive.production import can_resume_unsubmitted
+import pytest
 
 
 def test_failed_content_cannot_be_accepted():
@@ -34,7 +35,8 @@ def test_resume_only_when_no_generation_has_been_submitted(tmp_path):
     assert not can_resume_unsubmitted(tmp_path,report)
 
 
-def test_user_can_cancel_scene_overlays_without_removing_dialogue_or_choices(tmp_path,monkeypatch):
+@pytest.mark.parametrize('content_ok,media_ok', [(True,True),(False,True),(True,False)])
+def test_user_can_cancel_scene_overlays_without_removing_dialogue_or_choices(tmp_path,monkeypatch,content_ok,media_ok):
     import json
     from types import SimpleNamespace
     import pytest
@@ -57,11 +59,28 @@ def test_user_can_cancel_scene_overlays_without_removing_dialogue_or_choices(tmp
     monkeypatch.setattr(delivery,'run',lambda command:commands.append(command))
     monkeypatch.setattr(delivery.subprocess,'run',lambda command,**kw:commands.append(command) or SimpleNamespace(returncode=0,stderr=''))
     streams={'streams':[{'codec_type':'video','codec_name':'h264','width':1080,'height':1920,'r_frame_rate':'25/1','nb_frames':'7500'}, {'codec_type':'audio','codec_name':'aac'}]}
-    monkeypatch.setattr(delivery.subprocess,'check_output',lambda *a,**k:json.dumps(streams))
-    receipt=delivery.deliver(SimpleNamespace(context=ctx),{'assembly':{'final_video':str(assembled),'ass':str(ass)}},tmp_path/'delivery')
+    def probe(command,**kwargs):
+        data=json.loads(json.dumps(streams))
+        data['streams'][0]['nb_frames']='7425' if str(command[-1]).endswith('body.mp4') else '7500'
+        return json.dumps(data)
+    monkeypatch.setattr(delivery.subprocess,'check_output',probe)
+    measured=[]
+    def inspect(video,cover,ending,subtitles,settings,report,**kwargs):
+        measured.append((video,kwargs))
+        return {'passed':media_ok,'checks':{'silence_ratio':{'passed':media_ok}}}
+    monkeypatch.setattr(delivery,'inspect_media',inspect)
+    report={'assembly':{'final_video':str(assembled),'ass':str(ass),'thin_passed':False,
+                        'media_qc':{'checks':{'silence_ratio':{'passed':False}}}},
+            'quality_review':{'passed':False,'content_passed':content_ok}}
+    receipt=delivery.deliver(SimpleNamespace(context=ctx),report,tmp_path/'delivery')
     first=commands[0]
     assert first[first.index('-i')+1]==str(work/'joined.mp4')
     assert first[first.index('-vf')+1]=='ass=subtitles.ass'
     assert receipt['evidence_events']==[]
     assert receipt['delivery_policy']=={'extra_visual_overlays':False,'dialogue_subtitles':True,'interaction_card':True}
     assert any('anullsrc=r=48000:cl=stereo' in command for command in commands)
+    assert measured==[(tmp_path/'delivery/episode01.mp4',{'silent_outro_seconds':3,'subtitles_required':False})]
+    assert receipt['production_media_passed'] is media_ok
+    assert receipt['content_passed'] is content_ok
+    assert receipt['source_assembly_media_passed'] is False
+    assert receipt['status']==('accepted' if content_ok and media_ok else 'candidate')

@@ -149,6 +149,21 @@ def test_soundscape_cannot_add_or_duplicate_native_speech(sound):
         adopt(draft)
 
 
+def test_authored_music_reaches_final_request_without_becoming_speech():
+    draft = structured(episode())
+    draft['clips'][0]['h3']['music'] = 'A sparse curious pulse, ducked beneath the voice.'
+    _, plan = adopt(draft)
+    assert 'non_diegetic_music:\nA sparse curious pulse, ducked beneath the voice.' in plan['clips'][0]['prompt_h3']
+
+
+@pytest.mark.parametrize('music', ['<DIALOGUE_1>', '<d>[Chinese] 偷加台词。</d>', 42])
+def test_music_cannot_add_native_speech_or_invalid_types(music):
+    draft = structured(episode())
+    draft['clips'][0]['h3']['music'] = music
+    with pytest.raises(ValueError, match='music'):
+        adopt(draft)
+
+
 def test_prepared_script_accepts_structured_directions_without_changing_plan(tmp_path, monkeypatch):
     ctx, old, prompts = prepared(tmp_path, monkeypatch)
     prompts['clip_01'] = {'shots': ['<Subject 2> lifts the cup. <DIALOGUE_1> The cup settles.']}

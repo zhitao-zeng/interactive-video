@@ -239,10 +239,10 @@ def conversation_deferred(saved):
 
 
 @lru_cache(maxsize=256)
-def completed_idle(directory):
+def completed_idle(directory, allow_timed_out=False):
     """Observed output/handoff facts, not the wording of the final answer."""
     folder=Path(directory);record=read_json(folder/'attempt.json',{})
-    if record.get('exit')!=0 or record.get('produced')!=[]:return False
+    if record.get('exit') not in ((0,124) if allow_timed_out else (0,)) or record.get('produced')!=[]:return False
     path=folder/'session.jsonl'
     if not path.is_file():return False
     for line in path.open():
@@ -261,7 +261,19 @@ def completed_idle(directory):
     return True
 
 
-def resume_protocol(run_dir,episode_dir,saved, *, validate_input=None):
+def idle_fallback_available(saved, config):
+    """An already configured fallback may take over two observed idle turns once."""
+    fallback=config.get('refusal_fallback') or {}
+    attempts=saved.get('attempts') or []
+    return bool(saved.get('status')=='blocked' and not saved.get('model_switch')
+        and not saved.get('protocol_recovery') and remaining_at_stop(saved)>0
+        and saved.get('reason')=='episode agent ended twice without operation or output progress'
+        and (saved.get('job')or{}).get('status') not in {'accepted','running'}
+        and all(fallback.get(k) for k in ('model','base_url','key_var'))
+        and len(attempts)>=2 and all(completed_idle(str(p),True) for p in attempts[-2:]))
+
+
+def resume_protocol(run_dir,episode_dir,saved, *, validate_input=None, allow_timed_out_idle=False):
     """One continuation after a diagnosed interface fix, using unspent time only."""
     if (saved.get('status')!='blocked' or saved.get('passed') or saved.get('protocol_recovery')
             or remaining_at_stop(saved)<=0 or (saved.get('job') or {}).get('status') in {'accepted','running'}):
@@ -319,7 +331,7 @@ def resume_protocol(run_dir,episode_dir,saved, *, validate_input=None):
     if (kind is None and not failures and not saved.get('model_switch') and len(attempts)>=2
             and saved.get('reason') in {'episode agent ended twice without operation or output progress',
                                        'episode agent reached the bounded operation continuation limit'}
-            and all(completed_idle(str(p)) for p in attempts[-2:])):
+            and all(completed_idle(str(p),allow_timed_out_idle) for p in attempts[-2:])):
         kind='idle_turns'
     if kind is None:return None
     remaining=remaining_at_stop(saved)
@@ -403,12 +415,12 @@ def switch_for_refusal(ctx, config, result, attempt, before, after):
     handed_off = (after.get('job') or {}).get('id') != (before.get('job') or {}).get('id')
     result['summary_only_turns'] = (result.get('summary_only_turns', 0)+1
                                   if attempt.record.get('summary_only') and not handed_off else 0)
-    idle=(attempt.record.get('exit')==0 and attempt.record.get('produced')==[] and not handed_off)
+    idle=(attempt.record.get('exit') in (0,124) and attempt.record.get('produced')==[] and not handed_off)
     result['idle_turns']=result.get('idle_turns',0)+1 if idle else 0
     reason = attempt.record.get('refusal') or (
         'Repeated summary-only completions without a host operation'
         if result['summary_only_turns'] >= 2 else
-        'Two completed turns without changed output or a host operation' if result['idle_turns']>=2 else '')
+        'Two turns without changed output or a host operation' if result['idle_turns']>=2 else '')
     fallback = config.get('refusal_fallback')
     if not fallback or result.get('model_switch') or not reason or handed_off:
         return None

@@ -1,0 +1,169 @@
+"""Creative-only intake and one persistent author; no media services."""
+import json
+from pathlib import Path
+from types import SimpleNamespace
+import zipfile
+
+import pytest
+
+from novel_manga.interactive import creation
+from novel_manga.interactive.creative_contract import read_evidence
+
+
+def write(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False), encoding='utf-8')
+
+
+def task(tmp_path, *, original=False):
+    archive = tmp_path / 'original.zip'
+    if not original:
+        with zipfile.ZipFile(archive, 'w') as z:
+            z.writestr('试播集/原稿.md', '# 原稿\n入口有一块牌，旅客看完后停步。')
+            z.writestr('角色/身份.png', b'supplied-image-bytes')
+            z.writestr('__MACOSX/._原稿.md', b'metadata')
+    path = tmp_path / 'task.json'
+    write(path, {'mode': 'original' if original else 'adaptation', 'project': 'adventure',
+                 'title': '测试', 'brief': '写完整一集，先不生成视频。',
+                 **({} if original else {'source_archive': str(archive)}),
+                 'target_seconds': [180, 300], 'voice_reference_policy': 'none',
+                 'world_card_seconds': 3, 'end_card_seconds': 3})
+    return path
+
+
+def episode():
+    shots = [{'index': i, 'scene_id': 'entry', 'location': '入口',
+              'duration_seconds': 15, 'purpose': '核对入口规则',
+              'start_state': '站在入口', 'event': '读牌后停步', 'end_state': '停在牌旁',
+              'camera': '固定中景，牌和旅客同框', 'characters': ['旅客'], 'in_frame': ['旅客'],
+              'turns': [], 'sfx': '风声', 'audio_plan': {'music_cue': '无配乐'},
+              'source_quote': '入口有一块牌，旅客看完后停步。'} for i in range(1, 13)]
+    return {'title': '测试', 'logline': '旅客核对入口规则。', 'adaptation_notes': ['保留原始事实'],
+            'chapter_script': {'shots': shots},
+            'clips': [{'shot_indexes': [i], 'request_seconds': 15} for i in range(1, 13)],
+            'interaction': {'question': '下一步？', 'selected': None, 'options': [
+                {'id': 'A', 'label': '查入口', 'reason': '入口有牌'},
+                {'id': 'B', 'label': '看周围', 'reason': '周围还没核对'}]},
+            'spatial_plan': {'scenes': [{'scene_id': 'entry', 'anchors': ['入口', '牌'],
+                'placed': ['旅客'], 'shot_indexes': list(range(1, 13)),
+                'assumptions': ['距离是调度方案，未经测量']}]},
+            'self_review': {'source': '已核对', 'open_issues': []}}
+
+
+def test_package_intake_keeps_complete_sources_and_installs_one_integrated_skill(tmp_path):
+    manifest = creation.prepare(task(tmp_path), tmp_path / 'run')
+    work = tmp_path / 'run/sandbox'
+    assert (work / 'input/package/试播集/原稿.md').read_text() == '# 原稿\n入口有一块牌，旅客看完后停步。'
+    assert (work / 'input/package/角色/身份.png').read_bytes() == b'supplied-image-bytes'
+    assert manifest['phase'] == 'creation_only' and manifest['media_generation_allowed'] is False
+    assert set(manifest['skill_references']) >= {'camera_language', 'spatial_blockout',
+        'authoring', 'repair_playbook', 'creative_authoring', 'travel_authoring'}
+    for p in manifest['skill_references'].values():
+        assert (work / p).is_file()
+    assert len(json.loads((work / 'input/creation-methods.json').read_text())) == 6
+    assert not (work / 'tools').exists()
+    assert sorted(p.name for p in (work / '.claude/skills').iterdir()) == ['episode-production']
+
+
+def test_prepare_preserves_candidate_and_refuses_changed_task(tmp_path):
+    source = task(tmp_path); run = tmp_path / 'run'
+    first = creation.prepare(source, run)
+    candidate = run / 'sandbox/output/episode.json'; write(candidate, {'unfinished': True})
+    assert creation.prepare(source, run) == first
+    assert json.loads(candidate.read_text()) == {'unfinished': True}
+    changed = json.loads(source.read_text()); changed['brief'] = '另一份创作'; write(source, changed)
+    with pytest.raises(ValueError, match='new output directory'):
+        creation.prepare(source, run)
+
+
+@pytest.mark.parametrize('project', ['adventure', 'romance', 'suspense'])
+def test_shared_dialogue_craft_is_installed_and_required_for_every_creator_genre(tmp_path, project):
+    source = task(tmp_path)
+    data = json.loads(source.read_text()); data['project'] = project; write(source, data)
+    manifest = creation.prepare(source, tmp_path/'run')
+    guide = manifest['skill_references']['dialogue_craft']
+    assert guide in manifest['required_reads']
+    assert (tmp_path/'run/sandbox'/guide).is_file()
+    assert manifest['skill_references'][manifest['selected_genre']] in manifest['required_reads']
+
+
+def test_original_brief_is_a_distinct_authority_without_a_fake_archive(tmp_path):
+    manifest = creation.prepare(task(tmp_path, original=True), tmp_path / 'run')
+    assert manifest['mode'] == 'original' and manifest['source_documents'] == []
+    assert manifest['source_archive'] is None
+
+
+def test_contract_checks_source_grouping_duration_and_unselected_interaction(tmp_path):
+    manifest = creation.prepare(task(tmp_path), tmp_path / 'run')
+    assert creation.validate(episode(), manifest, tmp_path / 'run/sandbox') == []
+    draft = episode(); draft['chapter_script']['shots'][0]['source_quote'] = '原文没有的袭击。'
+    draft['clips'][0]['shot_indexes'] = [2]
+    draft['interaction']['selected'] = 'A'
+    problems = creation.validate(draft, manifest, tmp_path / 'run/sandbox')
+    assert any('source_quote' in x for x in problems)
+    assert any('cover' in x for x in problems)
+    assert any('selected' in x for x in problems)
+
+
+def test_read_evidence_keeps_successful_cat_before_an_unrelated_command_failure(tmp_path):
+    manifest = creation.prepare(task(tmp_path), tmp_path/'run')
+    work = tmp_path/'run/sandbox'; attempt = work/'attempts/native'; attempt.mkdir(parents=True)
+    source = manifest['source_documents'][0]
+    events = [{'type':'item.completed','item':{'type':'command_execution','exit_code':127,
+        'command':f'cat /work/{source}; file missing-command',
+        'aggregated_output':(work/source).read_text()+'\nfile: not found'}}]
+    (attempt/'codex-events.jsonl').write_text('\n'.join(json.dumps(x) for x in events))
+    assert source in {r['path'] for r in read_evidence(work)}
+    events[0]['item']['aggregated_output'] = 'cat failed, no source content'
+    (attempt/'codex-events.jsonl').write_text(json.dumps(events[0]))
+    assert source not in {r['path'] for r in read_evidence(work)}
+
+
+@pytest.mark.parametrize('first_issue', ['selected_route', 'truncated_json'])
+def test_run_uses_file_tools_and_one_existing_session_for_correction(tmp_path, monkeypatch, first_issue):
+    source = task(tmp_path); run = tmp_path / 'run'; calls = []
+    manifest = creation.prepare(source, run)
+
+    def invoke(work, prompt, **kwargs):
+        calls.append(kwargs)
+        actual_manifest = json.loads((work/'input/manifest.json').read_text())
+        assert actual_manifest['skill_references']['dialogue_craft'] in actual_manifest['required_reads']
+        attempt = work / 'attempts' / str(len(calls)); attempt.mkdir(parents=True)
+        draft = episode()
+        if len(calls) == 1:
+            draft['interaction']['selected'] = 'A'
+        write(work / 'output/episode.json', draft)
+        if len(calls) == 1 and first_issue == 'truncated_json':
+            (work / 'output/episode.json').write_text('{"title": "partial"')
+        write(work / 'episode-session.json', {'session_id': 'same-creator'})
+        rows = [{'type': 'assistant', 'message': {'content': [
+            {'type': 'tool_use', 'name': 'Read', 'input': {'file_path': '/work/' + p}}
+            for p in manifest['required_reads']]}}]
+        (attempt / 'session.jsonl').write_text('\n'.join(json.dumps(x) for x in rows))
+        return SimpleNamespace(ok=True, exit_code=0, seconds=1, directory=attempt,
+                               record={'session_id': 'same-creator', 'model': 'configured-model'})
+
+    monkeypatch.setattr(creation, 'run_session', invoke)
+    result = creation.run(source, run, config={'source_agent_slice_seconds': 1200, 'timeout_seconds': 5400})
+    assert result['status'] == 'creative_candidate' and result['session_id'] == 'same-creator'
+    assert len(calls) == 2 and calls[0]['resume'] is False and calls[1]['resume'] is True
+    assert all(x['enable_tools'] is False and x['expected_output'] == 'episode.json' for x in calls)
+    assert all(x['timeout'] <= 1200 for x in calls)
+    assert result['allowance_seconds'] == 5400 and result['slice_seconds'] == 1200
+    assert (run / 'delivery/剧本.md').is_file() and (run / 'delivery/白模空间设计.md').is_file()
+    assert result['new_video_generations'] == 0
+    assert creation.run(source, run, config={'source_agent_slice_seconds': 1200}) == result
+    assert len(calls) == 2
+    legacy = json.loads((run/'sandbox/input/manifest.json').read_text())
+    guide = legacy['skill_references'].pop('dialogue_craft')
+    legacy['required_reads'].remove(guide)
+    write(run/'sandbox/input/manifest.json', legacy)
+    feedback = tmp_path/'review.md'; feedback.write_text('明确夜间光源，保留原故事。')
+    revised = creation.run(source, run, config={'source_agent_slice_seconds': 1200},
+                           resume=True, feedback=feedback)
+    assert revised['session_id'] == 'same-creator' and len(calls) == 3
+    assert calls[-1]['resume'] is True
+    archived = json.loads((run/'manifest-before-dialogue-craft.json').read_text())
+    assert archived == legacy and guide not in archived['required_reads']
+    assert json.loads((run/'sandbox/input/manifest.json').read_text())['task'] == legacy['task']
+    assert (run/'sandbox/input/feedback/revision-01.md').read_text() == feedback.read_text()

@@ -22,7 +22,7 @@ from novel_manga.story.h3 import request_issues, identity_issues, correction
 from novel_manga.application.repair.inputs import RepairInputs
 
 from novel_manga.application.repair.history import MAX_GENERATED_TAKES, generated_counts, generation_limit
-REFRAME_POLICY = 'reframe-v3-reference-state-and-candidate-feedback'
+REFRAME_POLICY = 'reframe-v5-validated-timeout-candidates'
 
 
 def source_state(directory: Path, clip: dict, *, inputs: RepairInputs | None = None) -> dict:
@@ -51,8 +51,23 @@ def source_state(directory: Path, clip: dict, *, inputs: RepairInputs | None = N
 def input_state(directory: Path, clip: dict, verdict: dict, takes: dict, *, inputs: RepairInputs | None = None) -> dict:
     inputs = inputs if inputs is not None else RepairInputs.load(directory)
     from novel_manga.application.preparation.request_check import POLICY as INPUT_POLICY
-    from novel_manga.application.repair.agent import enabled, FRAME_HANDOFF_POLICY
+    from novel_manga.application.repair.agent import enabled, FRAME_HANDOFF_POLICY, load_config
+    profile = read(directory.parent/'profile.json', {})
+    model = profile.get('repair_agent_model')
+    endpoint = profile.get('repair_agent_endpoint')
+    execution = {}
+    if enabled(directory):
+        config = load_config()
+        options = {**(config.get('extra_body') or {}), **(config.get('repair_extra_body') or {})}
+        execution['repair_agent_max_output_tokens'] = options.get('max_tokens')
+        from novel_manga.application.agents.sandbox import thinking_budget
+        budget = thinking_budget({**config, 'extra_body': options})
+        if budget is not None:
+            execution['repair_agent_max_thinking_tokens'] = budget
     return {**({'repair_evidence_policy':FRAME_HANDOFF_POLICY} if enabled(directory) else {}),
+            **execution,
+            **({'repair_agent_model':model} if model else {}),
+            **({'repair_agent_endpoint':endpoint} if endpoint else {}),
             'reframe_policy': REFRAME_POLICY, 'input_check_policy': INPUT_POLICY, 'clip':history.accepted_clip_material(clip),
             'note':inputs.notes.get(clip['clip_id'],''),
             'source':source_state(directory,clip,inputs=inputs),'take':takes.get(clip['clip_id']),
@@ -68,13 +83,18 @@ def candidates(directory: Path, review: dict | None = None) -> tuple[list[str],d
     counts = generated_counts(history.load(directory))
     wanted,blocked = [],{}
     grants = read(directory/'repair_budget_grants.json',{})
+    from novel_manga.application.repair.agent import enabled
+    budget_limit = history.preparation_limit if enabled(directory) else generation_limit
     inputs = None
     for clip in plan.get('clips',[]):
         cid = clip['clip_id'];verdict = review.get('clips',{}).get(cid,{})
+        if review.get('review_backend') == 'sandbox_agent' and (review.get('agent_execution') or {}).get('status') != 'complete':
+            blocked[cid] = 'Agent review incomplete; no blind retake'
+            continue
         if ((cid not in review.get('feedback',{}) and not identity_issues(clip)) or verdict.get('technical') or clip.get('kind')!='video'
                 or not takes.get(cid) or verdict.get('video')!=takes[cid]['video'] or verdict.get('take')!=takes[cid]['take']):
             continue
-        if counts.get(cid,0)>=generation_limit(directory,cid,grants=grants):
+        if counts.get(cid,0)>=budget_limit(directory,cid,grants=grants):
             blocked[cid]='effective clip retry budget used'
         else:
             previous = decisions.get(cid, {})
@@ -151,7 +171,7 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
     initial_count = len(history.load(directory)['trials'])
     for cid in targets:
         counts = generated_counts(history.load(directory))
-        if counts.get(cid, 0) >= generation_limit(directory, cid):
+        if counts.get(cid, 0) >= history.preparation_limit(directory, cid):
             blocked[cid] = 'effective clip retry budget used'
             continue
         plan = read(directory/'clip_plan.json', {})
@@ -178,12 +198,15 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
                 if read(directory/'clip_plan.json',{})!=plan or read(directory/'chapter_script.json',{})!=source_before:
                     raise ValueError('episode inputs changed while selecting reference views')
                 publish_candidate(directory,reference_proposal,'reference_single_view',{cid})
+                history.mark_extra_prepared(directory, [cid])
                 changed.append(cid)
                 decisions[cid]={'at':time.strftime('%F %T'),'action':'reference_single_view','status':'prepared',
                     'diagnosis':reference_proposal.changes,'inputs':before}
                 atomic_write_json(directory/'repair_routing.json',decisions)
                 continue
-            decision = agent.propose(directory, clip, verdict)
+            decision = agent.reviewed_decision(directory, clip, verdict)
+            if decision is None:
+                decision = agent.propose(directory, clip, verdict)
             # Do not accept a proposal against a source changed while the sandbox was running.
             if (read(directory/'clip_plan.json', {}) != plan
                     or read(directory/'chapter_script.json', {}) != source_before
@@ -194,19 +217,22 @@ def prepare_agent_batch(directory: Path, targets: list[str], blocked=None) -> di
             if action == 'keep':
                 result = prepare_source_recheck(directory, [cid])
                 changed.extend(result['changed']); accepted.extend(result['accepted'])
-            elif action == 'edit':
-                proposal = agent.final_proposal(directory, plan, clip, decision)
+            elif action in {'edit','input'}:
+                proposal = (agent.source_proposal(directory,plan,clip,decision) if action=='input'
+                            else agent.final_proposal(directory, plan, clip, decision))
                 updated = next(c for c in proposal.plan['clips'] if c['clip_id'] == cid)
                 check = agent.check_request(updated, directory.parent)
                 if not check.get('consistent') or check.get('problems'):
                     raise ValueError('agent candidate input conflict: '+ '; '.join(check.get('problems', [])))
-                publish_candidate(directory, proposal, 'agent_prompt', {cid})
+                publish_candidate(directory, proposal, 'agent_input' if action=='input' else 'agent_prompt', {cid})
+                history.mark_extra_prepared(directory, [cid])
                 changed.append(cid)
             else:
                 check = agent.check_request(clip, directory.parent)
                 if not check.get('consistent') or check.get('problems'):
                     raise ValueError('agent retake input conflict: '+ '; '.join(check.get('problems', [])))
                 publish_retake(directory, retake_proposal(plan, cid, decision))
+                history.mark_extra_prepared(directory, [cid])
                 changed.append(cid)
             decisions[cid] = {'at':time.strftime('%F %T'), 'action':action, 'diagnosis':decision,
                               'status':'prepared', 'inputs':before}

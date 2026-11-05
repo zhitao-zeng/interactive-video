@@ -52,3 +52,12 @@ def test_shared_sandbox_arguments_are_provider_specific():
 def test_sandbox_declares_the_configured_custom_model_context_window():
     args = sandbox.provider_container_args({'context_window': 1000000})
     assert args == ['-e', 'CLAUDE_CODE_MAX_CONTEXT_TOKENS=1000000']
+
+
+def test_disabled_thinking_also_disables_cli_adaptive_thinking():
+    for config in [{'max_thinking_tokens': 0}, {'extra_body': {'thinking': {'type': 'disabled'}}}]:
+        args = sandbox.provider_container_args(config)
+        assert args.count('MAX_THINKING_TOKENS=0') == 1
+        assert args.count('CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1') == 1
+    assert sandbox.thinking_budget({}) is None
+    assert sandbox.thinking_budget({'max_thinking_tokens': 2048}) == 2048

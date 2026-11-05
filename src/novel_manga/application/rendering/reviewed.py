@@ -41,7 +41,9 @@ def run(runner, *, repair_existing=False):
             return report
     if repair_existing:
         history.adopt_reviewed_run(directory)
-    review = _review(directory, fresh=not repair_existing)
+    # A resumed render can mix new and unchanged takes. The review's own
+    # take/policy/source checks decide which verdicts still stand.
+    review = _review(directory, fresh=False)
     rounds, corrected, blocked = [], [], {}
     for _ in range(managed.MAX_GENERATED_TAKES):
         input_blocked = {}

@@ -158,9 +158,9 @@ def test_propose_hands_current_and_history_frames_to_sandbox(tmp_path,monkeypatc
             assert all((work/f['path']).is_file() for f in t['frames'])
             assert (work/t['request']).is_file() and (work/t['asr']).is_file()
         import subprocess,sys
-        answer=json.loads(subprocess.check_output([sys.executable,str(work/'tools/video_frames.py'),'take-1','--seconds','2.2']))
-        assert answer['frames'][0]['seconds']==2
-        assert answer['selection']=='nearest supplied frame'
+        answer=json.loads(subprocess.check_output([sys.executable,str(work/'tools/video_frames.py'),'take-1']))
+        assert answer['frames'][1]['seconds']==2
+        assert answer['selection']=='all supplied frames'
         write(work/'output/decision.json',{'action':'stop','reason':'fixture','evidence':['input/evidence.json']})
         return SimpleNamespace(ok=True,produced=['decision.json'],attempt='test')
     monkeypatch.setattr(agent,'run_agent',execute)
@@ -265,7 +265,8 @@ def test_primary_input_exposes_actual_current_frames_before_full_episode_evidenc
         assert primary['verdict'] == verdict
         assert evidence['segments'] == segments and len(evidence['takes']) == 2
         prompt = (work/'prompt.txt').read_text()
-        assert prompt.startswith('Read input/primary.json first and immediately open its current_frames[].path JPEGs.')
+        assert prompt.startswith('In your first parallel Read tool batch, read input/primary.json and open these current-take JPEGs: ')
+        assert all('/work/'+row['path'] in prompt for row in primary['current_frames'])
         assert 'evidence.json retains complete history' in prompt
         write(work/'output/decision.json', {'action': 'stop', 'reason': 'fixture',
                                           'evidence': ['input/primary.json']})
@@ -335,3 +336,25 @@ def test_actual_video_fallback_has_readable_images_and_timestamps(tmp_path,agent
     assert record['frames'][-1]['seconds']==pytest.approx(1.8)
     for f in frames:
         with Image.open(f) as image:assert image.height>image.width
+
+
+def test_formal_review_uses_selected_postmix_current_take(tmp_path, monkeypatch, agent):
+    directory, current, _, clip, media = setup_episode(tmp_path)
+    postmix=current.parent/'postmix.mp4';postmix.write_bytes(b'postmixed existing take')
+    media['clips'][0]['selected']['postmix_video']=str(postmix)
+    write(directory/'thin_media_report.json',media)
+    mock_host_frames(agent,monkeypatch)
+    primary,evidence=agent.prepare_inputs(directory,clip,{},tmp_path/'review',include_history=False)
+    selected=next(t for t in evidence['takes'] if t['current'])
+    provenance=json.loads((tmp_path/'review'/selected['path']/'frames/frame-evidence.json').read_text())
+    assert provenance['source_video']==str(postmix)
+    assert primary['actual_request']=='request 0'
+
+
+def test_blind_formal_evidence_does_not_expose_old_proposal_reason(tmp_path,monkeypatch,agent):
+    directory,current,_,clip,_=setup_episode(tmp_path)
+    clip['prompt_h3_agent']={'reason':'OLD DIAGNOSIS NOT CURRENT PIXELS','evidence':['prior review']}
+    mock_host_frames(agent,monkeypatch)
+    primary,evidence=agent.prepare_inputs(directory,clip,{},tmp_path/'review',include_history=False)
+    assert 'prompt_h3_agent' not in evidence['clip']
+    assert 'prompt_h3_agent' in clip  # original plan material is untouched

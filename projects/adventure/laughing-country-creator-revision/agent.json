@@ -1,0 +1,32 @@
+{
+  "image": "agent-sandbox:0918",
+  "video_decoder": "/mnt/disk2/zengzhitao/superres/envs/seedvsr/lib/python3.11/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2",
+  "base_url": "http://127.0.0.1:8789",
+  "model": "glm-5.3-flash",
+  "key_var": "PHANTHY_API_KEY",
+  "effort": "medium",
+  "parallel": {
+    "day": 2,
+    "night": 4,
+    "night_from": 20,
+    "night_until": 10
+  },
+  "timeout_seconds": 5400,
+  "agent_slice_seconds": 600,
+  "source_agent_slice_seconds": 1200,
+  "context_window": 1048576,
+  "docker_network": "host",
+  "extra_body": {
+    "thinking": {
+      "type": "disabled"
+    },
+    "output_config": {
+      "effort": "low"
+    },
+    "max_tokens": 65536
+  },
+  "runs_root": "/mnt/disk1/zengzhitao/worktrees/interactive-adventure-rhythm/.runtime/laughing-country-agent-execution-fix-20261020/agent-runs",
+  "refusal_fallback": null,
+  "_note": "笑之国新版整集Agent：沿用GLM5.3Flash与原600秒/5400秒上限；64k为既有审核预算。旧Luna403与当前路由缺失已留证，本版不使用该备用；不改共享默认。 禁用CLI流中断后的隐式非流式回退，避免预算65536被改成64000；仍原有重试/续接及时限。上游524尚未消除，不将其当作画面缺陷。",
+  "disable_nonstreaming_fallback": true
+}

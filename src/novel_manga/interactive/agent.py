@@ -23,8 +23,11 @@ def run(runner, lane, *, resume=False):
     from novel_manga.application.rendering.reviewed import run as reviewed_run
     from novel_manga.application.review.execution import media_matches
     from novel_manga.util import read_json
-    reuse = resume and media_matches(runner.context.clip_plan,
-        read_json(runner.context.episode_dir/'thin_media_report.json',{}), notes=runner.context.feedback)
+    media = read_json(runner.context.episode_dir/'thin_media_report.json',{}) if resume else {}
+    # A matching report can still contain missing clips after an infrastructure
+    # failure. The renderer must resume tasks/fill gaps before content repair.
+    reuse = resume and not media.get('failed_clips') and media_matches(
+        runner.context.clip_plan, media, notes=runner.context.feedback)
     previous = runner.context.profile
     runner.context.profile = {**previous, 'repair_backend': 'sandbox_agent'}
     try:

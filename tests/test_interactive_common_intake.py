@@ -8,6 +8,34 @@ from novel_manga.application.agents.episode.context import create_context
 from novel_manga.application.agents.episode.inputs import prepare_inputs
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_creator_plural_source_ids_and_production_context_survive_formal_handoff(material, tmp_path):
+    from novel_manga.interactive.intake import finalize
+    episode = prepare_authored(material, tmp_path/'creator-handoff', family='adventure')
+    pack_authored(episode)
+    script = read_json(episode/'chapter_script.json')
+    for shot in script['shots']:
+        shot['segment_ids'] = [shot.pop('segment_id')]
+    atomic_write_json(episode/'chapter_script.json', script)
+    artifacts = {
+        'spatial_plan.json': {'scenes':[{'scene_id':'entry','shot_indexes':[1], 'anchors':['door']}]},
+        'production_handoff.json': {'audio_reference_ids':[], 'subtitle_policy':'host only'},
+        'publication.json': {'world_card':{'after_clip_id':'clip_01','seconds':3,'audio':'silence'}},
+    }
+    for name, data in artifacts.items():
+        atomic_write_json(episode/name, data)
+    finalize(episode, 'adventure', documents=[material/'source.md'])
+    ctx = create_context(episode.parent, episode.name, output_root=tmp_path/'agent')
+    manifest = prepare_inputs(ctx)
+    for name, expected in artifacts.items():
+        assert read_json(ctx.work_dir/'input'/name) == expected
+        assert 'input/'+name in manifest['authoritative_inputs']
+    assert read_json(ctx.work_dir/'input/chapter_script.json') == script
+    script['shots'][0]['segment_ids'].append('missing-source-id')
+    atomic_write_json(episode/'chapter_script.json', script)
+    with pytest.raises(ValueError, match='retained source segment'):
+        finalize(episode, 'adventure')
 @pytest.fixture
 def material(tmp_path):
     import json
@@ -104,3 +132,18 @@ def test_resume_reuses_only_report_matching_current_requests(monkeypatch,tmp_pat
     monkeypatch.setattr('novel_manga.application.rendering.reviewed.run',lambda *a,**k:seen.append(k) or {})
     agent.run(runner,'h3',resume=True)
     assert seen==[{'repair_existing':True} if matches else {}]
+
+
+@pytest.mark.parametrize('lane',['h3','sd25'])
+def test_resume_returns_missing_clips_to_renderer_even_when_inputs_match(monkeypatch,tmp_path,lane):
+    from types import SimpleNamespace
+    from novel_manga.interactive import agent
+    atomic_write_json(tmp_path/'thin_media_report.json',{'clips':[{'clip_id':'a','selected':None}],
+                                                       'failed_clips':['a']})
+    runner=SimpleNamespace(context=SimpleNamespace(profile={},clip_plan={'clips':[{'clip_id':'a'}]},
+                                                   episode_dir=tmp_path,feedback={}))
+    monkeypatch.setattr('novel_manga.application.review.execution.media_matches',lambda *a,**k:True)
+    seen=[]
+    monkeypatch.setattr('novel_manga.application.rendering.reviewed.run',lambda *a,**k:seen.append(k) or {})
+    agent.run(runner,lane,resume=True)
+    assert seen==[{}]

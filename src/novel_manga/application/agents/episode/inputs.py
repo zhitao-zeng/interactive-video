@@ -25,6 +25,17 @@ SCRIPT_FILES = ('chapter_script.json', 'clip_plan.json', 'episode_plan.json', 's
 SKILL_REFERENCES = {
     'output_contract': 'references/output-contract.md',
     'authoring': 'references/authoring.md',
+    'dialogue_craft': 'references/dialogue-craft.md',
+    'camera_language': 'references/camera-language.md',
+    'spatial_blockout': 'references/spatial-blockout.md',
+    'creative_authoring': 'references/creative-authoring.md',
+    'travel_authoring': 'references/genres/travel.md',
+    'romance_authoring': 'references/genres/romance.md',
+    'romance_dialogue': 'references/genres/romance/dialogue-and-scenes.md',
+    'romance_observations': 'references/genres/romance/observed-craft.md',
+    'suspense_authoring': 'references/genres/suspense.md',
+    'suspense_deliverables': 'references/genres/suspense/deliverables.md',
+    'suspense_observations': 'references/genres/suspense/observed-craft.md',
     'h3_format': 'references/h3-format.md',
     'official_h3_guide': 'references/official/VIDEO_PROMPT_WRITING_GUIDE_ref_en.md',
     'review_and_repair': 'references/review-and-repair.md',
@@ -78,6 +89,8 @@ def _snapshot_file(ctx, source, relative):
     if not source.is_file():
         return False
     target = ctx.novel_dir / relative
+    if source.resolve() == target.resolve():
+        return True  # Retain the actual file when taking over an existing production.
     current = ctx.novel_dir
     for part in Path(relative).parent.parts:
         current /= part
@@ -554,6 +567,16 @@ def prepare_inputs(ctx: EpisodeContext):
         manifest['request_draft'] = _request_draft(ctx, plan)
     atomic_write_json(ctx.work_dir / 'input/manifest.json', manifest)
     atomic_write_json(ctx.run_dir / 'inputs.json', manifest)
+    if ctx.novel_dir == ctx.source_novel_dir and not (ctx.run_dir / 'prepared.json').is_file():
+        from novel_manga.application.repair import history
+        # The existing plan is already adopted. Resume its receipts instead of
+        # adopting a replacement draft or creating another generation allowance.
+        atomic_write_json(ctx.run_dir / 'prepared.json', {
+            'ready': manifest['ready'], 'input_mode': 'script', 'method': 'existing production takeover',
+            'clips': len(plan.get('clips', [])),
+            'seconds': sum(c.get('request_seconds', 0) for c in plan.get('clips', [])),
+            'generation_counts': history.generation_counts(ctx.episode_dir),
+            'repair_round_start': len(read_json(ctx.run_dir / 'tool-repair-decisions.json', []))})
     return manifest
 
 

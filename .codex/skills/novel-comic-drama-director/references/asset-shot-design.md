@@ -57,6 +57,14 @@ Maintain the 180-degree line inside a conversation unless a deliberate emotional
 
 ## Dialogue construction
 
+For native H3, preserve the authored POV, visible/offscreen delivery and reference
+roles. Place event-specific performance before the exact utterance and a meaningful
+reaction after it; see [authoring](../../../../skills/episode-production/references/authoring.md).
+Keep audio inputs consistent with the selected voice-reference policy.
+
+The following composition constraints apply to the selected **locked-audio,
+speaker-close-up workflow**; they do not override native H3 shot design:
+
 - Use exactly one visible speaker per generated speaking clip.
 - Frame a front or three-quarter close-up with the mouth clear enough for reference-audio animation.
 - Keep the speaker in frame from before speech onset through at least 0.3 seconds after speech end.

@@ -63,3 +63,42 @@ def test_two_different_rooms_in_a_single_camera_view_are_not_forced_to_retake():
     before={'severity':'pass','reasonable_deviation':True,'visual_defects':False}
     after=merge_presentation(before,{'layout':'single','body_scale':'natural','space_motion':'natural','evidence':'柱子隔开两个房间，透视相连'})
     assert after['severity']=='pass'
+
+
+def test_native_dialogue_captions_require_repair_but_physical_text_does_not():
+    physical={'severity':'minor','text_or_watermark':True,'identity_ok':True,'visual_defects':False}
+    assert policy.fix_tier(physical,SimpleNamespace(characters=[]))=='ignore'
+    caption={**physical,'unplanned_subtitles':True,'subtitle_issue':'帧2下方出现大字对白'}
+    assert policy.fix_tier(caption,SimpleNamespace(characters=[]))=='must_fix'
+    correction=policy.compose_feedback(caption)
+    assert '对白字幕由宿主统一添加' in correction and '保留经批准的剧情内' in correction
+    assert '不得出现任何文字' not in correction
+
+
+def test_a_paper_that_adds_a_meeting_is_not_an_ordinary_background_text_deviation():
+    changed={'severity':'fail','story_ok':False,'story_kind':'关键线索内容被改写',
+             'reasonable_deviation':True,'identity_ok':True,'visual_defects':False}
+    assert policy.fix_tier(changed,SimpleNamespace(characters=[]))=='must_fix'
+
+
+def test_verify_keeps_native_captions_and_changed_clues_separate_from_generic_text():
+    caption=policy.verify_to_verdict({'unplanned_subtitles':True,'subtitle_issue':'帧3对白固定于屏幕下方',
+        'verdict':'clear','evidence':'帧3下方出现额外对白','people':[]})
+    assert caption['severity']=='fail' and caption['unplanned_subtitles']
+    assert policy.fix_tier(caption,SimpleNamespace(characters=[]))=='must_fix'
+    clue=policy.verify_to_verdict({'clue_text_changed':True,'evidence':'纸条另写了新的会面约定','people':[]})
+    assert clue['story_ok'] is False and clue['story_kind']=='关键线索内容被改写'
+    assert policy.fix_tier(clue,SimpleNamespace(characters=[]))=='must_fix'
+
+
+def test_a_positive_native_caption_observation_cannot_remain_a_pass(tmp_path,monkeypatch):
+    from novel_manga.application.review import judges
+    import novel_manga.application.packing.visor as visor
+    monkeypatch.setattr(visor,'recorded_clip_states',lambda *a,**k:{})
+    monkeypatch.setattr(judges.review_evidence,'review_mode',lambda *a:'verify')
+    monkeypatch.setattr(judges,'judge_clip_verify',lambda *a,**k:{'severity':'pass','unplanned_subtitles':True})
+    monkeypatch.setattr(judges,'presentation_check',lambda *a:None)
+    monkeypatch.setattr(judges.cast_video,'enabled',lambda:False)
+    verdict=judges.judge_clip({},tmp_path/'raw.mp4',None,{},'',tmp_path/'episode/work/review/clip')
+    assert verdict['severity']=='fail' and verdict['reasonable_deviation'] is False
+    assert '实体文字' in verdict['feedback']

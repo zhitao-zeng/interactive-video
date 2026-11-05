@@ -101,6 +101,9 @@ def judge_clip(clip: dict, video: Path, bible: review_models_StoryBible, locatio
         else:
             verdict = cast_video.review(clip, video, work_dir, verdict)
         verdict = adjudication.review(clip, video, bible, work_dir, verdict)
+    if verdict.get('unplanned_subtitles') is True:
+        verdict.update(severity='fail',reasonable_deviation=False,
+                       feedback='取消原生漂浮对白字幕，保留画面内经批准的实体文字；对白字幕由宿主统一添加。')
     return verdict
 
 
