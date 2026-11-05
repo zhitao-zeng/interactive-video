@@ -10,6 +10,14 @@ from PIL import Image
 from novel_manga.application.review import cast_video, judges
 from novel_manga.review import policy
 
+
+def test_native_video_review_requires_a_selected_video_endpoint(monkeypatch):
+    import pytest
+    monkeypatch.setenv('NOVEL_REVIEW_VIDEO_JUDGE','')
+    monkeypatch.setattr(cast_video.model_client,'ask_json',lambda *a,**k:pytest.fail('Unconfigured native video must not call a model'))
+    with pytest.raises(ValueError,match='whole-video'):
+        cast_video.ask([{'type':'video_url','video_url':{'url':'data:video/mp4;base64,dGVzdA=='}}],{},'video-check')
+
 CLIP = {"clip_id": "clip_36", "cast": ["席勒", "托尼·斯塔克"], "extras": [],
         "prompt_h3": "subject_definitions:\n<Subject 1> is the person shown in <Picture 1>.\ndetailed_description:\n"
                      "[Shot 1] <Subject 1> and <Subject 2> talk in the lab.\noverall_soundscape:\nHum."}

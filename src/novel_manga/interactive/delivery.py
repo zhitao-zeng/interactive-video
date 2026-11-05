@@ -383,7 +383,7 @@ def deliver(runner, report: dict, destination: Path) -> dict:
 
 def reviewed_delivery(runner,report,destination):
     """Export the actual captions/card first; return its failures to the shared loop."""
-    from novel_manga.application.review.final_cut import review_assembly
+    from novel_manga.application.review.final_cut import review_assembly, blocking_issues
     from novel_manga.util import read_json
     destination=Path(destination)
     pending={**report,'quality_review':{**report.get('quality_review',{}),'passed':False,'content_passed':False}}
@@ -406,7 +406,7 @@ def reviewed_delivery(runner,report,destination):
     final=review_assembly(runner,report,receipt=receipt)
     final['final_audio_review_required'] = True
     receipt['final_audio_review_required'] = True
-    if final.get('complete') is True and final.get('passed') is True and not final.get('issues') and not final.get('errors'):
+    if final.get('complete') is True and final.get('passed') is True and not blocking_issues(final.get('issues') or []) and not final.get('errors'):
         movie = Path(final.get('movie') or '')
         try:
             from novel_manga.application.review.final_audio import review_audio
@@ -457,7 +457,7 @@ def export_context(runner,report):
 
 def record_native_publication(runner,report,destination,previous_inputs):
     """Rebind cached export inputs after the publisher's unchanged native-movie copy."""
-    from novel_manga.application.review.final_cut import current
+    from novel_manga.application.review.final_cut import current, blocking_issues
     from novel_manga.util import read_json
     path=Path(destination)/'delivery.json';receipt=read_json(path,{})
     final=report.get('final_cut_review')or{}
@@ -469,7 +469,7 @@ def record_native_publication(runner,report,destination,previous_inputs):
 
 def finish_reviewed_delivery(runner,report,destination):
     """Close the receipt for the exact reviewed movie without encoding it again."""
-    from novel_manga.application.review.final_cut import current
+    from novel_manga.application.review.final_cut import current, blocking_issues
     from novel_manga.util import read_json
     destination=Path(destination);receipt=read_json(destination/'delivery.json',{})
     final=report.get('final_cut_review') or {}
@@ -477,7 +477,7 @@ def finish_reviewed_delivery(runner,report,destination):
            and receipt.get('final_video')==final.get('movie')
            and current(runner.context.episode_dir,report,final)
            and final.get('complete') is True and final.get('passed') is True
-           and not final.get('issues') and not final.get('errors'))
+           and not blocking_issues(final.get('issues') or []) and not final.get('errors'))
     audio_review = (report.get('final_audio_review') or final.get('audio_review')
                     or receipt.get('final_audio_review') or {})
     audio_required = (report.get('final_audio_review_required') is True

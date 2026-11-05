@@ -10,6 +10,18 @@ from .input_effects import effects
 
 def evidence(ctx,cid):
     source=(ctx.run_dir/'source.txt').read_text() if (ctx.run_dir/'source.txt').is_file() else ''
+    approval_path=ctx.episode_dir/'work/input_authorizations'/f'{cid}.json'
+    approval=read_json(approval_path,{})
+    candidate=approval.get('candidate')
+    if (approval.get('status')=='approved' and isinstance(approval.get('authorization'),str)
+            and approval['authorization'].strip() and approval.get('source_text')==source
+            and isinstance(candidate,dict) and candidate.get('clip_id')==cid and candidate.get('action')=='input'
+            and isinstance(candidate.get('source_quote'),str) and candidate['source_quote'].strip()
+            and candidate['source_quote'] in source):
+        return {'kind':'user_approved_input','evidence_path':str(approval_path),
+                'authorization':approval['authorization'],'allowed_kinds':['input'],
+                'reason':approval.get('reason')or'User approved this exact input revision once',
+                'candidate':copy.deepcopy(candidate)}
     paths=sorted((ctx.episode_dir/'work/input_repairs').glob('clip_*-*.json'),key=lambda p:p.stat().st_mtime_ns)
     for path in reversed(paths):
         record=read_json(path,{})
@@ -45,13 +57,15 @@ def grant(ctx,cid,proof,*,kind):
     if kind not in {'input','time'}:raise ValueError('recovery grants input or time, never video')
     verified=evidence(ctx,cid)
     if not verified or verified!=proof:raise ValueError('recovery requires current host-owned evidence')
+    if kind not in verified.get('allowed_kinds',['input','time']):
+        raise ValueError('this user authorization permits input only, not time, image or video')
     path=ctx.episode_dir/'repair_budget_grants.json'
     with (ctx.episode_dir/'repair_budget_grants.lock').open('a')as lock:
         fcntl.flock(lock,fcntl.LOCK_EX);grants=read_json(path,{})
         entries=grants.setdefault(cid,{}).setdefault('upstream_recovery',{})
         if entries.get(kind):return copy.deepcopy(entries[kind])
         item={'evidence':verified,'candidate':verified['candidate'],'consumed':False,
-              'authorization':'approved-upstream-recovery-20261009','reason':verified['reason']}
+              'authorization':verified.get('authorization')or'approved-upstream-recovery-20261009','reason':verified['reason']}
         entries[kind]=item;atomic_write_json(path,grants);return copy.deepcopy(item)
 
 
