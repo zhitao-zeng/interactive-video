@@ -41,10 +41,21 @@ def normalized_events(events):
 
 def run_session(work_dir, prompt_text, *, resume=False, timeout=1200, config,
                 expected_output=None, enable_tools=False, project_root=None):
+    from novel_manga.media.resources import acquire_inflight_slot,release_inflight_slot
+    pool=os.environ.get('NOVEL_CODEX_INFLIGHT_DIR')
+    handle=acquire_inflight_slot(Path(work_dir),int(config.get('codex_parallel',4)),pool_directory=Path(pool))if pool else None
+    try:
+        return _run_session(work_dir,prompt_text,resume=resume,timeout=timeout,config=config,
+            expected_output=expected_output,enable_tools=enable_tools,project_root=project_root)
+    finally:release_inflight_slot(handle)
+
+
+def _run_session(work_dir, prompt_text, *, resume=False, timeout=1200, config,
+                 expected_output=None, enable_tools=False, project_root=None):
     if not prompt_text.strip() or timeout <= 0:
         raise SandboxRefused('Codex needs a nonempty episode prompt and positive timeout.')
     expected_output = expected_output or ('repair.json' if resume and not enable_tools else 'episode.json')
-    if expected_output not in {'episode.json', 'requests.json', 'repair.json'}:
+    if expected_output not in {'episode.json', 'requests.json', 'repair.json','decision.json','review.json','response.json'}:
         raise SandboxRefused('Expected output must be episode.json, requests.json or repair.json.')
     binary = shutil.which('codex')
     if not binary:
@@ -65,19 +76,20 @@ def run_session(work_dir, prompt_text, *, resume=False, timeout=1200, config,
             raise SandboxRefused('No valid saved Codex episode session to resume.') from error
     elif state_path.exists():
         raise SandboxRefused('This episode already has a session; use resume=True.')
+    manifest = read_json(work/'input/manifest.json', {})
+    bounded_task=manifest.get('phase')in{'model_json','media_review','clip_repair'}
     skill = work/'.claude/skills/episode-production'
-    if skill.parent.exists() and any(p.name != 'episode-production' for p in skill.parent.iterdir()):
+    if not bounded_task and skill.parent.exists() and any(p.name != 'episode-production' for p in skill.parent.iterdir()):
         raise SandboxRefused('This workspace contains other skills; use a dedicated episode workspace.')
     output = work/'output'
     output.mkdir(parents=True, exist_ok=True)
-    manifest = read_json(work/'input/manifest.json', {})
     creation_only = manifest.get('phase') == 'creation_only'
     script_preparation = manifest.get('phase') == 'script_preparation'
     attempt = unique_attempt(work/'attempts', f'{time.strftime("%Y%m%d-%H%M%S")}-episode')
-    if skill.exists():
-        shutil.copytree(skill, attempt/'skill-before')
-    shutil.copytree(SKILL_SOURCE, skill, dirs_exist_ok=True)
-    shutil.copytree(skill, attempt/'skill-current')
+    if not bounded_task:
+        if skill.exists():shutil.copytree(skill, attempt/'skill-before')
+        shutil.copytree(SKILL_SOURCE, skill, dirs_exist_ok=True)
+        shutil.copytree(skill, attempt/'skill-current')
     role = ('You are the whole-episode production Agent. Read '
         '/work/.claude/skills/episode-production/SKILL.md and only the relevant references. '
         'Use /work/tools/episode.py for host workflow actions. After yield=true, end this turn '
@@ -110,15 +122,39 @@ def run_session(work_dir, prompt_text, *, resume=False, timeout=1200, config,
             'No host workflow or media-generation tools are installed. Do not invoke models, media '
             'services, production adoption, or modify inputs, history or authentication. '
             'The host composes and checks the final syntax and executes the complete pipeline.\n\n')
-    (attempt/'prompt.txt').write_text(role+prompt_text, encoding='utf-8')
     before = {p.relative_to(output): (p.stat().st_mtime_ns, p.stat().st_size)
               for p in output.rglob('*') if p.is_file()}
     shutil.copytree(output, attempt/'output-before')
+    role = ('For text reads, including SKILL.md and the manifest, use python3 /work/.claude/skills/episode-production/scripts/read-text.py PATH '
+        '[--section "Exact heading"] [--start END]. Each result contains at most 6,000 UTF-8 text bytes plus cursor metadata; '
+        'continue its end offset until complete, one page per result. '
+        'Use the supplied manifest/current-task paths before directory discovery. '
+        'Read one short resource or named section per tool result, using small windows '
+        'of about 2,000 characters or 40 lines for long text. Do not concatenate whole '
+        'large references into one result. If output is truncated, fetch only the '
+        'missing range; reuse unchanged material already read in this session. '
+        'Read all original source text, with continuation windows as needed.\n\n') + role
+    if bounded_task:
+        role=('You are a bounded media reviewer or clip repair Agent in an isolated workspace. '
+              'Your task files and supplied guidance are under /work. Host repository setup and workspace '
+              'registration are owned by the coordinator; do not search for host workspace paths or global skills. '
+              'Follow this task only; inspect its supplied actual images/source, preserve original verdicts and histories, '
+              'and write only requested output candidates. Do not invoke models, generate media, install software or modify authentication. '
+              'A negative finding is valid; never invent passage or observations.\n\n')
+        if manifest.get('phase')=='model_json':
+            role=('Answer this one structured model request from its supplied text and actual attached images. '
+                  'Use no tools, make no file changes, and output only the final JSON object.\n\n')
+    (attempt/'prompt.txt').write_text(role+prompt_text, encoding='utf-8')
     command = ['docker', 'run', '--rm', '-i', '--network', 'host',
         '--name', f'episode-codex-{uuid.uuid4()}', '--user', '1001:1001',
         '-e', f'HOME={Path.home()}', '-v', f'{auth_home}:{auth_home}',
-        '-v', f'{binary}:/usr/local/bin/codex:ro', '-v', f'{work}:/work', '-w', '/work']
+        '-v', f'{binary}:/usr/local/bin/codex:ro', '-v', f'{work}:/work', '-w', '/work',
+        '--tmpfs', '/work/attempts:ro,mode=755']
     environment = dict(os.environ)
+    if config.get('codex_proxy_url'):
+        for name in ('HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY',
+                     'http_proxy', 'https_proxy', 'all_proxy'):
+            environment[name] = config['codex_proxy_url']
     for name in ('HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'NO_PROXY',
                  'http_proxy', 'https_proxy', 'all_proxy', 'no_proxy', 'CODEX_HOME'):
         if environment.get(name):
@@ -127,10 +163,27 @@ def run_session(work_dir, prompt_text, *, resume=False, timeout=1200, config,
         command.extend(['-v', f'{SKILL_SOURCE.parents[1]/"src"}:/opt/novel-code:ro'])
     command.extend([config['image'], 'timeout', str(timeout), 'codex', 'exec',
         '--ignore-user-config', '--skip-git-repo-check', '--json',
-        '--sandbox', 'danger-full-access' if enable_tools or creation_only or script_preparation else 'workspace-write',
+        '--sandbox', 'danger-full-access' if enable_tools or creation_only or script_preparation or bounded_task else 'workspace-write',
         '-c', 'approval_policy="never"', '-c', f'model_reasoning_effort={json.dumps(config.get("effort", "medium"))}',
         '--model', config['model']])
+    if bounded_task:
+        command.extend(['--enable','skip_host_skill_discovery','-c','project_doc_max_bytes=0'])
+    if config.get('codex_transport')=='http':
+        for value in ('model_provider="codex-http"',
+                      'model_providers.codex-http.name="Codex saved login HTTP"',
+                      'model_providers.codex-http.base_url="https://chatgpt.com/backend-api/codex"',
+                      'model_providers.codex-http.wire_api="responses"',
+                      'model_providers.codex-http.requires_openai_auth=true',
+                      'model_providers.codex-http.supports_websockets=false'):
+            command.extend(['-c',value])
     attached = []
+    if config.get('codex_output_schema'):
+        command.extend(['--output-schema','/work/'+config['codex_output_schema']])
+    if manifest.get('phase')=='model_json':
+        command.extend(['--output-last-message','/work/output/'+expected_output])
+    if not resume:
+        for path in config.get('codex_attached_images',[]):
+            command.extend(['--image','/work/'+path]);attached.append({'path':path,'bytes':(work/path).stat().st_size})
     if creation_only and not resume:
         for row in manifest.get('asset_catalog', []):
             command.extend(['--image', '/work/'+row['path']])

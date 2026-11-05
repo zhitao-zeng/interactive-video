@@ -77,12 +77,13 @@ def check_compilation(shots,clip):
     from novel_manga.llm.client import ask_json,obj
     from novel_manga.review.endpoints import judge_settings
     return ask_json([{'type':'text','text':
-        '独立核对本次源分镜修复后的实际英文请求是否忠实。只检查此次片段：机位/可见与画外物体、'
+        '独立核对本次源分镜修复后的实际模型请求是否忠实。按request_dialect核对，不要求另一模型的英文标签或占位符。只检查此次片段：机位/可见与画外物体、'
         '原事件顺序、相同人物和服装、深浅/干湿空间状态、发声与明确静音区段。'
         '正在录制的设备属于视点，不能自动变成被外部相机拍摄的入画道具。'
         '源分镜若要求设备保持画外，英文展示它就是冲突。原生片问题的旧报告不是真实源文。'
-        '不要要求逐字翻译，不为未改变的美术细节制造矛盾。只列具体确定的源文/英文冲突。\n'+
-        json.dumps({'approved_shots':shots,'actual_english':clip.get('prompt_h3'),'actual_references':clip.get('references',[])},ensure_ascii=False)}],
+        '不要要求逐字翻译，不为未改变的美术细节制造矛盾。只列具体确定的源文/请求冲突。\n'+
+        json.dumps({'approved_shots':shots,'actual_request':clip.get('prompt_h3')or clip.get('prompt'),
+                    'request_dialect':'H3'if clip.get('prompt_h3')else'SD','actual_references':clip.get('references',[])},ensure_ascii=False)}],
         obj({'consistent':{'type':'boolean'},'problems':{'type':'array','items':{'type':'string'}}}),
         name='agent_input_compiled_source',max_tokens=1200,timeout=180,settings=judge_settings())
 
@@ -201,8 +202,9 @@ def input_proposal(directory,plan,clip,decision):
             if target.get(key)!=before.get(key):raise ValueError('input compiler changed protected timing/dialogue')
         target['repair_take']=int(before.get('repair_take',0))+1
         target.pop('prompt_h3',None);target.pop('prompt_h3_of',None)
-        errors=[];convert(target,note='',episode_dir=directory,source_script=candidate_script,problems=errors)
-        if errors or not target.get('prompt_h3'):raise ValueError('source correction English compilation failed: '+str(errors))
+        if read_json(directory.parent/'profile.json',{}).get('sd_input_mode')!='first-frame':
+            errors=[];convert(target,note='',episode_dir=directory,source_script=candidate_script,problems=errors)
+            if errors or not target.get('prompt_h3'):raise ValueError('source correction English compilation failed: '+str(errors))
         checked=check_request(target,directory.parent)
         if checked.get('consistent') is not True or checked.get('problems'):
             raise ValueError('corrected source/reference request remains inconsistent: '+str(checked))

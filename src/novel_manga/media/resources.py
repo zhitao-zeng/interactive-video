@@ -27,7 +27,7 @@ def _earlier_capacity(directory, ticket):
                 path.unlink()
     return ceiling
 
-def acquire_inflight_slot(novel_dir: Path, limit: int):
+def acquire_inflight_slot(novel_dir: Path, limit: int, *, pool_directory: Path | None = None):
     """A cross-process counting semaphore made of lock files: every runner of the
     novel competes for the same `limit` slots, so the clips in flight stay at a
     constant number no matter how many episodes render at once."""
@@ -40,7 +40,7 @@ def acquire_inflight_slot(novel_dir: Path, limit: int):
     # NOVEL_INFLIGHT_DIR makes the pool belong to the API key rather than to this novel, so
     # two novels rendering on one key share a single ceiling instead of one each.
     shared = os.environ.get("NOVEL_INFLIGHT_DIR", "").strip()
-    directory = Path(shared) if shared else novel_dir / (f".inflight-{pool}" if pool else ".inflight")
+    directory = Path(pool_directory) if pool_directory is not None else Path(shared) if shared else novel_dir / (f".inflight-{pool}" if pool else ".inflight")
     directory.mkdir(parents=True, exist_ok=True)
     from novel_manga.resource_waits import QueueWait
     with QueueWait('video') as queue, (directory/'admission.lock').open('a+') as admission:

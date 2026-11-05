@@ -8,9 +8,9 @@ from .input_records import _phase_groups
 from novel_manga.application.identity.phases import LOOK_FIELDS
 
 SHOT_NAMES = {'in_frame', 'extras', 'listeners'}
-SHOT_FIELDS = {'location', 'light', 'scene_id', 'scene_time', 'scene_transition',
+SHOT_FIELDS = {'location', 'light', 'camera', 'shot_scale', 'scene_id', 'scene_time', 'scene_transition',
                'wears', 'props', 'scene_objects', 'visual_prompt', 'motion_prompt',
-               'start_state', 'event', 'end_state', 'sfx', 'actions', 'speaker_map', 'turn_texts', 'turns', *SHOT_NAMES}
+               'start_state', 'event', 'end_state', 'sfx', 'actions', 'speaker_map', 'turn_texts', 'turns','opening_frame', *SHOT_NAMES}
 
 
 
@@ -47,7 +47,10 @@ def normalize_arguments(row):
         if extra := set(patch)-{'index'}-SHOT_FIELDS:
             raise RepairArgumentError(f'{path} unsupported fields {sorted(extra)}; allowed: {sorted(SHOT_FIELDS)}')
         for field, value in patch.items():
-            if field == 'turns':
+            if field=='opening_frame':
+                from novel_manga.story.fields import opening_frame_error
+                if issue:=opening_frame_error(value):raise RepairArgumentError(issue)
+            elif field == 'turns':
                 from novel_manga.planning.constants import DELIVERY_MODES
                 if not isinstance(value,list):
                     raise RepairArgumentError(f'{path}.turns must be an ordered list of source-correct turns')

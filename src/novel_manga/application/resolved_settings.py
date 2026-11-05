@@ -62,6 +62,80 @@ def recorded_plan_settings(plan: dict) -> RecordedPlanSettings:
 
 
 
+def agent_route(env, config):
+    """What this task's model calls actually use, and which roles keep theirs.
+
+    The sandbox CLI runs one provider/model; preparation, translation and both
+    reviewers are separate named routes.  Recording all of them stops a task
+    from claiming that changing the author model changed every backend.
+    """
+    api = {'base_url': env.get('QWEN38_LOCAL_BASE_URL'),
+           'model': env.get('QWEN38_LOCAL_MODEL'),
+           'key_var': env.get('QWEN38_LOCAL_API_KEY_VAR')}
+    preset = next((name for name, values in ENDPOINTS.items()
+                   if all(values.get(key) == env.get(key) for key in
+                          ('QWEN38_LOCAL_BASE_URL', 'QWEN38_LOCAL_MODEL',
+                           'QWEN38_LOCAL_API_KEY_VAR'))), None)
+    agent = {'provider': config.get('provider') or 'phanrouter-sandbox',
+             'model': config.get('model'), 'base_url': config.get('base_url'),
+             'key_var': config.get('key_var')}
+    roles = {}
+    for role, variable in (('planner', 'NOVEL_PLANNER_ENDPOINT'),
+                           ('preparation', 'NOVEL_PREPARATION_ENDPOINT'),
+                           ('h3_translation', 'NOVEL_H3_TRANSLATION_ENDPOINT'),
+                           ('h3_request_check', 'NOVEL_H3_REQUEST_CHECK_ENDPOINT'),
+                           ('review', 'SECOND_REVIEW_JUDGE'),
+                           ('video_review', 'NOVEL_REVIEW_VIDEO_JUDGE')):
+        name = str(env.get(variable) or '').strip()
+        if not name:
+            continue
+        values = ENDPOINTS.get(name, {})
+        roles[role] = {'endpoint': name, 'model': values.get('QWEN38_LOCAL_MODEL'),
+                       'base_url': values.get('QWEN38_LOCAL_BASE_URL')}
+    # The image-capable judge is a configuration fact here; this task makes no
+    # live image call while recording it, so that part stays unverified.
+    vision = roles.get('review')
+    return {'provider': agent['provider'], 'model': agent['model'],
+            'base_url': agent['base_url'], 'key_var': agent['key_var'],
+            'agent': agent, 'api': api, 'preset': preset, 'roles': roles,
+            'vision': ({'endpoint': vision['endpoint'], 'model': vision['model'],
+                        'verified': False,
+                        'unverified': 'recorded from task configuration; no live image call was made'}
+                       if vision else {'verified': False, 'unverified': 'no review route configured'})}
+
+
+def apply_agent_route(runtime, config, route):
+    """Resume the recorded provider/model instead of whatever today's default is."""
+    agent = route.get('agent')
+    if not agent:
+        return config
+    for key in ('base_url', 'model', 'key_var', 'provider'):
+        if agent.get(key):
+            config[key] = agent[key]
+    api = route.get('api') or {}
+    for key, value in (('QWEN38_LOCAL_BASE_URL', api.get('base_url')),
+                       ('QWEN38_LOCAL_MODEL', api.get('model')),
+                       ('QWEN38_LOCAL_API_KEY_VAR', api.get('key_var'))):
+        if value:
+            runtime[key] = value
+        else:
+            runtime.pop(key, None)
+    role_env = {'planner': 'NOVEL_PLANNER_ENDPOINT',
+                'preparation': 'NOVEL_PREPARATION_ENDPOINT',
+                'h3_translation': 'NOVEL_H3_TRANSLATION_ENDPOINT',
+                'h3_request_check': 'NOVEL_H3_REQUEST_CHECK_ENDPOINT',
+                'review': 'SECOND_REVIEW_JUDGE',
+                'video_review': 'NOVEL_REVIEW_VIDEO_JUDGE'}
+    roles = route.get('roles') or {}
+    for role, variable in role_env.items():
+        endpoint = (roles.get(role) or {}).get('endpoint')
+        if endpoint:
+            runtime[variable] = endpoint
+        else:
+            runtime.pop(variable, None)
+    return config
+
+
 def resolve_agent_environment(ctx, config):
     env = environment(ctx.project_root)
     pipeline = read_json(ctx.project_root / 'configs/pipeline.json', {})

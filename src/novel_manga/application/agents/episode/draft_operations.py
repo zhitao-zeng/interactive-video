@@ -115,6 +115,12 @@ class DraftOperations:
                             from .scoped_repack import validate
                         validate(self.ctx,row)
                         continue
+                    if action == 'cutaway':
+                        if len(draft['decisions']) != 1:
+                            raise RepairArgumentError('submit one cutaway separately from clip repairs')
+                        from .postproduction import record_cutaway
+                        record_cutaway(self.ctx, row, check_only=True)
+                        continue
                     if not provisional:
                         from .arguments import first_pass_scope,spent_video_budget
                         first_pass_scope(self.ctx,[cid])

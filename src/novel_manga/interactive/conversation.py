@@ -15,28 +15,31 @@ from novel_manga.util import read_json, atomic_write_json
 
 def compile_conversation_clip(clip: dict, shot: dict, *, performance: dict,
                              reference_cast: list[str] | None = None,
-                             reference_props: list[str] | None = None) -> dict:
+                             reference_props: list[str] | None = None, include_h3: bool = True) -> dict:
     from novel_manga.story.h3 import compose, request_issues
+    from novel_manga.story.voice_delivery import native_speech_selected
     from novel_manga.application.profiles import h3_stamp
 
-    for field in ('visual_prompt', 'end_state', 'camera', 'authored_frame'):
+    for field in ('visual_prompt', 'end_state', 'camera', *(('authored_frame',) if include_h3 else ())):
         if not str(shot.get(field, '')).strip():
             raise ValueError(f'Continuous exchange requires {field}')
     visible = shot.get('in_frame', [])
-    if set(visible) - set(shot['characters']):
-        raise ValueError('Visible cast must belong to the room')
+    # Explicitly authored visible people are already present in the room. Fill
+    # inventory omissions without changing the authored frame or its cast.
+    room = list(dict.fromkeys([*shot['characters'], *visible]))
     turns = [t for t in shot['turns'] if t.get('delivery_mode') != 'silent_action']
     if any(t['delivery_mode'] not in {'visible_dialogue', 'offscreen_dialogue'} for t in turns):
         raise ValueError('Continuous exchange supports visible or offscreen dialogue')
     if any(t['speaker_name'] not in visible for t in turns if t['delivery_mode'] == 'visible_dialogue'):
         raise ValueError('A speaking participant must be visible in this exchange')
-    slots = re.findall(r'<DIALOGUE_(\d+)>', shot['authored_frame'])
-    if slots != [str(i) for i in range(1, len(turns) + 1)]:
-        raise ValueError('English dialogue slots must bind every turn once in order')
+    if include_h3:
+        slots = re.findall(r'<DIALOGUE_(\d+)>', shot['authored_frame'])
+        if slots != [str(i) for i in range(1, len(turns) + 1)]:
+            raise ValueError('English dialogue slots must bind every turn once in order')
     result = copy.deepcopy(clip)
     # The room inventory describes continuity, including things outside this
     # camera. Only the explicitly selected design images go to the generator.
-    for role, selected, world in [('character', reference_cast, shot['characters']),
+    for role, selected, world in [('character', reference_cast, room),
                                   ('prop', reference_props, shot.get('props', []))]:
         if selected is None:
             continue
@@ -61,12 +64,19 @@ def compile_conversation_clip(clip: dict, shot: dict, *, performance: dict,
         if ref.get('reference_scope') == 'spatial_layout':
             bindings.append(f'@图片{i}仅用于机位、座位和物品位置，不采用灰模外观；灰模代理对应已有三维位置中的人物，不增加演员')
             continue
+        if ref['role'] == 'character' and ref.get('reference_scope') == 'identity_portrait':
+            binding = (f'{ref["name"]}采用@图片{i}图中可见的五官、发型、年龄感和肤色；'
+                       '不从肖像推断全身体型或整套服装，体型与服装按本镜文字；参考拼版不作为画面构图')
+            if ref.get('wardrobe'):
+                binding += f'；角色服装设定：{ref["wardrobe"]}'
+            bindings.append(binding)
+            continue
         scope = '身份与衣装' if ref['role'] == 'character' else '外观设计'
         bindings.append(f'{ref["name"]}采用@图片{i}的{scope}；参考拼版不作为画面构图')
     lines = [
         f'恋综，同一房间内一段{clip["request_seconds"]:g}秒连续交流。',
         '【参考绑定】' + '。'.join(bindings) + '。',
-        '【房间在场】' + '、'.join(shot['characters']) + '。画外不等于离场。',
+        '【房间在场】' + '、'.join(room) + '。画外不等于离场。',
         '【开始状态】' + shot['visual_prompt'],
         '【本段机位】' + shot['camera'] + '。取景内人物：' + '、'.join(visible),
         '【动作与交流】' + shot.get('motion_prompt', ''),
@@ -75,18 +85,30 @@ def compile_conversation_clip(clip: dict, shot: dict, *, performance: dict,
     for turn in turns:
         scope = '（画外声音，画内嘉宾不替它开口）' if turn['delivery_mode'] == 'offscreen_dialogue' else ''
         lines.append(f'{turn["speaker_name"]}{scope}：{turn["text"]}（{turn.get("emotion", "自然接话")}）')
+    preserve = ('人物身份与画风按各参考范围，服装按本镜描述和角色服装设定，保持物品归属；'
+                if any(r.get('reference_scope') == 'identity_portrait' for r in pictured)
+                else '保持原参考的画风、脸、服装和物品归属；')
     lines += ['【结束状态】' + shot['end_state'],
               '声音：' + shot.get('sfx', '安静室内底噪') + '。只说列出的对白；其他人自然静默听。',
-              '保持原参考的画风、脸、服装和物品归属；字幕由后期添加，画面不生成文字。']
+              preserve + '字幕由后期添加，画面不生成文字。']
     result['prompt'] = '\n'.join(lines)
     result['prompt_chars'] = len(result['prompt'])
+    result['prompt_compiler'] = 'romance_conversation_v1'
     # H3 consumes its own field; do not reuse the legacy multi-stage binding
     # table after collapsing the exchange into one continuous camera take.
     result['dialogue_bindings'] = [dict(t, stage=1, source_stage=shot['index']) for t in turns]
     result['shot_timing'] = [{'stage': 1, 'seconds': clip['request_seconds']}]
+    if not include_h3:
+        for key in ('prompt_h3','prompt_h3_of','prompt_h3_skip','authored_english_source'):
+            result.pop(key,None)
+        return result
     stage = [('', [(t['speaker_name'], t['text'], t['delivery_mode'] == 'offscreen_dialogue', '') for t in turns])]
     direction = shot['authored_frame']
     for index, turn in enumerate(turns, 1):
+        if native_speech_selected(result):
+            # Native speech already binds the author's English emotion once in
+            # compose; adding a second Performance line violates that contract.
+            continue
         emotion = turn.get('emotion', '').strip()
         cue = performance.get(emotion, '').strip()
         if emotion and not cue:
@@ -129,6 +151,7 @@ def pack_conversation(directory: Path) -> dict:
         packed = {'kind': 'video', 'location': shot['location'], 'shots': [shot],
                   'seconds': group['request_seconds'], 'request_seconds': group['request_seconds'],
                   'shot_timing': [{'seconds': shot['duration_seconds']}]}
+        if 'reference_cast'in group:packed['reference_cast']=group['reference_cast']
         clip = clip_entry(packed, f'clip_{number:02d}', context)
         if group.get('location_reference'):
             path=group['location_reference']
@@ -159,7 +182,8 @@ def pack_conversation(directory: Path) -> dict:
             clip['references'].append({'role': 'location', 'name': '空间布局参考',
                 'path': path, 'reference_scope': 'spatial_layout'})
         clip = compile_conversation_clip(clip, shot, performance=performance,
-            reference_cast=group.get('reference_cast'), reference_props=group.get('reference_props'))
+            reference_cast=group.get('reference_cast'), reference_props=group.get('reference_props'),
+            include_h3=context.get('profile',{}).get('sd_input_mode')!='first-frame')
         clip['source_authored_segment'] = group['source_segment']
         clips.append(clip)
     plan = {'policy': POLICY, 'clips': clips,
