@@ -230,7 +230,8 @@ def test_unclassified_old_boolean_answer_cannot_silently_pass():
 
 
 @pytest.mark.parametrize('old_policy', ['request-reference-v1', 'request-reference-v2-scoped-evidence',
-                                    'request-reference-v3-scoped-evidence', 'request-reference-v4-current-input-only'])
+                                    'request-reference-v3-scoped-evidence', 'request-reference-v4-current-input-only',
+                                    'request-reference-v10-grounded-conflict-recheck'])
 @pytest.mark.parametrize('old_consistent', [True, False])
 def test_policy_change_rechecks_old_rejections_but_reuses_unchanged_passes(tmp_path, monkeypatch,
                                                                          old_policy, old_consistent):

@@ -24,6 +24,16 @@ def current(directory, final):
                 and independent.get('context') == final.get('context'))
 
 
+def confirmed_failure(directory,final):
+    """A complete current independent failure can guide repair, never fill missing acceptance."""
+    row=read_json(Path(directory)/'independent_review.json',{})
+    if (required(directory) and row.get('policy')==POLICY and row.get('context')==final.get('context')
+            and row.get('complete')is True and row.get('passed')is False
+            and row.get('issues') and not row.get('errors')):
+        return row
+    return None
+
+
 def validate(answer, frames, *, previous=()):
     if (not isinstance(answer.get('passed'), bool) or answer.get('complete') is not True
             or not isinstance(answer.get('observations'), list) or not answer['observations']
@@ -114,7 +124,7 @@ def register(directory, media, report):
     final = read_json(directory/'final_cut_review.json', {})
     if (final.get('policy') != FINAL_POLICY
             or final.get('context') != context(directory, media, final.get('movie', ''))
-            or final.get('automatic_review', final).get('complete') is not True
+            or (final.get('automatic_review', final).get('complete') is not True and raw.get('passed')is not False)
             or raw.get('movie') != final.get('movie')):
         raise ValueError('independent report must identify the current reviewed movie')
     known = {f['path']: f for f in final.get('frames', [])}
@@ -308,6 +318,14 @@ def combine(directory, final):
     result.pop('dispute_reviews', None)
     result['automatic_review'] = copy.deepcopy(automatic)
     if automatic['complete'] is not True:
+        known=confirmed_failure(directory,result)
+        if known:
+            result['independent_review']=copy.deepcopy(known)
+            result['issues']=[*automatic['issues'],*known['issues']]
+            frames={f['path']:f for f in result['frames']}
+            frames.update({f['path']:f for f in known['frames']})
+            result['frames']=list(frames.values())
+            result['passed']=False
         return result
     try:
         independent = observe(directory, result)

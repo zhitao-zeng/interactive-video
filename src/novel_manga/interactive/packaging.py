@@ -1,7 +1,6 @@
 """Opt-in world introduction and series mark for authored travel episodes."""
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
-from novel_manga.util import run
 
 
 def shift_events(events, cut, seconds):
@@ -53,8 +52,9 @@ def shift_subtitles(source: Path, target: Path, cut: float, seconds: float) -> N
     target.write_text('\n'.join(result) + '\n')
 
 
-def package_body(source: Path, publication: dict, timeline: list[dict], destination: Path,
-                 font: Path, width: int, height: int, *, boundary_has_speech: bool) -> tuple[Path, dict]:
+def prepare_publication(publication: dict, timeline: list[dict], destination: Path,
+                        font: Path, width: int, height: int, *, boundary_has_speech: bool) -> dict:
+    """Prepare the existing card/mark and receipt without encoding the movie."""
     cut, seconds = world_card_boundary(publication, timeline)
     card = publication['world_card']
     image = Image.new('RGB', (width, height), '#172623')
@@ -76,28 +76,29 @@ def package_body(source: Path, publication: dict, timeline: list[dict], destinat
         stroke_width=1, stroke_fill=(0, 0, 0, 90))
     mark_path = destination / 'series-watermark.png'
     mark.save(mark_path)
+    return {'world_card': {**card, 'start':cut, 'end':cut+seconds, 'seconds':seconds},
+            'watermark':publication.get('watermark', ''), 'scene_evidence_overlays':False,
+            'world_card_audio':'silence' if boundary_has_speech else 'wordless_boundary_tail'}
+
+
+def publication_graph(publication: dict, card_input: int, mark_input: int) -> str:
+    """Insert the card into filtered body_video/body_audio in the final encode."""
+    cut=publication['world_card']['start'];seconds=publication['world_card']['seconds']
+    cut_frames=round(cut*25);card_frames=round(seconds*25)
     # Reusing a spoken cold-open's tail can replay its final syllables over the
     # title. Only a wordless boundary clip can supply the existing ambience tail.
-    audio = ('[0:a]asplit=2[a_before][a_after];'
-             f'anullsrc=r=48000:cl=stereo,atrim=duration={seconds}[a1];'
-             if boundary_has_speech else
-             '[0:a]asplit=3[a_before][a_card][a_after];'
-             f'[a_card]atrim=start={max(0,cut-.6)}:end={cut},asetpts=PTS-STARTPTS,'
-             f'afade=t=out:st=0:d=0.6,apad,atrim=duration={seconds}[a1];')
-    graph = (f'[0:v]split=2[before][after];'
-        f'[before]trim=end={cut},setpts=PTS-STARTPTS[v0];'
-        f'[after]trim=start={cut},setpts=PTS-STARTPTS[v2];'
-        f'[1:v]trim=duration={seconds},setpts=PTS-STARTPTS,format=yuv420p,setsar=1[v1];'
+    audio = ('[body_audio]asplit=2[pub_a_before][pub_a_after];'
+             f'anullsrc=r=48000:cl=stereo,atrim=duration={seconds}[pub_a1];'
+             if publication['world_card_audio']=='silence' else
+             '[body_audio]asplit=3[pub_a_before][pub_a_card][pub_a_after];'
+             f'[pub_a_card]atrim=start={max(0,cut-.6)}:end={cut},asetpts=PTS-STARTPTS,'
+             f'afade=t=out:st=0:d=0.6,apad,atrim=duration={seconds}[pub_a1];')
+    return ('[body_video]split=2[pub_before][pub_after];'
+        f'[pub_before]trim=end_frame={cut_frames},setpts=PTS-STARTPTS[pub_v0];'
+        f'[pub_after]trim=start_frame={cut_frames},setpts=PTS-STARTPTS[pub_v2];'
+        f'[{card_input}:v]trim=end_frame={card_frames},setpts=PTS-STARTPTS,format=yuv420p,setsar=1[pub_v1];'
         + audio +
-        f'[a_before]atrim=end={cut},asetpts=PTS-STARTPTS[a0];'
-        f'[a_after]atrim=start={cut},asetpts=PTS-STARTPTS[a2];'
-        '[v0][a0][v1][a1][v2][a2]concat=n=3:v=1:a=1[body][a];'
-        '[body][2:v]overlay=0:0:shortest=1[v]')
-    body = destination / 'published-body.mp4'
-    run(['ffmpeg','-y','-v','error','-threads','4','-i',str(source),'-loop','1','-framerate','25',
-         '-i',str(card_path),'-loop','1','-framerate','25','-i',str(mark_path),'-filter_complex',graph,
-         '-map','[v]','-map','[a]','-r','25','-c:v','libx264','-preset','fast','-crf','19',
-         '-pix_fmt','yuv420p','-c:a','aac','-ar','48000','-ac','2','-b:a','192k',str(body)])
-    return body, {'world_card': {**card, 'start':cut, 'end':cut+seconds, 'seconds':seconds},
-                  'watermark':publication.get('watermark', ''), 'scene_evidence_overlays':False,
-                  'world_card_audio':'silence' if boundary_has_speech else 'wordless_boundary_tail'}
+        f'[pub_a_before]atrim=end={cut},asetpts=PTS-STARTPTS[pub_a0];'
+        f'[pub_a_after]atrim=start={cut},asetpts=PTS-STARTPTS[pub_a2];'
+        '[pub_v0][pub_a0][pub_v1][pub_a1][pub_v2][pub_a2]concat=n=3:v=1:a=1[pub_body][published_audio];'
+        f'[pub_body][{mark_input}:v]overlay=0:0:shortest=1[published_video]')

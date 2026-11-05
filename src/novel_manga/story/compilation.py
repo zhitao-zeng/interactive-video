@@ -573,7 +573,7 @@ class ClipCompiler:
         else:
             lines.append(f"镜头采用{frame['text']}，按阶段切换景别（{scales}），每个阶段开始时切一次画面，阶段内机位固定不运镜；{frame['composition']}；同一场景内保持人物左右位置和视线方向不变。")
         music = [(i, str((shot.get('audio_plan') or {}).get('music_cue') or '').strip())
-                 for i, shot in enumerate(shots, 1)]
+                 for i, shot in enumerate(shots, 1)if(shot.get('audio_plan')or{}).get('music_delivery')!='postmix']
         music = [(i, cue) for i, cue in music if cue]
         music_text = ('背景音乐按阶段执行：' + '；'.join(f'阶段{i}：{cue}' for i, cue in music)
                       + '；音乐始终低于对白，动作音效保持可辨。') if music else '无背景音乐。'

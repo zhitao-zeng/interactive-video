@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "evidence_status": "Relative proposed staging only. No Blender input, measured survey, or existing white model was supplied.",
+  "rooms": {
+    "kitchen": "North counter and soup station; refrigerator west; south doorway directly faces dining room. Camera axis from south looking north.",
+    "dining": "Initial six-person grouping at the indoor table. Kitchen door north; terrace access east. Do not move this table outdoors or confuse it with the repaired terrace dinner table.",
+    "terrace": "Existing roofed terrace table on the authored north-south axis. The source dinner is held here after stabilization. For west-side dinner cameras, near/west row image-left to right Tao Ran, Xia Ning, Qiao Yi; far/east row Zhou Xu, Lu Chuan, Cheng Yue. Single dark-grey shim under the same house-side left leg, two clips on the same windward corners, vase inner-centre.",
+    "interview": "Southwest interior nook of dining room; chair faces east, camera southeast looking northwest; fixed floor lamp behind subject left."
+  },
+  "fixed_objects": [
+    "Six-seat table and chairs remain fixed during dinner.",
+    "Terrace table receives exactly one deep-gray shim under its uneven left-side leg.",
+    "Xia Ning’s mild-spice dish is set aside by Lu Chuan and remains hers."
+  ],
+  "relative_only": true,
+  "source_resolution": "Original source’s terrace effort, ready terrace table at 19:00 and Qiao Yi’s opening-dinner line determine the actual dinner location; the original indoor/dinner label is treated as a template mapping error. The original seat order is preserved on the terrace table."
+}
