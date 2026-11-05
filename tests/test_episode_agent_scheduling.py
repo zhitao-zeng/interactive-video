@@ -878,7 +878,7 @@ def test_retry_of_started_episode_renders_current_plan_without_readopting_a_draf
     ctx = replace(ctx, input_mode='script')
     install_fake_runtime(monkeypatch, ctx)
     atomic_write_json(ctx.run_dir/'agent-run.json', {'status': prior_status, 'passed': False,
-                                                   'deadline': time.time()-1})
+                                                   'remaining_seconds': 30, 'deadline': time.time()-1})
     original = flow.EpisodeTools
     payloads = []
     video=ctx.episode_dir/'work/clips/c/attempt_01/clip.mp4'
@@ -1130,6 +1130,62 @@ def test_completed_finish_receipt_recovers_after_crash_even_if_deadline_expired(
     assert result['deadline'] < time.time()
 
 
+def test_hostless_completed_finish_recovers_after_crash(ctx, config, monkeypatch):
+    install_fake_runtime(monkeypatch, ctx)
+    atomic_write_json(ctx.work_dir/'input/latest-finish.json', {
+        'passed': True, 'technical_passed': True, 'author_session': {}})
+    atomic_write_json(ctx.run_dir/'agent-run.json', {
+        'status': 'running', 'deadline': time.time() - 1,
+        'job': {'id': 'job-8', 'action': 'finish', 'status': 'completed',
+                'result': {'ok': True, 'passed': True}}})
+    monkeypatch.setattr(episode_turns, 'run_session',
+                        lambda *a, **k: pytest.fail('finished host work resumed an Agent'))
+    monkeypatch.setattr(flow, 'EpisodeBridge', lambda *a: pytest.fail('finished tools restarted'))
+    result = flow.run_episode(ctx, config={**config, 'production_mode': 'agent'})
+    assert result['passed'] and result['status'] == 'finished'
+
+
+def test_completed_false_finish_recovery_uses_current_route_and_continues(ctx, config, monkeypatch):
+    calls = install_fake_runtime(monkeypatch, ctx)
+    original = flow.EpisodeTools
+    atomic_write_json(ctx.episode_dir/'clip_plan.json', {
+        'clips': [{'clip_id': 'clip_01', 'kind': 'video'}]})
+    atomic_write_json(ctx.work_dir/'episode-session.json', {'session_id': 'old-session'})
+    atomic_write_json(ctx.work_dir/'input/latest-finish.json', {
+        'passed': False, 'technical_passed': False,
+        'author_session': {'session_id': 'old-session'}})
+    atomic_write_json(ctx.run_dir/'agent-run.json', {
+        'status': 'running', 'deadline': time.time() + 30,
+        'job': {'id': 'job-8', 'action': 'finish', 'status': 'completed',
+                'result': {'ok': False, 'passed': False, 'error': 'missing_video'}}})
+
+    class Tools(original):
+        def dispatch(self, action, payload):
+            result = super().dispatch(action, payload)
+            if action == 'status':
+                result['adopted'] = True
+            return result
+
+    monkeypatch.setattr(flow, 'EpisodeTools', Tools)
+    monkeypatch.setattr(flow, 'prepare_operations', lambda *args: (None, None))
+    monkeypatch.setattr(episode_turns, 'run_session',
+                        lambda *a, **k: pytest.fail('current host work must continue before an Agent turn'))
+
+    def route(_, status=None):
+        job = status.get('job') or {}
+        if job.get('action') == 'first_frames':
+            return {'action': 'finish'}
+        if job.get('action') == 'finish' and (job.get('result') or {}).get('passed') is True:
+            return {'action': 'finish'}
+        return {'action': 'first_frames', 'reason': 'opening is still missing',
+                'blocked': {'clip_01': 'missing'}}
+
+    monkeypatch.setattr('novel_manga.application.agents.episode.readiness.next_action', route)
+    result = flow.run_episode(ctx, config={**config, 'production_mode': 'agent'})
+    assert result['passed'] is True
+    assert [action for action in calls if action != 'status'] == ['first_frames', 'finish']
+
+
 def test_pause_interrupts_waiting_for_model_without_invocation(ctx, config, monkeypatch):
     install_fake_runtime(monkeypatch, ctx)
     monkeypatch.setenv('NOVEL_MODEL_RESOURCES', json.dumps([{'base': config['base_url'], 'slots': 1}]))
@@ -1186,6 +1242,102 @@ def test_newly_available_permission_is_progress_but_same_unused_permission_is_no
     before = rules.progress(ctx,old)
     assert rules.made_progress(ctx,before,old,new)
     assert not rules.made_progress(ctx,rules.progress(ctx,new),new,new)
+
+
+@pytest.mark.parametrize(('error','http_status','retryable'), [
+    (RuntimeError('task submission returned HTTP 503: service unavailable'),503,True),
+    (RuntimeError('task submission returned HTTP 401: unauthorized'),401,False),
+    (RuntimeError('task submission returned HTTP 402: quota_not_enough'),402,False),
+    (ValueError('malformed local payload'),None,False),
+])
+def test_dispatch_preserves_service_structure_and_conservative_retry_policy(
+        ctx,monkeypatch,error,http_status,retryable):
+    tools=flow.EpisodeTools(ctx)
+    monkeypatch.setattr(tools,'review',lambda payload: (_ for _ in ()).throw(error))
+    result=tools.dispatch('review',{})
+    assert result['ok'] is False and result['retryable'] is retryable
+    if http_status is None:
+        assert 'service_interrupted' not in result
+    else:
+        assert result['service_interrupted']['http_status']==http_status
+
+
+def test_first_frame_exception_boundary_keeps_partial_outcome_and_service_structure(ctx,monkeypatch):
+    from novel_manga.application.agents.episode import first_frames
+    class BrokenOperations:
+        def __init__(self,ctx):
+            self.partial_outcome={'clips':{'clip_01':{'ok':False,'repair_grant':{'operation':'resume'}}}}
+        def prepare(self,payload):
+            raise RuntimeError('task submission returned HTTP 503: service unavailable')
+    monkeypatch.setattr(first_frames,'FirstFrameOperations',BrokenOperations)
+    atomic_write_json(ctx.work_dir/'output/first-frames.json',{'frames':[{'clip_id':'clip_01'}]})
+    result=flow.EpisodeTools(ctx).dispatch('first_frames',{})
+    assert result['service_interrupted']['http_status']==503
+    assert result['retryable'] is True
+    assert result['clips']['clip_01']['repair_grant']=={'operation':'resume'}
+    assert read_json(ctx.work_dir/'input/latest-first-frames.json')['retryable'] is True
+
+
+def test_submission_uncertain_requires_reconciliation_not_content_repair(ctx,monkeypatch):
+    from novel_manga.providers.phanrouter_tasks import SubmissionUncertain
+    tools=flow.EpisodeTools(ctx)
+    error=SubmissionUncertain('task submission unconfirmed (HTTP 502): not sent again')
+    monkeypatch.setattr(tools,'render',lambda payload: (_ for _ in ()).throw(error))
+    result=tools.dispatch('render',{})
+    assert result['service_interrupted']['http_status']==502
+    assert result['service_interrupted']['submission_uncertain'] is True
+    assert result['required_action']=='reconcile_submission'
+    assert result['retryable'] is False
+
+
+def _service_failure_run(ctx,config,monkeypatch,failure):
+    calls=install_fake_runtime(monkeypatch,ctx)
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',{
+        'clips':[{'clip_id':'clip_01','kind':'video'}]})
+    original=flow.EpisodeTools
+    failed=[True]
+    class Tools(original):
+        def dispatch(self,action,payload):
+            result=super().dispatch(action,payload)
+            if action=='status':
+                result['adopted']=True
+            if action=='render' and failed[0]:
+                return {**result,'ok':False,**failure}
+            return result
+    monkeypatch.setattr(flow,'EpisodeTools',Tools)
+    agent=[]
+    monkeypatch.setattr(episode_turns,'run_session',
+        lambda *args,**kwargs: agent.append(1) or fake_attempt(ctx,len(agent)))
+    options={**config,'production_mode':'agent','agent_invocations_per_slice':1}
+    result=flow.run_episode(ctx,config=options)
+    return result,calls,agent,failed,options
+
+
+def test_transient_service_has_no_agent_and_resumes_only_the_same_host_operation(ctx,config,monkeypatch):
+    failure={'service_interrupted':{'http_status':503,'detail':'service unavailable'},'retryable':True}
+    first,calls,agent,failed,options=_service_failure_run(ctx,config,monkeypatch,failure)
+    assert first['status']=='blocked' and first['retryable'] is True
+    assert first['service_interrupted']['http_status']==503
+    assert calls.count('render')==1 and agent==[]
+    failed[0]=False
+    second=flow.run_episode(ctx,config=options,retry_issues=True)
+    assert calls.count('render')==2 and agent==[]
+    assert second['status']=='blocked'
+
+
+@pytest.mark.parametrize('failure', [
+    {'error':'ValueError: local H3 returned no task id','retryable':False},
+    {'service_interrupted':{'http_status':401,'detail':'unauthorized'},'retryable':False},
+    {'service_interrupted':{'http_status':402,'detail':'quota_not_enough'},'retryable':False},
+    {'service_interrupted':{'http_status':502,'detail':'submission unconfirmed','submission_uncertain':True},
+     'retryable':False,'required_action':'reconcile_submission'},
+])
+def test_nonretryable_service_and_uncertain_submission_stop_without_agent_or_repost(ctx,config,monkeypatch,failure):
+    result,calls,agent,_,_=_service_failure_run(ctx,config,monkeypatch,failure)
+    assert result['status']=='blocked' and result['retryable'] is False
+    assert calls.count('render')==1 and agent==[]
+    if failure.get('required_action'):
+        assert result['required_action']=='reconcile_submission'
 
 
 def test_new_input_route_is_progress_without_resetting_numeric_input_count(ctx):

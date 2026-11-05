@@ -3,6 +3,12 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 import os
+from pathlib import Path
+
+
+def paused():
+    path = os.environ.get('NOVEL_AGENT_PAUSE_FILE')
+    return bool(path and Path(path).exists())
 
 
 @contextmanager

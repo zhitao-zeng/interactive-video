@@ -1,5 +1,6 @@
 """Reuse the isolated SoulTuner runtime; return local candidates, never an adoption."""
 from pathlib import Path
+import hashlib
 import json
 import os
 import subprocess
@@ -62,7 +63,17 @@ def recommend(root,config,query,directory):
     """Run upstream with its existing environment; secrets only cross via environment."""
     from novel_manga.application.configuration import environment
     from novel_manga.llm.config import JsonEndpoint,ENDPOINTS
-    endpoint=JsonEndpoint.from_env({**environment(Path(root)),**ENDPOINTS[config.get('text_endpoint','phanthy-ds41')]})
+    from novel_manga.llm.catalog import catalogue, choose
+    selected=config.get('text_endpoint','phanthy-ds41')
+    if selected == 'phanthy-ds41':
+        selected=choose(catalogue()['candidates']['json'],'http-chat')
+        if not selected:
+            raise ValueError('No qualified HTTP chat resource available for SoulTuner in the configured candidate order')
+    endpoint=JsonEndpoint.from_env({**environment(Path(root)),**ENDPOINTS[selected]})
+    if not endpoint.endpoints[0].startswith(('http://','https://')):
+        raise ValueError('SoulTuner requires an HTTP chat resource; saved-login Codex uses another protocol')
+    from novel_manga.llm import quota
+    quota.check(quota.for_model(endpoint.model, endpoint.endpoints[0], endpoint.key), endpoint.key)
     env={**os.environ,'ST_LLM_BASE_URL':endpoint.endpoints[0],'ST_LLM_MODEL':endpoint.model,'ST_LLM_KEY':endpoint.key}
     for name in ('NO_PROXY','no_proxy'):
         env[name]=','.join(filter(None,[env.get(name,''),'127.0.0.1','localhost']))
@@ -171,8 +182,28 @@ def selected_assets(policy):
     return list({a['id']:a for a in assets}.values())
 
 
+def file_sha256(path):
+    digest=hashlib.sha256()
+    with Path(path).open('rb')as source:
+        for chunk in iter(lambda:source.read(1024*1024),b''):digest.update(chunk)
+    return digest.hexdigest()
+
+
+def audio_identity(candidate):
+    evidence=(candidate.get('audio_evidence')or{}).get('report')
+    return {'source_path':candidate['path'],'source_sha256':file_sha256(candidate['path']),
+        'audio_evidence_path':evidence,'audio_evidence_sha256':file_sha256(evidence)if evidence else None}
+
+
+def clip_identity(candidate,start,seconds):
+    return {'audio':audio_identity(candidate),'interval':{'start':start,'seconds':seconds},
+        'encoding':{'sample_rate':48000,'channels':2,'codec':'pcm_s16le'}}
+
+
 def source_inputs(directory,source_file):
     script=read_json(Path(directory)/'chapter_script.json',{})
+    plan=read_json(Path(directory)/'clip_plan.json',{})
     return {'source_file':str(source_file),'source':Path(source_file).read_text(),
+        'planned_music_delivery':sorted({c['music_delivery'] for c in plan.get('clips',[]) if isinstance(c.get('music_delivery'),str)}),
         'shot_audio':[{k:s.get(k)for k in ('index','scene_id','location','scene_time','duration_seconds','purpose','event','sfx','audio_plan')}for s in script.get('shots',[])],
         'authored_music_plan':script.get('music_plan')}

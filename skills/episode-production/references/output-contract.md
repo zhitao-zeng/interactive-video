@@ -43,6 +43,22 @@ Each `chapter_script.shots` entry uses the existing chapter-script fields:
 `end_state`, `camera`, `turns`, plus `duration_seconds`.
 Optional fields include `light`, `actions`, `extras`, `props`, `scene_objects`,
 `wears`, `sfx`, `listeners`, `independent_props` and verbatim `source_quote`.
+`camera` is one nonempty string, not a JSON object of camera subfields. Keep its
+purpose, start, trigger, actor path, camera path, focus, endpoint and hold/cut
+condition in that executable text. `props` and `scene_objects` are lists of name
+strings, not one sentence or a list of objects; `[]` is valid. For example:
+
+```json
+{
+  "camera": "Purpose: show the handoff. Start: eye-level beside the table. Trigger: the actor lifts the cup. Actor path: one step toward the table. Camera path: fixed. Focus: the cup, then the receiving hand. Endpoint: cup rests on the table. Hold/cut: hold until the hand releases, then cut.",
+  "props": ["cup"],
+  "scene_objects": ["table"]
+}
+```
+
+Keep empty shots and end cards empty when authored; these field types do not
+require actors or placements. Python-generated JSON is allowed; the final JSON
+must use these types and retain the complete authored details.
 `sfx` accepts a string or a string array in authored order; the host joins an
 array with `; ` for the existing sound field and preserves the authored array.
 `extras` accepts a string array or one complete string description; the host
@@ -208,15 +224,32 @@ individually; it does not cancel another clip's permitted repair.
 For a confirmed source/input defect, use `input` instead of changing the final
 English to conceal a wrong reference. Include a verbatim `source_quote` from
 `input/source.txt`. Optional `shots` contains patches at this clip's existing
-shot indexes; supported fields are `location`, `light`, `visual_prompt`, `motion_prompt`,
+shot indexes; supported fields are `location`, `light`, `camera`, `shot_scale`,
+`scene_id`, `scene_time`, `scene_transition`, `visual_prompt`, `motion_prompt`,
 `start_state`, `event`, `end_state`, `sfx`, `props`, `scene_objects`, `wears`,
-`in_frame`, `extras`, `listeners`, `actions` and `speaker_map`.
+`in_frame`, `extras`, `listeners`, `actions`, `speaker_map`, `turn_texts`, `turns`,
+`opening_frame`, `storyboard`, `device_state` and `audio_plan`. The current host `repair_capabilities.adopted_input.shot_fields`
+is the authoritative list if an older document differs.
 `in_frame`/`extras`/`listeners` are lists of nonempty names. `actions` contains
 objects with text `actor`, `action`, `target`; these correct source event ownership.
 `speaker_map` maps existing shot speaker names to source-correct names, for example
 `{"Wrong actor":"Actual source speaker"}`. The host changes only the names,
-retaining dialogue text and delivery mode. Source events, camera, timing and
-grouping stay intact; reattribution requires independent source support.
+retaining dialogue text and delivery mode. Patch only fields involved in the defect;
+timing and grouping stay intact, and reattribution requires independent source support.
+`device_state` is source-backed text for the current device/equipment state, such as
+a phone remaining mounted outside the frame; it is not a visible-character list and
+does not imply an `opening_frame` change unless that opening is also implicated.
+
+For a first-frame source conflict, repair every cited field together. Supply a complete
+`opening_frame` object when its prompt or visible people change, and also correct
+`shot_scale`, `camera` or `device_state` when those fields participate in the conflict.
+`visual_prompt` does not replace the first-frame `opening_frame`. Call `check`, then `apply`.
+The current target's `input.grant` gives the actual operation, shot indexes, fields and
+evidence fingerprint; the global capability list is only a vocabulary and grants no
+additional fields or shots. An image-origin defect permits only `retake_candidate`;
+reference restoration or a review-policy change permits only `reuse_candidate`;
+a service interruption resumes only the unchanged original candidate. A retake cannot
+carry source patches. Reuse reviews retained pixels without new generation.
 
 After adoption, `characters` can also request a missing card for a named visible
 actor or actual speech owner in the corrected shots, using the design fields in
@@ -327,3 +360,20 @@ commands. Bind supported work to the existing host inputs and report unsupported
 editing work explicitly; no general footage-cutaway interface is implied. Verify
 that the edit is present in the actual delivered version and has passed its final
 review. Passing an unchanged native take does not fulfill that separate obligation.
+
+## First-frame host compilation
+
+In optional first-frame mode, a normal `output/first-frames.json` contains only
+the clip identity and any supplemental video references:
+
+```json
+{"render_ready": false,
+ "frames": [{"clip_id": "clip_01", "extra_references": []}]}
+```
+
+The host inherits the approved opening, binds and hashes the ordered references,
+checks the opening source before translation, and compiles or reuses H3 only after
+the actual opening image passes review. Do not duplicate opening or H3 fields in
+a normal row. Report confirmed source or image defects through the documented
+repair paths. `reuse_candidate` rechecks retained pixels; `retake_candidate`
+requests one bounded replacement and cannot be combined with reuse.

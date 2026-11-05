@@ -64,21 +64,22 @@ def edition_status(root: Path, project: str, edition: str) -> dict:
             active_run=Path(run_path) if run_path else None
             break
     report=read_json(directory/'thin_media_report.json',{})
-    final=read_json(directory/'final_cut_review.json',{})
+    from novel_manga.review.acceptance import acceptance_status
+    acceptance = acceptance_status(directory,active_run)
+    final=acceptance['final_visual']
+    audio=acceptance['final_audio']
     run_state=read_json(active_run/'agent-run.json',{}) if active_run and active_run.is_dir() else {}
-    quality=report.get('quality_review') or {}
-    status=report.get('status','not_completed')
-    if quality.get('passed') is False or final.get('passed') is False:
-        status='candidate'
     counts=generation_counts(directory)
     return {'project':project,'edition':edition,'episode_dir':str(directory),
             'source_episode_dir':str(source_directory),'active_episode_dir':str(directory),
             'active_run_dir':str(active_run) if active_run else None,
             'active_agent_status':run_state.get('status'),'active_phase':run_state.get('phase'),
-            'status':status,
+            'status':acceptance['status'],'passed':acceptance['passed'],
             'source_status':report.get('status'),'generation_counts':counts,
             'generation_total':sum(counts.values()),'final_review_complete':final.get('complete'),
             'final_review_passed':final.get('passed'),
+            'final_audio_review_complete':audio.get('complete'),
+            'final_audio_review_passed':audio.get('passed'),
             'remaining_findings':len(final.get('issues',[])) if final.get('complete') is True else None,
             'final_video':final.get('movie') or (report.get('assembly') or {}).get('final_video')}
 
@@ -177,7 +178,8 @@ def run_episode(root: Path, lane: str, *, project: str = 'adventure', resume_uns
     if sd_input_mode is not None:
         from .sd_first_frames import select_mode as select_sd_mode
         select_sd_mode(novel,sd_input_mode)
-    if read_json(novel/'profile.json',{}).get('sd_input_mode')=='first-frame':
+    music_plan=read_json(episode/'chapter_script.json',{}).get('music_plan')
+    if read_json(novel/'profile.json',{}).get('sd_input_mode')=='first-frame' and not music_plan:
         configure(root,lane,project=project)
         from .sd_first_frames import prepare as prepare_sd_frames
         prepare_sd_frames(root,novel)
@@ -185,14 +187,13 @@ def run_episode(root: Path, lane: str, *, project: str = 'adventure', resume_uns
     report_path=episode/'thin_media_report.json'
     label=edition.removeprefix(project+'-') if edition else lane
     destination=(root/f'delivery/{project}/{label}').resolve()
-    music_plan=read_json(episode/'chapter_script.json',{}).get('music_plan')
-    if read_json(novel/'profile.json',{}).get('h3_input_mode')=='first-frame'or(lane=='h3'and music_plan):
+    if read_json(novel/'profile.json',{}).get('h3_input_mode')=='first-frame' or music_plan:
         if music_plan and read_json(novel/'profile.json',{}).get('h3_input_mode')!='first-frame':
             from novel_manga.application.repair.history import generation_counts
             if any(generation_counts(episode).values()):
                 raise ValueError('Keep this existing production and its take budgets; story-music Agent entry requires a new prepared edition')
         from .first_frame_entry import run as run_first_frames
-        return run_first_frames(root,novel,project=project,destination=destination,resume=resume,config=agent_config)
+        return run_first_frames(root,novel,project=project,destination=destination,resume=resume,config=agent_config,lane=lane)
     saved_final=read_json(episode/'final_cut_review.json',{})
     saved_movie=Path(saved_final.get('movie') or '')
     if saved_movie.is_file() and saved_movie.parent.parent.name=='versions':

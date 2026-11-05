@@ -10,6 +10,17 @@
         "voice:collective": "无名群声"
       },
       "actorless_confirmed": false,
+      "binding_decisions": [
+        {
+          "source_id": 1,
+          "entity_id": "e001",
+          "decision": "catalogue",
+          "paragraphs": [
+            1
+          ],
+          "reason": ""
+        }
+      ],
       "discarded_mentions": [],
       "mentions": [
         {
@@ -55,7 +66,8 @@
       ],
       "unmatched_actors": [],
       "semantic_review": {
-        "approved": true
+        "approved": true,
+        "policy": "identity-judge-only-v1"
       },
       "semantic_extras": [],
       "semantic_new_names": []
@@ -255,6 +267,17 @@
           "voice:collective": "无名群声"
         },
         "actorless_confirmed": false,
+        "binding_decisions": [
+          {
+            "source_id": 1,
+            "entity_id": "e001",
+            "decision": "catalogue",
+            "paragraphs": [
+              1
+            ],
+            "reason": ""
+          }
+        ],
         "discarded_mentions": [],
         "mentions": [
           {
@@ -300,7 +323,8 @@
         ],
         "unmatched_actors": [],
         "semantic_review": {
-          "approved": true
+          "approved": true,
+          "policy": "identity-judge-only-v1"
         },
         "semantic_extras": [],
         "semantic_new_names": []
@@ -531,6 +555,17 @@
         "voice:collective": "无名群声"
       },
       "actorless_confirmed": false,
+      "binding_decisions": [
+        {
+          "source_id": 1,
+          "entity_id": "e001",
+          "decision": "catalogue",
+          "paragraphs": [
+            1
+          ],
+          "reason": ""
+        }
+      ],
       "discarded_mentions": [],
       "mentions": [
         {
@@ -576,7 +611,8 @@
       ],
       "unmatched_actors": [],
       "semantic_review": {
-        "approved": true
+        "approved": true,
+        "policy": "identity-judge-only-v1"
       },
       "semantic_extras": [],
       "semantic_new_names": []
@@ -933,6 +969,17 @@
           "voice:collective": "无名群声"
         },
         "actorless_confirmed": false,
+        "binding_decisions": [
+          {
+            "source_id": 1,
+            "entity_id": "e001",
+            "decision": "catalogue",
+            "paragraphs": [
+              1
+            ],
+            "reason": ""
+          }
+        ],
         "discarded_mentions": [],
         "mentions": [
           {
@@ -978,7 +1025,8 @@
         ],
         "unmatched_actors": [],
         "semantic_review": {
-          "approved": true
+          "approved": true,
+          "policy": "identity-judge-only-v1"
         },
         "semantic_extras": [],
         "semantic_new_names": []
@@ -1031,6 +1079,7 @@
         "voice:collective": "无名群声"
       },
       "actorless_confirmed": true,
+      "binding_decisions": [],
       "discarded_mentions": [],
       "mentions": [],
       "relations": [],
@@ -1038,7 +1087,8 @@
       "source_actors": [],
       "unmatched_actors": [],
       "semantic_review": {
-        "approved": true
+        "approved": true,
+        "policy": "identity-judge-only-v1"
       },
       "semantic_extras": [],
       "semantic_new_names": []
@@ -1337,6 +1387,7 @@
           "voice:collective": "无名群声"
         },
         "actorless_confirmed": true,
+        "binding_decisions": [],
         "discarded_mentions": [],
         "mentions": [],
         "relations": [],
@@ -1344,7 +1395,8 @@
         "source_actors": [],
         "unmatched_actors": [],
         "semantic_review": {
-          "approved": true
+          "approved": true,
+          "policy": "identity-judge-only-v1"
         },
         "semantic_extras": [],
         "semantic_new_names": []
@@ -1381,6 +1433,17 @@
         "voice:collective": "无名群声"
       },
       "actorless_confirmed": false,
+      "binding_decisions": [
+        {
+          "source_id": 1,
+          "entity_id": "e001",
+          "decision": "catalogue",
+          "paragraphs": [
+            1
+          ],
+          "reason": ""
+        }
+      ],
       "discarded_mentions": [
         {
           "source_id": 1,
@@ -1435,7 +1498,8 @@
       ],
       "unmatched_actors": [],
       "semantic_review": {
-        "approved": true
+        "approved": true,
+        "policy": "identity-judge-only-v1"
       },
       "semantic_extras": [],
       "semantic_new_names": []
@@ -1762,6 +1826,17 @@
           "voice:collective": "无名群声"
         },
         "actorless_confirmed": false,
+        "binding_decisions": [
+          {
+            "source_id": 1,
+            "entity_id": "e001",
+            "decision": "catalogue",
+            "paragraphs": [
+              1
+            ],
+            "reason": ""
+          }
+        ],
         "discarded_mentions": [
           {
             "source_id": 1,
@@ -1816,7 +1891,8 @@
         ],
         "unmatched_actors": [],
         "semantic_review": {
-          "approved": true
+          "approved": true,
+          "policy": "identity-judge-only-v1"
         },
         "semantic_extras": [],
         "semantic_new_names": []

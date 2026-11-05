@@ -176,6 +176,8 @@ def review_assembly(runner, media, *, receipt=None):
     final={'policy':POLICY,'movie':str(movie),'context':before,'complete':False,'passed':False,
            'frames':[],'groups':[],'responses':[],'issues':[],'errors':[],
            'scope':'Actual movie visual/caption continuity; ASR evidence where supplied, no subjective audio listening'}
+    from novel_manga.service_errors import service_failure, service_vote
+    failures=[]
     def save():
         atomic_write_json(directory/'final_cut_review.json',final)
         atomic_write_json(target/'review.json',final)
@@ -308,14 +310,18 @@ def review_assembly(runner, media, *, receipt=None):
                         final['groups'].append(answer);final['issues'].extend(answer['issues'])
                     if error is not None:
                         errors.append(f'group {group}: {type(error).__name__}: {str(error)[:250]}')
+                        failures.append(service_failure(error))
                     save()
                 if errors:
                     final['errors'].extend(errors)
                     break
+        if failures:
+            final.update(service_vote(failures))
         if before!=context(directory,media,movie):raise ValueError('movie or episode inputs changed during final review')
         if not final['errors']:
             final.update(complete=True,passed=not blocking_issues(final['issues']))
     except Exception as error:
         final['errors'].append(type(error).__name__+': '+str(error)[:250])
+        final.update(service_vote([*failures,service_failure(error)]))
     final=independent.combine(directory,final)
     save();return final

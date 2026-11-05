@@ -39,14 +39,14 @@ def select_mode(novel,mode):
         budget['video_units']=len(indexes);atomic_write_json(budget_path,budget)
 
 
-def run(root,novel,*,project,destination,resume=False,config=None):
+def run(root,novel,*,project,destination,resume=False,config=None,lane='h3'):
     from novel_manga.application.agents.episode.context import create_context
     from novel_manga.application.agents.episode.flow import run_episode
     from novel_manga.application.agents.sandbox import load_config
     from .runtime import configure,runner_for
-    configure(root,'h3',project=project)
+    configure(root,lane,project=project)
     profile=read_json(novel/'profile.json',{})
-    first_frame=profile.get('h3_input_mode')=='first-frame'
+    first_frame=profile.get('h3_input_mode')=='first-frame' or profile.get('sd_input_mode')=='first-frame'
     import os
     if profile.get('native_h3_short_edge'):os.environ['NOVEL_H3_SHORT_EDGE']=str(profile['native_h3_short_edge'])
     ctx=create_context(novel,novel.name+'_1',output_root=root/('outputs/episode-agent-firstframes'if first_frame else'outputs/episode-agent-music'),input_mode='script')
@@ -63,29 +63,34 @@ def run(root,novel,*,project,destination,resume=False,config=None):
     # This is the existing Agent creation/production entry, with host media tools.
     # The separate fixed novel pipeline mode would run video before the Agent can supply openings.
     config={**config,'production_mode':'agent','_agent_config_explicit':explicit_agent_config}
-    options={}
     if resume:
         config['resume_session_on_retry']=True
-        # An explicit resume authorization is the existing bounded retry path:
-        # lifecycle.start_run archives the stopped run and establishes a current
-        # repair window while keeping cumulative agent_seconds and attempts.
-        # Do not intercept it here with the old (already spent) deadline; only a
-        # scheduler continuation of a deferred slice keeps its saved remainder.
-        saved=read_json(ctx.run_dir/'agent-run.json',{})
-        if saved.get('status')=='deferred':
-            remaining=int(saved.get('remaining_seconds') or 0)
-            if remaining<=0:return {'status':'blocked','reason':'original Agent operation time budget exhausted','run_dir':str(ctx.run_dir)}
-            options['timeout']=remaining
-    result=run_episode(ctx,config=config,retry_issues=resume,**options)
+    result=run_episode(ctx,config=config,retry_issues=resume)
     while result.get('status')=='deferred' and result.get('remaining_seconds',0)>0:
         # Continue only the existing scheduler slice; never renew a stopped budget.
         result=run_episode(ctx,config=config)
     atomic_write_json(novel/('first-frame-agent-run.json'if first_frame else'music-agent-run.json'),{'run_dir':str(ctx.run_dir),'active_novel_dir':str(ctx.novel_dir),
         'active_episode_dir':str(ctx.episode_dir),'result':result})
+    failure={'retryable':result.get('retryable') is True}
+    for key in ('error','reason','service_interrupted','required_action','invalid_fields',
+                'argument_errors','repair_origin','repair_grant','source_input_conflicts','blocked'):
+        if key in result:
+            failure[key]=result[key]
+    if result.get('status') == 'blocked':
+        return {'status':'blocked','agent':result,'run_dir':str(ctx.run_dir),**failure}
     report=read_json(ctx.episode_dir/'thin_media_report.json',{})
     if not report.get('assembly'):
-        return {'status':'blocked','agent':result,'run_dir':str(ctx.run_dir)}
+        return {'status':'blocked','agent':result,'run_dir':str(ctx.run_dir),**failure}
     from .delivery import finish_reviewed_delivery
-    runner=runner_for(root,ctx.novel_dir,'h3',project=project)
+    runner=runner_for(root,ctx.novel_dir,lane,project=project)
+    runner.context.run_dir = ctx.run_dir
     receipt=finish_reviewed_delivery(runner,report,destination)
-    return {**receipt,'agent_run_dir':str(ctx.run_dir),'agent_status':result.get('status')}
+    if receipt.get('status') == 'accepted':
+        from novel_manga.review.acceptance import acceptance_status
+        acceptance=acceptance_status(ctx.episode_dir,ctx.run_dir)
+        receipt['acceptance_status']=acceptance
+        if acceptance.get('passed') is not True:
+            receipt.update(status=acceptance.get('status') or 'candidate',content_passed=False)
+            atomic_write_json(Path(destination)/'delivery.json',receipt)
+    return {**receipt,'agent_run_dir':str(ctx.run_dir),'agent_status':result.get('status'),
+            'retryable':False}

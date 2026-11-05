@@ -14,6 +14,25 @@ from novel_manga.application.production import episode_state
 from novel_manga.media.results import has_analysis
 
 
+def service_failure_result(report):
+    from novel_manga.service_errors import is_terminal_failure, service_vote
+    rows = []
+    for row in report.get('clips') or []:
+        if not is_terminal_failure(row) and not row.get('service_interrupted'):
+            continue
+        current = dict(row)
+        if row.get('service_interrupted'):
+            current['service_interrupted'] = {**row['service_interrupted'],
+                'clip_id': row['service_interrupted'].get('clip_id', row.get('clip_id'))}
+        rows.append(current)
+    if not rows:
+        return None
+    fields = ('error', 'retake_error', 'service_interrupted', 'retryable', 'required_action', 'evidence')
+    error = 'service_interrupted' if any(row.get('service_interrupted') for row in rows) else 'media_execution_failed'
+    return {'ok': False, 'error': error, **service_vote(rows),
+            'clips': {row['clip_id']: {key: row[key] for key in fields if key in row} for row in rows}}
+
+
 class MediaOperations:
     def __init__(self, ctx, drafts, evidence):
         self.ctx = ctx
@@ -32,6 +51,8 @@ class MediaOperations:
             raise ValueError('managed episode rendering requires a positive NOVEL_RENDER_INFLIGHT')
         profile = read_json(self.ctx.novel_dir / 'profile.json')
         profile['repair_backend'] = 'sandbox_agent'
+        if profile.get('native_h3_short_edge') is not None:
+            os.environ['NOVEL_H3_SHORT_EDGE'] = str(profile['native_h3_short_edge'])
         bgm = Path(profile['bgm_path']) if profile.get('bgm_path') else None
         if bgm is not None:
             bgm = bgm if bgm.is_absolute() else self.ctx.novel_dir / bgm
@@ -43,6 +64,7 @@ class MediaOperations:
             bible=StoryBible.model_validate(read_json(self.ctx.novel_dir / 'story_bible.json')),
             workers=workers, inflight=inflight, max_attempts=1,
             profile=profile)
+        runner.context.run_dir = self.ctx.run_dir
         runner.context.asr_helper = self.ctx.project_root / 'scripts/thin_asr_segments.py'
         runner.context.source_novel_dir = getattr(self.ctx, 'source_novel_dir', None) or self.ctx.novel_dir
         runner.context.options.first_pass_only = os.environ.get('NOVEL_FIRST_PASS_ONLY') == '1'
@@ -122,6 +144,9 @@ class MediaOperations:
         report.update(status='assembled', assembly=assembly,
                       elapsed_seconds=round(float(report.get('elapsed_seconds') or 0)+seconds, 3))
         report.setdefault('timing', {})['assembly_s'] = seconds
+        # Postmix can reject a source range. Keep the completed body/timeline so
+        # select_music can fix that range without encoding the same video again.
+        atomic_write_json(self.ctx.episode_dir/'thin_media_report.json', report)
         from novel_manga.application.repair.ambience import apply_assembly
         report=apply_assembly(self.ctx.episode_dir,report,context=runner.context)
         atomic_write_json(self.ctx.episode_dir/'thin_media_report.json', report)
@@ -130,7 +155,7 @@ class MediaOperations:
 
 
     def refresh_technical_policy(self, report, plan):
-        """Recheck the same movie when its book's QC waivers change; never render."""
+        """Refresh current QC rules on the same movie; never render."""
         from novel_manga.application.profiles import frame_spec, load_profile, media_qc_ignores, MAX_HOLD_SECONDS
         from novel_manga.application.review.execution import media_matches
         from novel_manga.config import Settings
@@ -147,7 +172,8 @@ class MediaOperations:
         scope_changed = (0 < outro < duration and black.get('passed') is False
                          and detail.get('scope') != 'story'
                          and checks.get('ending_screen', {}).get('passed') is True)
-        if not checks or (ignored.intersection(checks) == previous and not scope_changed):
+        obsolete_ratio = 'silence_ratio' in checks
+        if not checks or (ignored.intersection(checks) == previous and not scope_changed and not obsolete_ratio):
             return report
         if not media_matches(plan, report, notes=read_json(self.ctx.episode_dir/'review_feedback.json', {})):
             return report
@@ -190,6 +216,12 @@ class MediaOperations:
         frame_mode=first_frame_mode(self.ctx)
         if frame_mode:
             pending=read_json(self.ctx.episode_dir/'clip_plan.json',{})
+            from .opening_source import source_blockers
+            opening_conflicts=source_blockers(self.ctx,pending)
+            if opening_conflicts:
+                from novel_manga.media.first_frames import review_problems
+                return {'ok':False,'error':'opening_source_conflict','source_input_conflicts':opening_conflicts,
+                        'blocked':{cid:review_problems({'findings':findings}) for cid,findings in opening_conflicts.items()}}
             frame_blocks={}
             for clip in pending.get('clips',[]):
                 if clip.get('kind')=='video':
@@ -260,6 +292,11 @@ class MediaOperations:
                    inflight=int(os.environ.get('NOVEL_RENDER_INFLIGHT', '0')))
         report = runner.run(assemble=False)
         atomic_write_json(self.ctx.work_dir / 'input/latest-render.json', report)
+        if failure := service_failure_result(report):
+            failure.update(artifact='input/latest-render.json',
+                           generation_counts=history.generation_counts(self.ctx.episode_dir))
+            record_state(self.ctx, 'rendered', status=report.get('status'))
+            return failure
         if first_pass:
             # Fill missing first takes before spending this host on film review.
             # Existing media stays on disk; the normal repair queue owns acceptance.
@@ -294,7 +331,10 @@ class MediaOperations:
         from novel_manga.application.review.execution import review_saved
         if not read_json(self.ctx.episode_dir / 'clip_plan.json'):
             raise ValueError('review requires an adopted episode')
-        self.hydrate_analysis(read_json(self.ctx.episode_dir/'thin_media_report.json', {}))
+        report = read_json(self.ctx.episode_dir/'thin_media_report.json', {})
+        if failure := service_failure_result(report):
+            return failure
+        self.hydrate_analysis(report)
         record_state(self.ctx, 'reviewing', owner='episode_agent_tools')
         review = review_saved(self.ctx.episode_dir, fresh=False)
         episode_state.record(self.ctx.run_dir, 'review_saved',

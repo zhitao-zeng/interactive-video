@@ -59,6 +59,26 @@ def test_codex_unavailable_never_returns_a_successful_empty_review(tmp_path,monk
     with pytest.raises(RuntimeError,match='did not complete'):codex.completion({'model':'gpt-5.6-luna','messages':[]},timeout=5)
 
 
+def test_native_model_capacity_is_a_retryable_service_failure_not_content(tmp_path, monkeypatch):
+    from novel_manga.application import configuration
+    from novel_manga.application.agents import sandbox
+    from novel_manga.application.agents.episode import codex_session
+    from novel_manga.service_errors import service_failure
+
+    monkeypatch.setattr(configuration, 'project_root', lambda:tmp_path)
+    monkeypatch.setattr(sandbox, 'load_config', lambda *args:{})
+    def execute(work, *args, **kwargs):
+        attempt = work/'attempt'; attempt.mkdir()
+        (attempt/'codex-events.jsonl').write_text(json.dumps({
+            'type':'turn.failed', 'error':{'message':'Selected model is at capacity. Please try a different model.'}})+'\n')
+        return SimpleNamespace(ok=False, produced=[], directory=attempt)
+    monkeypatch.setattr(codex_session, 'run_session', execute)
+    with pytest.raises(ConnectionError, match='at capacity') as stopped:
+        codex.completion({'model':'gpt-6-sol', 'messages':[]}, timeout=5)
+    assert service_failure(stopped.value)['retryable'] is True
+    assert list(tmp_path.rglob('codex-events.jsonl'))
+
+
 def test_codex_clip_repair_uses_saved_login_without_phanthy_credential(tmp_path,monkeypatch):
     from novel_manga.application.agents import sandbox
     from novel_manga.application.agents.episode import codex_session

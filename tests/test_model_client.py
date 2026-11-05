@@ -8,6 +8,17 @@ from novel_manga.llm import transport
 from novel_manga.llm.config import JsonEndpoint
 
 
+def test_truncated_review_is_a_typed_incomplete_model_response(monkeypatch):
+    monkeypatch.setattr(client, 'post_any', lambda *args, **kwargs:{'choices':[
+        {'message':{'content':'{"observations":'}, 'finish_reason':'length'}]})
+    with pytest.raises(client.ModelOutputTruncated) as failed:
+        client.ask_json([], {}, name='episode_first_frame', max_tokens=1800,
+                        retry_truncated=False, settings=JsonEndpoint('test', ('http://mock/v1',)))
+    assert failed.value.name == 'episode_first_frame'
+    assert failed.value.max_tokens == 1800
+    assert 'JSON truncated at 1800' in str(failed.value)
+
+
 def test_explicit_ds_refusal_uses_qwen_once_inside_same_deadline(monkeypatch):
     monkeypatch.setenv('NOVEL_REFUSAL_FALLBACK', 'flashnext')
     calls = []
@@ -71,6 +82,39 @@ def test_stream_keeps_usage_and_existing_platform_parameters(monkeypatch):
     assert result == {'choices': [{'message': {'content': '{"ok":true}', 'reasoning': 'check'},
                                   'finish_reason': 'stop'}], 'usage': {'total_tokens': 42}}
     assert payload == original
+
+
+def test_stream_preserves_provider_reported_model_without_changing_requested_alias(monkeypatch):
+    monkeypatch.setenv('QWEN38_LOCAL_MIN_MAX_TOKENS','0')
+    payload={'model':'phanthy.com/deepseek-v4','max_tokens':128}
+    def respond(request):
+        assert json.loads(request.content)['model']==payload['model']
+        data={'model':'kimi-k2.6','choices':[{'delta':{'content':'{}'},'finish_reason':'stop'}],
+              'usage':{'total_tokens':3}}
+        return httpx.Response(200,text='data: '+json.dumps(data)+'\ndata: [DONE]\n')
+    with httpx.Client(transport=httpx.MockTransport(respond),trust_env=False)as http:
+        result=transport.stream_completion(http,'http://test.invalid/v1/chat/completions',{},payload,17)
+    assert result['model']=='kimi-k2.6'
+    assert payload['model']=='phanthy.com/deepseek-v4'
+
+
+@pytest.mark.parametrize('caller_budget',[1200,1800,20000])
+def test_phanty_reasoning_judge_uses_existing_transport_floor_for_short_review_callers(monkeypatch,caller_budget):
+    from novel_manga.review.endpoints import judge_settings
+    monkeypatch.setenv('PHANTHY_API_KEY','')
+    settings=judge_settings('phanthy-dsv4')
+    sent=[]
+    def respond(request):
+        sent.append(json.loads(request.content))
+        event={'model':'kimi-k2.6','choices':[{'delta':{'content':'{"ok":true}'},'finish_reason':'stop'}]}
+        return httpx.Response(200,text='data: '+json.dumps(event)+'\ndata: [DONE]\n')
+    payload={'model':settings.model,'max_tokens':caller_budget,'messages':[]}
+    before=copy.deepcopy(payload)
+    with httpx.Client(transport=httpx.MockTransport(respond),trust_env=False)as http:
+        answer=transport.stream_completion(http,'http://test.invalid/v1/chat/completions',{},payload,17,settings=settings)
+    assert len(sent)==1 and sent[0]['max_tokens']==max(16000,caller_budget)
+    assert sent[0]['model']=='phanthy.com/deepseek-v4'
+    assert answer['model']=='kimi-k2.6' and payload==before
 
 
 @pytest.mark.parametrize('body', ['data: {"error":{"message":"unavailable"}}\n', 'data: [DONE]\n'])

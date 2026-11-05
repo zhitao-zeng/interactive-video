@@ -12,6 +12,15 @@ from novel_manga.providers.phanrouter_video import video_payload
 from novel_manga.interactive.sd_first_frames import prepare,select_mode
 
 
+@pytest.fixture(autouse=True)
+def compatible_opening_sources(monkeypatch):
+    import json
+    def ask(parts,schema,**kwargs):
+        payload=json.loads(parts[0]['text'].rsplit('\n',1)[1])
+        return {'reviews':[{'clip_id':row['clip_id'],'findings':[]} for row in payload['clips']]}
+    monkeypatch.setattr('novel_manga.llm.client.ask_json',ask)
+
+
 def test_task_asset_channel_can_use_supplier_urls_instead_of_an_old_tunnel(tmp_path,monkeypatch):
     from novel_manga.interactive import runtime
     import os
@@ -135,6 +144,32 @@ def test_all_source_openings_are_checked_before_any_image_charge(tmp_path,monkey
         prepare(tmp_path,book,builder=lambda *args:pytest.fail('No partial image spend'))
 
 
+def test_source_preflight_blocks_all_fast_images_and_reuses_cache(tmp_path,monkeypatch):
+    book,episode=parallel_book(tmp_path,monkeypatch,2);calls=[]
+    finding={'origin':'source','relation':'contradiction',
+        'observed':'wide',
+        'expected':'One actor standing by the table.',
+        'basis':['opening.camera','opening.opening_frame.image_prompt'],
+        'reason':'The two opening requirements cannot hold simultaneously.'}
+    def ask(parts,schema,**kwargs):
+        import json
+        calls.append(parts)
+        payload=json.loads(parts[0]['text'].rsplit('\n',1)[1])
+        assert {row['clip_id'] for row in payload['clips']}=={'clip_01','clip_02'}
+        return {'reviews':[{'clip_id':'clip_01','findings':[finding]},
+                           {'clip_id':'clip_02','findings':[]}]}
+    monkeypatch.setattr('novel_manga.llm.client.ask_json',ask)
+    for _ in range(2):
+        with pytest.raises(ValueError,match='opening_source_conflict'):
+            prepare(tmp_path,book,builder=lambda *args:pytest.fail('No image before source acceptance'),
+                    checker=lambda *args:pytest.fail('No image review before source acceptance'))
+    assert len(calls)==1
+    runtime=tmp_path/'.runtime/sd-first-frames'/book.name
+    evidence=runtime/'input/first_frames/clip_01/source-preflight.json'
+    assert read_json(evidence)['findings']==[finding]
+    assert not (book/'first_frames').exists()
+
+
 def test_fast_prompt_does_not_point_at_removed_portrait_numbers():
     ctx=NS(settings=NS(local_h3_base_url=None),profile={'sd_input_mode':'first-frame'},feedback={})
     clip={'clip_id':'clip_01','first_frame':{'path':'opening.png'},
@@ -193,4 +228,40 @@ def test_source_correct_retake_requires_approval_and_preserves_original_three_im
         with pytest.raises(ValueError,match='candidate budget used'):prepare(tmp_path,book,builder=build,checker=check)
     assert len(calls)==3
     assert [read_json(p.with_suffix('.png.task.json'))['task_id']for p in calls]==['candidate_01','candidate_02','candidate_03']
+
+
+def test_storyboard_review_only_reuses_sd_candidate_until_explicit_retake(tmp_path,monkeypatch):
+    book,episode=fixture_book(tmp_path);builds=[];reviews=[]
+    monkeypatch.setattr('novel_manga.style_packs.frame_style',lambda novel:{})
+    monkeypatch.setattr('novel_manga.style_packs.first_frame_prompt',lambda text,style:text)
+    def build(ctx,row,path):
+        builds.append(path);Image.new('RGB',(18,32)).save(path)
+    def check(ctx,path,row,contract):
+        frame=(contract['opening'].get('storyboard') or {}).get('frame')
+        reviews.append((path.parent.name,frame))
+        if path.parent.name=='candidate_01' and frame=='零点已有C':
+            return {'observations':['旧像素只有A、B'],'findings':[{
+                'origin':'image','relation':'contradiction','observed':'旧像素只有A、B',
+                'expected':'零点已有C','basis':['opening.storyboard.frame'],
+                'reason':'旧像素不符合新的零点frame'}]}
+        return {'consistent':True,'problems':[]}
+    prepare(tmp_path,book,builder=build,checker=check)
+    root=book/'first_frames'/episode.name/'clip_01';candidate=root/'candidate_01'
+    original=read_json(candidate/'sd-input.json')
+
+    script=read_json(episode/'chapter_script.json')
+    script['shots'][0]['storyboard']={'frame':'零点已有C','action_beats':['后续动作不进首帧']}
+    atomic_write_json(episode/'chapter_script.json',script)
+    with pytest.raises(ValueError,match='review rejected'):
+        prepare(tmp_path,book,builder=build,checker=check)
+    assert len(builds)==1 and len(list(root.glob('candidate_*')))==1
+    assert reviews==[('candidate_01',None),('candidate_01','零点已有C')]
+    assert read_json(candidate/'sd-input.json')==original
+
+    atomic_write_json(candidate/'retake-decision.json',{
+        'approved':True,'reason':'按新frame纠正旧像素'})
+    plan=prepare(tmp_path,book,builder=build,checker=check)
+    assert len(builds)==2 and builds[-1]==root/'candidate_02/opening.png'
+    assert plan['clips'][0]['first_frame']['candidate']=='candidate_02'
+    assert reviews[-1]==('candidate_02','零点已有C')
 

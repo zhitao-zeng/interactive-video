@@ -12,6 +12,17 @@ from .tool_state import record_state
 from novel_manga.application.production import episode_state
 
 
+def _audio_current(ctx, audio, movie):
+    if not movie or not Path(movie).is_file():
+        return False
+    resolved = str(Path(movie).resolve())
+    if not (audio.get('movie') == resolved and audio.get('complete') is True
+            and audio.get('passed') is True and not audio.get('issues') and not audio.get('errors')):
+        return False
+    from novel_manga.application.review.final_audio import freshness as _audio_freshness
+    return _audio_freshness(ctx, audio, resolved).get('fresh') is True
+
+
 class EpisodeCompletion:
     def __init__(self, ctx, media, evidence):
         self.ctx = ctx
@@ -31,6 +42,22 @@ class EpisodeCompletion:
         if speech_errors := episode_native_speech_errors(self.ctx.episode_dir,report):
             return {'ok':False,'passed':False,'error':'native_speech_policy','required_action':'apply',
                     'clips':speech_errors,'message':'Correct task speech policy, per-line performance and actual native requests before finishing; retain existing takes and limits.'}
+        if (self.ctx.run_dir/'interactive-delivery.json').is_file():
+            selected={row['clip_id']:(row.get('selected')or{}).get('video') for row in report.get('clips',[])}
+            missing=[clip['clip_id'] for clip in plan.get('clips',[]) if clip.get('kind')=='video'
+                     and (not selected.get(clip['clip_id']) or not Path(selected[clip['clip_id']]).is_file())]
+            if missing:
+                from .readiness import first_frame_blocks, next_action
+                from .first_frames import status as first_frame_status
+                from .input_repair import repair_status
+                frames=first_frame_blocks(self.ctx,plan)
+                status={'job':None,'first_frames':first_frame_status(self.ctx,plan),
+                        'input_repairs':repair_status(self.ctx)}
+                route=next_action(self.ctx,status)
+                return {'ok':False,'passed':False,'error':'missing_video','clips':missing,
+                    'required_action':route['action'],'reason':route.get('reason'),
+                    'blocked':route.get('blocked') or {},'first_frame_blocks':frames,
+                    'message':'No complete movie exists yet. Resolve the current opening/video blockers using the original budgets before assembly or music mixing.'}
         unreviewed = self.evidence.unreviewed_clips(report, review)
         if unreviewed:
             return {'ok': False, 'error': 'missing_review', 'required_action': 'review',
@@ -90,20 +117,24 @@ class EpisodeCompletion:
                 actionable=any(history.remaining_takes(self.ctx.episode_dir,cid,preparation=True)>0
                                for cid in review.get('final_cut_feedback',{}))
                 if actionable or final.get('complete') is not True:
+                    failure={key:final[key] for key in ('retryable','service_interrupted','required_action')
+                             if key in final}
                     return {'ok':False,'passed':False,'error':'final_movie_review_requires_repair',
                             'final_cut_review':final,'review_evidence':evidence,
-                            'next':'Repair the current full-movie findings with the existing tools, then render and finish; retain all counts.'}
+                            'next':'Repair the current full-movie findings with the existing tools, then render and finish; retain all counts.',
+                            **failure}
             if report.get('final_audio_review_required') and final.get('passed') is True:
                 audio_review = report.get('final_audio_review') or {}
                 final_movie = Path(final.get('movie') or '')
-                audio_current = (audio_review.get('movie') == str(final_movie.resolve())
-                    and audio_review.get('complete') is True and audio_review.get('passed') is True
-                    and not audio_review.get('issues') and not audio_review.get('errors'))
+                audio_current = _audio_current(self.ctx, audio_review, final.get('movie'))
                 if not audio_current:
+                    failure={key:audio_review[key] for key in ('retryable','service_interrupted','required_action')
+                             if key in audio_review}
                     return {'ok': False, 'passed': False, 'error': 'final_audio_review_requires_repair',
-                        'required_action': 'apply', 'movie': str(final_movie),
-                        'final_audio_review': audio_review,
-                        'next': 'Use the audio findings returned by final review with the existing repair tools; finish again after the current export passes audio review.'}
+                        **({} if audio_review.get('service_interrupted') else {'required_action':'apply'}),
+                        'movie': str(final_movie), 'final_audio_review': audio_review,
+                        'next': 'Use the audio findings returned by final review with the existing repair tools; finish again after the current export passes audio review.',
+                        **failure}
             elif report.get('final_audio_review_required'):
                 report['final_audio_review_status'] = 'not_run_visual_gate'
         quality = report.get('quality_review') or {}
@@ -159,13 +190,10 @@ class EpisodeCompletion:
         author_session = read_json(self.ctx.work_dir / 'episode-session.json', {})
         audio_required = report.get('final_audio_review_required') is True
         audio_review = report.get('final_audio_review') or {}
-        reviewed_movie = Path((report.get('final_cut_review') or {}).get('movie') or '')
         final_visual = report.get('final_cut_review') or {}
         final_visual_passed = not final_visual or final_visual.get('passed') is True
         audio_passed = (not audio_required or
-            (reviewed_movie.is_file() and audio_review.get('movie') == str(reviewed_movie.resolve())
-             and audio_review.get('complete') is True and audio_review.get('passed') is True
-             and not audio_review.get('issues') and not audio_review.get('errors')))
+                        _audio_current(self.ctx, audio_review, final_visual.get('movie')))
         manifest = {'method': ('one persistent sandbox agent owns authoring and host tool calls' if author_session
                               else 'existing requests executed by host with independent acceptance'),
             'passed': quality.get('passed') is True and final_visual_passed and audio_passed,

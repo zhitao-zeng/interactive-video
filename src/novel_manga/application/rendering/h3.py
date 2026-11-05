@@ -123,7 +123,8 @@ def request_context(clip: dict, episode_dir: Path | None, *, source_script=None)
 
 
 def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path | None = None,
-            problems: list | None = None, source_script=None, source_conflicts: list | None = None) -> bool:
+            problems: list | None = None, source_script=None, source_conflicts: list | None = None,
+            errors: list | None = None, source_review: dict | None = None) -> bool:
     """Generate one authoritative shot/sound/delivery response, then bind protected text and references.
 
     Incomplete output is retried within the existing budget; source conflicts return to the caller. Never
@@ -242,6 +243,7 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
                    audio_delivery=spoken.get('audio_delivery', 'native'),
                    request_seconds=clip.get('request_seconds'),
                    shot_timing=clip.get('shot_timing', []))
+    if source_review is not None:context['source_conflict_review']=source_review
     schema = copy.deepcopy(SCHEMA)
     music_rules = ''
     if clip.get('music_delivery')=='postmix':
@@ -263,10 +265,12 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
                     'pattern': '^' + (ENGLISH_CHARACTERS + '*').join(
                         ['', *[re.escape(m) for m in markers], '']) + '$'}
         directions.append(contract)
-    schema['properties']['shots'].update(prefixItems=directions, items=False)
+    schema['properties']['shots'].update(prefixItems=directions,
+        items=copy.deepcopy(SCHEMA['properties']['shots']['items']))
     problem = reference_rejection
     endpoint = h3_translation_endpoint()
     run_id = time.strftime('%Y%m%d-%H%M%S')
+    last_error = None
     for attempt in range(1, tries + 1):
         answer = None
         try:
@@ -276,6 +280,10 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
                 'Keep the complete starting state, action and ending of each shot in that single item. '
                 'Put physical sound in the separate top-level soundscape field, never as another shots item. '
                 'Return source conflicts in the top-level conflicts array.\n')
+            if source_review is not None:
+                response_rules+=('This is one correction of the previous compiler claim using the independent source review in context. '
+                    'Recheck that claim against the actual source; do not rewrite source facts or invent a repair. '
+                    'If a genuine source conflict remains, report it rather than choosing a side.\n')
             acting_rules=ASK
             if native_speech_selected(clip):
                 start=acting_rules.index('Write its vocal delivery once')
@@ -336,6 +344,7 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
             merge_correction_into_prompt()
             return True
         except Exception as error:  # noqa: BLE001 - bounded generation, never a semantic fallback
+            last_error = error
             problem = f'{type(error).__name__}: {str(error)[:350]}'
             if episode_dir is not None and answer is not None:
                 atomic_write_json(episode_dir / 'h3_translation_failures' / clip['clip_id']
@@ -343,6 +352,8 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
     warn(clip, f"FAILED after {tries} tries: {problem}")
     if problems is not None and problem:
         problems.append(problem)
+    if errors is not None and last_error is not None:
+        errors.append(last_error)
     return False
 
 

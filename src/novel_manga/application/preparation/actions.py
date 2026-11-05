@@ -60,12 +60,79 @@ def prepare_plan(directory):
     return plan
 
 
-def check_script(directory, plan, *, concerns=None):
+def repair_script(directory, plan, answer):
     n = ep_names.chapter_of(directory.name)
+    cache_path = directory / 'pre_render_story_audit.json'
+    record(directory, 'repairing', audit=answer)
+    if needs_full_replan(answer['issues']):
+        replan(directory, answer['issues'])
+    else:
+        from novel_manga.application.repair.flow import repair_episode
+        targets = {}
+        for clip in plan['clips']:
+            found = [i for i in answer['issues'] if i['stage'] in clip.get('shot_indexes', [])]
+            if found:
+                targets[clip['clip_id']] = json.dumps(found, ensure_ascii=False) + '。按原文修正台词归属和动作。'
+        result = repair_episode(directory.parent, n, False, use_history=False, reframe=True,
+                                source_issues=targets, return_proposal=True)
+        proposal = result.get('proposal')
+        if not proposal or set(targets) - set(result.get('changed', [])):
+            return None, record(directory, 'needs_repair', reason=result.get('why', 'incomplete local repair'))
+        from novel_manga.repair.proposal import RepairProposal
+        from novel_manga.application.repair.publication import publish_preparation
+        publish_preparation(directory, RepairProposal.from_result(result))
+    after = audit(directory)
+    atomic_write_json(cache_path, {'policy':POLICY,'at':time.strftime('%F %T'),
+                                 'inputs':inputs(directory),'answer':after,'before':answer})
+    if not after['source_readable'] or after['issues']:
+        return None, record(directory, 'needs_source' if not after['source_readable'] else 'needs_repair', audit=after)
+    return after, None
+
+
+def creative_review_fingerprint(directory):
+    from novel_manga.application.preparation.audit import creative_fingerprint
+    script=read(directory/'chapter_script.json',{})
+    sources={}
+    original=directory/'authored_source.md'
+    if original.is_file():sources['authored_source.md']=original.read_text(encoding='utf-8')
+    segments=directory/'segments.json'
+    if segments.is_file():
+        sources['segments.json']=json.dumps(read(segments),ensure_ascii=False,sort_keys=True,separators=(',',':'))
+    return creative_fingerprint({'chapter_script':script},sources)
+
+
+def reusable_creative_review(directory):
+    cache=read(directory/'pre_render_story_audit.json',{})
+    fingerprint=cache.get('content_fingerprint') or cache.get('fingerprint')
+    if not fingerprint or fingerprint!=creative_review_fingerprint(directory):return None
+    try:
+        from novel_manga.application.preparation.audit import _confirmed_answer
+        raw=cache['raw'];confirmation=cache['confirmation'];answer=cache['answer']
+        if (not isinstance(raw,dict) or type(raw.get('source_readable')) is not bool
+                or not isinstance(raw.get('source_problem'),str) or not isinstance(raw.get('issues'),list)
+                or any(not isinstance(issue,dict) for issue in raw['issues'])):
+            raise ValueError('invalid raw answer')
+        if not raw['source_readable'] and raw['issues']:
+            raise ValueError('source_readable=false cannot include issues')
+        if raw['source_readable'] and raw['issues'] and confirmation is None:
+            raise ValueError('creative audit lacks confirmation')
+        expected=_confirmed_answer(raw,confirmation)
+        if answer!=expected:
+            raise ValueError('answer does not match raw evidence and confirmation')
+        return cache
+    except (KeyError,TypeError,ValueError) as error:
+        raise ValueError('invalid published creative audit: '+str(error)) from error
+
+
+def check_script(directory, plan, *, concerns=None):
     cache_path = directory / 'pre_render_story_audit.json'
     cache = read(cache_path, {})
     record(directory, 'auditing')
-    if not concerns and cache.get('inputs') == inputs(directory) and cache.get('policy') == POLICY:
+    published=reusable_creative_review(directory) if not concerns else None
+    creative_cache=bool(cache.get('content_fingerprint') or cache.get('fingerprint'))
+    if published is not None:
+        answer=published['answer']
+    elif not concerns and not creative_cache and cache.get('inputs') == inputs(directory) and cache.get('policy') == POLICY:
         answer = cache['answer']
     else:
         answer = audit(directory, concerns=concerns) if concerns else audit(directory)
@@ -74,40 +141,11 @@ def check_script(directory, plan, *, concerns=None):
     if not answer['source_readable']:
         return None, record(directory, 'needs_source', audit=answer)
     if answer['issues']:
-        if os.environ.get('NOVEL_AGENT_MANAGED') == '1':
-            # This controller owns a native Episode Agent. Keep the existing
-            # plan and exact issue kinds instead of running a second reframe
-            # workflow that can turn a location correction into re-attribution.
-            return None, record(directory, 'needs_replan' if needs_full_replan(answer['issues'])
-                                else 'needs_repair', audit=answer,
-                                reason='Existing inputs need the recorded local corrections')
-        record(directory, 'repairing', audit=answer)
-        full = needs_full_replan(answer['issues'])
-        if full:
-            replan(directory, answer['issues'])
-        else:
-            from novel_manga.application.repair.flow import repair_episode
-            targets = {}
-            for clip in plan['clips']:
-                found = [i for i in answer['issues'] if i['stage'] in clip.get('shot_indexes', [])]
-                if found:
-                    targets[clip['clip_id']] = json.dumps(found, ensure_ascii=False) + '。按原文修正台词归属和动作。'
-            result = repair_episode(directory.parent, n, False, use_history=False, reframe=True,
-                                    source_issues=targets, return_proposal=True)
-            proposal = result.get('proposal')
-            if not proposal or set(targets) - set(result.get('changed', [])):
-                return None, record(directory, 'needs_repair', reason=result.get('why', 'incomplete local repair'))
-            from novel_manga.repair.proposal import RepairProposal
-            from novel_manga.application.repair.publication import publish_preparation
-            publish_preparation(directory, RepairProposal.from_result(result))
-        # A rewritten script must be checked again; success is never inferred
-        # from the rewriting model or the presence of the new files.
-        after = audit(directory)
-        atomic_write_json(cache_path, {'policy': POLICY, 'at': time.strftime('%F %T'),
-                                     'inputs': inputs(directory), 'answer': after, 'before': answer})
-        if not after['source_readable'] or after['issues']:
-            return None, record(directory, 'needs_source' if not after['source_readable'] else 'needs_repair', audit=after)
-        answer = after
+        if os.environ.get('NOVEL_LEGACY_PREPARATION_REPAIR') == '1' and os.environ.get('NOVEL_AGENT_MANAGED') != '1':
+            return repair_script(directory, plan, answer)
+        return None, record(directory, 'needs_replan' if needs_full_replan(answer['issues'])
+                            else 'needs_repair', audit=answer,
+                            reason='Existing inputs need the recorded local corrections')
     return answer, None
 
 

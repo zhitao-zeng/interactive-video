@@ -22,7 +22,7 @@ def inspect_silence(video: Path, duration: float, *, silent_outro_seconds: float
 
     The thin renderer appends a four-second silent end card. Measuring it together with the last shot's
     trailing pause made otherwise valid finals fail the 4.5-second limit. The same story-only duration is
-    used for the silence ratio; a pause inside the story, including its tail before the card, still counts.
+    used for the diagnostic silence ratio; only an abnormally long continuous gap is a silence gate.
     """
     if not 0 <= silent_outro_seconds < duration:
         raise ValueError("silent outro must be shorter than the video")
@@ -42,10 +42,9 @@ def inspect_silence(video: Path, duration: float, *, silent_outro_seconds: float
     return {
         "long_silence": {"passed": maximum <= 4.5, "detail": {"max_silence_seconds": round(maximum, 6), **scope,
             "max_interval": max(intervals, key=lambda row: row['seconds'], default=None),
-            "long_intervals": [row for row in intervals if row['seconds'] > 4.5]}},
-        "silence_ratio": {"passed": seconds / story_seconds <= 0.35,
-                          "detail": {"silence_seconds": round(seconds, 6), "duration_seconds": round(story_seconds, 6),
-                                     "ratio": round(seconds / story_seconds, 6), "threshold_db": -45, **scope}},
+            "long_intervals": [row for row in intervals if row['seconds'] > 4.5],
+            "silence_seconds": round(seconds, 6), "duration_seconds": round(story_seconds, 6),
+            "ratio": round(seconds / story_seconds, 6), "threshold_db": -45}},
     }
 
 
@@ -56,11 +55,17 @@ def subtitle_check(ass: Path, *, required: bool = True) -> dict:
 
 
 def apply_check_policy(checks: dict, ignored) -> dict | None:
-    """Apply book waivers to saved measurements; unknown old waivers need inspection."""
+    """Apply current checks and book waivers while retaining saved measurements."""
     ignored = set(ignored)
     result = {}
     for name, original in checks.items():
+        if name=='silence_ratio':continue
         row = dict(original)
+        if name=='long_silence' and checks.get('silence_ratio'):
+            detail=checks['silence_ratio'].get('detail') or {}
+            row['detail']={**{key:detail[key] for key in
+                ('silence_seconds','duration_seconds','ratio','threshold_db') if key in detail},
+                **(row.get('detail') or {})}
         measured = row.get('measured_passed') if row.get('waived') else row.get('passed')
         if row.get('waived') and measured is None and name not in ignored:
             return None

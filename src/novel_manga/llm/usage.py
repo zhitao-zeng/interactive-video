@@ -18,7 +18,7 @@ _LOCK = threading.Lock()
 _SCOPE: contextvars.ContextVar[dict] = contextvars.ContextVar('llm_usage_scope', default={})
 
 USAGE_KEYS = ('prompt_tokens', 'completion_tokens', 'total_tokens',
-              'input_tokens', 'output_tokens', 'cache_read_input_tokens',
+              'input_tokens', 'output_tokens', 'cached_input_tokens', 'cache_read_input_tokens',
               'cache_creation_input_tokens', 'reasoning_tokens')
 
 
@@ -37,17 +37,25 @@ def scoped(**fields) -> dict:
     return {**_SCOPE.get(), **fields}
 
 
-def record(*, name: str, model: str, usage: dict | None, url: str = '') -> bool:
+def record(*, name: str, model: str, usage: dict | None, url: str = '', reasoning=None, quota_group=None, response_model: str | None = None) -> bool:
     if not usage:
         return False
     try:
         from novel_manga.application.configuration import project_root
         path = project_root() / '.runtime' / FILE
         path.parent.mkdir(parents=True, exist_ok=True)
+        from .catalog import identify
+        resource_id, resource = identify(model, url.removesuffix('/chat/completions'))
         row = {'ts': time.time(), 'name': name, 'model': model or '',
                'endpoint': url.removesuffix('/chat/completions') if url else '',
                **{k: usage[k] for k in USAGE_KEYS if usage.get(k) is not None},
                **_SCOPE.get()}
+        if resource_id:
+            row.update(resource_id=resource_id, billing=resource.get('billing', 'unknown'), quota_group=quota_group)
+        if isinstance(response_model, str) and response_model:
+            row['response_model'] = response_model  # Provider-reported identity; routing/billing use the request.
+        if reasoning:
+            row.update(reasoning)
         with _LOCK:
             with path.open('a', encoding='utf-8') as stream:
                 fcntl.flock(stream, fcntl.LOCK_EX)

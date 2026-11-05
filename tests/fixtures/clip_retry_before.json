@@ -323,6 +323,7 @@
         }
       ],
       "retake_error": "RuntimeError: unavailable",
+      "retryable": false,
       "selected": {
         "video": "<root>/take-1.mp4",
         "passed": false,
@@ -380,7 +381,8 @@
         "max_volume_db": -5,
         "generated_this_run": true
       },
-      "error": "CacheMiss: missing cache"
+      "error": "CacheMiss: missing cache",
+      "retryable": false
     },
     "flags": {
       "_generated": true
@@ -419,6 +421,13 @@
         }
       ],
       "retake_error": "SubmissionUncertain: answer lost",
+      "required_action": "reconcile_submission",
+      "retryable": false,
+      "service_interrupted": {
+        "http_status": null,
+        "detail": "answer lost",
+        "submission_uncertain": true
+      },
       "selected": {
         "video": "<root>/take-1.mp4",
         "passed": false,

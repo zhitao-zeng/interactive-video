@@ -9,6 +9,7 @@ from . import progress as progress_rules
 from contextlib import contextmanager
 import os
 import shutil
+import json
 from pathlib import Path
 import time
 
@@ -37,8 +38,7 @@ def wait_for_idle(bridge):
 
 
 def paused():
-    path = os.environ.get('NOVEL_AGENT_PAUSE_FILE')
-    return bool(path and Path(path).exists())
+    return runtime_rules.paused()
 
 
 @contextmanager
@@ -64,7 +64,7 @@ def episode_lock(ctx):
             path.unlink()
 
 
-def current_finish(ctx, previous_stamp, job):
+def current_finish(ctx, previous_stamp, job, *, allow_host=False):
     receipt = (job or {}).get('result') or {}
     if ((job or {}).get('action') != 'finish' or (job or {}).get('status') != 'completed'
             or type(receipt.get('passed')) is not bool):
@@ -77,10 +77,23 @@ def current_finish(ctx, previous_stamp, job):
     if not isinstance(manifest, dict):
         return None
     current = read_json(ctx.work_dir / SESSION_FILE, {}).get('session_id')
-    if not current or (manifest.get('author_session') or {}).get('session_id') != current:
+    author = manifest.get('author_session') or {}
+    if current:
+        if author.get('session_id') != current:
+            return None
+    elif not allow_host or author.get('session_id'):
         return None
     if manifest.get('passed') is not receipt['passed']:
         return None
+    return manifest
+
+
+def finished_manifest(ctx, previous_stamp, status, *, allow_host=False, route_guard=False):
+    manifest = current_finish(ctx, previous_stamp, status.get('job'), allow_host=allow_host)
+    if manifest is not None and manifest.get('passed') is False and route_guard:
+        from .readiness import next_action
+        if next_action(ctx, status)['action'] != 'finish':
+            return None
     return manifest
 
 
@@ -112,15 +125,18 @@ def finish_existing(ctx, saved, runtime, tools_factory):
             result.update(status='paused', phase='paused', exit_code=0, reason='production dispatch paused')
         else:
             atomic_write_json(ctx.run_dir/'agent-run.json', result)
+            finish_stamp = progress_rules.file_stamp(ctx.work_dir/'input/latest-finish.json')
             answer = tools_factory(ctx).dispatch('finish', {})
             number = int(((saved.get('job') or {}).get('id') or 'job-0').rsplit('-', 1)[-1])+1
             result['job'] = {'id': f'job-{number}', 'action': 'finish', 'status': 'completed', 'result': answer}
-            manifest = read_json(ctx.work_dir/'input/latest-finish.json', {})
-            if answer.get('ok') and type(answer.get('passed')) is bool and manifest.get('passed') is answer['passed']:
+            manifest = current_finish(ctx, finish_stamp, result['job'], allow_host=True)
+            if answer.get('ok') and manifest is not None:
                 record_finish(result, manifest)
             else:
+                failure = {key: answer[key] for key in ('retryable', 'service_interrupted', 'required_action')
+                           if key in answer}
                 result.update(status='blocked', phase='blocked', exit_code=2,
-                              reason=answer.get('error') or 'existing media acceptance incomplete')
+                              reason=answer.get('error') or 'existing media acceptance incomplete', **failure)
         result['updated_at'] = time.strftime('%F %T')
         atomic_write_json(ctx.run_dir/'agent-run.json', result)
     return result
@@ -196,6 +212,56 @@ def _consume_window_grant(ctx, saved):
     return saved
 
 
+def apply_resume_plan(ctx, planned):
+    import datetime
+    import fcntl
+    for action in planned['actions']:
+        kind = action['kind']
+        if kind == 'source_review':
+            atomic_write_json(ctx.run_dir/'source-review-recovery.json',
+                              {**action['recovery'],'previous':action['previous']})
+        elif kind == 'protocol':
+            if action.get('validate'):
+                from . import recovery
+                from .input_repair import repair as validate_input
+                confirmed = recovery.resume_protocol(ctx.run_dir,ctx.episode_dir,action['previous'],
+                                                    validate_input=validate_input)
+                if confirmed is None:
+                    raise ValueError('protocol recovery changed before lifecycle validation')
+            atomic_write_json(ctx.run_dir/'protocol-recovery.json',
+                              {'previous':action['previous'],'recovery':action['recovery']})
+        elif kind == 'fallback':
+            archive = ctx.run_dir/'model-switch'
+            archive.mkdir(parents=True,exist_ok=True)
+            session = ctx.work_dir/'episode-session.json'
+            if session.exists():
+                session.rename(archive/'episode-session.json')
+            atomic_write_json(archive/'switch.json',action['record'])
+        elif kind == 'upstream_window':
+            path = ctx.episode_dir/'repair_budget_grants.json'
+            with (ctx.episode_dir/'repair_budget_grants.lock').open('a') as lock:
+                fcntl.flock(lock,fcntl.LOCK_EX)
+                grants = read_json(path,{})
+                marker = grants[action['cid']]['upstream_recovery']['time']
+                from .bounded_recovery import evidence
+                if marker.get('consumed') or evidence(ctx,action['cid']) != action['evidence']:
+                    raise ValueError('upstream recovery window changed before lifecycle consumption')
+                marker['consumed'] = True
+                atomic_write_json(path,grants)
+        elif kind == 'window_grant':
+            path = ctx.run_dir/'window-grant.json'
+            with (ctx.run_dir/'window-grant.lock').open('a') as lock:
+                fcntl.flock(lock,fcntl.LOCK_EX)
+                current = read_json(path,{})
+                if not current.get('consumed_at'):
+                    current['consumed_at'] = datetime.datetime.now().astimezone().isoformat()
+                    atomic_write_json(path,current)
+        else:
+            raise ValueError(f'unknown resume action: {kind}')
+    atomic_write_json(ctx.run_dir/'agent-run.json',planned['saved'])
+    return planned['saved']
+
+
 def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_factory):
     from . import recovery
     explicit_config = config is not None
@@ -210,20 +276,35 @@ def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_facto
     seconds = int(timeout if timeout is not None else config.get('timeout_seconds', DEFAULT_OPERATION_SECONDS))
     if seconds <= 0:
         raise ValueError('timeout must be positive')
+    from novel_manga.llm.catalog import select_agent
+    existing = read_json(ctx.run_dir / 'agent-run.json', {})
+    config = select_agent(config, explicit=explicit_config or any(os.environ.get(v) for v in
+        ('NOVEL_AGENT_BASE_URL', 'NOVEL_AGENT_MODEL', 'NOVEL_AGENT_KEY_VAR')),
+        resumed=bool(existing) or (ctx.work_dir/'episode-session.json').is_file())
     runtime = resolve_agent_environment(ctx, config)
     # Load the persisted task before reading its model route.  Keeping the
     # route beside the task state makes resume deterministic without making a
     # fresh run depend on a previous run's settings.
     saved = read_json(ctx.run_dir / 'agent-run.json', {})
-    from novel_manga.application.resolved_settings import agent_route, apply_agent_route
-    # A saved route is restored only when this invocation uses the default
-    # task configuration. An explicitly selected task config owns this run.
-    recorded = saved.get('agent_route') or {}
-    if saved and recorded.get('agent') and not explicit_config:
-        config = apply_agent_route(runtime, config, recorded)
+    from novel_manga.application.resolved_settings import agent_route, apply_agent_route, assert_route_compatible
+    route = agent_route(runtime,config)
+    recorded = saved.get('effective_route') or saved.get('agent_route') or {}
+    budget_changes=[]
+    if saved and recorded.get('agent'):
+        if explicit_config:
+            budget_changes=assert_route_compatible(route,recorded)
+        else:
+            config = apply_agent_route(runtime,config,recorded)
+            route = recorded
     config = {**config, 'base_url': (config.get('base_url') or '').rstrip('/')}
-    route = agent_route(runtime, config)
+    initial_route = saved.get('initial_route') or recorded or route
+    route_history = list(saved.get('route_history') or [])
+    if saved and recorded and 'initial_route' not in saved and 'effective_route' not in saved:
+        route_history.append({'kind':'legacy','route':'unknown'})
+    if budget_changes:
+        route_history.append({'kind':'output_budget','changes':budget_changes})
     recorded_route = route
+    runtime['NOVEL_RESOLVED_ROUTE'] = json.dumps(route,ensure_ascii=False,sort_keys=True)
     runtime['NOVEL_RESOURCE_WAIT_FILE']=str(ctx.run_dir/'resource-waits.jsonl')
     if config.get('refusal_fallback'):
         runtime['NOVEL_REFUSAL_FALLBACK'] = config['refusal_fallback'].get('endpoint', 'flashnext')
@@ -245,31 +326,31 @@ def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_facto
     stage(ctx)
     install_client(ctx.work_dir)
     if not paused():
-        saved = recovery.resume_source_review(ctx.run_dir, ctx.episode_dir, saved) or saved
-        from .input_repair import repair as validate_input
-        saved = recovery.resume_protocol(ctx.run_dir,ctx.episode_dir,saved,validate_input=validate_input) or saved
-        config,saved=recovery.protocol_fallback(ctx,config,saved)
+        planned = recovery.plan_resume(ctx,saved,config,retry_issues)
+        saved = apply_resume_plan(ctx,planned)
+        config = planned['config']
     if saved.get('model_switch') and config.get('refusal_fallback'):
         config = {**config, 'model_slots_reserved_for_tools': 0, **config['refusal_fallback']}
+    if saved.get('model_switch'):
+        route = agent_route(runtime,config)
+        if route != recorded_route:
+            receipt = saved['model_switch']
+            if not any(row.get('record') == receipt for row in route_history):
+                route_history.append({'kind':'fallback','record':receipt})
+        runtime['NOVEL_RESOLVED_ROUTE'] = json.dumps(route,ensure_ascii=False,sort_keys=True)
+    if saved:
+        saved.update(initial_route=initial_route,effective_route=route,route_history=route_history)
     stale_completed=False
     if saved.get('status')=='finished' and saved.get('passed')is True:
-        from novel_manga.application.production.runs import episode_status
-        current=episode_status(ctx.episode_dir,True)
-        stale_completed=current=='stale'
+        from novel_manga.review.acceptance import acceptance_status
+        acceptance = acceptance_status(ctx.episode_dir,ctx.run_dir)
+        stale_completed = not acceptance['passed']
         if stale_completed:
             saved={**saved,'status':'finished_with_issues','passed':False,
-                   'previous_delivery_status':current}
+                   'previous_delivery_status':acceptance['status']}
             if (saved.get('job')or{}).get('action')=='finish':saved['job']=None
     if config.get('finish_existing'):
         return BootstrapResult(completed=finish_existing(ctx, saved, runtime, tools_factory))
-    if retry_issues:
-        recovered = recovery.resume_summary_loop(ctx, config, saved)
-        if recovered is not None:
-            config, saved = recovered
-    from .bounded_recovery import resume_window
-    recovered_window=resume_window(ctx,saved)
-    if recovered_window is not None:saved=recovered_window
-    saved=_consume_window_grant(ctx,saved)
     if saved.get('upstream_recovery') and saved.get('status') in {'blocked','finished_with_issues'}:
         return BootstrapResult(completed=saved)
     if saved.get('status') == 'deferred':
@@ -283,6 +364,11 @@ def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_facto
         saved['deadline'] = time.time() + max(0, float(saved['deadline'])-stopped_at)
     expired_operation = (saved.get('status') in {'running', 'retrying'}
                          and float(saved.get('deadline') or 0) <= time.time())
+    if retry_issues and saved.get('status') in {'blocked','finished_with_issues'}:
+        remaining = recovery.remaining_at_stop(saved)
+        if remaining <= 0:
+            return BootstrapResult(completed=saved)
+        seconds = min(seconds,max(1,int(remaining)))
     if retry_issues and not saved.get('upstream_recovery') and (saved.get('status') in {'finished_with_issues', 'blocked'} or expired_operation):
         # A requested retry never renews video budgets. An interrupted author
         # can explicitly keep its session instead of rereading the same work.
@@ -298,7 +384,8 @@ def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_facto
         pending = saved.get('job') or {}
         saved = {**saved, 'status': 'retrying', 'deadline': time.time()+seconds,
                  'fallback_invocations': 0, 'no_progress': 0,
-                 'stop_detail': None, 'agent_route': recorded_route or saved.get('agent_route'),
+                 'stop_detail': None, 'agent_route': route,
+                 'initial_route':initial_route,'effective_route':route,'route_history':route_history,
                  'job': pending if pending.get('status') in {'running', 'accepted'} else None}
         atomic_write_json(ctx.run_dir/'agent-run.json', saved)
     if saved.get('status') in {'finished', 'finished_with_issues'}:
@@ -306,10 +393,15 @@ def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_facto
     previous_job = saved.get('job') or {}
     if (not stale_completed and previous_job.get('action') == 'finish' and previous_job.get('status') == 'completed'
             and type((previous_job.get('result') or {}).get('passed')) is bool):
-        manifest = read_json(ctx.work_dir / 'input/latest-finish.json', {})
-        current_session = read_json(ctx.work_dir / SESSION_FILE, {}).get('session_id')
-        if (current_session and (manifest.get('author_session') or {}).get('session_id') == current_session
-                and manifest.get('passed') is previous_job['result']['passed']):
+        recovery_status = {'job': previous_job}
+        if previous_job['result']['passed'] is False:
+            recovery_status = tools_factory(ctx).dispatch('status', {})
+            recovery_status['job'] = previous_job
+        manifest = finished_manifest(
+            ctx, None, recovery_status,
+            allow_host=config.get('production_mode') == 'agent',
+            route_guard=config.get('production_mode') == 'agent')
+        if manifest is not None:
             record_finish(saved, manifest)
             atomic_write_json(ctx.run_dir / 'agent-run.json', saved)
             return BootstrapResult(completed=saved)
@@ -323,10 +415,13 @@ def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_facto
               'summary_only_turns': saved.get('summary_only_turns', 0),
               'idle_turns': saved.get('idle_turns',0),
               'agent_seconds': saved.get('agent_seconds', 0),
-              'agent_route': route,
+              'agent_route': route,'initial_route':initial_route,'effective_route':route,
+              'route_history':route_history,
               'model_wait_seconds': saved.get('model_wait_seconds', 0)}
     if saved.get('upstream_recovery'):
         result['upstream_recovery']=saved['upstream_recovery']
+    if saved.get('upstream_handoff'):
+        result['upstream_handoff']=saved['upstream_handoff']
     if saved.get('model_switch'):
         result['model_switch'] = saved['model_switch']
     if saved.get('source_review_recovery'):

@@ -14,7 +14,7 @@ INPUT_LIMIT = 2
 
 from .input_recovery_policy import (SOURCE_REVIEW_POLICY, asset_configuration_recoverable,
                                     source_review_recoverable, posture_protocol_recoverable,
-                                    first_frame_recoverable)
+                                    first_frame_recoverable, asset_image_recoverable)
 
 
 def latest_input_records(episode_dir):
@@ -70,9 +70,17 @@ def _standard_input_route(ctx, cid, row=None, *, records=None, image_review_poli
         path, record = latest[-1]
         # An unchanged candidate interrupted by the shared service keeps every
         # count; only the service state changed, not this content.
-        if (record.get('status') == 'tool_error' and record.get('error_kind') == 'service_interrupted'
+        if (record.get('error_kind') == 'service_interrupted'
+                and (record.get('status') == 'tool_error' or (record.get('status') == 'incomplete'
+                    and record.get('step') in {'character_assets', 'draft_assets', 'assets'}
+                    and (record.get('source') or {}).get('consistent') is True))
                 and (row is None or effects(record['decision']) == effects(row))):
             return 'service_resume', path, record
+        if row is None or effects(record['decision']) == effects(row):
+            if (record.get('asset_image_review') or {}).get('exhausted'):
+                raise ValueError('asset image attempts exhausted (3/3); keep the source and all counts')
+            if asset_image_recoverable(record):
+                return 'asset_image_recovery', path, record
     matches = [(p, r) for p, r in records if row is not None and r.get('decision')
                and r.get('status') != 'tool_error' and effects(r['decision']) == effects(row)]
     for path, record in reversed(matches):
@@ -154,7 +162,7 @@ def input_operations(ctx, cid, *, records=None):
     try:
         route, _, _ = input_route(ctx, cid, records=records)
         result[route] = {'allowed': True}
-        if route == 'service_resume':
+        if route in {'service_resume', 'asset_image_recovery'}:
             result['resume'] = {'allowed': True}
     except ValueError as error:
         for mode in ('new', 'revise'):
@@ -168,7 +176,7 @@ def input_operations(ctx, cid, *, records=None):
             'reason': 'The shared service interrupted this candidate; resume it unchanged after the service is fixed.'}
         return result
     if latest.get('decision') and (latest.get('status') in {'checking', 'incomplete', 'published'}
-                                   or source_review_recoverable(latest)
+                                   or source_review_recoverable(latest) or asset_image_recoverable(latest)
                                    or latest.get('error_kind') == 'service_interrupted'):
         try:
             input_route(ctx, cid, latest['decision'], records=records)
@@ -189,7 +197,11 @@ def input_receipt(ctx, cid, row, *, image_review_policy=None, check_only=False):
     record = copy.deepcopy(record)
     if route == 'reuse':
         return path, record
-    if route == 'service_resume':
+    if route == 'asset_image_recovery':
+        record['previous_asset_image_error'] = record.get('error')
+        record['status'] = 'checking'
+        record.pop('error_kind', None)
+    elif route == 'service_resume':
         record['service_resume'] = {'at': time.strftime('%F %T'),
             'previous_error': record.get('error'),
             'reason': 'The shared service interrupted this candidate; content and all counts are unchanged.'}

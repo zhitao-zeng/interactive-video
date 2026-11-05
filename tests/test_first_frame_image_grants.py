@@ -11,6 +11,11 @@ from novel_manga.util import atomic_write_json, read_json
 from support.first_frame_cases import case
 
 
+def pixel_hash(path):
+    import hashlib
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 @pytest.fixture
 def spent_frames(tmp_path, monkeypatch):
     ctx, clips = case(tmp_path, monkeypatch)
@@ -34,9 +39,10 @@ def spent_frames(tmp_path, monkeypatch):
             atomic_write_json(candidate/'opening.png.task.json', {'task_id': f'retained-{cid}-{index}'})
             atomic_write_json(candidate/'rejected.json', {'error': 'earlier opening was rejected',
                 'review': {'consistent': False, 'problems': ['visible pixel defect']}})
-            atomic_write_json(candidate/'reviews/review_001.json',{'input':review_inputs[cid],
-                'review':{'consistent':False,'problems':['visible pixel defect']}})
             Image.new('RGB', (8, 16)).save(candidate/'opening.png')
+            atomic_write_json(candidate/'reviews/review_001.json',{
+                'input':{**review_inputs[cid],'candidate_sha256':pixel_hash(candidate/'opening.png')},
+                'review':{'consistent':False,'problems':['visible pixel defect']}})
     retained = {p: p.read_bytes() for root in roots.values() for p in root.rglob('*') if p.is_file()}
     calls = []
 
@@ -60,7 +66,8 @@ def save_current_review(ctx, rows, candidate, review):
     contract=current_contract(ctx,clip,row['image_references'],include_style=True)
     review_input={'policy':REVIEW_POLICY,'source_contract':contract,
         'source_assets':source_asset_state(ctx,row['image_references']),
-        'image_prompt':row['image_prompt'],'visible_characters':row['visible_characters']}
+        'image_prompt':row['image_prompt'],'visible_characters':row['visible_characters'],
+        'candidate_sha256':pixel_hash(candidate/'opening.png')}
     atomic_write_json(candidate/'reviews/review_002.json',{'input':review_input,'review':review})
 
 
@@ -93,7 +100,11 @@ def test_explicit_clip_grant_allows_only_fourth_and_resume_never_refills(spent_f
     assert resumed['clips']['clip_01']['ok'] is True
     assert calls == [('clip_01', 'candidate_04')] and receipt.read_bytes() == before
 
-    rows[0]['image_prompt'] = 'A different source-supported opening request.'
+    changed_prompt = 'A different source-supported opening request.'
+    plan = read_json(ctx.episode_dir/'clip_plan.json')
+    plan['clips'][0]['shots'][0]['opening_frame']['image_prompt'] = changed_prompt
+    atomic_write_json(ctx.episode_dir/'clip_plan.json', plan)
+    rows[0]['image_prompt'] = changed_prompt
     atomic_write_json(ctx.work_dir/'output/first-frames.json', {'frames': rows})
     changed = FirstFrameOperations(ctx, builder=build, checker=checker).prepare({})
     assert changed['clips']['clip_01']['error'] == 'first-frame image candidate budget used'
@@ -176,6 +187,8 @@ def test_explicit_retake_spends_one_image_and_both_resume_paths_reuse_it(spent_f
     assert decision['reason'] == rows[0]['retake_candidate']['reason']
     replacement = roots['clip_01']/'candidate_04'
     assert read_json(replacement/'input.json')['image_prompt'] == rows[0]['image_prompt']
+    request = read_json(replacement/'image-request.json')
+    assert request['request_prompt'].count(rows[0]['retake_candidate']['reason']) == 1
     assert result['first_frames']['clips']['clip_01']['image_candidates'] == 4
 
     # Same explicit request, then an ordinary resume with the retake field omitted.
@@ -285,3 +298,170 @@ def test_supplier_exception_resume_stays_on_reserved_replacement(spent_frames):
     assert calls == [('clip_01', 'candidate_04'), ('clip_01', 'candidate_04')]
     assert read_json(roots['clip_01']/'candidate_03/retake-decision.json')['replacement_candidate'] == 'candidate_04'
     assert len(list(roots['clip_01'].glob('candidate_*'))) == 4
+
+
+def test_service_interruption_only_resumes_original_candidate(tmp_path,monkeypatch):
+    ctx,clips=case(tmp_path,monkeypatch)
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':[clips[0]]})
+    row=read_json(ctx.work_dir/'output/first-frames.json')['frames'][0]
+    atomic_write_json(ctx.work_dir/'output/first-frames.json',{'frames':[row]})
+    def interrupted(c,r,path):
+        atomic_write_json(path.with_suffix('.png.task.json'),{'task_id':'retained-service-task'})
+        raise RuntimeError('task submission returned HTTP 503: service unavailable')
+    operation=FirstFrameOperations(ctx,builder=interrupted)
+    with pytest.raises(RuntimeError,match='503'):operation.prepare({})
+    grant=operation.partial_outcome['clips']['clip_01']['repair_grant']
+    assert grant['operation']=='resume'
+    atomic_write_json(ctx.work_dir/'input/latest-first-frames.json',operation.partial_outcome)
+    changed={**row,'image_prompt':'a different request cannot ride service resume'}
+    plan=read_json(ctx.episode_dir/'clip_plan.json')
+    plan['clips'][0]['shots'][0]['opening_frame']['image_prompt']=changed['image_prompt']
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',plan)
+    atomic_write_json(ctx.work_dir/'output/first-frames.json',{'frames':[changed]})
+    with pytest.raises(ValueError,match='resume.*original candidate'):
+        FirstFrameOperations(ctx,builder=lambda *a:pytest.fail('changed request must not allocate')).prepare({})
+    plan['clips'][0]['shots'][0]['opening_frame']['image_prompt']=row['image_prompt']
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',plan)
+    atomic_write_json(ctx.work_dir/'output/first-frames.json',{'frames':[row]})
+    def resume(c,r,path):Image.new('RGB',(8,16)).save(path)
+    result=FirstFrameOperations(ctx,builder=resume,checker=lambda *a:{'consistent':True,'problems':[]}).prepare({})
+    assert result['ok'] and len(list((ctx.novel_dir/'first_frames/book_1/clip_01').glob('candidate_*')))==1
+
+
+def test_first_frame_entry_propagates_retryable_service_without_reopening_content(tmp_path,monkeypatch):
+    from types import SimpleNamespace
+    from novel_manga.interactive import first_frame_entry,runtime
+    root=tmp_path;novel=root/'outputs/book';episode=novel/'book_1';run_dir=root/'run'
+    ctx=SimpleNamespace(run_dir=run_dir,episode_dir=episode,novel_dir=novel,
+        work_dir=run_dir/'sandbox',source_episode_dir=episode,input_mode='script')
+    atomic_write_json(novel/'profile.json',{})
+    atomic_write_json(run_dir/'frozen.json',{})
+    monkeypatch.setattr(runtime,'configure',lambda *a,**k:None)
+    monkeypatch.setattr('novel_manga.application.agents.episode.context.create_context',lambda *a,**k:ctx)
+    monkeypatch.setattr('novel_manga.application.agents.episode.postproduction.transfer_cutaway',lambda *a:None)
+    failure={'http_status':503,'detail':'service unavailable'}
+    monkeypatch.setattr('novel_manga.application.agents.episode.flow.run_episode',
+        lambda *a,**k:{'status':'blocked','retryable':True,'service_interrupted':failure,'remaining_seconds':10})
+    result=first_frame_entry.run(root,novel,project='adventure',destination=root/'delivery',resume=True,config={})
+    assert result['status']=='blocked' and result['retryable'] is True
+    assert result['service_interrupted']==failure
+
+
+@pytest.mark.parametrize(('receipt','expected'), [
+    ({'status':'blocked','retryable':True,'service_interrupted':{'http_status':503,'detail':'outage'}},True),
+    ({'status':'candidate','retryable':True,'service_interrupted':{'http_status':503,'detail':'outage'}},False),
+])
+def test_film_propagates_only_retryable_blocked_production(tmp_path,monkeypatch,receipt,expected):
+    from types import SimpleNamespace
+    from novel_manga.interactive import film,creation,production,creative_material,authored,runtime,first_frame_entry
+    from novel_manga.application.preparation import audit
+    from novel_manga.application.preparation import actions
+    source=tmp_path/'request.json'
+    atomic_write_json(source,{'mode':'original','project':'suspense','brief':'Original test','target_seconds':[45,60]})
+    def create(path,directory,**kwargs):
+        atomic_write_json(directory/'sandbox/input/manifest.json',{
+            'profile':{},'task':{'brief':'Original test'},'source_documents':[]})
+        (directory/'sandbox/input/brief.md').write_text('Original test')
+        atomic_write_json(directory/'sandbox/output/episode.json',{'title':'candidate','chapter_script':{'shots':[]}})
+        atomic_write_json(directory/'creator-state.json',{'status':'creative_candidate'})
+        return {'status':'creative_candidate','seconds_used':1,'allowance_seconds':10}
+    monkeypatch.setattr(creation,'run',create)
+    monkeypatch.setattr(audit,'creative_audit',lambda *a,**k:{
+        'fingerprint':'current-content','answer':{'source_readable':True,'issues':[]}})
+    monkeypatch.setattr(creative_material,'write_material',lambda *a,**k:{})
+    def prepare(material,book,family):
+        (book/(book.name+'_1')).mkdir(parents=True)
+    monkeypatch.setattr(authored,'prepare_authored',prepare)
+    monkeypatch.setattr(authored,'pack_authored',lambda episode:atomic_write_json(episode/'clip_plan.json',{'clips':[]}))
+    monkeypatch.setattr(first_frame_entry,'select_mode',lambda *a:None)
+    monkeypatch.setattr(runtime,'configure',lambda *a,**k:None)
+    monkeypatch.setattr(runtime,'runner_for',lambda *a,**k:SimpleNamespace(build_assets=lambda:None))
+    monkeypatch.setattr(actions,'creative_review_fingerprint',lambda *_:'current-content')
+    monkeypatch.setattr(production,'run_episode',lambda *a,**k:receipt)
+    result=film.run(tmp_path,source,tmp_path/'run','new-film')
+    assert result['status']==receipt['status'] and result['retryable'] is expected
+    if expected:
+        assert result['service_interrupted']==receipt['service_interrupted']
+
+
+def test_film_bare_connection_error_keeps_service_structure(tmp_path,monkeypatch):
+    from novel_manga.interactive import film,creation,runtime
+    source=tmp_path/'request.json'
+    atomic_write_json(source,{'mode':'original','project':'suspense','brief':'Original test','target_seconds':[45,60]})
+    monkeypatch.setattr(runtime,'configure',lambda *args,**kwargs:None)
+    monkeypatch.setattr(creation,'run',lambda *a,**k: (_ for _ in ()).throw(ConnectionError('connection lost')))
+    result=film.run(tmp_path,source,tmp_path/'run','new-film')
+    assert result['status']=='blocked' and result['retryable'] is True
+    assert result['service_interrupted']['http_status'] is None
+    assert 'connection lost' in result['service_interrupted']['detail']
+
+
+def test_existing_assembly_service_failure_flows_through_film_and_bounded_batch(tmp_path,monkeypatch):
+    from types import SimpleNamespace
+    from novel_manga.interactive import (first_frame_entry,runtime,film,creation,production,
+        creative_material,authored,batch)
+    from novel_manga.application.preparation import audit,actions
+    entry_root=tmp_path/'entry';novel=entry_root/'outputs/book';episode=novel/'book_1';run_dir=entry_root/'run'
+    ctx=SimpleNamespace(run_dir=run_dir,episode_dir=episode,novel_dir=novel,
+        work_dir=run_dir/'sandbox',source_episode_dir=episode,input_mode='script')
+    atomic_write_json(novel/'profile.json',{})
+    atomic_write_json(run_dir/'frozen.json',{})
+    atomic_write_json(episode/'thin_media_report.json',{'assembly':{'final_video':'existing.mp4'}})
+    monkeypatch.setattr(runtime,'configure',lambda *a,**k:None)
+    monkeypatch.setattr('novel_manga.application.agents.episode.context.create_context',lambda *a,**k:ctx)
+    monkeypatch.setattr('novel_manga.application.agents.episode.postproduction.transfer_cutaway',lambda *a:None)
+    failure={'http_status':503,'detail':'service unavailable'}
+    monkeypatch.setattr('novel_manga.application.agents.episode.flow.run_episode',
+        lambda *a,**k:{'status':'blocked','retryable':True,'service_interrupted':failure,
+                       'required_action':'resume_render','remaining_seconds':10})
+    monkeypatch.setattr('novel_manga.interactive.delivery.finish_reviewed_delivery',
+        lambda *a,**k:pytest.fail('service interruption must not reach delivery'))
+    monkeypatch.setattr(runtime,'runner_for',lambda *a,**k:SimpleNamespace(build_assets=lambda:None))
+    receipt=first_frame_entry.run(entry_root,novel,project='adventure',
+        destination=entry_root/'delivery',resume=True,config={})
+    assert receipt['status']=='blocked' and receipt['retryable'] is True
+    assert receipt['service_interrupted']==failure and receipt['required_action']=='resume_render'
+
+    film_root=tmp_path/'film'
+    source=film_root/'request.json'
+    atomic_write_json(source,{'mode':'original','project':'suspense','brief':'Original test','target_seconds':[45,60]})
+    def create(path,directory,**kwargs):
+        atomic_write_json(directory/'sandbox/input/manifest.json',{
+            'profile':{},'task':{'brief':'Original test'},'source_documents':[]})
+        (directory/'sandbox/input/brief.md').write_text('Original test')
+        atomic_write_json(directory/'sandbox/output/episode.json',{'title':'candidate','chapter_script':{'shots':[]}})
+        atomic_write_json(directory/'creator-state.json',{'status':'creative_candidate'})
+        return {'status':'creative_candidate','seconds_used':1,'allowance_seconds':10}
+    monkeypatch.setattr(creation,'run',create)
+    monkeypatch.setattr(audit,'creative_audit',lambda *a,**k:{
+        'fingerprint':'current-content','answer':{'source_readable':True,'issues':[]}})
+    monkeypatch.setattr(creative_material,'write_material',lambda *a,**k:{})
+    monkeypatch.setattr(authored,'prepare_authored',
+        lambda material,book,family:(book/(book.name+'_1')).mkdir(parents=True))
+    monkeypatch.setattr(authored,'pack_authored',lambda episode:atomic_write_json(episode/'clip_plan.json',{'clips':[]}))
+    monkeypatch.setattr(first_frame_entry,'select_mode',lambda *a:None)
+    monkeypatch.setattr(runtime,'runner_for',lambda *a,**k:SimpleNamespace(build_assets=lambda:None))
+    monkeypatch.setattr(actions,'creative_review_fingerprint',lambda *_:'current-content')
+    monkeypatch.setattr(production,'run_episode',lambda *a,**k:receipt)
+    film_state=film.run(film_root,source,film_root/'run','new-film')
+    assert film_state['status']=='blocked' and film_state['retryable'] is True
+    assert film_state['service_interrupted']==failure
+
+    receipt_path=film_root/'receipt.json';atomic_write_json(receipt_path,film_state)
+    worker=film_root/'worker.py'
+    worker.write_text('''import json,sys,pathlib
+receipt=json.loads(pathlib.Path(sys.argv[1]).read_text())
+out=pathlib.Path(sys.argv[2]);calls=out.parent/'calls'
+n=int(calls.read_text())+1 if calls.exists() else 1;calls.write_text(str(n))
+out.write_text(json.dumps(receipt if n==1 else {'status':'accepted'}))
+''')
+    task=film_root/'batch-task.json';atomic_write_json(task,{'brief':'original'})
+    spec={'max_launches':2,'episodes':[{'edition':'one','task':str(task)}]}
+    batch_path=film_root/'batch.json';atomic_write_json(batch_path,spec)
+    result=batch.run(film_root,batch_path,film_root/'batch-run',poll_seconds=.01,retry_seconds=0,
+        command=lambda root,item,directory,resume:[
+            __import__('sys').executable,str(worker),str(receipt_path),str(directory/'state.json')])
+    row=result['episodes']['one']
+    assert row['launches']==2 and row['result']['status']=='accepted'
+    assert row['history'][0]['result']['service_interrupted']==failure
+    assert row['history'][0]['result']['retryable'] is True

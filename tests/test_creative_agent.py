@@ -31,23 +31,44 @@ def task(tmp_path, *, original=False):
     return path
 
 
-def episode():
-    shots = [{'index': i, 'scene_id': 'entry', 'location': '入口',
-              'duration_seconds': 15, 'purpose': '核对入口规则',
-              'start_state': '站在入口', 'event': '读牌后停步', 'end_state': '停在牌旁',
-              'camera': '固定中景，牌和旅客同框', 'characters': ['旅客'], 'in_frame': ['旅客'],
-              'turns': [], 'sfx': '风声', 'audio_plan': {'music_cue': '无配乐'},
-              'source_quote': '入口有一块牌，旅客看完后停步。'} for i in range(1, 13)]
-    return {'title': '测试', 'logline': '旅客核对入口规则。', 'adaptation_notes': ['保留原始事实'],
-            'chapter_script': {'shots': shots},
-            'clips': [{'shot_indexes': [i], 'request_seconds': 15} for i in range(1, 13)],
-            'interaction': {'question': '下一步？', 'selected': None, 'options': [
-                {'id': 'A', 'label': '查入口', 'reason': '入口有牌'},
-                {'id': 'B', 'label': '看周围', 'reason': '周围还没核对'}]},
-            'spatial_plan': {'scenes': [{'scene_id': 'entry', 'anchors': ['入口', '牌'],
-                'placed': ['旅客'], 'shot_indexes': list(range(1, 13)),
-                'assumptions': ['距离是调度方案，未经测量']}]},
-            'self_review': {'source': '已核对', 'open_issues': []}}
+from support.creative_candidates import episode
+
+
+def test_nested_existing_groups_report_the_exact_json_path_without_regrouping(tmp_path):
+    import copy
+    manifest=creation.prepare(task(tmp_path),tmp_path/'run');draft=episode()
+    draft['chapter_script']['clips']=draft.pop('clips');original=copy.deepcopy(draft)
+    errors=creation.validate(draft,manifest,tmp_path/'run/sandbox')
+    assert any('chapter_script.clips' in error and 'top-level clips' in error for error in errors)
+    assert draft==original
+
+
+@pytest.mark.parametrize('value',[None,'旅客、背包',['旅客','滑向海面的深灰背包']])
+def test_creator_catches_roster_prose_or_nonactor_before_material_handoff(tmp_path,value):
+    manifest=creation.prepare(task(tmp_path),tmp_path/'run');draft=episode()
+    draft['chapter_script']['shots'][0]['in_frame']=value
+    errors=creation.validate(draft,manifest,tmp_path/'run/sandbox')
+    assert any('shot 1' in e and 'in_frame' in e and 'actor' in e for e in errors)
+
+
+def test_cached_candidate_rechecks_current_contract_and_resumes_same_author(tmp_path,monkeypatch):
+    source=task(tmp_path);run=tmp_path/'run';manifest=creation.prepare(source,run);work=run/'sandbox'
+    draft=episode();draft['chapter_script']['shots'][0]['in_frame']='旅客、背包'
+    write(work/'output/episode.json',draft);(work/'output/creative-notes.md').write_text('Original camera notes')
+    write(run/'creator-state.json',{'status':'creative_candidate','seconds_used':20,'allowance_seconds':90})
+    calls=[]
+    def invoke(work,prompt,**kwargs):
+        assert kwargs['resume'] is True and kwargs['timeout']==70
+        feedback=json.loads((work/'input/creative-validation.json').read_text())
+        assert any('in_frame' in e for e in feedback['issues'])
+        calls.append(1);write(work/'output/episode.json',episode())
+        attempt=work/'attempts/corrected';attempt.mkdir(parents=True)
+        rows=[{'type':'tool_use','name':'Read','input':{'file_path':'/work/'+p}} for p in manifest['required_reads']]
+        (attempt/'session.jsonl').write_text(json.dumps({'message':{'content':rows}}))
+        return SimpleNamespace(ok=True,exit_code=0,seconds=1,directory=attempt,record={'session_id':'same-author','model':'configured'})
+    monkeypatch.setattr(creation,'run_session',invoke)
+    result=creation.run(source,run,resume=True,config={'timeout_seconds':999,'source_agent_slice_seconds':1200})
+    assert result['status']=='creative_candidate' and result['seconds_used']==21 and calls==[1]
 
 
 @pytest.mark.parametrize('placeholder',['__MORE_SHOTS__','__END__'])

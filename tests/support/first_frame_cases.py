@@ -1,6 +1,7 @@
 """Shared first-frame test factories (moved out of test modules for the
 tests-use-support rule; behavior unchanged)."""
 from types import SimpleNamespace as NS
+import copy
 
 from PIL import Image
 
@@ -8,24 +9,36 @@ from novel_manga.media.first_frames import opening_contract
 from novel_manga.util import atomic_write_json, read_json
 
 
-def case(tmp_path, monkeypatch):
+def stub_host_h3(monkeypatch):
+    from novel_manga.application.profiles import h3_stamp
+    def ensure(ctx,clip):
+        clip['prompt_h3']=clip.get('prompt_h3') or 'English request'
+        clip['prompt_h3_of']=h3_stamp(clip)
+    monkeypatch.setattr('novel_manga.application.agents.episode.first_frames.ensure_current_h3',ensure)
+
+
+def case(tmp_path, monkeypatch, *, host_h3=False):
     ctx = NS(novel_dir=tmp_path/'book', episode_dir=tmp_path/'book/book_1',
              run_dir=tmp_path/'run', work_dir=tmp_path/'run/sandbox')
     ctx.episode_dir.mkdir(parents=True); (ctx.work_dir/'output').mkdir(parents=True)
     Image.new('RGB', (8, 16)).save(ctx.novel_dir/'scene.png')
     ref = {'role': 'location', 'path': 'scene.png', 'name': 'pool'}
+    opening = {'image_prompt': 'empty pool', 'visible_characters': [], 'reference_subjects': ['pool']}
     clips = [{'clip_id': f'clip_{i:02d}', 'kind': 'video', 'shot_indexes': [i],
               'segment_ids': [str(i)], 'references': [ref],
-              'shots': [{'index': i, 'start_state': 'empty pool', 'turns': []}]} for i in (1, 2)]
+              'shots': [{'index': i, 'start_state': 'empty pool', 'turns': [],
+                         'opening_frame': copy.deepcopy(opening)}]} for i in (1, 2)]
     atomic_write_json(ctx.novel_dir/'profile.json', {'h3_input_mode': 'first-frame'})
     atomic_write_json(ctx.episode_dir/'clip_plan.json', {'clips': clips})
     atomic_write_json(ctx.episode_dir/'segments.json', [{'segment_id': str(i), 'text': 'empty pool'} for i in (1, 2)])
     atomic_write_json(ctx.run_dir/'catalog.json', [ref])
     rows = [{'clip_id': c['clip_id'], 'image_prompt': 'empty pool', 'image_references': ['scene.png'],
-             'visible_characters': [], 'extra_references': [], 'prompt_h3': 'English request',
-             'source_quote': 'empty pool'} for c in clips]
+             'visible_characters': [], 'extra_references': [], 'prompt_h3': 'English request'} for c in clips]
     atomic_write_json(ctx.work_dir/'output/first-frames.json', {'frames': rows})
     monkeypatch.setattr('novel_manga.application.agents.episode.first_frames.validate_existing_request', lambda *a: None)
+    monkeypatch.setattr('novel_manga.application.agents.episode.first_frames.review_opening_sources',
+                        lambda *a: {}, raising=False)
+    if not host_h3:stub_host_h3(monkeypatch)
     return ctx, clips
 
 
@@ -41,6 +54,7 @@ def character_case(tmp_path, monkeypatch):
     clip['references'].append(ref)
     clip['shots'][0].update(in_frame=[], start_state='A films the pool; headlamp is inside the closed backpack.',
                             device_state='headlamp stays inside the backpack', wears={'A': 'backpack'})
+    clip['shots'][0]['opening_frame']['reference_subjects']=['pool','A']
     atomic_write_json(ctx.episode_dir/'clip_plan.json', {'clips': [clip]})
     atomic_write_json(ctx.run_dir/'catalog.json', clip['references'])
     row = read_json(ctx.work_dir/'output/first-frames.json')['frames'][0]

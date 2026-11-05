@@ -82,6 +82,40 @@ def test_mix_tool_uses_registered_audio_and_preserves_generation_counts(tmp_path
     assert records[0]['source_review_history'][0]['review']['problems']==['Synthetic, listening not performed.']
 
 
+def test_music_and_ambience_use_the_same_policy_persistence_helper(tmp_path,monkeypatch):
+    from novel_manga.application.agents.episode import postproduction
+    from novel_manga.application.agents.episode.audio_mix import AudioMixOperations
+    from novel_manga.application.agents.episode.music import MusicOperations
+
+    episode=tmp_path/'book_1';episode.mkdir();run=tmp_path/'run';work=run/'sandbox';(work/'output').mkdir(parents=True)
+    ctx=NS(project_root=tmp_path,episode_dir=episode,novel_dir=tmp_path,run_dir=run,work_dir=work)
+    bed=episode/'room.wav';wave_tone(bed,300,.02)
+    asset={'id':'room','path':str(bed),'review':{'speech_free':True,'method':'source-reviewed speech-free fixture'}}
+    atomic_write_json(episode/'delivery_policy.json',{'interaction_ambience':asset})
+    native=episode/'native.mp4';native.touch()
+    atomic_write_json(episode/'thin_media_report.json',{'status':'assembled','assembly':{'final_video':str(native)}})
+    (run/'source.txt').write_text('同一间池室，背景是水声和空房间底声。')
+    atomic_write_json(work/'output/audio-mix.json',{'candidate_id':'room','gain_db':-6,
+        'source_quote':'背景是水声和空房间底声','reason':'Keep the room acoustic bed between spoken lines.'})
+    media=NS(runner=lambda:NS(context=NS()))
+    calls=[]
+    def persist(*args,**kwargs):
+        calls.append((args,kwargs))
+        report=read_json(episode/'thin_media_report.json')
+        return report,(report.get('assembly')or{}).get('final_video')
+    monkeypatch.setattr(postproduction,'persist_audio_policy',persist,raising=False)
+    monkeypatch.setattr('novel_manga.application.repair.ambience.apply_assembly',lambda _d,report,**_k:report)
+    monkeypatch.setattr('novel_manga.application.review.execution.save_result',lambda _d,report,*_a,**_k:report)
+
+    music={'asset':{'id':'BGM-009','review':{'status':'accepted'}},'gain_db':-18,
+        'source_review':{'consistent':True,'problems':[]}}
+    assert MusicOperations(ctx,media).publish(music)['ok']
+    assert AudioMixOperations(ctx,media,source_checker=lambda *a:{'consistent':True,'problems':[]}).prepare({})['ok']
+    assert len(calls)==2
+    assert all(kwargs['context'] is ctx for _,kwargs in calls)
+    assert [kwargs['policy_key'] for _,kwargs in calls]==['episode_music','episode_ambience']
+
+
 @pytest.mark.parametrize('clip_bed',[False,True])
 def test_published_mix_reuses_pre_bed_source_for_replay_and_gain(tmp_path,monkeypatch,clip_bed):
     from novel_manga.application.repair.delivery import publish_if_ready
