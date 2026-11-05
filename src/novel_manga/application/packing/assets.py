@@ -7,6 +7,7 @@ from novel_manga.models.bible import StoryBible
 from novel_manga.story.compilation import anchor_of, compact
 from novel_manga.application.identity.phases import load_phases, phase_for, phased
 from novel_manga.application.packing.context import compiler_options
+from novel_manga.util import read_json
 
 LEAD_ROLES = {"主角", "女主角", "男主角"}
 
@@ -117,6 +118,12 @@ def build_references(cast: list[str], location_short: str | None, bible: StoryBi
         references.append({"tag": f"@图片{first}", "role": "character", "name": name, "asset_id": asset, "path": f"series_assets/characters/{asset}/{image_name}",
                            **({"view": "closed"} if closed_only else {}),
                            **({"phase": str(phase.get("label", ""))} if phase else {})})
+        # An imported face crop may occupy the historical turnaround.jpeg seat.
+        # Its supplied scope, rather than that filename, defines what it can bind.
+        card = novel_dir / references[-1]['path'] if novel_dir is not None else None
+        portrait_only = card is not None and read_json(card.with_suffix(card.suffix + '.origin.json'), {}).get('reference_scope') == 'identity_portrait'
+        if portrait_only:
+            references[-1].update(reference_scope='identity_portrait', wardrobe=look.wardrobe)
         sheet = novel_dir is not None and (novel_dir / "series_assets" / "characters" / asset / "expressions.jpeg").is_file()
         lead_sheet = settings.two_views in ("leads", "all") and settings.two_view_cast_limit > 0 and sheet and name in leads
         # Only a sheet that exists is referenced: the fast tier never draws one at render time (the full tier
@@ -126,7 +133,8 @@ def build_references(cast: list[str], location_short: str | None, bible: StoryBi
         if not closed_only and ((two_views and wants_sheet) or lead_sheet):
             count += 1
             second = count
-            references.append({"tag": f"@图片{second}", "role": "character", "name": name, "asset_id": asset, "path": f"series_assets/characters/{asset}/expressions.jpeg"})
+            references.append({"tag": f"@图片{second}", "role": "character", "name": name, "asset_id": asset, "path": f"series_assets/characters/{asset}/expressions.jpeg",
+                               **({'reference_scope': 'identity_portrait', 'wardrobe': look.wardrobe} if portrait_only else {})})
             anchor = anchor_of(name, bible, character=look, prefer=changed)
             bindings.append(
                 # Which card defines what follows what each card actually draws: turnaround.jpeg is the
@@ -147,6 +155,13 @@ def build_references(cast: list[str], location_short: str | None, bible: StoryBi
                 f"<{name}>{body_note}只对应@图片{first}，只采用五官、发型、体型和服装，不采用图片背景、姿势和构图；"
                 "不得把该角色的长相用在其他人身上"
                 + (f"。{name}的辨识特征：{anchor}" if anchor else ""))
+        if portrait_only:
+            tags = '和'.join(r['tag'] for r in references if r.get('role') == 'character' and r.get('name') == name)
+            bindings[-1] = (
+                f'<{name}>{body_note}对应{tags}：只采用图中可见的五官、发型、年龄感和肤色；'
+                '不采用图片背景、姿势和构图，不从肖像推断全身体型或整套服装；'
+                f'服装按本镜文字，角色服装设定为：{look.wardrobe}；该角色只能出现一次'
+                + (f'。{name}的辨识特征：{anchor}' if anchor else ''))
         if closed_only:
             bindings[-1] = bindings[-1].replace('五官、发型、体型和服装', '图中可见的体型、服装和闭合头盔') + '。全段保持参考图的闭合面罩状态。'
         # Only where the faceplate is shut (packing/visor.py): sent to every clip, H3 shut it on its own.
@@ -173,7 +188,6 @@ def build_references(cast: list[str], location_short: str | None, bible: StoryBi
         location_asset = f"location_{location_index[location_short]:03d}"
         location_phase = None
         if novel_dir is not None:
-            from novel_manga.util import read_json
             location_phases = read_json(novel_dir/'series_assets/phases.json', {}).get('locations', {})
             location_phase = phase_for(location_phases, location_short, chapter)
             if location_phase:

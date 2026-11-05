@@ -15,6 +15,33 @@
 角色图和原始文本完整复制到独立输入，原ZIP另行保留。原创模式明确使用用户意图，
 不伪造外部素材来源。不同任务版本使用不同输出目录，已有候选和会话保留。
 
+### 选择画风包（2026-10-19）
+
+任务可增加 `"style": "modern-live"`。新任务只复制这一包到 `input/style.json`，
+将其规则列为必读；已审可用的原创样图或明确标注的历史例图作为 `style-reference`
+提供给主创。样图只指导色光、材质和构图，不提供新故事的人物身份、衣装、剧情、
+空间布局或机位。主创在各镜 `visual_prompt`、`light` 和 `camera` 落实具体选择。
+
+目前升级7包：`weimei` 唯美CG、`modern-live` 自然写实、`travel-live` 旅行探险、
+`poolrooms-live` 明亮池室、`institutional-sci-fi` 制度科幻、`paper-folklore` 纸艺民俗、
+`graphic-animation` 图形动画。每包包含用途、色板、光线、构图、母题、人物/地点/道具
+规则、禁忌、实际看片依据和图像/视频验证状态。原有其他预设继续可选。
+
+`pending`、`blocked_quota`、`needs_revision` 样图保留在图库作为记录，不自动传给主创。
+可用图片被声明却缺失时直接提示缺图；未出图的草案仍可用文字规则创作。
+导出包含冻结的 `style.json` 与实际采用的样图。相同输出目录续跑保持已选版本；
+图库更新不改已有任务、项目 `style.json`、素材、旧片或拍摄次数。
+
+运行 `python scripts/style_library.py --output-dir delivery/style-library-20261019`
+可从当前配置重建离线画风册与ZIP，查看样图、历史例图、局限及选择用的代号。
+图片生成继续使用既有图片API，画风册本身不调用媒体模型。
+
+维护时修改同一画风的规则并递增 `pack_version`；例图写明种类、状态和来源/图审记录。
+图片存于忽略Git的 `assets/style-library/日期/代号/`，随离线包分发。
+新样图经实际审看后才标为 `reviewed`；未拍视频保持 `video: not_tested`。
+已有短小样用 `video: short_sample_reviewed` 和 `validation.video_sample` 记录文件、模式与审阅范围；
+离线画风册可直接播放这些样片。单种子5秒取样审图不等于完整动作、整集或声音验收。
+
 ```bash
 PYTHONPATH=src .venv/bin/python scripts/creative_agent.py prepare \
   --task /path/to/task.json --output-dir /path/to/independent-run

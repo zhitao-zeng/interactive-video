@@ -1,0 +1,71 @@
+{
+  "name": "《心动待定》EP01｜现代真人恋综·小屋厨房",
+  "video_kind": "现代真人恋爱观察综艺片段",
+  "render_family": "photo",
+  "visual_style": "现代真人恋综摄影，真实自然皮肤、真实头发与织物。场景是已建立的海边共居小屋室内厨房，暖木柜、浅色墙砖和真实备餐台；傍晚室内实用灯光，克制的近距离生活交流。",
+  "render_direction": "Photo-real live-action photography with natural skin texture, individual facial identity, believable knit and cotton fabric, ordinary kitchen task movement, and warm but neutral practical interior lighting.",
+  "scene_style": "Photorealistic lived-in seaside shared-house kitchen interior; the approved kitchen reference determines visible cabinetry, pale tile, counter, refrigerator and room scale.",
+  "scene_direction": "Keep the source-established north counter, east-side stove, west-side recipe station and south doorway camera relationship. Use the kitchen reference for materials and practical architecture, not as a new floor plan or a first frame.",
+  "h3_style_line": "Photorealistic contemporary Chinese dating-reality footage inside a lived-in seaside shared-house kitchen at evening. Natural skin and hair, true-to-life knit and cotton fabric, warm practical interior lighting, restrained observational camera, and ordinary food preparation. The approved room reference supplies the visible kitchen materials and scale.",
+  "card_suffix": "",
+  "prompt_fingerprint": false,
+  "tidy_prompts": true,
+  "location_empty_suffix": "Empty room reference only; no people or silhouettes. Preserve the supplied kitchen materials and architecture.",
+  "pack_version": "ep01-romance-live-candidate-1",
+  "art_direction": {
+    "intent": "A grounded contemporary dating-reality exchange in the already approved small seaside house. Let the shared cooking task and the other person’s concrete response carry the relationship beat.",
+    "suitable_for": [
+      "Contemporary relationship reality footage",
+      "Natural indoor conversation during a practical shared task",
+      "A lived-in seaside shared-house interior"
+    ],
+    "palette": {
+      "base": [
+        "warm wood",
+        "pale tile",
+        "natural skin tones",
+        "soft evening neutrals"
+      ],
+      "accent": [
+        "ivory knit",
+        "dark forest green",
+        "charcoal grey"
+      ],
+      "use": "Keep source-defined wardrobe colors distinct from the warm kitchen materials."
+    },
+    "lighting": [
+      "Evening indoor practical light in the established kitchen.",
+      "Preserve readable natural skin tones and visible fabric texture."
+    ],
+    "composition": [
+      "Establish both people, the shared counter and their fixed west/east positions in the same frame.",
+      "Keep the spoken exchange legible in a continuous camera take; use only one purposeful move to show the serving action.",
+      "Frame the skirt hem and the relevant upper-body details naturally while the pair cook; no fashion posing."
+    ],
+    "motifs": [
+      "The recipe, scallion bowl, chili bowl and small dish remain ordinary task objects.",
+      "The small mild portion becomes visible only when Lu Chuan serves it once."
+    ],
+    "asset_guidance": {
+      "character": [
+        "Independent portraits guide each person’s identity and hair. Clothing is authored in text and character cards, not inferred from face-only portraits."
+      ],
+      "location": [
+        "Use the approved kitchen photograph for visible materials and practical interior context. Relative room positions are authored; no measured plan or Blender model is claimed."
+      ],
+      "prop": [
+        "Everyday kitchen objects appear at the positions stated in the shot; they do not need to become character or scene references."
+      ]
+    }
+  },
+  "examples": [],
+  "validation": {
+    "image": "references reviewed",
+    "video": "not generated in this authoring pass",
+    "notes": [
+      "Task-local EP01 override; it does not change the global modern-live package.",
+      "The H3 baseline and both SD baseline frames show trousers on Xia Ning; the previous requests did not explicitly transmit the skirt specification.",
+      "This candidate explicitly assigns wardrobe in bilingual shot text and keeps the face references scoped to identity."
+    ]
+  }
+}

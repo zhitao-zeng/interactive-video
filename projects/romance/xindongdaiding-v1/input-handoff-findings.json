@@ -1,0 +1,26 @@
+{
+  "verdict": "source-to-request handoff gap confirmed",
+  "evidence": [
+    {
+      "source": "input/source-material.json",
+      "observation": "源稿 material.bible.characters[夏宁].wardrobe 明确写为“奶白细针织短袖上衣、墨绿过膝A字裙、珍珠耳钉、米白平底鞋”。"
+    },
+    {
+      "source": "input/sent-wardrobe-trace.json and input/P, Q, R/requests.json",
+      "observation": "检索摘录报告六份实际请求（每版clip_01/clip_02）均没有裙/skirt/dress或具体裙装要求。已核实际request.prompt：这项服装约束没有被明确交给三版模型。"
+    },
+    {
+      "source": "input/P/requests.json",
+      "observation": "H3 subject definition写“Identity and outfit design follow <Picture 1>”，retention也要求保留图片服装；但实际Picture 1是夏宁脸部肖像，不含下装信息。请求还含“modern outdoor clothing, soft overcast daylight, realistic terrain”等与本稿室内恋综厨房不一致的通用摄影风摘要。"
+    },
+    {
+      "source": "input/Q/requests.json and input/R/requests.json",
+      "observation": "SD人物绑定说图片负责五官、发型、体型和服装，并列出脸部辨识点；实际@图片1是夏宁脸部肖像，不能指定裙装。两版生成目标开头都写“现代真人探险片段”，与室内厨房恋综不符；同一prompt后文又有现代恋综、室内厨房等正确场景描述，存在目标摘要与细节指令交接不一致。"
+    },
+    {
+      "source": "input/source-material.json reference_images.scope",
+      "observation": "源材料中的reference_images.scope以中文说明脸部参考用途，但现有证据不能确认该范围作为正式identity_portrait枚举进入本轮编译；不据此断言编译器执行了脸部范围。"
+    }
+  ],
+  "attribution": "三版夏宁裤装与源稿设定不符的画面观察和failed候选结论保持有效；但由于六份实际请求都没有明确裙装指令，不能归因为模型收到明确要求后不遵从，也不能据本轮推断三模型固有服装能力相同或差异相同。源稿到实际请求存在服装细节遗漏；另SD目标摘要及H3摄影风摘要与室内恋综场景不匹配。此为输入交接归因，不撤销既有其他画面观察，也不构成新一轮通过判定。"
+}

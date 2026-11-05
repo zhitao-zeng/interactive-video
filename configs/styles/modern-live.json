@@ -10,5 +10,116 @@
   "card_suffix": "",
   "prompt_fingerprint": false,
   "tidy_prompts": true,
-  "location_empty_suffix": "空场参考，画面内无人，没有人影或剪影；牌面不生成文字，由后期添加"
+  "location_empty_suffix": "空场参考，画面内无人，没有人影或剪影；牌面不生成文字，由后期添加",
+  "pack_version": "2026-10-19.2",
+  "art_direction": {
+    "intent": "以现代实景的尺度、自然人物和可解释光源建立可信度，适合日常交流、现场工作和实地探索。既有自然户外摄影是起点；本包不擅自改写作者已定的室内外、时刻、天气、人物、服装或视点。",
+    "suitable_for": [
+      "现代现实题材短剧与访谈式交流",
+      "调查、记录、修理等现场任务",
+      "自然地形与现代建筑中的实地探索"
+    ],
+    "palette": {
+      "base": [
+        "岩灰与自然中性色",
+        "苔绿及地点本身的植物色",
+        "旧纸黄、木棕与自然肤色"
+      ],
+      "accent": [
+        "工作物件固有色",
+        "既定服装与环境的适量对比",
+        "实际标识或灯具的局部颜色"
+      ],
+      "use": "保留物件和人物的真实色差，整体克制但不套灰滤镜。一个场景只突出当前行动需要的细节，颜色例外要有物件或光源依据。"
+    },
+    "lighting": [
+      "默认柔和自然日光，明确的夜场、室内灯与其他光源按剧本执行，不自动改成阴天或夜景。",
+      "光照方向与窗口、天光、工作灯对应；阴影有可读细节，肤色不因低饱和失去生气。",
+      "让光线帮助看清操作、证据和回应，不额外给每个人制造无来源的轮廓光。"
+    ],
+    "composition": [
+      "先把工作区、人物相对位置和正在处理的对象交代清楚，再选择需要的近景。",
+      "细节镜头看得到操作结果；一次递交保留双方手的位置与物件归属。",
+      "留白可以容纳未知或下一步行动，摄影机仍遵循本作已定的记录者和可达机位。",
+      "深景与浅景深按信息需求选择，避免把重要环境一律虚化成背景装饰。"
+    ],
+    "motifs": [
+      "记录痕迹、使用痕迹与工作工具来自本场人物的实际任务。",
+      "熟悉的门、窗、台面可以成为前后比较的锚点，变化要与事件相关。",
+      "保持一个可重复辨认的实物细节，比不断增加无关道具更有用。"
+    ],
+    "asset_guidance": {
+      "character": [
+        "自然皮肤、发丝和身体比例，保留角色既定年龄与外观；不统一磨皮成同一张脸。",
+        "服装按场景用途与原素材选择，布料接缝、厚薄和使用感可信，不强迫所有人穿户外装。",
+        "专业性通过持握、观察和操作体现，人物卡不预演未经作者确定的剧情。"
+      ],
+      "location": [
+        "门窗、地面、台面与人物使用尺度相容，行动区和出口可辨认。",
+        "石、木、织物、金属各有材质差异，使用痕迹适量且服从地点。",
+        "保留本场真实光源与气候，不为所谓电影感自动增加雨、雾、废墟或霓虹。"
+      ],
+      "prop": [
+        "工具和证物有合理尺寸、重量感及可操作结构。",
+        "关键物件与周围杂物拉开视觉层级，提供剧情需要的前后状态。",
+        "精确编号、文字与屏幕按项目文字流程处理，原始样板不生成字。"
+      ]
+    },
+    "pitfalls": [
+      "写实不是默认黑夜、阴雨、脏污或低曝光；记录感也不等于抖动和噪点。",
+      "不要用器材、制服和复杂背景堆出专业外观，却看不清人物正在做什么。",
+      "不要把自然皮肤改成美型CG，也不把所有演员处理成疲惫、粗糙或不漂亮。",
+      "美术指导不替作者新增恐怖机制、身份、道具用途或观察者不可能知道的信息。"
+    ],
+    "references": [
+      {
+        "title": "零号档案第3集",
+        "url": "https://www.douyin.com/video/7645916838001511743",
+        "observed_method": "全时间轴3秒抽帧及局部单帧；00:18—01:03实际可见病房收容、观察和笔记。",
+        "lesson": "人物的专业感来自操作、记录和具体物件，光线与地点用途相连。",
+        "limits": "该片为科幻AI作品；只取任务与材质组织，不移植异类、机构或技术设定，未连续听审。"
+      },
+      {
+        "title": "The Backrooms (Found Footage)",
+        "url": "https://www.bilibili.com/video/BV1LL4y1s7eE/",
+        "observed_method": "授权中文字幕版全时间轴3秒抽帧及关键帧，00:06—00:33可见拍摄任务和记录机位来由。",
+        "lesson": "摄影机为什么在此有具体动机，普通建筑构件提供现实尺度参照。",
+        "limits": "非AI参考；不把VHS质感、黄色迷宫或恐惧设为通用现代写实要求。"
+      }
+    ],
+    "sample_prompt": "One complete cinematic frame, 16:9 landscape. Two original adult strangers stand on opposite sides of a small counter. One offers a plain folded note across the counter; the other has not yet accepted it, with the receiving hand still clearly separated from the note. A window and a door remain visible in the background. One eye-level oblique medium two-shot shows both faces, both hands and the note. Contemporary live-action cinematic realism, natural skin texture and hair, plausible modern clothing with visible fabric construction. A modest real interior with a practical wood counter, understated grey, moss green and warm paper tones. Soft daylight from the visible window provides the main direction, with believable reflected fill and readable shadows. Give the folded note and the space between the hands priority over background clutter. Keep architecture and material scale physically credible, without decorative haze or artificial dramatic darkness. No panels, text, logos or borrowed character identities."
+  },
+  "examples": [
+    {
+      "kind": "original_style_board",
+      "path": "assets/style-library/2026-10-19/modern-live/board.png",
+      "scope": "style_only_not_character_identity",
+      "status": "reviewed",
+      "review": "assets/style-library/2026-10-19/modern-live/image-review.json"
+    }
+  ],
+  "validation": {
+    "image": "reviewed",
+    "video": "short_sample_reviewed",
+    "notes": [
+      "规则与样图只指导色光、材质、构图；源素材的人物身份、事实、衣装、空间与已定机位优先。",
+      "reviewed表示已实际看图并符合本次静帧展示意图，不是视频、动作或声音通过。",
+      "只展示现代写实的一种室内交流场景，不把这一演员、发型、衣物或地点固定为包内角色身份。",
+      "没有修图、修改风格配置或再次提交生成。",
+      "本版补齐三张新样图，并登记七种画风的8步H3短小样；美术规则未变，旧任务保持原快照。",
+      "小样取样审阅不等于完整动作、整集、声音或长时连续性通过；具体偏差见附带审阅。",
+      "仍标needs_revision的唯美/纸艺静帧继续保留问题状态，不因视频风格保持而自动成为可用作者参考。"
+    ],
+    "video_sample": {
+      "path": "delivery/style-h3-h100-20261019/modern-live/sample.mp4",
+      "review": "delivery/style-h3-h100-20261019/review-modern-weimei.json",
+      "mode": "H100 H3 Ref2VA / 8step acceleration LoRA / strength1",
+      "seconds": 5.207,
+      "short_edge": 768,
+      "seed": 2101,
+      "num_inference_steps": 9,
+      "scope": "单种子5秒小样，21张4fps样本及关键原帧审阅；非整集、连续播放或声音验收。",
+      "source_config_version": "2026-10-19.1"
+    }
+  }
 }

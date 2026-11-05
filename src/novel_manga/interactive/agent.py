@@ -1,11 +1,12 @@
 """Select the request adapter for the existing bounded repair loop."""
 from contextlib import contextmanager
 import os
+from .runtime import VIDEO_LANES
 
 
 @contextmanager
 def repair_lane(lane):
-    if lane not in {'h3', 'sd25'}:
+    if lane not in VIDEO_LANES:
         raise ValueError('Unsupported repair lane')
     key = 'NOVEL_INTERACTIVE_REPAIR_LANE'
     previous = os.environ.get(key)

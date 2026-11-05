@@ -31,6 +31,7 @@ class MediaOperations:
         if os.environ.get('NOVEL_AGENT_MANAGED') == '1' and inflight <= 0:
             raise ValueError('managed episode rendering requires a positive NOVEL_RENDER_INFLIGHT')
         profile = read_json(self.ctx.novel_dir / 'profile.json')
+        profile['repair_backend'] = 'sandbox_agent'
         bgm = Path(profile['bgm_path']) if profile.get('bgm_path') else None
         if bgm is not None:
             bgm = bgm if bgm.is_absolute() else self.ctx.novel_dir / bgm
@@ -53,18 +54,26 @@ class MediaOperations:
         from novel_manga.application.rendering.reviewed import _load_current
         from novel_manga.application.review.execution import media_matches
         plan = read_json(self.ctx.episode_dir/'clip_plan.json')
-        if not (any(row.get('selected') and not has_analysis(row['selected']) for row in report.get('clips', []))
-                and media_matches(plan, report, notes=read_json(self.ctx.episode_dir/'review_feedback.json', {}))):
+        from novel_manga.media.retained import silent_insert_seconds
+        profile=read_json(self.ctx.novel_dir/'profile.json',{})
+        script=read_json(self.ctx.episode_dir/'chapter_script.json',{})
+        clips = {clip['clip_id']: clip for clip in plan['clips']}
+        matching=media_matches(plan,report,notes=read_json(self.ctx.episode_dir/'review_feedback.json',{}))
+        def needs(row):
+            selected=row.get('selected')or{}
+            if not selected or row['clip_id']not in clips:return False
+            seconds=silent_insert_seconds(clips[row['clip_id']],profile,script)
+            saved=(selected.get('retained_speech_window')or{}).get('end')
+            return seconds!=saved or (matching and not has_analysis(selected))
+        if not any(needs(row)for row in report.get('clips',[])):
             return report
         if runner is None:
             runner = self.runner()
             _load_current(runner)
-        clips = {clip['clip_id']: clip for clip in plan['clips']}
         hydrated = False
         for row in report['clips']:
             selected = row.get('selected')
-            if not selected or has_analysis(selected):
-                continue
+            if not needs(row):continue
             # First-pass reports can retain only video/passed. The ordinary
             # analyser reads ASR beside this selected take and refreshes it for
             # the current dialogue; another take's cached path is never used.
@@ -77,7 +86,8 @@ class MediaOperations:
             finally:
                 runner.context.options.cache_only = cached_only
                 runner.context.state.black_checks = black_checks
-            row['selected'] = {**selected, **analysis}
+            retained_fields={'retained_speech_window','excluded_tail_speech_chunks','native_speech_issues'}
+            row['selected'] = {**{k:v for k,v in selected.items()if k not in retained_fields}, **analysis}
             failed = report.setdefault('gate_failed_clips', [])
             if analysis.get('passed') is False:
                 if row['clip_id'] not in failed:
@@ -110,6 +120,8 @@ class MediaOperations:
         report.update(status='assembled', assembly=assembly,
                       elapsed_seconds=round(float(report.get('elapsed_seconds') or 0)+seconds, 3))
         report.setdefault('timing', {})['assembly_s'] = seconds
+        from novel_manga.application.repair.ambience import apply_assembly
+        report=apply_assembly(self.ctx.episode_dir,report,context=runner.context)
         atomic_write_json(self.ctx.episode_dir/'thin_media_report.json', report)
         history.record_render(self.ctx.episode_dir, report)
         return report
@@ -172,12 +184,22 @@ class MediaOperations:
         from novel_manga.application.repair import history
         from novel_manga.application.rendering.reviewed import _load_current
         from .local_preparation import active, stage, before_render
-        local_inputs = active(self.ctx) and not media_started(self.ctx.episode_dir)
+        from novel_manga.media.first_frames import enabled as first_frame_mode, require_current
+        frame_mode=first_frame_mode(self.ctx)
+        if frame_mode:
+            pending=read_json(self.ctx.episode_dir/'clip_plan.json',{})
+            frame_blocks={}
+            for clip in pending.get('clips',[]):
+                if clip.get('kind')=='video':
+                    try:require_current(self.ctx,clip)
+                    except (ValueError,OSError) as error:frame_blocks[clip['clip_id']]=str(error)
+            if frame_blocks:return {'ok':False,'error':'first_frames_required','blocked':frame_blocks}
+        local_inputs = (active(self.ctx) or frame_mode) and not media_started(self.ctx.episode_dir)
         if local_inputs:
             stage(self.ctx)
         path = self.ctx.episode_dir/'clip_plan.json'
         pending_script = (self.ctx.input_mode == 'script'
-            and not (self.ctx.run_dir/'prepared.json').is_file()
+            and not frame_mode and not (self.ctx.run_dir/'prepared.json').is_file()
             and not media_started(self.ctx.episode_dir))
         if not path.is_file() or payload.get('file') or pending_script:
             adopted = self.drafts.adopt(payload)

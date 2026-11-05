@@ -3,7 +3,7 @@
  "image": "agent-sandbox:0918",
  "runs_root": "/mnt/disk1/zengzhitao/tmp/agent-sandbox/runs",
  "base_url": "http://127.0.0.1:8789",
- "model": "deepseek-v4.1-flash",
+ "model": "deepseek-v4.1-flash-1017",
  "_model": "2026-10-14：悬疑修复Agent统一为用户预期的Phanthy DeepSeek V4.1 Flash；图像兼容修复独立于模型选择。",
  "parallel": {
   "day": 2,
