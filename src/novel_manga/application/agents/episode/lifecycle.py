@@ -210,6 +210,11 @@ def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_facto
     seconds = int(timeout if timeout is not None else config.get('timeout_seconds', DEFAULT_OPERATION_SECONDS))
     if seconds <= 0:
         raise ValueError('timeout must be positive')
+    from novel_manga.llm.catalog import select_agent
+    existing = read_json(ctx.run_dir / 'agent-run.json', {})
+    config = select_agent(config, explicit=explicit_config or any(os.environ.get(v) for v in
+        ('NOVEL_AGENT_BASE_URL', 'NOVEL_AGENT_MODEL', 'NOVEL_AGENT_KEY_VAR')),
+        resumed=bool(existing) or (ctx.work_dir/'episode-session.json').is_file())
     runtime = resolve_agent_environment(ctx, config)
     # Load the persisted task before reading its model route.  Keeping the
     # route beside the task state makes resume deterministic without making a

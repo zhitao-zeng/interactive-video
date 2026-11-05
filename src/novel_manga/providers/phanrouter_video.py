@@ -120,8 +120,11 @@ def generate_video(settings, client, video_headers, payload, output, additional_
     if not task_id:
         if before_submit is not None:
             before_submit()
+        from novel_manga.llm.catalog import identify
+        resource_id, _ = identify(settings.video_model)
         task_id = submit_recorded(submit, task_path, {"request_sha256": request_sha256, "kind": "video",
-                                                            "model": settings.video_model})
+                                                            "model": settings.video_model}, resource_id=resource_id,
+                                  resource_key=video_headers.get('Authorization', '').removeprefix('Bearer '))
         if task_id:
             atomic_write_json(
                 task_path,

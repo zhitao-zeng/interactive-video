@@ -139,7 +139,26 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
         if dialogue not in manifest['required_reads']:
             manifest['required_reads'].append(dialogue)
         atomic_write_json(work/'input/manifest.json', manifest)
+    explicit_config = config is not None
     config = load_config() if config is None else config
+    route_path = run_dir/'creator-agent-route.json'
+    if not explicit_config and (resume or state) and route_path.is_file():
+        config = {**config, **read_json(route_path, {})}
+    elif not explicit_config and (resume or state):
+        prior_session = read_json(work/SESSION_FILE, {})
+        if prior_session.get('backend') == 'codex' and state.get('model'):
+            config = {**config, 'backend':'codex', 'model':state['model'],
+                      'base_url':'codex://local', 'key_var':'H3_PROMPT_NO_KEY'}
+    from novel_manga.llm.catalog import select_agent
+    config = select_agent(config, explicit=explicit_config, resumed=resume or bool(state))
+    if explicit_config or not route_path.exists() and not (resume or state):
+        fields = ('backend','model','base_url','key_var','provider','resource_id','resource_billing',
+                  'effort','extra_body','repair_extra_body','max_thinking_tokens','task_reasoning',
+                  'codex_parallel','codex_slots_reserved_for_tools','codex_inflight_dir','codex_transport','refusal_fallback')
+        stored = {k:config[k] for k in fields if k in config}
+        if config.get('backend') == 'codex':
+            stored.setdefault('refusal_fallback', None)
+        atomic_write_json(route_path, stored)
     execute = run_session
     slice_seconds = int(config.get('source_agent_slice_seconds', 1200))
     allowance = int(config.get('timeout_seconds', slice_seconds))

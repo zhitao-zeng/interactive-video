@@ -71,6 +71,19 @@ ENDPOINTS = {
                      "QWEN38_LOCAL_MIN_MAX_TOKENS": "0"},
 }
 
+from .catalog import catalogue as _catalogue
+for _name, _resource in _catalogue()['resources'].items():
+    _base = _resource.get('base_url', '')
+    if not _resource.get('model') or not _base.startswith(('http://', 'https://', 'codex://')):
+        continue
+    _existing = ENDPOINTS.get(_name, {})
+    ENDPOINTS[_name] = {**_existing,
+        'QWEN38_LOCAL_BASE_URL': _base if _base.startswith('codex://') else _base.rstrip('/')+'/v1',
+        'QWEN38_LOCAL_MODEL': _resource['model'],
+        'QWEN38_LOCAL_API_KEY_VAR': _resource.get('key_var', 'H3_PROMPT_NO_KEY'),
+        'QWEN38_LOCAL_STREAM': '0' if _base.startswith('codex://') else '1',
+        'QWEN38_LOCAL_MIN_MAX_TOKENS': _existing.get('QWEN38_LOCAL_MIN_MAX_TOKENS', '0')}
+
 TRANSPORT_ENV = ('QWEN38_LOCAL_STREAM', 'QWEN38_LOCAL_REASONING', 'QWEN38_LOCAL_MIN_MAX_TOKENS')
 
 
@@ -86,7 +99,7 @@ def planner_endpoint_name(environ=None) -> str:
     environ = os.environ if environ is None else environ
     # 2026-10-10 用户决定：主力模型切 Phanthy API（本地大模型服务保留配置不再使用）。
     # API deepseek-v4.1-flash 实测 6 并发全绿、长输出无 8000 天花板（6979 自然停止）。
-    name = str(environ.get("NOVEL_PLANNER_ENDPOINT", "") or "").strip() or "phanthy-ds41"
+    name = str(environ.get("NOVEL_PLANNER_ENDPOINT", "") or "").strip() or 'phanthy-ds41'
     if name not in ENDPOINTS:
         raise ValueError(f"NOVEL_PLANNER_ENDPOINT={name!r} names no endpoint; pick one of {sorted(ENDPOINTS)}")
     return name
