@@ -1,0 +1,114 @@
+{
+  "name": "图形叙事动画",
+  "render_family": "2d",
+  "visual_style": "原创二维图形动画，清楚轮廓、概括体块、哑光色块与有主次的线条共同表达动作和关系",
+  "render_direction": "人物比例、面部与服装有自主设计，手和道具轮廓清楚；按本场采用平涂与少量硬边阴影，保留明确身份与服装事实",
+  "scene_style": "具有清楚前后关系的二维设计空间，形状、留白和色块服务当前事件",
+  "scene_direction": "先组织人物、门窗和行动物件的形状关系，再补适量材质笔触；配色随故事需要，可明亮多彩，不默认黑白或全景噪纹",
+  "h3_style_line": "Original two-dimensional graphic animation with clear silhouettes, economical contour lines, matte color fields and selective hard-edged shadow. Organize shapes and negative space around the authored action. Preserve identity, wardrobe, object state, time of day, lighting logic, geography and camera viewpoint; color may be vivid when the brief calls for it.",
+  "location_empty_suffix": "无人二维场景参考，门窗、通路和前中后层次清楚；不出现人物、人影、画中人或镜中人；文字与标志按项目既定方案呈现",
+  "pack_version": "2026-10-19.2",
+  "card_suffix": "",
+  "prompt_fingerprint": false,
+  "tidy_prompts": true,
+  "art_direction": {
+    "intent": "把角色关系和物件动作转成第一眼可读的形状组织。风格只概括视觉，不删掉故事需要的动作阶段、身份区别或空间信息。",
+    "suitable_for": [
+      "人物关系与都市短篇",
+      "轻喜剧和寓言",
+      "强调形状、节奏感与表情的动画",
+      "需要原创平面设计的彩色叙事"
+    ],
+    "palette": {
+      "base": [
+        "由场景选取的纸白或浅中性色",
+        "支持人物分离的冷暖主色块",
+        "少量较深结构色"
+      ],
+      "accent": [
+        "剧情道具或人物自有重点色",
+        "按情绪需要使用的鲜明互补色"
+      ],
+      "use": "用色块面积与明度分配主次，不靠删光颜色获得统一。可采用彩色方案；已有角色色、物件色和场景事实优先。"
+    },
+    "lighting": [
+      "把本场光源概括为明面、阴面与接触阴影，受光方向保持可解释。",
+      "人物脸、递物的手和关键道具不陷入同一块暗色中。",
+      "阴影服从形体与情绪；日景保持日景，夜景可用明度和局部光表达，不一律铺黑。"
+    ],
+    "composition": [
+      "通过轮廓间隔看清谁做什么，手和物件不能粘成同一块形状。",
+      "人物、柜台与背景分成可辨层次，留白指向正在发生的交换或犹豫。",
+      "背景形状支持本场，不以同等粗细与细节争抢每一个边缘。",
+      "镜头保持源稿规定的观看位置；图形化不等于分格漫画或强行正侧面。"
+    ],
+    "motifs": [
+      "从既有服装、场所或物件提取可重复的圆、折线或矩形关系。",
+      "重复形状帮助识别人物和场所，不擅自把它们变成隐藏符号。",
+      "关键物件的形状与颜色保持稳定；状态变化依动作和事件表达。"
+    ],
+    "asset_guidance": {
+      "character": [
+        "原创轮廓与发型，成人保持明确成年特征；不套用知名动画角色的脸型组合。",
+        "线条和阴影简洁，身份由面部、发型、体态和既定穿着共同区分。",
+        "手指和关节可适度概括，但握持方向、接触与未接触状态必须可读。"
+      ],
+      "location": [
+        "先画清地面、工作面、门窗和空间朝向，再加入简练装饰。",
+        "用色块和遮挡建立深度；远景细节降低，重要通路不被花纹遮挡。",
+        "背景质感可以粗糙，角色和重要道具的轮廓仍保持干净。"
+      ],
+      "prop": [
+        "关键道具保留能识别用途的轮廓与朝向，不只剩抽象色点。",
+        "同一物件不因镜头换成另一套形状或图案；纸条折面简单可辨。",
+        "文字承载信息时沿用项目可靠的呈现方式，造型不能替代精确内容。"
+      ]
+    },
+    "pitfalls": [
+      "不要借用知名IP人物、服装、标志或独特场面；参考是组织方法，不是角色模板。",
+      "不要把平面设计误当必须黑白，或把所有颜色统一压成脏灰。",
+      "不要在皮肤、衣服和背景上平均铺排线、颗粒与高亮边。",
+      "静态样张不证明二维动作补间、表演节拍或口型效果。"
+    ],
+    "references": [
+      {
+        "title": "《牡丹记》约04:39–05:57的平面回忆段",
+        "url": "https://www.bilibili.com/video/BV1NMokBTE7h/",
+        "observed_method": "2026-10-19全时轴每3秒采样，实际审看包含该段的第4、5张网格；整片共8张160帧。未连续播放听审。",
+        "lesson": "平面画面通过人物位置、舟柳和书桌等清楚形状组织诗境，并以形式变化标记时间层。取有主次的平面组织和形式服务叙事的原则。",
+        "limits": "该段为工笔回忆表达，不是本包赛璐璐或图形动画的模型实测；不复制其人物、笔法组合或诗句，也不据静帧宣称动画流畅。"
+      }
+    ],
+    "sample_prompt": "One complete cinematic frame, 16:9, original two-dimensional graphic animation. Two original adult strangers stand across a small counter. One adult with short wavy hair and a brick-red rolled-sleeve shirt holds out one plain folded note above the counter; the other adult, with a tied braid and a muted mustard cardigan, has not accepted it, with both hands remaining on their own side. Make the note, the holding hand and the visible gap to the recipient distinct silhouettes. A window is visible behind them on the left and a closed door on the right. Soft afternoon light is translated into clean matte color fields and a small number of hard-edged shadows. Cool muted teal background shapes, warm clothing accents and quiet ivory negative space guide attention to the exchange. Clear adult proportions and original facial designs. A single coherent scene, no panels, no captions, no readable text, no logos, no borrowed characters."
+  },
+  "examples": [
+    {
+      "kind": "original_style_board",
+      "path": "assets/style-library/2026-10-19/graphic-animation/board.png",
+      "scope": "style_only_not_character_identity",
+      "status": "reviewed",
+      "review": "assets/style-library/2026-10-19/graphic-animation/image-review-remaining-20261019.json"
+    }
+  ],
+  "validation": {
+    "image": "reviewed",
+    "video": "short_sample_reviewed",
+    "notes": [
+      "规则与样图只指导色光、材质、构图；源素材的人物身份、事实、衣装、空间与已定机位优先。",
+      "本版补齐三张新样图，并登记七种画风的8步H3短小样；美术规则未变，旧任务保持原快照。",
+      "小样取样审阅不等于完整动作、整集、声音或长时连续性通过；具体偏差见附带审阅。",
+      "仍标needs_revision的唯美/纸艺静帧继续保留问题状态，不因视频风格保持而自动成为可用作者参考。"
+    ],
+    "video_sample": {
+      "path": "delivery/style-h3-remaining-20261019/graphic-animation/sample.mp4",
+      "review": "delivery/style-h3-remaining-20261019/video-review-graphic.json",
+      "mode": "H100 H3 Ref2VA / 8step acceleration LoRA / strength1",
+      "seconds": 5.207,
+      "short_edge": 768,
+      "seed": 2101,
+      "num_inference_steps": 9,
+      "scope": "单种子5秒小样，21张4fps样本及关键原帧审阅；非整集、连续播放或声音验收。",
+      "source_config_version": "2026-10-19.1"
+    }
+  }
+}

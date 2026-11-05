@@ -14,6 +14,9 @@ from .phanrouter_tasks import SUBMIT_TIMEOUT_SECONDS, SubmissionUncertain, uncon
 
 VIDEO_MODEL_LIMITS: dict[str, dict[str, object]] = {
     "MiniMax-H3": {"resolution": "768P", "max_duration": 15},
+    # Conservative project cap, not a verified upstream Fast/Mini duration limit.
+    "sd2.0-fast": {"max_duration": 15},
+    "sd2.0-mini": {"max_duration": 15},
 }
 
 
@@ -27,6 +30,8 @@ def video_payload(
     *, ratio: str = "9:16", resolution: str = "720p",
 ) -> dict:
     limits = VIDEO_MODEL_LIMITS.get(settings.video_model, {})
+    if settings.video_model in {"sd2.0-fast", "sd2.0-mini"} and duration > limits["max_duration"]:
+        raise ValueError("Fast/Mini currently require clips of at most 15 seconds; retain the source and prepare shorter groups")
     content = [{"type": "text", "text": prompt}]
     if image_url is not None:
         content.append(

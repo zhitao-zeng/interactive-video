@@ -172,13 +172,16 @@ def source_budget(directory, cid, *, preparation=False, grants=None):
     from .repack_budget import group_for, balances
     grants=read(directory/'repair_budget_grants.json',{}) if grants is None else grants
     group=group_for(directory,cid)
+    if not group:
+        return {'roots': [], 'constraints': {}, 'remaining': None}
     limits={root:generation_limit(directory,root,grants=grants) for root in group['source_budget']['roots']} if group else {}
     return balances(directory,cid,generation_counts(directory),grants,limits,preparation=preparation)
 
 
-def remaining_takes(directory, cid, *, preparation=False):
+def remaining_takes(directory, cid, *, preparation=False, counts=None):
     limit=preparation_limit(directory,cid) if preparation else generation_limit(directory,cid)
-    own=max(0,limit-generation_counts(directory).get(cid,0))
+    counts=generation_counts(directory) if counts is None else counts
+    own=max(0,limit-counts.get(cid,0))
     budget=source_budget(directory,cid,preparation=preparation)
     return min(own,budget['remaining']) if budget['roots'] else own
 
