@@ -280,3 +280,5 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | ZCode #12+会话退化修复 | ①create_context目录发现:无显式output_root时探测firstframes/music/agent三约定既有run,CLI retry续真状态(冒烟已验:verify edition解析到firstframes真实目录);②默认作者配置切快速档(thinking off+effort low+16k,修复线同款),传导链有测试;2新测试,全量4053连两轮绿 | main(783b0c4) | context.py、configs/agent_sandbox.json、tests/test_agent_run_discovery.py | 2026-10-22 | 已提交;verify edition下次resume即用快速档;并行瞬态(一轮11败)已定位为与sd线资源竞争,复跑全绿 |
 
 | Codex 10小时协助ZCODE20261023 | 用户授权给原ZCODE会话指令并协助完成今早10点前知遥20集成片；协助窗口至11:56 | codex/zcode-supervision-20261023 | 仅自有协调runtime/必要独立诊断；生产单写者ZCODE，旧恋综暂不处理 | 2026-10-23 01:56 | 在途：原ZCODE已收到指令并ACK，34项相关独立回归过；定位原会话session_7acef82aafd79b10dac6e5f434e1cf08，核对真实隔离产线；不清额度/历史，不把candidate或blocked误称accepted；以20个完整导出文件验收。 |
+
+| Codex 知遥ModelScope数据集20261023 | 用户授权公开数据集收录20集；先传既有13个完整delivery导出，后续同步 | codex/zhiyao-modelscope-20261023 | 仅scripts/ops/zhiyao_modelscope_sync.py与自有.runtime；不动生产/计数/源码WIP | 2026-10-23 | 在途：Flame4pd/zhiyao-episodes首轮13集/26媒体文件已逐路径字节核验；匿名页面与W01/W11/W20头尾Range有效。原watch PID 1963986持独占锁，每120秒补齐7集/新版；接续核验已交接至自有runtime/CONTINUE.md，OS watch继续运行，未另起上传/未提交。 |
