@@ -105,7 +105,9 @@ def initial_prompt(ctx):
             'For a confirmed source/input conflict, use apply with action=input, a verbatim source_quote '
             'and supported cast/speaker/scene/appearance/wearing/sound corrections. '
             'shots can correct in_frame/extras/listeners/actions, event/start_state/end_state, '
-            'speaker_map and sfx. characters requests a missing source actor card after adoption too. '
+            'speaker_map and sfx. The complete allowed fields come from current '
+            'repair_capabilities.adopted_input.shot_fields, including opening_frame/shot_scale/camera/visual_prompt. '
+            'characters requests a missing source actor card after adoption too. '
             'The host checks source support, builds scoped cards and recompiles dependent clips retaining cuts and words. '
             'output/requests.json is already seeded with the existing final requests. '
             'Read manifest.request_draft: reusable lists structurally valid requests and needs_work '
@@ -128,6 +130,8 @@ def initial_prompt(ctx):
             'Use source evidence for cast/speaker/appearance/wardrobe/scene/sound corrections. '
             'Input can correct references and request missing source actor cards with characters. '
             'Use shots.in_frame/extras/listeners/actions, speaker_map and sfx as needed; '
+            'use current repair_capabilities.adopted_input.shot_fields for the complete allowed list, '
+            'including opening_frame/shot_scale/camera/visual_prompt for opening consistency repairs. '
             'unnamed crowds remain extras unless an actual speech owner requires a card. '
             'accept_risk can explicitly acknowledge a '
             'current wearer-card or scene-people uncertainty for one clip before rendering; '
@@ -215,6 +219,8 @@ def continuation_prompt():
         'Do not rewrite appearance or wardrobe merely to apply the same state to another clip. '
         'After adoption, action=input supports scoped shots.in_frame/extras/listeners/actions and '
         'event/start_state/end_state/sfx corrections, plus speaker_map from old to source-correct speech owners. '
+        'The complete field list is current repair_capabilities.adopted_input.shot_fields; '
+        'opening_frame, shot_scale, camera and visual_prompt are distinct supported fields, not substitutes. '
         'characters can request a missing named visible actor or actual speech owner with appearance/wardrobe. '
         'For source-authored speech_overflow, input shots[].turn_texts may shorten each existing turn in order; '
         'the host preserves the speaker/mode and independently checks essential meaning against the source. '
@@ -239,23 +245,26 @@ def resume_prompt(task, *, agent_instructions=None):
     target_ids = {row.get('clip_id') for row in targets if row.get('clip_id')}
     next_action = task.get('next_action') or {}
     action = next_action.get('action')
+    source_conflicts=next_action.get('source_input_conflicts') or {}
     next_state = {key:next_action[key] for key in
-                  ('action','reason','blocked','service_interrupted','audio_review')
+                  ('action','reason','blocked','service_interrupted','audio_review','source_input_conflicts')
                   if key in next_action}
     state = {key:task[key] for key in
-             ('phase','mode','upstream_route','repair_capabilities','targets','issues',
+             ('phase','mode','workflow_scope','execution_rules','upstream_route','repair_capabilities','targets','issues',
               'last_operation','related_history','evidence_files','full_status','reference_catalog')
              if key in task}
     if task.get('postproduction'):
         state['postproduction'] = task['postproduction']
     if next_state:
         state['next_action'] = next_state
-    if action == 'first_frames':
+    if source_conflicts:
+        state['targets']=[row for row in targets if row.get('clip_id') in source_conflicts]
+    if action == 'first_frames' or source_conflicts:
         frames = task.get('first_frames') or {}
         blocked = next_action.get('blocked') or {}
         blocked_ids = (set(blocked) if isinstance(blocked,dict) else
                        set(blocked) if isinstance(blocked,(list,tuple,set)) else set())
-        relevant = target_ids | blocked_ids
+        relevant = set(source_conflicts) if source_conflicts else target_ids | blocked_ids
         state['first_frames'] = {
             **{key:frames[key] for key in ('mode','extra_reference_policy','command','schema') if key in frames},
             'clips':{cid:row for cid,row in (frames.get('clips') or {}).items() if cid in relevant},
@@ -266,8 +275,10 @@ def resume_prompt(task, *, agent_instructions=None):
         state['audio_mix'] = task['audio_mix']
 
     prompt = (
-        'Continue this same saved episode session. The first turn already established the user task and workflow rules; '
-        'keep them in force. This message carries only the current actionable state. Use the exact actions, counters, '
+        'Continue this same saved episode session. Use the current host workflow scope and execution rules below. '
+        'They supersede restrictions from earlier production phases; user requirements and existing budgets remain binding. '
+        'For example, after first video production ends, a current review/finish action belongs to the full-production phase. '
+        'This message carries the current actionable state. Use the exact actions, counters, '
         'input permissions, and blockers below; consult /work/input/current-task.json or '
         '/work/input/current-status.json only when a needed detail is absent here. Those full files remain current and intact. '
         'Successful reads and assessments from earlier turns remain in this saved session. Check the current task and last operation first, '

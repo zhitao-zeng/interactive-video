@@ -31,6 +31,16 @@ class EpisodeCompletion:
         if speech_errors := episode_native_speech_errors(self.ctx.episode_dir,report):
             return {'ok':False,'passed':False,'error':'native_speech_policy','required_action':'apply',
                     'clips':speech_errors,'message':'Correct task speech policy, per-line performance and actual native requests before finishing; retain existing takes and limits.'}
+        if (self.ctx.run_dir/'interactive-delivery.json').is_file():
+            selected={row['clip_id']:(row.get('selected')or{}).get('video') for row in report.get('clips',[])}
+            missing=[clip['clip_id'] for clip in plan.get('clips',[]) if clip.get('kind')=='video'
+                     and (not selected.get(clip['clip_id']) or not Path(selected[clip['clip_id']]).is_file())]
+            if missing:
+                from .readiness import first_frame_blocks
+                frames=first_frame_blocks(self.ctx,plan)
+                return {'ok':False,'passed':False,'error':'missing_video','clips':missing,
+                    'required_action':'first_frames' if frames else 'render','first_frame_blocks':frames,
+                    'message':'No complete movie exists yet. Resolve the current opening/video blockers using the original budgets before assembly or music mixing.'}
         unreviewed = self.evidence.unreviewed_clips(report, review)
         if unreviewed:
             return {'ok': False, 'error': 'missing_review', 'required_action': 'review',

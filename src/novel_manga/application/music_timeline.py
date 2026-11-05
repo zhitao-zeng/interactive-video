@@ -29,16 +29,28 @@ def resolve(directory,policy,timeline):
         spans[row['index']]={'start':min(old['start'],row['start'])if old else row['start'],
                              'end':max(old['end'],row['end'])if old else row['end']}
     if not spans:raise ValueError('Music needs an actual shot timeline before assembly')
-    def point(anchor):
+    episode_end=max(span['end']for span in spans.values())
+    # Interactive delivery appends a declared three-second choice card. There
+    # is no added music bus there; a source silence may include that silent tail.
+    interaction=read_json(directory/'interaction.json',{})
+    delivery_policy=read_json(directory/'delivery_policy.json',{})
+    silent_card=(interaction.get('seconds')==3 and not interaction.get('ambience_shot_index')
+                 and not delivery_policy.get('interaction_ambience'))
+    card_seconds=3 if silent_card else 0
+    def point(anchor,label,*,silence=False):
         if not isinstance(anchor,dict)or type(anchor.get('shot'))is not int or anchor.get('shot')not in spans:raise ValueError('music anchor requires a current shot')
         span=spans[anchor['shot']];edge=anchor.get('edge')
         if edge not in {'start','end'}:raise ValueError('music anchor edge must be start or end')
         value=span[edge]+_number(anchor.get('offset_seconds',0),'anchor offset')
-        if not span['start']-1e-6<=value<=span['end']+1e-6:raise ValueError('music anchor offset leaves its shot')
+        # An authored "shot end + 1.5s" is a point in the following shot.
+        # Keep that explicit offset while bounding it to the actual episode.
+        limit=episode_end+(card_seconds if silence else 0)
+        if not -1e-6<=value<=limit+1e-6:
+            raise ValueError(f'{label}: anchor {anchor} resolves to {value:g}s and leaves the episode range 0..{limit:g}s')
         return round(value,6)
     cues=[]
     for row in policy.get('cues',[]):
-        start,end=point(row['start']),point(row['end'])
+        start,end=point(row['start'],f'music cue {row["id"]}.start'),point(row['end'],f'music cue {row["id"]}.end')
         if end<=start:raise ValueError('music cue end must follow start')
         asset=row['asset'];path=Path(asset['path'])
         if asset.get('review',{}).get('status')!='accepted'or not path.is_file():raise ValueError('cue asset needs an accepted review and actual file')
@@ -57,9 +69,12 @@ def resolve(directory,policy,timeline):
     silences=[]
     # Source-authored listening gaps cannot be accidentally filled by a later cue edit.
     gaps=[*policy.get('silences',[]),*(script.get('music_plan')or{}).get('silences',[])]
-    for row in gaps:
-        start,end=point(row['start']),point(row['end'])
+    for number,row in enumerate(gaps,1):
+        label=f'music silence {row.get("id",number)}'
+        start,end=point(row['start'],label+'.start',silence=True),point(row['end'],label+'.end',silence=True)
         if end<=start:raise ValueError('music silence end must follow start')
+        start,end=min(start,episode_end),min(end,episode_end)
+        if end<=start:continue  # This gap is wholly in the already silent card.
         interval={'start':start,'end':end}
         if interval not in silences:silences.append(interval)
     return {'cues':cues,'silences':silences,'duration':max(s['end']for s in spans.values()),'timeline':timeline}
