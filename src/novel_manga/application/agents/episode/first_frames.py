@@ -10,9 +10,10 @@ from PIL import Image
 import shutil
 
 from novel_manga.util import atomic_write_json, read_json
-from novel_manga.media.first_frames import enabled, current_contract, source_asset_state, require_current, review_problems, interpret_review, unchanged_opening_scale, REVIEW_POLICY
+from novel_manga.media.first_frames import enabled, current_contract, matches_current_contract, source_asset_state, require_current, review_problems, source_conflicts, interpret_review, unchanged_opening_scale, REVIEW_POLICY
 from novel_manga.application.profiles import h3_stamp
 from .contracts import validate_existing_request
+from .opening_source import review_batch as review_opening_sources, remember as remember_opening_sources, current_review as current_opening_review
 from .tool_inputs import input_file
 
 MAX_CANDIDATES=3
@@ -35,15 +36,26 @@ def source_opening(ctx,clip):
     return copy.deepcopy(shot.get('opening_frame'))
 
 
-def authored_row(ctx,clip,row):
+def authored_row(ctx,clip,row,*,field_errors=None):
     """The creator owns the opening prompt; production binds cards and executes it."""
     row=copy.deepcopy(row);opening=source_opening(ctx,clip)
+    row.setdefault('extra_references',[])
+    if isinstance(row['extra_references'],list) and all(isinstance(p,str)for p in row['extra_references']):
+        from novel_manga.media.reference_views import canonical_paths
+        row['extra_references']=canonical_paths(ctx,row['extra_references'])
+    if isinstance(row.get('image_references'),list) and all(isinstance(p,str)for p in row['image_references']):
+        from novel_manga.media.reference_views import opening_references
+        row['image_references']=[ref['path'] for ref in opening_references(ctx,clip,row['image_references'])]
     if opening is None:return row # retained historical input has no authored prompt
     from novel_manga.story.fields import opening_frame_error
-    if issue:=opening_frame_error(opening):raise ValueError(issue)
+    if issue:=opening_frame_error(opening):
+        if field_errors is None:raise ValueError(issue)
+        field_errors['opening_frame']=issue
+        return row
     for field in ('image_prompt','visible_characters'):
         if field in row and row[field]!=opening[field]:
-            raise ValueError(
+            error=(
+                f'{field} differs from the approved source opening_frame. '
                 'Edit source opening_frame through input repair before changing its production prompt or visible people. '
                 f"For {clip['clip_id']}, write output/repair.json with decisions:[{{action:'input',clip_id:'{clip['clip_id']}',"
                 "reason:'specific observed defect',source_quote:'verbatim source for this clip',"
@@ -51,6 +63,10 @@ def authored_row(ctx,clip,row):
                 'Call check then apply. After the source repair is adopted, omit image_prompt and visible_characters '
                 'from the first_frames row to inherit that source. Reference-selection-only corrections may change '
                 'image_references directly; inspect opening_frame.reference_subjects when choosing cards.')
+            if field_errors is None:raise ValueError(error)
+            field_errors[field]=error
+        # The approved value permits other independent argument checks. Any
+        # recorded conflict still rejects the entire batch before generation.
         row[field]=copy.deepcopy(opening[field])
     return row
 
@@ -117,6 +133,14 @@ def check(ctx,path,row,contract):
     review_contract=copy.deepcopy(contract)
     if 'style'in review_contract:review_contract['style']=opening_appearance(review_contract['style'])
     instructions=('检查新生成的单一镜头首帧与原始素材及本镜开场状态。第一张是首帧，后面是原素材卡。'
+        '本次只审时间零点t=0：以下JSON的opening.opening是源镜头，start_state及opening_frame描述开场。'
+        'camera可能是一整镜的运动说明；只将其初始机位、景别、视线与明确持续的空间约束用于首帧，保留这些要求。'
+        '其中trigger之后的动作、actor_path箭头右侧、endpoint/终点和hold描述后续过程或末态，不是首帧必须完成的动作。'
+        '画面符合start_state时，不得仅因尚未完成camera中的后续动作判contradiction；'
+        '若开场文字自身明确互相矛盾，应引用实际冲突原句说明源输入问题，不猜选末态来要求重画。'
+        'reference_images逐项标明本次实际附件图号；identity_portrait只约束脸和头发，'
+        'wardrobe_design只约束可见服装、体态和配饰，不用衣装卡中的脸覆盖身份肖像。'
+        '衣装卡的姿势、持物和背包佩戴状态仍以本镜opening当前状态为准。'
         '逐张描述实际可见内容后判断；报告明确可见的身份/服饰/空间或开场机位、持物、可见人物矛盾。'
         '若opening.style给出所选画风，核对其明确的媒介、材质、色光与构图规则；'
         '原素材卡的拍摄媒介不覆盖所选画风。没有画风约定时不增加审美要求，轻微色差不自动失败。'
@@ -126,15 +150,35 @@ def check(ctx,path,row,contract):
         'POV不要求主角露脸；不要把后续动作或新人物提前放进开场。未展示的道具/身体部分不等于缺失。'
         '即使visible_characters为空，入画的腿、鞋、袖口等可见部位仍须与对应人物事实比较；不得要求画外部位出现。'
         '每条findings返回实际可见事实observed、对照要求expected及basis（本次contract字段路径或原素材图号），给出reason和relation。'
+        '同时返回origin：只有源字段彼此矛盾、即任何图片都无法同时满足时才标source；'
+        'source的basis须引用至少两个实际冲突的源字段路径，observed和expected分别引用其原句，说明为何不能同时成立。'
+        '源要求一致而实际图片不符合要求时标image；不要把图片画错标成source，也不要把源内部冲突转成重画要求。'
+        'basis只能引用本次JSON中实际存在的字段路径；camera字符串中的endpoint、actor_path等标签不是独立JSON字段。'
+        '引用camera时，expected须标出作为开场要求的原句，不能把后续终点改称开场终点。'
         'contradiction表示实际可见属性与明确当前依据不能同时成立；未展示、看不清或依据未指定是underspecified；可同时成立是compatible。'
         '只返回observations及findings，不另给自由通过结论或问题清单；程序只从明确contradiction生成通过结论和问题。无冲突可返回空findings。'
-        '不替首帧脑补正确事实，不把审美偏好当成失败。\n'+json.dumps({'opening':review_contract,'visible_characters':row['visible_characters'],'image_prompt':row['image_prompt']},ensure_ascii=False))
+        '不替首帧脑补正确事实，不把审美偏好当成失败。\n')
+    if 'image_references' in contract and list(contract['image_references'])!=row['image_references']:
+        raise ValueError('image review must receive the exact current ordered reference images')
+    from novel_manga.media.reference_views import scope_of
+    bindings={r['path']:dict(r) for r in contract.get('source_references',[]) if r.get('path')}
+    for ref in contract.get('reference_views',[]):bindings[ref['path']]={**bindings.get(ref['path'],{}),**ref}
+    supplied=[]
+    for reference_path in row['image_references']:
+        ref={**bindings.get(reference_path,{}),'path':reference_path}
+        if scope:=scope_of(ctx.novel_dir,ref):ref['reference_scope']=scope
+        supplied.append(ref)
+    instructions+=json.dumps({'opening':review_contract,'visible_characters':row['visible_characters'],
+        'image_prompt':row['image_prompt'],'reference_images':[
+            {'image_number':index+2,**{k:ref[k] for k in ('path','name','role','reference_scope') if k in ref}}
+            for index,ref in enumerate(supplied)]},ensure_ascii=False)
     raw=ask_json([{'type':'text','text':instructions},image_part(path,1280),
         *(image_part(ctx.novel_dir/p,1024) for p in row['image_references'])],
         obj({'observations':{'type':'array','items':{'type':'string'}},
              'findings':{'type':'array','items':obj({
                  'observed':{'type':'string'},'expected':{'type':'string'},
                  'basis':{'type':'array','minItems':1,'items':{'type':'string'}},
+                 'origin':{'type':'string','enum':['source','image']},
                  'relation':{'type':'string','enum':['contradiction','underspecified','compatible']},
                  'reason':{'type':'string'}})}}),
         name='episode_first_frame',max_tokens=1800,timeout=240,settings=judge_settings())
@@ -199,12 +243,58 @@ def status(ctx,plan):
                 row=rows[clip['clip_id']]
                 row['last_rejection']={'candidate':latest.name,'error':rejected.get('error'),
                     'problems':review_problems(rejected.get('review')or{}),'evidence':rejected.get('evidence')}
+                if conflicts:=source_conflicts(rejected.get('review')or{}):
+                    row['last_rejection']['source_conflicts']=conflicts
                 if issue is not None:
                     row['next_action']=(
                         'Inspect the rejected image and review evidence. Correct the relevant source opening_frame through input repair '
                         'or correct the registered reference selection, then call first_frames. '
+                        'After restoring missing original reference evidence, reuse_candidate can review an existing image against it without another generation. '
                         'If the source inputs are already correct and a visible pixel defect remains, request one bounded retake with '
                         "retake_candidate:{candidate:'candidate_NN',reason:'specific visible pixel defect'}; this uses one remaining image candidate.")
+            from novel_manga.media.reference_views import opening_references
+            saved_input=read_json(latest/'input.json',{})
+            original_paths=saved_input.get('image_references') or []
+            restored=[r['path'] for r in opening_references(ctx,clip,original_paths)
+                      if r.get('reference_scope')=='wardrobe_design' and r['path'] not in original_paths]
+            last_input=read_json(reviews[-1],{}).get('input',{}) if reviews else {}
+            reviewed_paths=(last_input.get('source_contract') or {}).get('image_references',[])
+            if issue is not None and reviews and last_input.get('policy')!=REVIEW_POLICY:
+                rows[clip['clip_id']]['review_policy_changed']={'previous':last_input.get('policy'),'current':REVIEW_POLICY}
+                rows[clip['clip_id']]['next_action']=(
+                    f"Opening review instructions changed. Use reuse_candidate:{latest.name!r} "
+                    'without retake_candidate to review this retained image before any new generation. '
+                    'Start with a single-row frames request and inspect its result before re-reviewing other images. '
+                    'Keep source text, original requests and image counts. A new review can still reject a real visible defect.')
+            if restored and not set(restored)<=set(reviewed_paths):
+                rows[clip['clip_id']]['restored_original_reference_views']=restored
+                rows[clip['clip_id']]['next_action']=(
+                    f"Original supplied wardrobe evidence is now available. Use reuse_candidate:{latest.name!r} "
+                    'without retake_candidate to review the retained image with these references first. '
+                    'The host binds the required views; original requests and image counts are retained. This grants no new generation.')
+            if issue is not None and reviews and last_input.get('policy')==REVIEW_POLICY and source_conflicts(review):
+                if matches_current_contract(ctx,clip,last_input.get('source_contract') or {}):
+                    rows[clip['clip_id']]['repair_origin']='source'
+                    rows[clip['clip_id']]['next_action']=(
+                        'The reviewed source fields conflict with each other. Use normal input repair (check then apply), not retake. '
+                        'Resolve the cited source requirements through the production Agent, then reuse_candidate to recheck the retained image. '
+                        'No new image can resolve contradictory source requirements.')
+                else:
+                    rows[clip['clip_id']]['next_action']=(
+                        f"The source changed since this rejection. Use reuse_candidate:{latest.name!r} to review the retained image "
+                        'against the adopted source before another input revision or image generation.')
+        opening=current_contract(ctx,clip,[])['opening']
+        preflight=current_opening_review(ctx,clip['clip_id'],opening)
+        if conflicts:=source_conflicts(preflight or {}):
+            rows[clip['clip_id']]['repair_origin']='source'
+            rows[clip['clip_id']]['last_rejection']={
+                'candidate':'source-preflight','error':'opening source fields conflict',
+                'problems':review_problems(preflight),'source_conflicts':conflicts,
+                'evidence':f"input/first_frames/{clip['clip_id']}/source-preflight.json"}
+            rows[clip['clip_id']]['next_action']=(
+                'The opening source fields conflict before image generation. Use normal input repair (check then apply), not retake. '
+                'Correct every cited source field through the production Agent, then call first_frames again. '
+                'No new image can resolve contradictory source requirements.')
     return {'mode':'first-frame','extra_reference_policy':'needed','clips':rows,
             'command':'python3 /work/tools/episode.py first_frames output/first-frames.json',
             'schema':{'render_ready':False,'frames':[{'clip_id':'current clip id','image_prompt':'single opening image prompt',
@@ -215,7 +305,7 @@ def status(ctx,plan):
                 'extra_references':['original clip image paths only for uncovered new content'],
                 'h3':{'shots':['English shot body with source <DIALOGUE_n> slots'],'soundscape':'English environment sound'},
                 'prompt_h3':'optional complete six-section alternative; actual Picture numbering; preserve Subject/Audio ids and dialogue',
-                'source_quote':'verbatim current source evidence'}]}}
+                'source_quote':'optional; omit to bind the exact current clip source text'}]}}
 
 
 class FirstFrameOperations:
@@ -241,34 +331,78 @@ class FirstFrameOperations:
         if isinstance(catalog,dict):catalog=catalog.get('assets',[])
         registered={r['path'] for r in catalog if r.get('role') in {'character','location','prop'} and r.get('path')}
         segments={r['segment_id']:r['text'] for r in read_json(ctx.episode_dir/'segments.json',[])}
-        prepared=[];seen=set()
+        prepared=[];seen=set();argument_errors={};invalid_fields={}
         for row in rows:
             if not isinstance(row,dict) or row.get('clip_id') not in clips or row['clip_id'] in seen:
                 raise ValueError('frames must select distinct current clips')
-            row=authored_row(ctx,clips[row['clip_id']],row)
             cid=row['clip_id'];seen.add(cid);clip=clips[cid]
+            errors={};invalid_types=set()
+            row=authored_row(ctx,clip,row,field_errors=errors)
+            for field in ('image_references','extra_references'):
+                if isinstance(row.get(field),list) and all(isinstance(path,str) for path in row[field]):
+                    row[field]=list(dict.fromkeys(row[field]))
+            source='\n'.join(segments.get(s,'') for s in clip.get('segment_ids',[]))
+            if row.get('source_quote') in (None, ''):
+                row['source_quote']=source
             for field in ('image_prompt','source_quote'):
-                if not isinstance(row.get(field),str) or not row[field].strip():raise ValueError(f'{cid}: {field} requires text')
+                if not isinstance(row.get(field),str) or not row[field].strip():
+                    errors.setdefault(field,f'{field} requires text');invalid_types.add(field)
             for field in ('image_references','extra_references','visible_characters'):
                 if not isinstance(row.get(field),list) or any(not isinstance(p,str) for p in row[field]) or len(set(row[field]))!=len(row[field]):
-                    raise ValueError(f'{cid}: {field} requires distinct strings')
-            if not row['image_references'] or not set(row['image_references'])<=registered:
-                raise ValueError(f'{cid}: image_references must use registered source cards, never old video/frames')
+                    errors.setdefault(field,f'{field} requires distinct strings');invalid_types.add(field)
             original={r['path'] for r in clip.get('references',[]) if r.get('role') in {'character','location','prop'}}
-            if not set(row['extra_references'])<=original:
-                raise ValueError(f'{cid}: extra_references must select current source image paths')
-            source='\n'.join(segments.get(s,'') for s in clip.get('segment_ids',[]))
-            if row['source_quote'] not in source:raise ValueError(f'{cid}: source_quote must quote this clip source verbatim')
+            if 'image_references' not in invalid_types and (not row['image_references'] or not set(row['image_references'])<=registered):
+                errors['image_references']=f'image_references must use registered source cards; current clip paths: {sorted(original & registered)}'
+            extras_valid='extra_references' not in invalid_types and set(row['extra_references'])<=original
+            if 'extra_references' not in invalid_types and not extras_valid:
+                errors['extra_references']=f'extra_references must select current source image paths: {sorted(original)}'
+            if 'source_quote' not in invalid_types and row['source_quote'] not in source:
+                errors['source_quote']=('source_quote must quote this clip source verbatim, not a summary. '
+                    f'Read segments.json for segment_ids={clip.get("segment_ids",[])}. '
+                    f'Current scoped source text: {source}')
+            from .requests import compose_request
+            if extras_valid and 'visible_characters' not in invalid_types:
+                draft_frame={'path':'pending.png','extra_references':row['extra_references'],'visible_characters':row['visible_characters']}
+                request_field='prompt_h3' if isinstance(row.get('prompt_h3'),str) and row['prompt_h3'].strip() else 'h3'
+                try:
+                    if request_field=='h3':
+                        if row.get('h3') is None and isinstance(clip.get('prompt_h3'),str) and clip['prompt_h3'].strip():
+                            row['prompt_h3']=clip['prompt_h3']
+                        else:
+                            row['prompt_h3']=compose_request({**clip,'first_frame':draft_frame},row.get('h3'))
+                    validate_existing_request({**clip,'first_frame':draft_frame},row['prompt_h3'])
+                except ValueError as error:errors[request_field]=str(error)
+            if errors:
+                argument_errors[cid]=list(errors.values());invalid_fields[cid]=sorted(errors);continue
             contract=current_contract(ctx,clip,row['image_references'],include_style=True)
             bindings={r['path']:r for r in catalog if r.get('path')}
-            bindings.update({r['path']:r for r in clip.get('references',[]) if r.get('path')})
+            bindings.update({r['path']:{**bindings.get(r['path'],{}),**r} for r in clip.get('references',[]) if r.get('path')})
+            from novel_manga.media.reference_views import opening_references
+            bindings.update({r['path']:r for r in opening_references(ctx,clip,row['image_references'])})
             row['request_prompt']=request_prompt(ctx,row,contract,references=bindings.values())
-            draft_frame={'path':'pending.png','extra_references':row['extra_references'],'visible_characters':row['visible_characters']}
-            from .requests import compose_request
-            if not isinstance(row.get('prompt_h3'),str) or not row['prompt_h3'].strip():
-                row['prompt_h3']=compose_request({**clip,'first_frame':draft_frame},row.get('h3'))
-            validate_existing_request({**clip,'first_frame':draft_frame},row['prompt_h3'])
             prepared.append((row,contract,source_asset_state(ctx,row['image_references'])))
+        if argument_errors:
+            self.partial_outcome={'argument_errors':argument_errors,'validation_targets':sorted(seen),
+                                  'invalid_fields':invalid_fields,
+                                  'validated_clips':[row['clip_id'] for row,_,_ in prepared],
+                                  'validation_scope':'request_arguments_only; no images generated or accepted'}
+            raise ValueError('Correct these first_frames fields before image generation: '+json.dumps(argument_errors,ensure_ascii=False))
+        source_reviews=review_opening_sources(ctx,prepared)
+        remember_opening_sources(ctx,prepared,source_reviews)
+        conflicts={cid:source_conflicts(review) for cid,review in source_reviews.items() if source_conflicts(review)}
+        if conflicts:
+            rejected={}
+            for cid,findings in conflicts.items():
+                evidence=ctx.work_dir/'input/first_frames'/cid/'source-preflight.json'
+                atomic_write_json(evidence,source_reviews[cid])
+                rejected[cid]={'ok':False,'error':'opening source fields conflict',
+                    'repair_origin':'source','problems':review_problems(source_reviews[cid]),
+                    'source_conflicts':findings,'evidence':str(evidence.relative_to(ctx.work_dir))}
+            outcome={'ok':False,'error':'opening_source_conflict','source_input_conflicts':conflicts,
+                     'clips':rejected,'first_frames':status(ctx,plan)}
+            self.partial_outcome=outcome
+            atomic_write_json(ctx.work_dir/'input/latest-first-frames.json',outcome)
+            return outcome
         results={};changed=[];reviewed_candidates=[]
         self.partial_outcome={'changed':changed,'reviewed_candidates':reviewed_candidates,'clips':results}
         def reserve(row,contract,assets):
@@ -292,8 +426,14 @@ class FirstFrameOperations:
                         or not (parent/'rejected.json').is_file()):
                     raise ValueError(f'{cid}: retake_candidate must name this clip\'s rejected candidate with an image')
                 reviewed=current_review(parent,row,contract,assets)
-                if reviewed is None or (reviewed.get('consistent') is True and not review_problems(reviewed)):
+                if reviewed is None:
+                    raise ValueError(f'{cid}: current source/reference evidence differs from the saved review; '
+                        f'use reuse_candidate:{parent.name!r} without retake_candidate to review the existing image first, with no new image generation')
+                if reviewed.get('consistent') is True and not review_problems(reviewed):
                     raise ValueError(f'{cid}: retake_candidate must name a candidate rejected by image review')
+                if source_conflicts(reviewed):
+                    raise ValueError(f'{cid}: source input fields conflict; use normal input repair (check then apply), '
+                        'then reuse_candidate to review the retained image. A retake cannot repair the source input.')
                 decision_path=parent/'retake-decision.json'
                 decision=read_json(decision_path,{})
                 if decision:
@@ -383,7 +523,10 @@ class FirstFrameOperations:
             shutil.copy2(record,export/'review-record.json')
             if review.get('consistent') is not True or review_problems(review):
                 rejected={'error':'first-frame image review rejected','review':review,
-                          'problems':review_problems(review),'evidence':str(export.relative_to(ctx.work_dir))}
+                          'problems':review_problems(review),'evidence':str(export.relative_to(ctx.work_dir)),
+                          'repair_origin':'source' if source_conflicts(review) else 'image'}
+                if rejected['repair_origin']=='source':
+                    rejected['next_action']='Use normal input repair (check then apply), not retake; then reuse_candidate to review the retained image.'
                 if not (candidate/'rejected.json').exists():atomic_write_json(candidate/'rejected.json',rejected)
                 # A newly rejected alternative does not revoke a different selection.
                 # Rechecking the currently selected pixels does revoke their old pass.
@@ -410,11 +553,15 @@ class FirstFrameOperations:
         # Only this caller allocates candidates, adopts plans and invokes callbacks.
         # Keep a rolling window so a failed service does not allocate or start the
         # rest of the batch. Already started work still settles and is adopted.
-        pending={};next_row=0;first_error=None
+        from .lifecycle import paused
+        pending={};next_row=0;first_error=None;dispatch_paused=False
         with ThreadPoolExecutor(max_workers=min(workers,len(prepared))) as pool:
             while True:
-                while (first_error is None and next_row<len(prepared) and len(pending)<workers
+                while (first_error is None and not dispatch_paused and next_row<len(prepared) and len(pending)<workers
                        and not any(future.done() for future in pending)):
+                    if paused():
+                        dispatch_paused=True
+                        break
                     row,contract,assets=prepared[next_row];next_row+=1
                     try:
                         task=reserve(row,contract,assets)
@@ -436,8 +583,11 @@ class FirstFrameOperations:
         reviewed_candidates.sort(key=lambda name:order[name.split('/')[0]])
         ordered={cid:results[cid] for cid in order if cid in results}
         results.clear();results.update(ordered)
+        if dispatch_paused:
+            self.partial_outcome.update(paused=True,pending_clips=[row['clip_id'] for row,_,_ in prepared[next_row:]])
         atomic_write_json(ctx.work_dir/'input/clip_plan.json',plan)
         if first_error is not None:raise first_error
-        outcome={'ok':all(r.get('ok') for r in results.values()),'changed':changed,'reviewed_candidates':reviewed_candidates,'clips':results,'first_frames':status(ctx,plan)}
+        outcome={'ok':not dispatch_paused and len(results)==len(prepared) and all(r.get('ok') for r in results.values()),
+                 **self.partial_outcome,'first_frames':status(ctx,plan)}
         atomic_write_json(ctx.work_dir/'input/latest-first-frames.json',outcome)
         return outcome

@@ -21,10 +21,36 @@ class PreparedInput:
     reused_locations: dict
 
 
+def validate_visible_types(shots, addresses, bible, new_characters=()):
+    """Report known set/prop names before they reach the portrait compiler."""
+    people = {c['name'] for c in bible.get('characters', [])} | set(new_characters)
+    locations = {text.partition('：')[0] for text in bible.get('locations', [])}
+    props = {p['name'] for p in bible.get('props', [])}
+    problems = []
+    for index in sorted(addresses):
+        shot = shots[index]
+        for name in shot.get('in_frame', []):
+            if name in people:
+                continue
+            kind = ('scene_objects' if name in (shot.get('scene_objects') or []) else
+                    'props' if name in props or name in (shot.get('props') or []) else
+                    'location' if name in locations or name == shot.get('location') else None)
+            if kind:
+                problems.append(f'shot {index}.in_frame: {name} is a known {kind}, not a Character; '
+                                f'keep it in {kind} and describe its visibility in the scene')
+    if problems:
+        raise RepairArgumentError('; '.join(problems))
+
+
 def prepare_candidate(ctx, row, plan, script, target, addresses, scope, matching):
     directory, cid = ctx.episode_dir, row['clip_id']
     raw_phases = row.get('phases') or {}
     candidate_script = copy.deepcopy(script)
+    if 'music_plan' in row:
+        from novel_manga.story.timing import music_plan_issues
+        if issues:=music_plan_issues(row['music_plan'],candidate_script['shots']):
+            raise RepairArgumentError('; '.join(issues))
+        candidate_script['music_plan']=copy.deepcopy(row['music_plan'])
     shots = {s.get('index', i): s for i, s in enumerate(candidate_script['shots'], 1)}
     card_names = {c['name'] for c in read_json(ctx.novel_dir/'story_bible.json')['characters']}
     card_names.update(row.get('characters') or {})
@@ -64,6 +90,8 @@ def prepare_candidate(ctx, row, plan, script, target, addresses, scope, matching
         if missing := shared-set(scope):
             raise RepairArgumentError('source shot edits also affect clips '+', '.join(sorted(missing))+
                 '; include the required shared-shot clips in clip_ids and preserve their existing cuts')
+    validate_visible_types(shots, addresses, read_json(ctx.novel_dir/'story_bible.json'),
+                           row.get('characters') or {})
     phases = copy.deepcopy(raw_phases.get('characters', {}))
     locations = copy.deepcopy(row.get('locations') or {})
     registered_locations = read_json(ctx.novel_dir/'series_assets/phases.json',{}).get('locations',{})
