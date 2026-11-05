@@ -28,10 +28,19 @@ temporary objects. Actions may target these, the actor themselves or an empty
 target when no recipient is established. Preserve these meanings rather than
 turning an animal, armor or environment object into an available human actor.
 
+For authored scene/shot design, read [camera language](camera-language.md) before
+choosing coverage. Ground each shot's camera in its story purpose, visible
+information and actual scene geometry. Carry that decision into the shot itself;
+a technique label or a general promise in author notes is not its implementation.
+
 ## Actual pictures, wearing and framing
 
 Inspect the actual selected images. Ordinary character cards supply identity and
 stable design; the authored shot supplies pose, camera, crop and current state.
+For a director name or stylized camera request, use
+[director camera styles](director-camera-styles.md) to choose a motivated design
+and write its visible path or focus relationship, ending composition and stop.
+A named style is optional and does not authorize changing protected script decisions.
 Multiple views of the same person define one Subject: explain which picture
 supplies face/hair and which supplies body proportions, clothing or another view.
 Picture count and Subject count are not body counts.
