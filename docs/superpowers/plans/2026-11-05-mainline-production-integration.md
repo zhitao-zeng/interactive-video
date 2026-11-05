@@ -38,3 +38,6 @@
 - Final independent review: one Important defect in the newly merged batch task precheck; no Critical. All five Review Focus areas passed independent inspection.
 - Final fix: test_batch_second_episode_task_and_task_file_conflict_has_no_side_effects observed RED (did not raise; init/run side effects), then GREEN after rejecting the two non-null options in the existing final manifest-precheck loop. No separate validator or new workflow. Final affected-suite run is recorded in media/runs/mainline-integration-validation-20261105/affected-regressions.xml.
 - Full frozen SDK comparison: src/scripts/configs/skills have no unported running changes; the only differences from the initial frozen SDK are the integrated Pi template/starter improvements.
+
+- Final affected Python suite: {'tests': 159, 'errors': 0, 'failures': 0, 'skipped': 0}; native Bun unit and timeout-wiring tests passed. The one Important review finding is fixed by RED→GREEN and this green suite; no deferred Important/Critical or Minor findings.
+- GitHub visibility confirmed public with default main. Integration is ready for fast-forward and remote verification; final receipt lives in media/runs/mainline-integration-validation-20261105/integration-result.json. Existing Gen8 PID2047397 remains the production owner; no migration/restart requested or performed.
