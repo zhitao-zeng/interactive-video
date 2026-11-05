@@ -1026,6 +1026,24 @@ def test_batch_invalid_second_episode_prevents_all_init_and_run(tmp_path, monkey
     assert not (manifest.parent / 'batch-state.json').exists()
 
 
+def test_batch_second_episode_task_and_task_file_conflict_has_no_side_effects(tmp_path, monkeypatch):
+    calls = []
+    monkeypatch.setattr(starter, 'initialize', lambda *a, **k: calls.append('init'))
+    monkeypatch.setattr(starter, 'run', lambda *a, **k: calls.append('run') or 0)
+    task_file = tmp_path / 'task.md'
+    task_file.write_text(AUTHORISED_TASK)
+    manifest = tmp_path / 'batch.json'
+    manifest.write_text(json.dumps({'sdk_root': str(SDK), 'dependencies': DEPS,
+        'episodes': [{'workspace': str(tmp_path / 'a'), 'task': AUTHORISED_TASK},
+                     {'workspace': str(tmp_path / 'b'), 'task': AUTHORISED_TASK,
+                      'task_file': str(task_file)}]}))
+    with pytest.raises(ValueError, match='task or task_file, not both'):
+        starter.run_batch(manifest)
+    assert calls == []
+    assert not (tmp_path / 'batch-state.json').exists()
+    assert not (tmp_path / 'a').exists() and not (tmp_path / 'b').exists()
+
+
 def test_batch_run_exception_does_not_block_other_episode(tmp_path, monkeypatch):
     barrier = threading.Barrier(2)
 

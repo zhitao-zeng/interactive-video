@@ -703,6 +703,8 @@ def run_batch(manifest):
         if v['resume']:
             continue
         item, idx = v['item'], v['index']
+        if item.get('task') is not None and item.get('task_file') is not None:
+            raise ValueError(f'episode {idx} give task or task_file, not both')
         task_text = item.get('task')
         if task_text is None and item.get('task_file'):
             task_text = Path(item['task_file']).read_text(encoding='utf-8')

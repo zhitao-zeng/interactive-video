@@ -48,7 +48,7 @@
       "path": "starter.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/starter.py",
       "source_sha256": "8b057e04ed564a8297b7368b5cb10b25bd9e60ac2b2ecf1466146ea65e3efc17",
-      "merged_sha256": "0ae1401c0afc620ec4c50881e034e7d7e4cf93e31f4a4a4d2920130d110d1939"
+      "merged_sha256": "7a2cdba2d01194044c50315bdd103a6de3864cb4fed6fb7246f6ec7b48dc648c"
     },
     {
       "path": "template/CAPABILITIES.md",
