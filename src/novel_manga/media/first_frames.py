@@ -6,7 +6,7 @@ from pathlib import Path
 from novel_manga.util import read_json
 
 OPENING_FIELDS=('start_state','camera','light','in_frame','props','wears','location','scene_objects','opening_frame','device_state','shot_scale')
-REVIEW_POLICY='first-frame-explicit-relations-v3-appearance-scope'
+REVIEW_POLICY='first-frame-explicit-relations-v5-source-origin'
 
 
 def compose_opening_image_prompt(authored,style,image_references,references=(),*,opening=None):
@@ -18,8 +18,9 @@ def compose_opening_image_prompt(authored,style,image_references,references=(),*
         ref=by_path.get(str(path),{});role=ref.get('role','reference')
         name=ref.get('name')or Path(path).stem
         if role=='character':
-            scope=('face and hair only'if ref.get('reference_scope')=='identity_portrait'
-                   else 'character identity and design')
+            scope=('face and hair only'if ref.get('reference_scope') in ('identity_portrait','identity-baseline')
+                   else 'clothing and body proportions only; face and hair come from the identity portrait'
+                   if ref.get('reference_scope') in ('wardrobe_design','wardrobe-visual-card') else 'character identity and design')
             instruction=f'{scope}; use the authored clothing and current equipment state, not the card pose or background'
         elif role=='location':
             instruction='space, architecture and materials; current time, camera and prop state follow the authored opening'
@@ -102,7 +103,13 @@ def current_contract(ctx, clip, image_references, *, include_style=False, shots=
         script=read_json(Path(directory)/'chapter_script.json',{}) if directory else {}
         indexes=clip.get('shot_indexes',[])
         shots=[s for s in script.get('shots',[]) if s.get('index') in indexes]or None
+    from .reference_views import opening_references
+    refs=opening_references(ctx,clip,image_references)
+    image_references=[r['path'] for r in refs]
     contract=opening_contract(clip,image_references,shots=shots)
+    scoped=[{k:r[k] for k in ('path','role','name','reference_scope') if k in r}
+            for r in refs if r.get('reference_scope') in ('identity_portrait','wardrobe_design')]
+    if scoped:contract['reference_views']=scoped
     contract['character_facts']=character_facts(ctx,clip,contract)
     if include_style:
         from novel_manga.style_packs import frame_style
@@ -131,6 +138,11 @@ def review_problems(review):
             reason=finding.get('reason') or f"{finding.get('observed','')} / {finding.get('expected','')}"
             if reason not in problems:problems.append(reason)
     return problems
+
+
+def source_conflicts(review):
+    return [finding for finding in review.get('findings',[])
+            if finding.get('relation')=='contradiction' and finding.get('origin')=='source']
 
 
 def interpret_review(review):

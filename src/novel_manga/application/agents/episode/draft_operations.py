@@ -107,6 +107,12 @@ class DraftOperations:
                     action = row.get('action')
                     if row.get('review_file') is not None and action != 'keep':
                         raise RepairArgumentError('review_file is supported only for a current-take keep decision')
+                    if row.get('input_clip_id') is not None:
+                        if len(draft['decisions']) != 1:
+                            raise RepairArgumentError('submit one same-source request correction separately')
+                        from .input_request_recovery import edit
+                        edit(self.ctx, row, check_only=True)
+                        continue
                     if action in {'repair_assets','repack'}:
                         if len(draft['decisions'])!=1:raise RepairArgumentError('submit one upstream operation separately')
                         if action=='repair_assets':

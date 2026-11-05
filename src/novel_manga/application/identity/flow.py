@@ -89,7 +89,8 @@ def reconcile_repeated_actors(directory, answer, segments, *, force=False):
     return {**answer, 'actors': result}
 
 
-def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData | None = None):
+def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData | None = None, settings=None):
+    options = {'settings': settings} if settings is not None else {}
     # Read source first; legacy dictionaries never enter this semantic call.
     from novel_manga.llm.client import ask_json
     directory = Path(directory).resolve()
@@ -125,7 +126,7 @@ def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData |
         answer = {'actors': saved['source_actors'], 'actorless_confirmed': saved.get('actorless_confirmed', False)}
     else:
         answer = ask_json([{'type': 'text', 'text': prompt}], source_schema(len(segments)),
-                          name='chapter_identity_source', max_tokens=4096, timeout=240)
+                          name='chapter_identity_source', max_tokens=4096, timeout=240, **options)
     raw_path = directory / 'identity_source_reading.json'
     atomic_write_json(raw_path, {'policy': POLICY, 'inputs': expected, 'answer': answer})
     if answer.get('source_readable') is False:
@@ -136,12 +137,12 @@ def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData |
             '只有字符顺序严重打乱、无法理解连续事件才填false。\n'
             + json.dumps(segments, ensure_ascii=False)}],
             obj({'source_readable': {'type':'boolean'}, 'source_problem': {'type':'string','maxLength':200}}),
-            name='source_readability_confirmation', max_tokens=500, timeout=120)
+            name='source_readability_confirmation', max_tokens=500, timeout=120, **options)
         atomic_write_json(directory / 'source_readability_confirmation.json', confirmation)
         if not confirmation['source_readable']:
             raise UnreadableSource(confirmation.get('source_problem') or 'source text is unreadable')
         answer = ask_json([{'type':'text','text':prompt + '\n原文可读性已独立复核通过；按连续事件识别主体，不要把断行或旧名残留报成字序损坏。'}],
-                          source_schema(len(segments)), name='chapter_identity_readable_source', max_tokens=4096, timeout=240)
+                          source_schema(len(segments)), name='chapter_identity_readable_source', max_tokens=4096, timeout=240, **options)
         atomic_write_json(raw_path, {'policy': POLICY, 'inputs': expected, 'answer': answer})
         if answer.get('source_readable') is False:
             raise ValueError('identity extraction failed after source readability was confirmed')
@@ -153,7 +154,7 @@ def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData |
             '逐段检查动作发起者、对话双方和提及对象；只要有人物或动物参与，就重新完整抽取actors。'
             '只有全文确实没有任何主体（例如纯景物描写），才允许actors为空并填actorless_confirmed=true。'
             '断行、人名残留或无法完成抽取不能作为无人章节；此时填false。'}], schema,
-            name='chapter_identity_empty_confirmation', max_tokens=4096, timeout=240)
+            name='chapter_identity_empty_confirmation', max_tokens=4096, timeout=240, **options)
         atomic_write_json(directory / 'identity_empty_confirmation.json', {'policy': POLICY, 'inputs': expected, 'answer': answer})
         if answer.get('source_readable') is False or (not answer.get('actors') and not answer.get('actorless_confirmed')):
             raise ValueError('identity extraction returned no actors without confirming an actorless chapter')
@@ -161,7 +162,7 @@ def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData |
     if unresolved:
         correction = ask_json([{'type': 'text', 'text': prompt + '\n只修正下列主体的forms与原文编号；保留source_id，不输出其他主体。'
             '每个主体必须至少有一个原文实际存在的指称，不能补出原文没有的代词。\n' + json.dumps(unresolved, ensure_ascii=False)}],
-            source_schema(len(segments)), name='chapter_identity_evidence', max_tokens=2500, timeout=180)
+            source_schema(len(segments)), name='chapter_identity_evidence', max_tokens=2500, timeout=180, **options)
         fixed, dropped, pending = clean_reading(correction, segments)
         wanted = {r['source_id'] for r in unresolved}
         restored = [r for r in fixed['actors'] if r['source_id'] in wanted]
@@ -183,7 +184,8 @@ def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData |
     aliases = reading_aliases(directory.parent, chapter)
     mapped = map_source_reading(cleaned, catalog, segments, aliases)
     corrected, review = semantic_review.bindings(directory, cleaned, catalog, segments, mapped,
-                                                cached=None if force else saved.get('semantic_review'), aliases=aliases)
+                                                cached=None if force else saved.get('semantic_review'), aliases=aliases,
+                                                settings=settings)
     cleaned = {**cleaned, 'actors': corrected['actors']}
     decisions = corrected['bindings']
     mapped = map_source_reading(cleaned, catalog, segments, aliases,

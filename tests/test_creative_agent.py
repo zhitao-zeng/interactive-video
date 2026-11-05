@@ -50,6 +50,43 @@ def episode():
             'self_review': {'source': '已核对', 'open_issues': []}}
 
 
+def test_nested_existing_groups_report_the_exact_json_path_without_regrouping(tmp_path):
+    import copy
+    manifest=creation.prepare(task(tmp_path),tmp_path/'run');draft=episode()
+    draft['chapter_script']['clips']=draft.pop('clips');original=copy.deepcopy(draft)
+    errors=creation.validate(draft,manifest,tmp_path/'run/sandbox')
+    assert any('chapter_script.clips' in error and 'top-level clips' in error for error in errors)
+    assert draft==original
+
+
+@pytest.mark.parametrize('value',[None,'旅客、背包',['旅客','滑向海面的深灰背包']])
+def test_creator_catches_roster_prose_or_nonactor_before_material_handoff(tmp_path,value):
+    manifest=creation.prepare(task(tmp_path),tmp_path/'run');draft=episode()
+    draft['chapter_script']['shots'][0]['in_frame']=value
+    errors=creation.validate(draft,manifest,tmp_path/'run/sandbox')
+    assert any('shot 1' in e and 'in_frame' in e and 'actor' in e for e in errors)
+
+
+def test_cached_candidate_rechecks_current_contract_and_resumes_same_author(tmp_path,monkeypatch):
+    source=task(tmp_path);run=tmp_path/'run';manifest=creation.prepare(source,run);work=run/'sandbox'
+    draft=episode();draft['chapter_script']['shots'][0]['in_frame']='旅客、背包'
+    write(work/'output/episode.json',draft);(work/'output/creative-notes.md').write_text('Original camera notes')
+    write(run/'creator-state.json',{'status':'creative_candidate','seconds_used':20,'allowance_seconds':90})
+    calls=[]
+    def invoke(work,prompt,**kwargs):
+        assert kwargs['resume'] is True and kwargs['timeout']==70
+        feedback=json.loads((work/'input/creative-validation.json').read_text())
+        assert any('in_frame' in e for e in feedback['issues'])
+        calls.append(1);write(work/'output/episode.json',episode())
+        attempt=work/'attempts/corrected';attempt.mkdir(parents=True)
+        rows=[{'type':'tool_use','name':'Read','input':{'file_path':'/work/'+p}} for p in manifest['required_reads']]
+        (attempt/'session.jsonl').write_text(json.dumps({'message':{'content':rows}}))
+        return SimpleNamespace(ok=True,exit_code=0,seconds=1,directory=attempt,record={'session_id':'same-author','model':'configured'})
+    monkeypatch.setattr(creation,'run_session',invoke)
+    result=creation.run(source,run,resume=True,config={'timeout_seconds':999,'source_agent_slice_seconds':1200})
+    assert result['status']=='creative_candidate' and result['seconds_used']==21 and calls==[1]
+
+
 @pytest.mark.parametrize('placeholder',['__MORE_SHOTS__','__END__'])
 def test_partial_creator_shots_report_an_issue_instead_of_crashing(tmp_path,placeholder):
     manifest=creation.prepare(task(tmp_path),tmp_path/'run');draft=episode()

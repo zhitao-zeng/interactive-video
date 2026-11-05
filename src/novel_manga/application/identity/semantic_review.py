@@ -39,10 +39,12 @@ def close(candidate, context, schema, *, name, cached=None, settings=None, valid
             '当前actors是本章主体；catalogue/record_origins是查找背景资料，不能把历史档案的重复条目误当作当前actors重复。'
             'planning_view明确实际出演和仅提及主体，不能把mentioned_only_subjects误当作入镜演员；物件按其kind呈现，不受旧库person标签影响。'
             '原文已经清楚的同指正常采用，只有确有多种合理解释时才留未知；临时个体可以无名。'
-            '原文已支持且不会误导演员的候选填approved=true、correction=null。实际有错才填false，只返回需要改动的actors/bindings条目，source_id保持；未改条目由宿主保留。'
+            '原文已支持且不会误导演员的候选填approved=true、correction=null。实际有错才填false，一次性列出本次全部确定问题并完整修正；只返回需要改动的actors/bindings条目，source_id保持，未改条目由宿主保留。'
+            'actor.paragraphs与对应binding.paragraphs必须一致；修正一个主体时不得留下另一个已知的指代、段落或在场错误。'
             '删除确实重复或虚构的主体用removed_source_ids；同一人两个叫法应合并forms、保留一个source_id并删除另一个，不强求共享人编号的两个主体。'
             '人物、群体、物件和声源分别登记。此候选没有relations字段，不负责补齐全书亲属关系或归并历史档案；未登记背景关系不构成本章绑定错误。'
             '只被提及且不出场的未知身份允许保留，不能以此否决规划。个体按individual理解，count=0不表示没有这个演员。'
+            '群体的count=0表示原文没有指定数量，仍按group呈现；不能误判成零个身体，也不能要求编造原文未给的具体数量。'
             '引用对应章节/段落原句，已有确证身份保持。'
             + demand + '\n'
             + json.dumps({'evidence': context, 'candidate': current,'planning_view':view}, ensure_ascii=False))
@@ -176,14 +178,16 @@ def book(ledger, chapter, text, raw, *, texts=None, original_records=None):
     return {**raw, **correction}, {'approved': False, 'reason': answer.get('reason','')}
 
 
-def bindings(directory, answer, catalog, segments, mapped, *, cached=None, aliases=None):
+def bindings(directory, answer, catalog, segments, mapped, *, cached=None, aliases=None, settings=None):
     from novel_manga.story.source_identity import source_schema, clean_reading, map_source_reading
     ids = {a['source_id'] for a in answer['actors']}
     old = {m['source_actor']: m['entity_id'] for m in mapped['mentions']}
     candidate = {'actors': answer['actors'], 'bindings': [
         {'source_id': sid, 'entity_id': old.get(sid, 'UNKNOWN'),
          'entity_kind': None,
-         'decision': 'catalogue' if old.get(sid, 'UNKNOWN') != 'UNKNOWN' else 'unknown',
+         'decision': ('catalogue' if old.get(sid, 'UNKNOWN') != 'UNKNOWN' else
+                      'extra' if next(a for a in answer['actors'] if a['source_id']==sid).get('presence')
+                      in {'on_stage', 'voice'} else 'unknown'),
          'paragraphs': next(a['paragraphs'] for a in answer['actors'] if a['source_id']==sid), 'reason': ''}
         for sid in sorted(ids)]}
     target_schema = client.obj({'source_id': {'type':'integer'},
@@ -242,7 +246,7 @@ def bindings(directory, answer, catalog, segments, mapped, *, cached=None, alias
                 +json.dumps(conflicts,ensure_ascii=False)+'. Keep individual bodies distinct; an anonymous group can use decision=extra rather than sharing a person id.')
         return checked
     value, review = close(candidate,context,schema,name='chapter_binding_review',cached=cached,validate=validate,
-                          merge_correction=merge_binding_changes,
+                          merge_correction=merge_binding_changes,settings=settings,
                           record=Path(directory)/'identity_binding_review.json')
     return value, review
 
