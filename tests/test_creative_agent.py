@@ -119,7 +119,22 @@ def test_read_evidence_keeps_successful_cat_before_an_unrelated_command_failure(
     assert source not in {r['path'] for r in read_evidence(work)}
 
 
-@pytest.mark.parametrize('first_issue', ['selected_route', 'truncated_json'])
+def test_native_read_evidence_records_declared_optional_skill_reference(tmp_path):
+    manifest = creation.prepare(task(tmp_path), tmp_path/'run')
+    work = tmp_path/'run/sandbox'
+    guide = manifest['skill_references']['director_camera_styles']
+    required = list(manifest['required_reads'])
+    assert guide not in required
+    attempt = work/'attempts/native'; attempt.mkdir(parents=True)
+    event = {'type':'item.completed','item':{'type':'command_execution','exit_code':0,
+        'command':f"sed -n '43,58p' /work/{guide}",
+        'aggregated_output':'## 2. 库布里克式低位稳定跟拍'}}
+    (attempt/'codex-events.jsonl').write_text(json.dumps(event))
+    assert guide in {r['path'] for r in read_evidence(work)}
+    assert json.loads((work/'input/manifest.json').read_text())['required_reads'] == required
+
+
+@pytest.mark.parametrize('first_issue', ['selected_route', 'truncated_json', 'missing_notes'])
 def test_run_uses_file_tools_and_one_existing_session_for_correction(tmp_path, monkeypatch, first_issue):
     source = task(tmp_path); run = tmp_path / 'run'; calls = []
     manifest = creation.prepare(source, run)
@@ -130,9 +145,11 @@ def test_run_uses_file_tools_and_one_existing_session_for_correction(tmp_path, m
         assert actual_manifest['skill_references']['dialogue_craft'] in actual_manifest['required_reads']
         attempt = work / 'attempts' / str(len(calls)); attempt.mkdir(parents=True)
         draft = episode()
-        if len(calls) == 1:
+        if len(calls) == 1 and first_issue != 'missing_notes':
             draft['interaction']['selected'] = 'A'
         write(work / 'output/episode.json', draft)
+        if len(calls) > 1 or first_issue != 'missing_notes':
+            (work/'output/creative-notes.md').write_text('镜1–12保持旅客与规则牌同框，让核对动作可见。')
         if len(calls) == 1 and first_issue == 'truncated_json':
             (work / 'output/episode.json').write_text('{"title": "partial"')
         write(work / 'episode-session.json', {'session_id': 'same-creator'})
@@ -155,6 +172,11 @@ def test_run_uses_file_tools_and_one_existing_session_for_correction(tmp_path, m
     assert creation.run(source, run, config={'source_agent_slice_seconds': 1200}) == result
     assert len(calls) == 2
     legacy = json.loads((run/'sandbox/input/manifest.json').read_text())
+    camera = run/'sandbox'/legacy['skill_references']['camera_language']
+    camera.write_text('Earlier camera guidance')
+    # A completed no-op must leave even an older mounted guide untouched.
+    assert creation.run(source, run, config={'source_agent_slice_seconds': 1200}) == result
+    assert camera.read_text() == 'Earlier camera guidance' and len(calls) == 2
     guide = legacy['skill_references'].pop('dialogue_craft')
     legacy['required_reads'].remove(guide)
     write(run/'sandbox/input/manifest.json', legacy)
@@ -162,6 +184,8 @@ def test_run_uses_file_tools_and_one_existing_session_for_correction(tmp_path, m
     revised = creation.run(source, run, config={'source_agent_slice_seconds': 1200},
                            resume=True, feedback=feedback)
     assert revised['session_id'] == 'same-creator' and len(calls) == 3
+    from novel_manga.application.agents.episode.session import SKILL_SOURCE
+    assert camera.read_bytes() == (SKILL_SOURCE/'references/camera-language.md').read_bytes()
     assert calls[-1]['resume'] is True
     archived = json.loads((run/'manifest-before-dialogue-craft.json').read_text())
     assert archived == legacy and guide not in archived['required_reads']

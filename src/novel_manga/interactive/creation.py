@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import shutil
 import time
+from types import SimpleNamespace
 
 from novel_manga.application.agents.episode.inputs import _install_skill, SKILL_REFERENCES
 from novel_manga.application.agents.episode.session import run_session, SESSION_FILE
@@ -54,7 +55,6 @@ def prepare(task_path, run_dir):
     (work / 'input/brief.md').write_text(task['brief'])
     atomic_write_json(work / 'input/task.json', task)
     atomic_write_json(work / 'input/creation-methods.json', [asdict(m) for m in METHODS.values()])
-    from types import SimpleNamespace
     skill, refs = _install_skill(SimpleNamespace(work_dir=work))
     genre = {'adventure': 'travel_authoring', 'romance': 'romance_authoring',
              'suspense': 'suspense_authoring'}[project]
@@ -89,6 +89,8 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
     state = read_json(state_path, {})
     if state.get('status') == 'creative_candidate' and feedback is None:
         return state
+    # A real continuation reads current guidance; completed/no-op tasks returned above.
+    _install_skill(SimpleNamespace(work_dir=work))
     # Existing author sessions keep their task; refresh this newly shared read
     # only when continuing real work, retaining the preceding input contract.
     dialogue = (Path(manifest['skill']).parent / SKILL_REFERENCES['dialogue_craft']).as_posix()
@@ -118,6 +120,19 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
                   'passages and refreshed references for the current revision. Preserve valid '
                   'work, write the complete corrected output/episode.json and self_review, '
                   'and finish the draft. File operations only; no media generation.')
+    camera_task = (
+        ' For this draft/revision, read the current camera guide at '
+        + manifest['skill_references']['camera_language']
+        + ". Choose coverage from each scene's information change and actual space. "
+        'Explain key choices with shot numbers in output/creative-notes.md, and implement '
+        'the trigger, actor/camera paths, endpoint and hold in the actual shot camera text. '
+        'If you select a dolly zoom, low stabilized tracking, symmetric swish-pan/zoom, '
+        'shared actor-camera floating move or split-field focus, first read the matching '
+        'section of ' + (Path(manifest['skill']).parent / SKILL_REFERENCES['director_camera_styles']).as_posix()
+        + '. Apply its relevant staging guidance and record which shots actually use it; '
+        'distinguish a considered option from an adopted design. No technique quota. '
+        'Self-review the resulting shots and correct mismatches, rather than reporting only that a guide was read.')
+    prompt += camera_task
     if feedback is not None:
         if not resume:
             raise ValueError('Feedback revises the same author; use resume=True')
@@ -142,6 +157,9 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
         missing = [p for p in manifest['required_reads'] if p not in seen]
         candidate = read_json(work / 'output/episode.json', {})
         issues = validate(candidate, manifest, work) if candidate else ['Complete output/episode.json is missing']
+        notes = work / 'output/creative-notes.md'
+        if not notes.is_file() or not notes.read_text().strip():
+            issues.append('Write output/creative-notes.md with the actual camera/cut choices and shot numbers')
         issues += ['Read the actual required source/Skill resource: ' + p for p in missing]
         report = {'issues': issues, 'required_reads_observed': len(manifest['required_reads']) - len(missing),
                   'required_reads_total': len(manifest['required_reads']), 'reads': reads,
@@ -169,7 +187,7 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
             resume = True
             prompt = ('Continue this same creator session and the existing output/episode.json. '
                       'Read input/creative-validation.json, correct all named issues while preserving '
-                      'valid choices, finish the full draft and self-review. Use only file tools; no media.')
+                      'valid choices, finish the full draft and self-review. Use only file tools; no media.') + camera_task
     return state
 
 

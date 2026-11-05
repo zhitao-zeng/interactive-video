@@ -14,6 +14,13 @@ identifies the current authoring/voice guidance, camera library, spatial blockou
 selected genre, repair playbook and six-method library. Read those resources, then
 choose useful methods for this story. They are one author's tools, not six rewrites.
 Record chosen methods and their concrete purpose in `output/creative-notes.md`.
+Before drafting each scene, decide what the audience learns, who knows it, and
+which information remains hidden. In those same notes, explain the key viewing
+choices using current shot numbers: why this position, move or cut serves that
+change. Implement the choices in each shot's `purpose` and `camera`; notes alone
+are not the design. During self-review, compare the actual camera text with the
+intended reveal, reaction and spatial continuity, correct mismatches, and identify
+the shots changed. Camera variety and director-name counts are not acceptance.
 Read [shared dialogue craft](dialogue-craft.md) for every genre. Shape what the
 character says in context before designing how the voice delivers it; do not use
 performance adjectives to cover a lecture-like line.

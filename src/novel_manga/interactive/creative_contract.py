@@ -116,7 +116,9 @@ def read_evidence(work_dir):
                     or not re.search(r'\b(cat|sed|head|tail)\b|read_text\(', command)):
                 continue
             manifest = json.loads((work_dir/'input/manifest.json').read_text())
-            for path in manifest['required_reads']:
+            declared = dict.fromkeys([*manifest['required_reads'],
+                                      *manifest.get('skill_references', {}).values()])
+            for path in declared:
                 candidate = work_dir/path
                 mention = path in command
                 prefix = '.claude/skills/episode-production/'
