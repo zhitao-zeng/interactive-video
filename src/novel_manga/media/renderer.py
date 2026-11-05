@@ -221,9 +221,15 @@ class Renderer:
         visual: Path,
         audio: Path,
         output: Path,
+        *,
+        duration_limit: float | None = None,
     ) -> tuple[Path, float]:
-        """Mux native audio without changing the generated clip's duration."""
+        """Keep native timing, or an explicitly authored silent-insert duration."""
         duration = media_duration(visual)
+        if duration_limit is not None:
+            if duration_limit<=0:
+                raise ValueError('An authored segment duration must be positive')
+            duration=min(duration,float(duration_limit))
         audio_padding = max(0.0, duration - media_duration(audio))
         output.parent.mkdir(parents=True, exist_ok=True)
         run([

@@ -168,7 +168,12 @@ class BootstrapResult:
 
 def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_factory):
     from . import recovery
-    config = load_config(ctx.project_root / 'configs/agent_sandbox.json') if config is None else config
+    explicit_config = config is not None
+    if config is None:
+        config = load_config(ctx.project_root / 'configs/agent_sandbox.json')
+    else:
+        config = dict(config)
+        explicit_config = bool(config.pop('_agent_config_explicit', explicit_config))
     config = {**config, **{field: os.environ[var] for field, var in
         (('base_url', 'NOVEL_AGENT_BASE_URL'), ('model', 'NOVEL_AGENT_MODEL'),
          ('key_var', 'NOVEL_AGENT_KEY_VAR')) if os.environ.get(var)}}
@@ -176,6 +181,19 @@ def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_facto
     if seconds <= 0:
         raise ValueError('timeout must be positive')
     runtime = resolve_agent_environment(ctx, config)
+    # Load the persisted task before reading its model route.  Keeping the
+    # route beside the task state makes resume deterministic without making a
+    # fresh run depend on a previous run's settings.
+    saved = read_json(ctx.run_dir / 'agent-run.json', {})
+    from novel_manga.application.resolved_settings import agent_route, apply_agent_route
+    # A saved route is restored only when this invocation uses the default
+    # task configuration. An explicitly selected task config owns this run.
+    recorded = saved.get('agent_route') or {}
+    if saved and recorded.get('agent') and not explicit_config:
+        config = apply_agent_route(runtime, config, recorded)
+    config = {**config, 'base_url': config['base_url'].rstrip('/')}
+    route = agent_route(runtime, config)
+    recorded_route = route
     runtime['NOVEL_RESOURCE_WAIT_FILE']=str(ctx.run_dir/'resource-waits.jsonl')
     if config.get('refusal_fallback'):
         runtime['NOVEL_REFUSAL_FALLBACK'] = config['refusal_fallback'].get('endpoint', 'flashnext')
@@ -196,7 +214,6 @@ def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_facto
     from .local_preparation import stage
     stage(ctx)
     install_client(ctx.work_dir)
-    saved = read_json(ctx.run_dir / 'agent-run.json', {})
     if not paused():
         saved = recovery.resume_source_review(ctx.run_dir, ctx.episode_dir, saved) or saved
         from .input_repair import repair as validate_input
@@ -250,7 +267,7 @@ def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_facto
         pending = saved.get('job') or {}
         saved = {**saved, 'status': 'retrying', 'deadline': time.time()+seconds,
                  'fallback_invocations': 0, 'no_progress': 0,
-                 'stop_detail': None,
+                 'stop_detail': None, 'agent_route': recorded_route or saved.get('agent_route'),
                  'job': pending if pending.get('status') in {'running', 'accepted'} else None}
         atomic_write_json(ctx.run_dir/'agent-run.json', saved)
     if saved.get('status') in {'finished', 'finished_with_issues'}:
@@ -275,6 +292,7 @@ def start_run(ctx, *, config=None, timeout=None, retry_issues=False, tools_facto
               'summary_only_turns': saved.get('summary_only_turns', 0),
               'idle_turns': saved.get('idle_turns',0),
               'agent_seconds': saved.get('agent_seconds', 0),
+              'agent_route': route,
               'model_wait_seconds': saved.get('model_wait_seconds', 0)}
     if saved.get('upstream_recovery'):
         result['upstream_recovery']=saved['upstream_recovery']

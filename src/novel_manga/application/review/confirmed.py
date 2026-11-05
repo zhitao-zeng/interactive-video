@@ -127,7 +127,7 @@ def judge_finding(clip, video, claim, work, novel_dir=None, review_criteria=()):
         ('\n本次由宿主提供的逐镜验收标准（仅这些明确容差覆盖较严格的旧判词；不覆盖原文明确事实，也不豁免身份、座位或道具空间关系的实际错误）：\n- ' + '\n- '.join(review_criteria) if review_criteria else '') +
         '\n对应原文：' + (passage or '本次未提供，不能推断原文事实。') +
         '\n当前采用分镜的可见状态、动作与穿戴（依据，非新的重拍条件）：' +
-        json.dumps([{k:s[k] for k in ('index','motion_prompt','visual_prompt','wears','props','in_frame','scene_time') if k in s} for s in stages],ensure_ascii=False) +
+        json.dumps([{k:s[k] for k in ('index','camera','motion_prompt','visual_prompt','wears','props','in_frame','scene_time') if k in s} for s in stages],ensure_ascii=False) +
         '\n本次原确认缺陷（用于确定验收范围，不当作新视频事实）：' + claim.get('issue','') +
         '\n待核对的验收目标：' + claim['instruction'] + '\n只输出JSON。')})
     answer = ask_json(parts, SCHEMA, name='confirmed_picture_check', max_tokens=1800,

@@ -178,6 +178,17 @@ def run_agent(run: str, *, skills: str = "", config: dict | None = None, model: 
     prompt_path = Path(prompt) if prompt else (run_dir / "prompt.txt")
     if not prompt_path.is_file():
         raise SandboxRefused(f"没有提示词：{prompt_path}")
+    if config.get('backend')=='codex':
+        from .episode.codex_session import run_session
+        from novel_manga.util import atomic_write_json
+        phase='clip_repair'if run.startswith('repair-')else'media_review'
+        (run_dir/'input').mkdir(exist_ok=True)
+        manifest=run_dir/'input/manifest.json'
+        if not manifest.exists():atomic_write_json(manifest,{'phase':phase})
+        saved=run_dir/'episode-session.json'
+        return run_session(run_dir,prompt_path.read_text(),resume='--continue'in config.get('extra_args',[])and saved.is_file(),
+            timeout=timeout or config.get('timeout_seconds',600),config=config,
+            expected_output='decision.json'if phase=='clip_repair'else'review.json')
 
     # The installed skills come from a run that already has them; without .claude the agent has no
     # method to follow and writes whatever it likes.

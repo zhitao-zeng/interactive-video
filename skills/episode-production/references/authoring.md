@@ -28,10 +28,19 @@ temporary objects. Actions may target these, the actor themselves or an empty
 target when no recipient is established. Preserve these meanings rather than
 turning an animal, armor or environment object into an available human actor.
 
+For authored scene/shot design, read [camera language](camera-language.md) before
+choosing coverage. Ground each shot's camera in its story purpose, visible
+information and actual scene geometry. Carry that decision into the shot itself;
+a technique label or a general promise in author notes is not its implementation.
+
 ## Actual pictures, wearing and framing
 
 Inspect the actual selected images. Ordinary character cards supply identity and
 stable design; the authored shot supplies pose, camera, crop and current state.
+For a director name or stylized camera request, use
+[director camera styles](director-camera-styles.md) to choose a motivated design
+and write its visible path or focus relationship, ending composition and stop.
+A named style is optional and does not authorize changing protected script decisions.
 Multiple views of the same person define one Subject: explain which picture
 supplies face/hair and which supplies body proportions, clothing or another view.
 Picture count and Subject count are not body counts.
@@ -74,49 +83,9 @@ ending. Source-mode cuts fit the planned speech and physical acting together;
 they need not count simultaneous action and dialogue twice or fill time with
 unmotivated pauses. Existing split ranges in script mode remain authoritative.
 
-## Native H3 speech performance
+## Sound direction
 
-Describe the person's response to the current event. Establish the starting state
-and let a discovered fact or another
-person's words trigger the next change. Bind useful pitch, pace, volume, breath,
-emphasis and facial changes to the relevant clause; ordinary lines need only the
-detail that matters. Preserve each character's manner and the genre. A travel
-update can move from easy sharing to restrained doubt without adopting an argument's
-crying or shouting. Later reactions begin after their trigger.
-
-Prefer this local order: English delivery and acting → the exact bound utterance
-or `<DIALOGUE_N>` → the authored result. Put the delivery immediately before the
-utterance, outside `<d>`. Where a pause or speech ending matters, describe closed
-lips and the actual observation, listening or continuing action. Fit speech and
-reaction into the supplied duration; add neither filler words nor generic waiting.
-Move existing delivery into one coherent direction instead of appending a competing
-second performance description.
-For example, a supplied rule-reading shot can use:
-
-```text
-Her voice starts level and conversational. At the obligation she briefly hesitates,
-gives the key word slightly more weight, and ends with a quieter questioning rise.
-<DIALOGUE_1>
-She closes her mouth and continues reading the sign.
-```
-
-The marker stands for the complete approved line, not permission to rewrite it.
-Keep an authored POV or offscreen voice; this method does not require a new facial
-close-up, a fixed shot length, or a dramatic change on every sentence. Use affirmative
-actions instead of stacking prohibitions or putting performance tags inside dialogue.
-
-Choose audio conditioning from the task, not from the mere existence of a voice
-file. For native H3 conversation with no required locked voice, a sample without
-audio reference is a useful option. When selected, the actual reference-audio list
-and submitted audio conditions must both be empty: omit Audio definitions, retention
-and the audio-reference summary label while keeping dialogue, pictures and speaker
-IDs. Describe a consistent voice within the clip; timbre across clips can drift.
-Retain a required locked voice or audio-first/postmix workflow unless a change is
-authorized. If the host still fixes audio selection, use its supported correction
-path; changing prose alone does not remove an actual audio input.
-
-The 2026-10-15 nine-second H3 pilot combined front-loaded performance with removal
-of audio conditioning, and the user preferred the result. This supports trying that
-combination, not a universal ban on voice references or proof of either factor alone.
-ASR measures spoken content; naturalness needs listening feedback. Preserve the
-existing music/physical-sound plan and trial history when comparing performances.
+Use [sound direction](sound-direction.md) for the selected native-speech contract,
+per-turn English performance, physical sound, private thought and postmix music.
+It is shared by creation and production. Source turns own delivery; structured
+H3 compilation inserts it once. Existing voice assets do not select a policy.

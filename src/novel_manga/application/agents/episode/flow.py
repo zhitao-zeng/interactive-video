@@ -143,9 +143,18 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                         job={**job,'result':{**outcome,'changed':[]}}
                 if (progress_rules.applied_repair(job)
                         and (time.monotonic() < state.deadline or config.get('complete_started_repairs'))):
-                    bridge.handle('render', {})
-                    bridge.update_state(phase='tool_running')
-                    continue
+                    # An accepted source/input change can invalidate the approved
+                    # opening. Render only when the host reports it as legal.
+                    from .readiness import next_action
+                    ready = next_action(ctx, bridge.handle('status', {}))
+                    result['next_action'] = ready
+                    bridge.update_state(next_action=ready)
+                    if ready['action'] == 'render':
+                        bridge.handle('render', {})
+                        bridge.update_state(phase='tool_running')
+                        continue
+                    # first_frames/agent: the saved session must author the missing
+                    # work; fall through to the normal invocation below.
                 if (result.get('upstream_recovery')or{}).get('proposals',0)>=2:
                     finished=bridge.tools.dispatch('finish',{})
                     if finished.get('passed'):
@@ -199,6 +208,7 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                     resume = (ctx.work_dir / SESSION_FILE).is_file()
                     prompt = prompts.continuation_prompt() if resume or (ctx.run_dir/'prepared.json').is_file() else prompts.initial_prompt(ctx)
                 resume = (ctx.work_dir / SESSION_FILE).is_file()
+                prompt += '\n'+prompts.task_instructions(ctx)
                 if config.get('agent_instructions'):
                     prompt += '\nTask-specific instructions:\n' + str(config['agent_instructions'])
                 diagnosis = recovery.diagnose(ctx, status)
