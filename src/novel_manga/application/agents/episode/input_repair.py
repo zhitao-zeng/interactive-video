@@ -15,39 +15,12 @@ from novel_manga.application.repair import history
 from novel_manga.util import atomic_write_json, read_json
 from .arguments import RepairArgumentError, UnsupportedInput, CompileConflict, validate_resume
 
-_SERVICE_STATUS = re.compile(r'\bHTTP[:\s]+([45]\d\d)\b')
-# A payment, credential, quota or outage answer is about the shared service,
-# never about this candidate's content.  It must not spend a content revision,
-# a media take or an input attempt, and the rest of the batch must not be sent
-# to a service already known to be unusable.
-_SERVICE_STATUSES = {401, 402, 403, 407, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524}
-_SERVICE_WORDS = ('quota_not_enough', 'insufficient', 'payment required', 'credential',
-                  'unauthorized', 'api key', 'rate limit', 'service unavailable')
+from .arguments import service_interruption
 
-
-def service_interruption(error):
-    """The HTTP status/text of an outage or account failure, or None.
-
-    Task submission wraps its answer in RuntimeError texts such as
-    ``task submission returned HTTP 402: ...``; direct httpx errors carry the
-    response.  Content rejections never match here.
-    """
-    if isinstance(error, UnsupportedInput):
-        return None
-    response = getattr(error, 'response', None)
-    status = getattr(response, 'status_code', None)
-    detail = getattr(response, 'text', None) or str(error)
-    if status is None:
-        match = _SERVICE_STATUS.search(str(error))
-        status = int(match.group(1)) if match else None
-    lowered = str(detail).lower()
-    if status in _SERVICE_STATUSES or any(word in lowered for word in _SERVICE_WORDS):
-        return {'http_status': status, 'detail': str(detail).strip().replace('\n', ' ')[:500]}
-    return None
 from .input_records import (INPUT_LIMIT, SOURCE_REVIEW_POLICY, _phase_groups, effects,
                            remaining_input_attempts, input_receipt, source_review_recoverable,
                            latest_input_records)
-from .input_records import asset_configuration_recoverable, posture_protocol_recoverable, first_frame_recoverable
+from .input_records import asset_configuration_recoverable, posture_protocol_recoverable, first_frame_recoverable, asset_image_recoverable
 
 from .input_contracts import normalize_arguments, expand_shared_scope, SHOT_NAMES, SHOT_FIELDS
 from .input_compilation import compile_input
@@ -131,6 +104,10 @@ def repair_status(ctx):
             row['resume_action']={'clip_id':cid,'action':'input','resume':True,
                 'reason':'Continue the same source-checked correction into fresh first-frame preparation.'}
             row['next_action']='Resume this unchanged candidate once after the host ordering fix; all image/video limits and earlier resume counts remain.'
+        if asset_image_recoverable(record):
+            row['resume_action']={'clip_id':cid,'action':'input','resume':True,
+                'reason':'Continue source-approved asset image repair within the new three-picture bound; text and video counts are unchanged.'}
+            row['next_action']='Resume the saved source/design at the picture stage; failed old picture is attempt one, at most three pictures total.'
     from .input_records import input_operations
     for cid, row in states.items():
         operations = input_operations(ctx, cid, records=records)
@@ -269,7 +246,7 @@ def refresh_inputs(ctx, plan, script):
         shutil.copy2(phases, ctx.work_dir/'input/phases.json')
 
 
-def repair(ctx, row, *, check_only=False):
+def repair(ctx, row, *, check_only=False, request_receipt=None):
     from novel_manga.application.repair.publication import publish_candidate
 
     directory = ctx.episode_dir
@@ -279,7 +256,8 @@ def repair(ctx, row, *, check_only=False):
         saved = latest[1] if latest else {}
         if (not saved.get('decision') or not (saved.get('status') in {'checking', 'incomplete', 'published'}
                                              or saved.get('error_kind') == 'service_interrupted'
-                                             or source_review_recoverable(saved))):
+                                             or source_review_recoverable(saved)
+                                             or asset_image_recoverable(saved))):
             raise ValueError('no incomplete input repair is available to resume')
         row = {**saved['decision'], 'reason': row.get('reason') or saved.get('reason') or 'Resume saved input repair'}
     row = normalize_arguments(row)
@@ -352,7 +330,13 @@ def repair(ctx, row, *, check_only=False):
     if check_only:
         input_receipt(ctx,cid,row,check_only=True)
         return {'valid':True,'clip_ids':sorted(targets),'allowed_shot_indexes':sorted(addresses)}
-    receipt, record = input_receipt(ctx, cid, row)
+    if request_receipt is None:
+        receipt, record = input_receipt(ctx, cid, row)
+    else:
+        receipt, record = request_receipt
+        if (effects(record.get('decision') or {}) != effects(row)
+                or (record.get('source') or {}).get('consistent') is not True):
+            raise ValueError('request correction must continue the exact source-approved input')
     if row != submitted_row:
         record['submitted_decision'] = submitted_row
     if record.get('status') in {'prepared', 'checked_existing_wearing'}:
@@ -388,6 +372,9 @@ def repair(ctx, row, *, check_only=False):
                 review_options['review_reason'] = row['reason']
             if characters:
                 review_options['characters'] = characters
+            if 'music_plan' in row:
+                review_options['music_plans']={'before':script.get('music_plan'),
+                                              'after':candidate_script['music_plan']}
             record['source'] = source_check(source, quote, patches, phases, locations, scoped_shots,
                                             **review_options)
             atomic_write_json(receipt, record)
@@ -457,17 +444,24 @@ def repair(ctx, row, *, check_only=False):
         atomic_write_json(receipt, record)
         return {'changed': changed, 'accepted': [], 'input_repaired': [cid], 'blocked': {}}
     except Exception as error:
+        from novel_manga.application.assets.candidates import AssetImageRejected
         if isinstance(error,CompileConflict):record['error_details']=error.details
-        if isinstance(error, UnsupportedInput) and hasattr(error, 'review'):
+        if isinstance(error, UnsupportedInput) and not isinstance(error, AssetImageRejected) and hasattr(error, 'review'):
             record['source_review'] = error.review
         outage = service_interruption(error)
-        kind = ('source_rejected' if isinstance(error, UnsupportedInput) else
+        kind = ('asset_image_rejected' if isinstance(error, AssetImageRejected) else
+                'source_rejected' if isinstance(error, UnsupportedInput) else
                 'tool_error' if isinstance(error, (KeyError, AttributeError, TypeError)) else
                 'service_interrupted' if outage or isinstance(error, (OSError, TimeoutError, subprocess.TimeoutExpired)) else
                 'input_validation')
-        record.update(status='rejected' if kind == 'source_rejected' else
-                      'tool_error' if kind in {'tool_error', 'service_interrupted'} else 'incomplete',
+        image_outage = (kind == 'service_interrupted' and stage in {'character_assets', 'assets'}
+                        and (record.get('source') or {}).get('consistent') is True)
+        record.update(status='rejected' if kind in {'source_rejected', 'asset_image_rejected'} else
+                      'tool_error' if kind in {'tool_error', 'service_interrupted'} and not image_outage else 'incomplete',
                       step=stage, error=f'{type(error).__name__}: {error}', error_kind=kind)
+        if isinstance(error, AssetImageRejected):
+            record['asset_image_review']={'exhausted':error.exhausted,'asset_id':error.asset_id,
+                                          'review':error.image_review}
         if kind == 'service_interrupted':
             # This is the shared service, not this candidate: keep the saved
             # decision and every count for an unchanged continuation.

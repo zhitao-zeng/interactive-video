@@ -137,7 +137,7 @@ def test_parallel_groups_still_share_the_existing_model_resource_slot(movie, mon
     monkeypatch.setattr(final_cut.model, 'endpoint_key', lambda:'')
     monkeypatch.setattr(final_cut.model, 'endpoint_order', lambda *a:[base])
     monkeypatch.setattr(transport, 'streaming_wanted', lambda:False)
-    monkeypatch.setattr(transport, '_meter', lambda *a:None)
+    monkeypatch.setattr(transport, '_meter', lambda *a, **k:None)
     original_slot = resources.model_slot
     two_waiting = threading.Event()
     lock = threading.Lock()

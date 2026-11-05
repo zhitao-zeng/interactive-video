@@ -54,7 +54,8 @@ def renumber_audio(prompt: str, sent: list[int]) -> str:
 def uses_h3_prompt(ctx, clip: dict) -> bool:
         # prompt_h3_skip keeps a clip already rendered from the Chinese prompt whose dialogue checked
         # out: it points the request back at the one that produced the clip, so the cache holds it.
-        return bool(ctx.settings.local_h3_base_url and clip.get("prompt_h3") and not clip.get("prompt_h3_skip"))
+        return bool((ctx.settings.local_h3_base_url or getattr(ctx.settings, "video_model", None) == "MiniMax-H3")
+                    and clip.get("prompt_h3") and not clip.get("prompt_h3_skip"))
 
 def clip_base(ctx, clip: dict) -> str:
         """The clip's prompt before any softening: what clip_prompt sends, and what the cache compares."""

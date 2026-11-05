@@ -15,6 +15,21 @@ class RetryState:
     privacy_repairs: int = 0
 
 
+def starting_attempt(work: Path, clip: dict) -> int:
+    """A new authorized retake must not overwrite an older unknown submission."""
+    from novel_manga.util import read_json
+    attempt = 1
+    root = work / 'clips' / clip['clip_id']
+    for path in sorted(root.glob('attempt_*/clip.mp4.task.json')):
+        task = read_json(path, {})
+        request = read_json(path.parent / 'request.json', {})
+        if (task.get('submit_uncertain_at') and not task.get('task_id')
+                and not (path.parent / 'clip.mp4').is_file()
+                and int(request.get('repair_take', 0)) < int(clip.get('repair_take', 0))):
+            attempt = max(attempt, int(path.parent.name.rsplit('_', 1)[1]) + 1)
+    return attempt
+
+
 @dataclass(frozen=True)
 class GenerationOutcome:
     video: Path | None = None

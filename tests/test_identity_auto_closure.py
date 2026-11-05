@@ -68,6 +68,14 @@ def actor(name='云柔'):
             'kind':'individual','count':1,'presence':'on_stage','appearance':'','paragraphs':[1]}
 
 
+def test_identity_review_requires_complete_actor_and_binding_correction(monkeypatch):
+    prompts=[]
+    monkeypatch.setattr(client,'ask_json',lambda parts,*args,**kwargs:prompts.append(parts[0]['text']) or {'approved':True,'correction':None})
+    review.close({'actors':[]},{},client.obj({}),name='test_identity_review')
+    assert '全部确定问题' in prompts[0]
+    assert 'actor.paragraphs与对应binding.paragraphs必须一致' in prompts[0]
+
+
 def test_prepare_identity_repairs_binding_and_caches_review(tmp_path,monkeypatch):
     ledger=book(tmp_path/'book');ep=ledger.novel_dir/'book_1'
     store.write_json(ledger.novel_dir/'bible_aliases.json',{'云柔':'云苍冥'})
@@ -75,15 +83,16 @@ def test_prepare_identity_repairs_binding_and_caches_review(tmp_path,monkeypatch
     corrected={'actors':[actor()], 'bindings':[{'source_id':1,'entity_id':'e001','decision':'catalogue','paragraphs':[1],'reason':'父亲身边女儿'}]}
     calls=[]
     def ask(*args,**kwargs):
-        calls.append(kwargs['name'])
+        calls.append((kwargs['name'],kwargs.get('settings')))
         if kwargs['name']=='chapter_identity_source':return {'source_readable':True,'source_problem':'','actors':[actor()]}
-        if calls.count('chapter_binding_review')==1:return {'approved':False,'reason':'旧别名错指叔父','correction':corrected}
+        if [name for name,_ in calls].count('chapter_binding_review')==1:return {'approved':False,'reason':'旧别名错指叔父','correction':corrected}
         return {'approved':True,'reason':'已校核','correction':None}
     monkeypatch.setattr(client,'ask_json',ask)
-    result=flow.resolve_chapter(ep)
+    result=flow.resolve_chapter(ep,settings='official-k3-settings')
     assert result['mentions'][0]['entity_id']=='e001'
-    assert flow.resolve_chapter(ep)==result
-    assert calls==['chapter_identity_source','chapter_binding_review','chapter_binding_review']
+    assert flow.resolve_chapter(ep,settings='official-k3-settings')==result
+    assert [name for name,_ in calls]==['chapter_identity_source','chapter_binding_review','chapter_binding_review']
+    assert {settings for _,settings in calls}=={'official-k3-settings'}
 
 
 def test_binding_discards_unsupported_alternate_form_before_final_review(tmp_path,monkeypatch):
@@ -500,3 +509,32 @@ def test_demanded_correction_is_merged_then_final_reviewed(monkeypatch):
     assert calls == ['review', 'review', 'review']
     assert merged == [{'actors': [{'name': '甲'}]}]
     assert value == {'actors': [{'name': '甲'}]}
+
+
+def test_in_frame_unmapped_animals_start_as_extras_but_mentions_stay_unknown(tmp_path,monkeypatch):
+    ledger=book(tmp_path/'book');ep=ledger.novel_dir/'book_1'
+    store.write_json(ep/'segments.json',[{'text':'耳鼠跑来。远方传来天狗叫声，狐狸只被提及。'}])
+    actors=[actor('耳鼠'),{**actor('天狗'),'source_id':2,'presence':'voice'},
+            {**actor('狐狸'),'source_id':3,'presence':'mentioned'}]
+    reviewed=[]
+    def ask(parts,schema,**kwargs):
+        if kwargs['name']=='chapter_identity_source':return {'source_readable':True,'source_problem':'','actors':actors}
+        payload=json.loads(parts[0]['text'].split('\n')[-1]);reviewed.append(payload['candidate'])
+        assert [r['decision']for r in payload['candidate']['bindings']]==['extra','extra','unknown']
+        return {'approved':True,'reason':'真实复核候选正确','correction':None}
+    monkeypatch.setattr(client,'ask_json',ask)
+    result=flow.resolve_chapter(ep)
+    assert reviewed and result['semantic_review']['approved']
+    assert set(result['semantic_extras'])=={'耳鼠','天狗'}
+
+
+def test_extra_initialization_still_requires_independent_semantic_pass(tmp_path,monkeypatch):
+    ledger=book(tmp_path/'book');ep=ledger.novel_dir/'book_1'
+    store.write_json(ep/'segments.json',[{'text':'耳鼠跑来。'}])
+    def ask(parts,schema,**kwargs):
+        if kwargs['name']=='chapter_identity_source':return {'source_readable':True,'source_problem':'','actors':[actor('耳鼠')]}
+        return {'approved':False,'reason':'实际来源仍有问题','correction':None}
+    monkeypatch.setattr(client,'ask_json',ask)
+    with pytest.raises(ValueError,match='identity semantic review unresolved'):
+        flow.resolve_chapter(ep)
+    assert not(ep/'identity_context.json').exists()

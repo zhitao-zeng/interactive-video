@@ -51,6 +51,21 @@ def made_progress(ctx, before, before_status, status):
             return before[0]!=progress(ctx,status)[0]and(not outcome.get('music_declined')or outcome.get('assessment_added'))
         if job.get('action')=='first_frames' and (outcome.get('reviewed_candidates') or outcome.get('video_progress')):
             return True
+        if job.get('action')=='first_frames' and outcome.get('argument_errors'):
+            previous=prior.get('result') or {}
+            targets=set(outcome.get('validation_targets') or [])
+            if targets and targets==set(previous.get('validation_targets') or []):
+                if set(previous.get('validated_clips') or []) < set(outcome.get('validated_clips') or []):
+                    return True  # The host verified more of the same requested rows.
+                # Several rows can each improve while none is fully valid yet.
+                # Compare host-confirmed field failures, never error wording.
+                old_fields=previous.get('invalid_fields')
+                new_fields=outcome.get('invalid_fields')
+                if isinstance(old_fields,dict) and isinstance(new_fields,dict):
+                    old_errors={(cid,field) for cid,fields in old_fields.items() for field in fields}
+                    new_errors={(cid,field) for cid,fields in new_fields.items() for field in fields}
+                    if new_errors < old_errors:
+                        return True
         if (outcome.get('changed') or outcome.get('assets_added')
                 or set(outcome.get('input_repaired') or []) - set(outcome.get('input_reused') or [])):
             return True

@@ -42,3 +42,12 @@ def test_legacy_ambiguous_route_does_not_overwrite_an_explicit_task_config():
     assert current is selected
     assert current['model'] == 'deepseek-v4.1-flash-1017'
     assert runtime['QWEN38_LOCAL_MODEL'] == 'qwen-vision-2026'
+
+
+def test_restoring_legacy_native_route_does_not_inherit_new_codex_backend():
+    from novel_manga.application.resolved_settings import apply_agent_route
+    current={'backend':'codex','model':'gpt-5.6-luna','base_url':'codex://local'}
+    restored=apply_agent_route({},current,{'agent':{'model':'deepseek-v4.1-flash-1017',
+        'base_url':'http://127.0.0.1:8789','key_var':'PHANTHY_API_KEY','provider':'phanrouter-sandbox'}})
+    assert 'backend' not in restored
+    assert restored['model']=='deepseek-v4.1-flash-1017'

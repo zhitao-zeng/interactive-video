@@ -127,3 +127,41 @@ def test_interactive_endpoint_recovery_is_process_local(tmp_path,monkeypatch):
         assert os.environ['SECOND_REVIEW_JUDGE']=='qwen-gpu52-current'
         assert os.environ['NOVEL_H3_SHORT_EDGE']=='768'
     assert (tmp_path/'configs/interactive.json').read_bytes()==original
+
+
+def test_non_gpt_defaults_and_explicit_review_roles_for_real_project_entries(tmp_path,monkeypatch):
+    from unittest.mock import patch
+    from novel_manga.interactive import runtime
+    from novel_manga.application import configuration
+    from novel_manga.review.endpoints import judge_settings
+    (tmp_path/'configs').mkdir()
+    (tmp_path/'configs/interactive.json').write_text(json.dumps({'services':{'text_endpoint':'phanthy-ds41'}}))
+    monkeypatch.setattr(runtime,'environment',lambda *a:{})
+    monkeypatch.setattr(configuration,'model_resources_environment',lambda *a:{})
+    for project in ['adventure','suspense','romance']:
+        with patch.dict(os.environ,{},clear=True):
+            runtime.configure(tmp_path,'h3',project=project)
+            assert os.environ['NOVEL_PLANNER_ENDPOINT']=='phanthy-dsv4'
+            assert os.environ['SECOND_REVIEW_JUDGE']=='phanthy-dsv4'
+            assert judge_settings().model=='phanthy.com/deepseek-v4'
+            assert os.environ['NOVEL_REVIEW_VIDEO_JUDGE']==''
+    with patch.dict(os.environ,{'SECOND_REVIEW_JUDGE':'codex-luna','NOVEL_REVIEW_VIDEO_JUDGE':'flashnext'},clear=True):
+        runtime.configure(tmp_path,'h3',project='suspense')
+        assert judge_settings().model=='gpt-5.6-luna'
+        assert os.environ['NOVEL_REVIEW_VIDEO_JUDGE']=='flashnext'
+
+
+def test_interactive_exhausted_candidates_do_not_reenter_legacy_metered_template(tmp_path,monkeypatch):
+    import copy
+    import pytest
+    from unittest.mock import patch
+    from novel_manga.interactive import runtime
+    import novel_manga.llm.catalog as catalog
+    rows=copy.deepcopy(catalog.catalogue())
+    for name in rows['candidates']['json']:rows['resources'][name]['available']=False
+    monkeypatch.setattr(catalog,'catalogue',lambda:rows)
+    monkeypatch.setattr(runtime,'environment',lambda *a:{})
+    (tmp_path/'configs').mkdir()
+    (tmp_path/'configs/interactive.json').write_text(json.dumps({'services':{'text_endpoint':'phanthy-ds41'}}))
+    with patch.dict(os.environ,{},clear=True),pytest.raises(ValueError,match='No qualified JSON'):
+        runtime.configure(tmp_path,'h3',project='suspense')
