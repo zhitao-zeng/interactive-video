@@ -7,12 +7,24 @@ from pathlib import Path
 from novel_manga.util import atomic_write_json, read_json
 
 
-def run(root, task_path, run_dir, edition, *, config=None, resume=False):
+def run(root, task_path, run_dir, edition, *, config=None, resume=False, lane=None):
     from . import creation, creative_material, authored, production, runtime
     root=Path(root).resolve();run_dir=Path(run_dir).resolve()
     if not edition or Path(edition).name!=edition:
         raise ValueError('edition must be a new output directory name')
     task=copy.deepcopy(read_json(Path(task_path),{}))
+    saved=read_json(run_dir/'state.json',{})
+    selected_lane=lane or task.get('video_lane') or saved.get('lane') or 'h3'
+    if selected_lane not in runtime.VIDEO_LANES:
+        raise ValueError('Unsupported video lane')
+    if saved and (saved.get('lane') or saved.get('task',{}).get('video_lane') or 'h3')!=selected_lane:
+        raise ValueError('Keep the frozen video lane; a changed production policy needs a new run')
+    if lane is not None or 'video_lane' in task or 'video_lane' in saved.get('task',{}) or not saved:
+        task['video_lane']=selected_lane
+    if selected_lane!='h3' and task.get('h3_input_mode'):
+        raise ValueError('H3 first-frame mode requires the h3 lane; select sd_input_mode for Fast')
+    if selected_lane!='sd20-fast' and task.get('sd_input_mode'):
+        raise ValueError('SD first-frame mode requires sd20-fast')
     if task.get('mode') not in {'original','adaptation'}:
         raise ValueError('produce accepts an original brief or a package adaptation')
     if task.get('mode')=='adaptation' and not task.get('series_material'):
@@ -24,10 +36,9 @@ def run(root, task_path, run_dir, edition, *, config=None, resume=False):
     if task.get('world_card_seconds'):
         raise ValueError('produce does not yet bind world cards; use approved material intake')
     task.update(production_handoff=True,end_card_seconds=3)
-    task.setdefault('h3_input_mode','first-frame')
+    if selected_lane=='h3':task.setdefault('h3_input_mode','first-frame')
     task.setdefault('music_mode','timeline')
     book=root/'outputs'/edition
-    saved=read_json(run_dir/'state.json',{})
     if saved and (saved.get('task')!=task or saved.get('edition')!=edition or saved.get('root')!=str(root)):
         raise ValueError('Keep this frozen task; changed input needs a new run and edition')
     if book.exists() and not saved:
@@ -38,7 +49,10 @@ def run(root, task_path, run_dir, edition, *, config=None, resume=False):
     (run_dir/'owner').write_text('Original creative-to-film run / automatic existing Agents and review / preserve all attempts\n')
     frozen=run_dir/'task.json'
     if not frozen.exists():atomic_write_json(frozen,task)
-    state={**saved,'task':task,'edition':edition,'root':str(root),'status':'running'}
+    state={**saved,'task':task,'edition':edition,'root':str(root),'lane':selected_lane,'status':'running','retryable':False}
+    if book.exists() and saved.get('stage')=='material_handoff' and not saved.get('assets_complete') and not saved.get('production_started'):
+        state['handoff_pending']=True
+    state.pop('error',None);state.pop('reason',None)
     def stage(value):
         state['stage']=value;atomic_write_json(run_dir/'state.json',state)
     try:
@@ -50,6 +64,9 @@ def run(root, task_path, run_dir, edition, *, config=None, resume=False):
         state['creator']=result
         if result.get('status')!='creative_candidate':
             state.update(status='blocked',reason='Creative Agent did not produce an accepted structured candidate')
+            state['retryable']=((result.get('status')=='agent_failed' and result.get('agent_exit')==124
+                or result.get('status')=='draft_invalid' and result.get('draft_changed') is True)
+                and float(result.get('seconds_used',0))<float(result.get('allowance_seconds',0)))
             atomic_write_json(run_dir/'state.json',state);return state
         stage('material_handoff')
         work=creator_dir/'sandbox'
@@ -62,27 +79,49 @@ def run(root, task_path, run_dir, edition, *, config=None, resume=False):
                 package_script=work/'input/package'/task['source_script'],style_source=style_source)
         else:
             material=creative_material.write_material(draft,manifest,run_dir/'material',style_source=style_source)
-        runtime.configure(root,'h3',project=task['project'])
+        runtime.configure(root,selected_lane,project=task['project'])
+        if (book.exists() and state.get('handoff_pending')
+                and not saved.get('assets_complete') and not saved.get('production_started')):
+            if any(book.rglob('*.task.json')) or any(book.rglob('*.mp4')):
+                raise ValueError('Retain existing media/task receipts; repair this adopted production through its original Agent')
+            history=run_dir/'handoff-history';history.mkdir(exist_ok=True)
+            archived=history/f'failed-{len(list(history.iterdir()))+1:03d}'
+            archived.mkdir();book.rename(archived/book.name)
         if not book.exists():
             authored.prepare_authored(material,book,family=task['project'])
-        from .first_frame_entry import select_mode
-        select_mode(book,manifest['profile'].get('h3_input_mode'))
+        if selected_lane=='h3':
+            from .first_frame_entry import select_mode
+            select_mode(book,manifest['profile'].get('h3_input_mode'))
+        elif selected_lane=='sd20-fast':
+            from .sd_first_frames import select_mode
+            select_mode(book,manifest['profile'].get('sd_input_mode'))
         episode=book/(book.name+'_1')
-        if not (episode/'clip_plan.json').is_file():
+        rebind=(resume and not state.get('assets_complete') and not state.get('production_started')
+                and not state.get('handoff_pending'))
+        if rebind and (any((episode/'work/clips').rglob('*.task.json')) or any((episode/'work/clips').rglob('*.mp4'))):
+            raise ValueError('Keep filmed requests and their budgets; resume the existing production Agent')
+        if not (episode/'clip_plan.json').is_file() or rebind:
             authored.pack_authored(episode)
+        state['handoff_pending']=False
         if not state.get('assets_complete'):
             stage('source_assets')
-            runtime.runner_for(root,book,'h3',project=task['project']).build_assets()
+            runtime.runner_for(root,book,selected_lane,project=task['project']).build_assets()
             state['assets_complete']=True
             atomic_write_json(run_dir/'state.json',state)
         stage('production_and_review')
         # Once entered, any retry is a resume of this same bounded production.
         production_started=bool(state.get('production_started'))
         state['production_started']=True;atomic_write_json(run_dir/'state.json',state)
-        receipt=production.run_episode(root,'h3',project=task['project'],edition=edition,
+        receipt=production.run_episode(root,selected_lane,project=task['project'],edition=edition,
             resume=production_started,agent_config=config)
         state.update(status=receipt.get('status','blocked'),delivery=receipt,stage='finished')
     except Exception as error:
         state.update(status='blocked',error=type(error).__name__+': '+str(error)[:600])
+        import httpx
+        from novel_manga.application.agents.episode.arguments import service_interruption
+        outage=service_interruption(error) or {}
+        state['retryable']=(isinstance(error,(TimeoutError,ConnectionError,
+                                            httpx.TimeoutException,httpx.NetworkError))
+            or outage.get('http_status') in {429,500,502,503,504,520,521,522,523,524})
     atomic_write_json(run_dir/'state.json',state)
     return state

@@ -53,6 +53,8 @@ def ask_json(parts: list[dict], schema: dict, *, name: str, max_tokens: int = 70
         "response_format": {"type": "json_schema", "json_schema": {"name": name, "strict": True, "schema": schema}},
         "messages": [{"role": "user", "content": parts}],
     }
+    from .policy import json_policy, role_for
+    payload.update(json_policy(payload['model'], role_for(name)))
     if json_object:
         # Some deployed services accept json_schema but corrupt free-form string arrays.
         # These callers validate their own result; make the shape visible to the model.
@@ -78,6 +80,8 @@ def ask_json(parts: list[dict], schema: dict, *, name: str, max_tokens: int = 70
                 settings = endpoint_settings(fallback)
                 headers = {'Authorization': 'Bearer '+settings.key} if settings.key else {}
                 payload = {**payload, 'model': settings.model}
+                payload.pop('thinking', None)
+                payload.update(json_policy(settings.model, role_for(name)))
                 log(f'{name}: explicit model refusal; switching once to {settings.model} within the same request budget')
                 body = post_any(client, list(settings.endpoints), headers, payload, settings=settings,
                                 deadline=deadline, timeout_message=f'{name}: fallback request budget exhausted')
