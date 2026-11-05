@@ -476,4 +476,4 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 
 | Codex 独审并发提升20261105 | 用户要求提高本批独立审片并发，先2→4 | codex/review-concurrency-20261105 | pi_episode_lanes.py、调度回归、入口文档；只换父调度不换在途Agent | 2026-11-05 | 已上线18:32:49：Gen9独审2→4，原5制作/2审片PID、会话、运行副本与额度保全；新增03C/10C复审实际调用模型，共4场，声检队列0。36相关回归通过，--review-workers默认2、本批4，制作容量不变。主线快进推送，证据dispatch-generation-9/{handoff-result,live-verification}.json。 |
 
-| Codex 最后三部授权收尾与第二季发布20261105 | 用户批准03A30min、06C/10C各15min，45部通过后新ModelScope数据集 | codex/authorized-resume-20261105 | 原会话授权恢复入口、回归；批次授权历史与发布目录 | 2026-11-05 | 原额度/任务/会话均保留；补授权续跑不能冒充Connectionerror，走同一协调器正常resume；独审通过后按第一季40部数据集样式发布第二季45部。 |
+| Codex 最后三部授权收尾与第二季发布20261105 | 用户批准03A30min、06C/10C各15min，45部通过后新ModelScope数据集 | codex/authorized-resume-20261105 | 原会话授权恢复入口、回归；批次授权历史与发布目录 | 2026-11-05 | 21:28 Gen10原03A/06C/10C已同入口并行续上，分别1800/900/900秒实际一次消费；开始时间/会话/256上限/旧grant历史保全。未完成授权恢复37回归红绿通过。条件发布进程已启动，只等45部当前片独审accepted再建Flame4pd/zhiyao-season2-episodes；42部已按S1视频/封面/索引/署名样式备齐，尚无远端写入。正在持续监控本轮真实结果，不将启动当完成。 |
