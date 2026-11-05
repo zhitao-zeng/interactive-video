@@ -10,13 +10,25 @@ from PIL import Image
 from novel_manga.util import atomic_write_json, read_json, run
 
 
+def _required_voice_specs(profile,script,specs):
+    from novel_manga.story.voice_delivery import native_speech_selected
+    if not native_speech_selected(profile):return specs
+    speakers={t['speaker_name']for s in script.get('shots',[])for t in s.get('turns',[])
+              if profile.get('inner_voice_delivery')=='postmix'and t.get('inner_monologue')and t.get('text')
+              and t.get('delivery_mode')in {'visible_dialogue','offscreen_dialogue'}}
+    return {name:spec for name,spec in specs.items()if name in speakers}
+
+
 def prepare_authored(project: Path, output: Path, *, family: str = 'adventure') -> Path:
     if output.exists():
         raise FileExistsError('Keep the existing episode, assets and all generation history')
     material=read_json(project/'material.json',{})
     from novel_manga.interactive.intake import PROJECTS
     if family not in PROJECTS:raise ValueError('Unknown interactive project')
+    voice_specs=_required_voice_specs(material['profile'],material['script'],material['voice_specs'])
     script=copy.deepcopy(material['script'])
+    if material['profile'].get('h3_speech_policy'):
+        script.setdefault('profile',{})['h3_speech_policy']=material['profile']['h3_speech_policy']
     shots=script['shots']
     indexes=[i for g in material['groups'] for i in g['shot_indexes']]
     if indexes != list(range(1,len(shots)+1)):
@@ -70,7 +82,7 @@ def prepare_authored(project: Path, output: Path, *, family: str = 'adventure') 
         atomic_write_json(output/'series_assets/voices/voices.json',supplied_voices)
     atomic_write_json(output/'production-budget.json',{'source_seconds':material.get('source_seconds'),
         'planned_body_seconds':sum(s['duration_seconds'] for s in shots),'end_card_seconds':3,
-        'voice_sources':len(material['voice_specs']),'video_units':len(material['groups']),
+        'voice_sources':len(voice_specs),'video_units':len(material['groups']),
         'max_generated_takes_per_unit':3,'runner_max_attempts':2,'sd_video_enabled':False,
         'policy':'Keep old editions and every request/task/take; resume the same edition without resetting limits'})
     from novel_manga.interactive.intake import finalize
@@ -88,16 +100,19 @@ def pack_authored(directory: Path) -> dict:
     context['compiler_options']=replace(context['compiler_options'],max_stages=6,camera_policy='authored')
     shots=prepared_shots(script,directory,identity_data=context.get('identity_data'))
     clips=[]
+    first_frame=read_json(directory.parent/'profile.json',{}).get('h3_input_mode')=='first-frame'
     for number,group in enumerate(read_json(directory/'authored_groups.json',[]),1):
         selected=[shots[i-1] for i in group['shot_indexes']]
         seconds=sum(s['duration_seconds'] for s in selected)
-        if not 4 <= seconds <= 15 or len(selected)>6:
+        if not (0 < seconds <= 15 if first_frame else 4 <= seconds <= 15) or len(selected)>6:
             raise ValueError('Travel generation group exceeds the existing duration/stage budget')
         packed={'kind':'video','location':selected[0]['location'],'shots':selected,
             'seconds':seconds,'request_seconds':seconds,
             'shot_timing':[{'seconds':s['duration_seconds']} for s in selected]}
         clip=clip_entry(packed,f'clip_{number:02d}',context)
+        if first_frame:clip['request_seconds']=max(4,seconds)
         clip['source_authored_segment']=group['source_segment']
+        if first_frame:clip['first_frame_opening']=[copy.deepcopy(selected[0])]
         clips.append(clip)
     plan={'policy':POLICY,'limits':{'max_clip_seconds':15,'max_stages':6,'camera_policy':'authored'},
         'totals':plan_totals(clips,shots,context),'clips':clips}
@@ -108,10 +123,13 @@ def pack_authored(directory: Path) -> dict:
 
 
 def build_authored_voices(root: Path, novel: Path, *, family: str = 'adventure') -> None:
+    episode=novel/(novel.name+'_1')
+    specs=_required_voice_specs(read_json(novel/'profile.json',{}),read_json(episode/'chapter_script.json',{}),
+                                read_json(novel/'voice_specs.json',{}))
+    if not specs:return
     from novel_manga.interactive.runtime import runner_for
     from novel_manga.providers.base import ImageResult
     runner=runner_for(root,novel,'h3',project=family)
-    specs=read_json(novel/'voice_specs.json',{})
     directory=novel/'series_assets/voices';directory.mkdir(parents=True,exist_ok=True)
     bank=read_json(directory/'voices.json',{})
     for name,spec in specs.items():

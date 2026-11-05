@@ -110,10 +110,19 @@ def run_session(work_dir, prompt_text, *, resume=False, timeout=1200, config,
             'No host workflow or media-generation tools are installed. Do not invoke models, media '
             'services, production adoption, or modify inputs, history or authentication. '
             'The host composes and checks the final syntax and executes the complete pipeline.\n\n')
-    (attempt/'prompt.txt').write_text(role+prompt_text, encoding='utf-8')
     before = {p.relative_to(output): (p.stat().st_mtime_ns, p.stat().st_size)
               for p in output.rglob('*') if p.is_file()}
     shutil.copytree(output, attempt/'output-before')
+    role = ('For text reads, including SKILL.md and the manifest, use python3 /work/.claude/skills/episode-production/scripts/read-text.py PATH '
+        '[--section "Exact heading"] [--start END]. Each result contains at most 6,000 UTF-8 text bytes plus cursor metadata; '
+        'continue its end offset until complete, one page per result. '
+        'Use the supplied manifest/current-task paths before directory discovery. '
+        'Read one short resource or named section per tool result, using small windows '
+        'of about 2,000 characters or 40 lines for long text. Do not concatenate whole '
+        'large references into one result. If output is truncated, fetch only the '
+        'missing range; reuse unchanged material already read in this session. '
+        'Read all original source text, with continuation windows as needed.\n\n') + role
+    (attempt/'prompt.txt').write_text(role+prompt_text, encoding='utf-8')
     command = ['docker', 'run', '--rm', '-i', '--network', 'host',
         '--name', f'episode-codex-{uuid.uuid4()}', '--user', '1001:1001',
         '-e', f'HOME={Path.home()}', '-v', f'{auth_home}:{auth_home}',

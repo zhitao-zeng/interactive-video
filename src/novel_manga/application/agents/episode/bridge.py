@@ -12,8 +12,8 @@ import time
 from novel_manga.util import atomic_write_json, read_json
 from novel_manga.application.production import episode_state
 
-ACTIONS = {'check', 'adopt', 'render', 'review', 'apply', 'status', 'finish', 'doctor'}
-SLOW_ACTIONS = {'adopt', 'render', 'review', 'apply', 'finish', 'doctor'}
+ACTIONS = {'check', 'adopt', 'render', 'review', 'apply', 'status', 'finish', 'doctor', 'first_frames', 'mix_audio'}
+SLOW_ACTIONS = {'adopt', 'render', 'review', 'apply', 'finish', 'doctor', 'first_frames', 'mix_audio'}
 MAX_REQUEST_BYTES = 65536
 
 

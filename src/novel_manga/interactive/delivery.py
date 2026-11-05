@@ -24,6 +24,19 @@ def video_seconds(stream: dict) -> float:
     return int(stream['nb_frames']) / float(Fraction(stream['r_frame_rate']))
 
 
+def technical_result(ctx, movie: Path, body_frames: int) -> tuple[float, bool]:
+    decode=subprocess.run(['ffmpeg','-v','error','-i',str(movie),'-f','null','-'],capture_output=True,text=True)
+    info=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(movie)],text=True))
+    video=next(s for s in info['streams'] if s['codec_type']=='video')
+    audio=next(s for s in info['streams'] if s['codec_type']=='audio')
+    duration=video_seconds(video)
+    passed=(decode.returncode==0 and not decode.stderr.strip() and video['width']==ctx.settings.width and video['height']==ctx.settings.height
+            and video['codec_name']=='h264' and video['r_frame_rate']=='25/1' and audio['codec_name']=='aac'
+            and ((ctx.episode_dir/'authored_groups.json').is_file() or 180<=duration<=300)
+            and int(video['nb_frames'])-body_frames==75)
+    return duration,passed
+
+
 def requested_sampling(provider,profile):
     # The framed H3 adapter owns the local sampler; its inherited image/video
     # profile resolution is the hosted lane's tier, not the H3 short edge.
@@ -163,16 +176,19 @@ def deliver(runner, report: dict, destination: Path) -> dict:
     # cwd-relative fixed filename avoids filesystem path escaping in the filter language.
     filters='ass=evidence.ass' if extra_overlays else 'ass=subtitles.ass'
     ass=Path(assembly.get('ass',''))
+    audio_input=[]
     if not extra_overlays:
         # The pre-caption join has native audio, no loudness processing or scene overlays.
         source=ctx.work/'joined.mp4'
         if not source.is_file() or not ass.is_file():
             raise FileNotFoundError('Clean delivery requires the native joined video and dialogue subtitles')
+        if assembly.get('audio_repair') or assembly.get('episode_ambience_mix'):
+            audio_input=['-i',assembly['final_video'],'-map','0:v:0','-map','1:a:0']
         shutil.copy2(ass,destination/'subtitles.ass')
     if postproduction is not None and ass.is_file():
         shutil.copy2(ass,destination/'subtitles.ass')
         filters+=',ass=subtitles.ass'
-    subprocess.run(['ffmpeg','-y','-v','error','-threads','4','-i',str(source),'-vf',filters,
+    subprocess.run(['ffmpeg','-y','-v','error','-threads','4','-i',str(source),*audio_input,'-vf',filters,
                     '-c:v','libx264','-preset','fast','-crf','19','-r','25','-pix_fmt','yuv420p',
                     '-c:a','aac','-ar','48000','-ac','2','-b:a','192k',str(body)],cwd=destination,check=True)
     publication_path=ctx.episode_dir/'publication.json'
@@ -250,14 +266,7 @@ def deliver(runner, report: dict, destination: Path) -> dict:
     if cover.is_file():shutil.copy2(cover,destination/'cover.jpeg')
     if packaging.get('cover'):shutil.copy2(packaging['cover'],destination/'cover.jpeg')
     elif publication:shutil.copy2(destination/'world-introduction.jpeg',destination/'cover.jpeg')
-    decode=subprocess.run(['ffmpeg','-v','error','-i',str(final),'-f','null','-'],capture_output=True,text=True)
-    info=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(final)],text=True))
-    video=next(s for s in info['streams'] if s['codec_type']=='video')
-    audio=next(s for s in info['streams'] if s['codec_type']=='audio')
-    duration=video_seconds(video)
-    technical=(decode.returncode==0 and not decode.stderr.strip() and video['width']==ctx.settings.width and video['height']==ctx.settings.height
-               and video['codec_name']=='h264' and video['r_frame_rate']=='25/1' and audio['codec_name']=='aac'
-               and 180<=duration<=300 and int(video['nb_frames'])-int(body_info['nb_frames'])==75)
+    duration,technical=technical_result(ctx,final,int(body_info['nb_frames']))
     # Clean delivery uses the native join, and publication inserts its own cards.
     # The assembly's normalized audio is a different track, not this film's QC.
     media_report=destination/'media-quality.json'
@@ -312,6 +321,10 @@ def deliver(runner, report: dict, destination: Path) -> dict:
         # The native take's verdict does not certify newly composited evidence.
         receipt['status']='candidate'
         receipt['final_evidence_review_pending']=True
+    from novel_manga.story.voice_delivery import episode_native_speech_errors
+    speech_errors=episode_native_speech_errors(ctx.episode_dir,report)
+    if speech_errors:
+        receipt.update(status='candidate',content_passed=False,speech_policy_errors=speech_errors)
     atomic_write_json(destination/'interactions.json',receipt['interaction'])
     atomic_write_json(destination/'delivery.json',receipt)
     return receipt
@@ -330,6 +343,10 @@ def reviewed_delivery(runner,report,destination):
         version=versions/f'export-{len(list(versions.glob("export-*")))+1:03d}'
         receipt=deliver(runner,pending,version)
         receipt['export_context']=inputs
+    elif receipt.get('technical_passed') is False:
+        # Recheck a cached failure under the current rules without re-encoding its movie.
+        _,receipt['technical_passed']=technical_result(runner.context,Path(receipt['final_video']),
+            round(receipt['actual_body_seconds']*25))
     if not receipt.get('final_video'):
         return {'movie':str(Path(destination)/'episode01.mp4'),'complete':False,'passed':False,
                 'issues':[],'frames':[],'errors':['No current assembled movie available for delivered review']}
@@ -358,6 +375,18 @@ def export_context(runner,report):
     return inputs
 
 
+def record_native_publication(runner,report,destination,previous_inputs):
+    """Rebind cached export inputs after the publisher's unchanged native-movie copy."""
+    from novel_manga.application.review.final_cut import current
+    from novel_manga.util import read_json
+    path=Path(destination)/'delivery.json';receipt=read_json(path,{})
+    final=report.get('final_cut_review')or{}
+    if (receipt.get('export_context')==previous_inputs and receipt.get('final_video')==final.get('movie')
+            and current(runner.context.episode_dir,report,final)):
+        receipt['export_context']=export_context(runner,report)
+        atomic_write_json(path,receipt)
+
+
 def finish_reviewed_delivery(runner,report,destination):
     """Close the receipt for the exact reviewed movie without encoding it again."""
     from novel_manga.application.review.final_cut import current
@@ -369,6 +398,12 @@ def finish_reviewed_delivery(runner,report,destination):
            and current(runner.context.episode_dir,report,final)
            and final.get('complete') is True and final.get('passed') is True
            and not final.get('issues') and not final.get('errors'))
+    from novel_manga.story.voice_delivery import episode_native_speech_errors
+    speech_errors=episode_native_speech_errors(runner.context.episode_dir,report)
+    if speech_errors:
+        receipt['speech_policy_errors']=speech_errors
+        valid=False
+    else:receipt.pop('speech_policy_errors',None)
     receipt['content_passed']=bool(valid and report.get('quality_review',{}).get('content_passed'))
     receipt['final_cut_review_passed']=bool(valid)
     receipt['status']=delivery_status(report,receipt.get('technical_passed') is True) if valid else 'candidate'

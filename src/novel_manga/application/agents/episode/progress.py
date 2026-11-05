@@ -44,6 +44,10 @@ def made_progress(ctx, before, before_status, status):
     prior = before_status.get('job') or {}
     outcome = job.get('result') or {}
     if job.get('id') != prior.get('id') and job.get('status') in {'completed', 'failed'}:
+        if job.get('action')=='mix_audio' and outcome.get('assembly_changed') and outcome.get('ok'):
+            return before[0] != progress(ctx,status)[0] or outcome != (prior.get('result')or{})
+        if job.get('action')=='first_frames' and outcome.get('reviewed_candidates'):
+            return True
         if (outcome.get('changed') or outcome.get('assets_added')
                 or set(outcome.get('input_repaired') or []) - set(outcome.get('input_reused') or [])):
             return True

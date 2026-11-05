@@ -52,8 +52,41 @@ def test_branding_is_encoded_before_final_movie_review(labelled_delivery):
     assert receipt['packaging']['watermark']==wm
 
 
+def test_controlled_native_publication_keeps_reviewed_export_receipt_current(labelled_delivery,monkeypatch):
+    import copy
+    from types import SimpleNamespace
+    from novel_manga.interactive import delivery
+    from novel_manga.application.repair.delivery import publish_if_ready
+    from novel_manga.application.review import final_cut
+    from novel_manga.util import atomic_write_json,read_json
+    case=labelled_delivery;ctx=case.ctx;runner=SimpleNamespace(context=ctx)
+    candidate=ctx.episode_dir/'repair_candidate/native.mp4';candidate.parent.mkdir();candidate.write_bytes(b'native')
+    case.destination.mkdir();exported=case.destination/'episode01.mp4';exported.write_bytes(b'reviewed native with final captions and card')
+    report=copy.deepcopy(case.report);report['assembly'].update(final_video=str(candidate),pending_publish=True)
+    for clip in ctx.clip_plan['clips']:clip['kind']='video'
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',ctx.clip_plan)
+    report['final_cut_review']={'policy':final_cut.POLICY,'movie':str(exported),'complete':True,'passed':True,
+        'issues':[],'errors':[],'context':final_cut.context(ctx.episode_dir,report,exported)}
+    atomic_write_json(ctx.episode_dir/'thin_media_report.json',report)
+    previous=delivery.export_context(runner,report)
+    atomic_write_json(case.destination/'delivery.json',{'final_video':str(exported),'export_context':previous,'technical_passed':True})
+    monkeypatch.setattr('novel_manga.application.production.runs.episode_status',lambda *a:'done')
+    monkeypatch.setattr('novel_manga.review.contracts.current_review',lambda *a:True)
+    monkeypatch.setattr('novel_manga.application.repair.delivery.precise_review_blockers',lambda *a:[])
+    assert publish_if_ready(ctx.episode_dir,{}, {})
+    published=read_json(ctx.episode_dir/'thin_media_report.json')
+    assert delivery.finish_reviewed_delivery(runner,published,case.destination)['status']=='candidate'
+    delivery.record_native_publication(runner,published,case.destination,previous)
+    assert delivery.finish_reviewed_delivery(runner,published,case.destination)['status']=='accepted'
+    receipt=read_json(case.destination/'delivery.json');bad_previous={**previous,'captions':['different source']}
+    receipt['export_context']=bad_previous;atomic_write_json(case.destination/'delivery.json',receipt)
+    delivery.record_native_publication(runner,published,case.destination,previous)
+    assert read_json(case.destination/'delivery.json')['export_context']==bad_previous
+
+
 @pytest.mark.parametrize('content_ok,media_ok', [(True,True),(False,True),(True,False)])
-def test_user_can_cancel_scene_overlays_without_removing_dialogue_or_choices(tmp_path,monkeypatch,content_ok,media_ok):
+@pytest.mark.parametrize('audio_edit',[None,'audio_repair','episode_ambience_mix'])
+def test_user_can_cancel_scene_overlays_without_removing_dialogue_or_choices(tmp_path,monkeypatch,content_ok,media_ok,audio_edit):
     import json
     from types import SimpleNamespace
     import pytest
@@ -89,10 +122,14 @@ def test_user_can_cancel_scene_overlays_without_removing_dialogue_or_choices(tmp
     report={'assembly':{'final_video':str(assembled),'ass':str(ass),'thin_passed':False,
                         'media_qc':{'checks':{'silence_ratio':{'passed':False}}}},
             'quality_review':{'passed':False,'content_passed':content_ok}}
+    if audio_edit:report['assembly'][audio_edit]={'source':'pre-mix.mp4'}
     receipt=delivery.deliver(SimpleNamespace(context=ctx),report,tmp_path/'delivery')
     first=commands[0]
     assert first[first.index('-i')+1]==str(work/'joined.mp4')
     assert first[first.index('-vf')+1]=='ass=subtitles.ass'
+    if audio_edit:
+        assert first[first.index('-i',first.index('-i')+1)+1]==str(assembled)
+        assert first[first.index('-map')+1]=='0:v:0' and '1:a:0' in first
     assert receipt['evidence_events']==[]
     assert receipt['delivery_policy']=={'extra_visual_overlays':False,'dialogue_subtitles':True,'interaction_card':True}
     assert any('anullsrc=r=48000:cl=stereo' in command for command in commands)
@@ -143,6 +180,82 @@ def labelled_delivery(tmp_path,monkeypatch):
             {'codec_type':'audio','codec_name':'aac'}]})
     monkeypatch.setattr(delivery.subprocess,'check_output',probe)
     return SimpleNamespace(ctx=ctx,report=report,commands=commands,destination=tmp_path/'delivery')
+
+
+@pytest.mark.parametrize('audio_input',[[],['old.wav']])
+def test_ordinary_delivery_checks_the_selected_speech_contract(labelled_delivery,audio_input):
+    from types import SimpleNamespace
+    from novel_manga.interactive import delivery
+    from novel_manga.story.voice_delivery import NATIVE_SPEECH_POLICY
+    from novel_manga.util import atomic_write_json
+    case=labelled_delivery;episode=case.ctx.episode_dir
+    atomic_write_json(episode.parent/'profile.json',{'h3_speech_policy':NATIVE_SPEECH_POLICY})
+    cue='Her voice stays low and steady.'
+    prompt=f'detailed_description:\n[Shot 1] {cue} She says <d>[Chinese] 等等。</d>\noverall_soundscape: Water.'
+    plan={'clips':[{'clip_id':'clip_01','kind':'video','h3_speech_policy':NATIVE_SPEECH_POLICY,
+        'dialogue_bindings':[{'stage':1,'text':'等等。','emotion':cue,'delivery_mode':'visible_dialogue'}]}]}
+    atomic_write_json(episode/'clip_plan.json',plan)
+    raw=episode/'work/clips/clip_01/attempt_01';raw.mkdir(parents=True)
+    atomic_write_json(raw/'request.json',{'prompt':prompt,'reference_audios':audio_input})
+    case.report['clips']=[{'clip_id':'clip_01','selected':{'video':str(raw/'clip.mp4')}}]
+    receipt=delivery.deliver(SimpleNamespace(context=case.ctx),case.report,case.destination)
+    assert receipt['technical_passed']is True and receipt['production_media_passed']is True
+    assert receipt['status']==('candidate'if audio_input else'accepted')
+    assert receipt['content_passed']==(not audio_input)
+    assert bool(receipt.get('speech_policy_errors'))==bool(audio_input)
+
+
+def test_approved_short_screenplay_keeps_media_and_exact_card_gates(labelled_delivery,monkeypatch):
+    import json
+    from types import SimpleNamespace
+    from novel_manga.interactive import delivery
+    case=labelled_delivery
+    groups=case.ctx.episode_dir/'authored_groups.json'
+    groups.write_text(json.dumps([{'shot_indexes':[1,2]}]))
+    final_frames=1257
+    def probe(command,**kwargs):
+        frames=1182 if command[-1].endswith('/body.mp4') else final_frames
+        return json.dumps({'streams':[
+            {'codec_type':'video','codec_name':'h264','width':1080,'height':1920,
+             'r_frame_rate':'25/1','nb_frames':str(frames)},
+            {'codec_type':'audio','codec_name':'aac'}]})
+    monkeypatch.setattr(delivery.subprocess,'check_output',probe)
+    runner=SimpleNamespace(context=case.ctx)
+    receipt=delivery.deliver(runner,case.report,case.destination)
+    assert receipt['duration']==50.28
+    assert receipt['technical_passed'] is True
+    final_frames=1256
+    assert delivery.deliver(runner,case.report,case.destination)['technical_passed'] is False
+    final_frames=1257
+    groups.unlink()
+    assert delivery.deliver(runner,case.report,case.destination)['technical_passed'] is False
+
+
+def test_cached_short_delivery_rechecks_old_technical_failure_without_encoding(labelled_delivery,monkeypatch):
+    import json
+    from pathlib import Path
+    from types import SimpleNamespace
+    from novel_manga.interactive import delivery
+    case=labelled_delivery
+    (case.ctx.episode_dir/'authored_groups.json').write_text('[]')
+    def probe(command,**kwargs):
+        return json.dumps({'streams':[
+            {'codec_type':'video','codec_name':'h264','width':1080,'height':1920,
+             'r_frame_rate':'25/1','nb_frames':'1182' if command[-1].endswith('/body.mp4') else '1257'},
+            {'codec_type':'audio','codec_name':'aac'}]})
+    monkeypatch.setattr(delivery.subprocess,'check_output',probe)
+    runner=SimpleNamespace(context=case.ctx)
+    receipt=delivery.deliver(runner,case.report,case.destination)
+    movie=Path(receipt['final_video']);movie.write_bytes(b'original encoded movie')
+    receipt.update(technical_passed=False,export_context=delivery.export_context(runner,case.report))
+    (case.destination/'delivery.json').write_text(json.dumps(receipt))
+    monkeypatch.setattr('novel_manga.application.review.final_cut.review_assembly',
+        lambda *a,**k:{'movie':str(movie),'complete':True,'passed':True})
+    before=len(case.commands)
+    delivery.reviewed_delivery(runner,case.report,case.destination)
+    assert json.loads((case.destination/'delivery.json').read_text())['technical_passed'] is True
+    assert movie.read_bytes()==b'original encoded movie'
+    assert not any('-c:v' in c for c in case.commands[before:])
 
 
 @pytest.mark.parametrize('manifest',[None,[],{}, {'surfaces':[]}])

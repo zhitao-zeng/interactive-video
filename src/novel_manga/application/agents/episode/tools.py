@@ -31,7 +31,7 @@ class EpisodeTools:
         try:
             if not isinstance(payload, dict) and payload is not None:
                 raise ValueError('tool payload requires an object')
-            if action not in {'check', 'adopt', 'render', 'review', 'apply', 'finish', 'status', 'doctor'}:
+            if action not in {'check', 'adopt', 'render', 'review', 'apply', 'finish', 'status', 'doctor', 'first_frames', 'mix_audio'}:
                 raise ValueError('unknown episode tool action')
             result = getattr(self, action)(payload or {})
             if action in {'apply', 'finish'}:
@@ -73,3 +73,11 @@ class EpisodeTools:
         report = run_doctor(self.ctx.novel_dir)
         record_state(self.ctx, 'doctor', ok=report['ok'])
         return {'ok': True, 'report': report}
+
+    def first_frames(self, payload):
+        from .first_frames import FirstFrameOperations
+        return FirstFrameOperations(self.ctx).prepare(payload)
+
+    def mix_audio(self,payload):
+        from .audio_mix import AudioMixOperations
+        return AudioMixOperations(self.ctx,self.media).prepare(payload)

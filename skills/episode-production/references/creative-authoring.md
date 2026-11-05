@@ -11,13 +11,24 @@ render contract.
 Read the manifest, `input/brief.md`, every original text document, and the supplied
 character/design images in `asset_catalog`. The manifest's `required_reads` also
 identifies the current authoring/voice guidance, camera library, spatial blockout,
-selected genre, repair playbook and six-method library. Read those resources, then
-choose useful methods for this story. They are one author's tools, not six rewrites.
+selected genre and six-method index. Read those required resources and all original
+sources. The index offers the method choices; `manifest.method_library` points to
+the complete library when a selected method needs its detailed procedure. These
+are one author's tools, not six rewrites. Production/H3 and repair references are
+available for their later phases or a concrete current ambiguity, not mandatory
+creation reading.
 Record chosen methods and their concrete purpose in `output/creative-notes.md`.
+Before drafting each scene, decide what the audience learns, who knows it, and
+which information remains hidden. In those same notes, explain the key viewing
+choices using current shot numbers: why this position, move or cut serves that
+change. Implement the choices in each shot's `purpose` and `camera`; notes alone
+are not the design. During self-review, compare the actual camera text with the
+intended reveal, reaction and spatial continuity, correct mismatches, and identify
+the shots changed. Camera variety and director-name counts are not acceptance.
 Read [shared dialogue craft](dialogue-craft.md) for every genre. Shape what the
 character says in context before designing how the voice delivers it; do not use
 performance adjectives to cover a lecture-like line.
-For shot design, use [camera language](camera-language.md) and
+For shot design, start with [scene camera selection](camera-selection.md) and
 [spatial blockout](spatial-blockout.md). Select the current genre's guidance:
 [travel](genres/travel.md), [romance](genres/romance.md), or
 [suspense](genres/suspense.md); their linked resources are for relevant cases,
@@ -36,6 +47,13 @@ record assumptions and use them consistently. Do not invent an external source.
 Use the supplied medium, length and interaction policy. A package's old timing or
 burn-in instructions do not override the current task. Preserve original assets.
 Where dimensions or off-camera geometry are unknown, mark a staging assumption.
+
+Use the known manifest paths instead of repeated directory inventories. Read a
+single short resource or a named section in each tool result. For a long document,
+use small windows (about 2,000 characters or 40 lines); after truncation, continue
+from the missing range instead of restarting. Reuse unchanged same-session reads.
+Read original source documents completely, with continuation windows as needed;
+shorter instructions never authorize dropping source events or evidence.
 
 ## Write the complete episode
 

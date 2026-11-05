@@ -33,6 +33,7 @@ def main():
     production.add_argument('--lane',choices=['h3','sd25'],required=True)
     production.add_argument('--project',choices=['adventure','romance','suspense'],default='adventure')
     production.add_argument('--edition',help='Render a separately prepared output edition, retaining other versions')
+    production.add_argument('--h3-input-mode',choices=['first-frame'],help='New edition only: fresh opening for every shot, selective extra cards, persistent Agent and review')
     production.add_argument('--resume-unsubmitted',action='store_true',help='Retry infrastructure failure only when no video task or take exists')
     production.add_argument('--resume',action='store_true',help='Resume original task receipts, takes and bounded review history; never clear them')
     status=commands.add_parser('status');status.add_argument('--project',choices=['adventure','romance','suspense'],default='adventure')
@@ -101,7 +102,7 @@ def main():
             if args.kind in ('all',kind):fn(ROOT,ROOT/'outputs/adventure-master')
     elif args.command=='run':
         from novel_manga.interactive.production import run_episode
-        result=run_episode(ROOT,args.lane,project=args.project,resume_unsubmitted=args.resume_unsubmitted,resume=args.resume,edition=args.edition)
+        result=run_episode(ROOT,args.lane,project=args.project,resume_unsubmitted=args.resume_unsubmitted,resume=args.resume,edition=args.edition,h3_input_mode=args.h3_input_mode)
         return 0 if result['status']=='accepted' else 2
     else:
         if args.edition:

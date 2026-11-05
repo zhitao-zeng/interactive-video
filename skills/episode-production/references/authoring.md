@@ -28,10 +28,19 @@ temporary objects. Actions may target these, the actor themselves or an empty
 target when no recipient is established. Preserve these meanings rather than
 turning an animal, armor or environment object into an available human actor.
 
+For authored scene/shot design, read [camera language](camera-language.md) before
+choosing coverage. Ground each shot's camera in its story purpose, visible
+information and actual scene geometry. Carry that decision into the shot itself;
+a technique label or a general promise in author notes is not its implementation.
+
 ## Actual pictures, wearing and framing
 
 Inspect the actual selected images. Ordinary character cards supply identity and
 stable design; the authored shot supplies pose, camera, crop and current state.
+For a director name or stylized camera request, use
+[director camera styles](director-camera-styles.md) to choose a motivated design
+and write its visible path or focus relationship, ending composition and stop.
+A named style is optional and does not authorize changing protected script decisions.
 Multiple views of the same person define one Subject: explain which picture
 supplies face/hair and which supplies body proportions, clothing or another view.
 Picture count and Subject count are not body counts.
@@ -114,6 +123,22 @@ IDs. Describe a consistent voice within the clip; timbre across clips can drift.
 Retain a required locked voice or audio-first/postmix workflow unless a change is
 authorized. If the host still fixes audio selection, use its supported correction
 path; changing prose alone does not remove an actual audio input.
+
+For a task choosing this combination, persist
+`profile.h3_speech_policy = "no_reference_performance_first"` in its adopted input.
+A new first-frame task requires an explicit speech-policy choice; `reference`
+retains an expressly requested locked voice. Historical frozen runs keep their
+original inputs.
+
+In the no-reference performance mode, each spoken turn's `emotion` contains the
+final English, event-specific performance direction. The compiler places it
+immediately before that turn's unchanged words. Keep physical acting and dialogue
+slots in `h3.shots`; do not repeat that vocal direction there or in `soundscape`.
+Use the source-backed input correction tool if inherited turns contain only a
+generic age/rate description or untranslated performance. Voice files may remain
+in the library, but neither native audio inputs nor Audio binding text may be
+sent. Packing, actual submission/cache reuse and final selected-take acceptance
+check this task contract. None of these checks proves naturalness without listening.
 
 The 2026-10-15 nine-second H3 pilot combined front-loaded performance with removal
 of audio conditioning, and the user preferred the result. This supports trying that
