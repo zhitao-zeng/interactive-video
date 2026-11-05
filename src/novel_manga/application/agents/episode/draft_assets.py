@@ -11,7 +11,7 @@ from novel_manga.review.endpoints import judge_settings
 from novel_manga.models.bible import Character, StoryBible
 from novel_manga.util import atomic_write_json, read_json
 from .arguments import UnsupportedInput
-from .input_records import input_receipt
+from .input_records import input_receipt, asset_image_recoverable
 
 IMAGE_REVIEW_POLICY = 2  # Scope appearance/style to humans, animals and empty settings.
 
@@ -90,7 +90,8 @@ def validate_request(ctx, row):
         records = sorted((ctx.episode_dir/'work/input_repairs').glob(f"{row['clip_id']}-*.json"),
                          key=lambda p: p.stat().st_mtime)
         previous = next((read_json(p) for p in reversed(records)
-                         if read_json(p, {}).get('status') in {'checking', 'incomplete'}), None)
+                         if read_json(p, {}).get('status') in {'checking', 'incomplete'}
+                         or asset_image_recoverable(read_json(p, {}))), None)
         if not previous or not previous.get('decision'):
             raise ValueError('no unfinished draft asset request to resume')
         row = {**previous['decision'], 'reason': row.get('reason') or previous['reason']}
@@ -145,7 +146,15 @@ def repair(ctx, row):
                 'assets': [{k: r[k] for k in ('id','name','role','path')} for r in assets],
                 'next': 'Read the actual new images in input/catalog.json, update draft reference_ids/H3 bodies, then check/render.'}
     except Exception as error:
+        from novel_manga.application.assets.candidates import AssetImageRejected
+        from .input_repair import service_interruption
+        kind = ('asset_image_rejected' if isinstance(error, AssetImageRejected) else
+                'source_rejected' if isinstance(error, UnsupportedInput) else
+                'service_interrupted' if service_interruption(error) or isinstance(error, (OSError, TimeoutError)) else 'input_validation')
         record.update(status='rejected' if isinstance(error, UnsupportedInput) else 'incomplete',
-                      step='draft_assets', error=f'{type(error).__name__}: {error}')
+                      step='draft_assets', error=f'{type(error).__name__}: {error}', error_kind=kind)
+        if isinstance(error, AssetImageRejected):
+            record['asset_image_review']={'exhausted':error.exhausted,'asset_id':error.asset_id,
+                                          'review':error.image_review}
         atomic_write_json(receipt, record)
         raise

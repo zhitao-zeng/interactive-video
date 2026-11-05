@@ -25,6 +25,11 @@ def prepare_candidate(ctx, row, plan, script, target, addresses, scope, matching
     directory, cid = ctx.episode_dir, row['clip_id']
     raw_phases = row.get('phases') or {}
     candidate_script = copy.deepcopy(script)
+    if 'music_plan' in row:
+        from novel_manga.story.timing import music_plan_issues
+        if issues:=music_plan_issues(row['music_plan'],candidate_script['shots']):
+            raise RepairArgumentError('; '.join(issues))
+        candidate_script['music_plan']=copy.deepcopy(row['music_plan'])
     shots = {s.get('index', i): s for i, s in enumerate(candidate_script['shots'], 1)}
     card_names = {c['name'] for c in read_json(ctx.novel_dir/'story_bible.json')['characters']}
     card_names.update(row.get('characters') or {})

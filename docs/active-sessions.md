@@ -276,3 +276,9 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | ZCode EP02-A复验收工 | 复验+修复链闭环:创作端三轮修复达candidate、改编桥全自动、首帧64候选18采纳、视频4落地、选曲接通、no-progress/智能窗/池健康/沙箱守卫/正式续窗等10+修复入main(全量4043过);剩余3帧+17视频+审片未完,两个新发现留档:#11新worktree缺选曲runtime(已修:拷runtime.json)、#12 episode CLI对首帧edition的run_dir与produce不同名(retry开平行状态)、作者会话退化(2万thinking事件/轮,快速档已配未验) | codex/backrooms55-ep02-diagnostic-20261022 | 诊断树+.runtime台账;verify edition状态全保留 | 2026-10-22 | 已收工;明日优先CLI run-dir兼容+会话退化对策;sd-noframe并行会话在产同集SD版;未推送 |
 
 | ZCode #12+会话退化修复 | ①create_context目录发现:无显式output_root时探测firstframes/music/agent三约定既有run,CLI retry续真状态(冒烟已验:verify edition解析到firstframes真实目录);②默认作者配置切快速档(thinking off+effort low+16k,修复线同款),传导链有测试;2新测试,全量4053连两轮绿 | main(783b0c4) | context.py、configs/agent_sandbox.json、tests/test_agent_run_discovery.py | 2026-10-22 | 已提交;verify edition下次resume即用快速档;并行瞬态(一轮11败)已定位为与sd线资源竞争,复跑全绿 |
+
+| Codex asset auto repair cold runtime | W06 source-approved image-only resume, existing production data | codex/zcode-asset-auto-repair-20261023 | root; candidates/input recovery/asset builder + retained root WIP | 2026-10-23 13:11 | 172 targeted tests passed in candidate; isolated cold runtime, PROD workers unchanged; no commit/push |
+
+| finish_four_recovery（接续independent_media_review） | W07/W10/W12/W14已正常完整混音导出为candidate；全部worker结束；实际take speech与source-reviewed postmix music_plan冷修复 | codex/native-four-finish-20261023 | 自有worktree/runtime；仅这4集PROD production artifacts及正常delivery；176+43相关测试通过 | 2026-10-23 | 未commit/push；PROD/C源代码未改；原镜头/计数/预算保留，真实工具耗时扣原余额 |
+
+| finish_four_recovery / ordered Taildrop | W06→W20顺序发送完整原片及现有音乐署名；W01–W05不重传，缺前集等待 | codex/native-four-finish-20261023 | 自有runtime sender；R/macmini-send-receipt-ordered-020.json；exact100.99.17.117 | 2026-10-23 | 单sender --watch后台运行，首等W06；原媒体不转码/复制，未改生产与ModelScope watch；4项离线验证通过 |
