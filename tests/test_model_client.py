@@ -73,6 +73,20 @@ def test_stream_keeps_usage_and_existing_platform_parameters(monkeypatch):
     assert payload == original
 
 
+def test_stream_preserves_provider_reported_model_without_changing_requested_alias(monkeypatch):
+    monkeypatch.setenv('QWEN38_LOCAL_MIN_MAX_TOKENS','0')
+    payload={'model':'phanthy.com/deepseek-v4','max_tokens':128}
+    def respond(request):
+        assert json.loads(request.content)['model']==payload['model']
+        data={'model':'kimi-k2.6','choices':[{'delta':{'content':'{}'},'finish_reason':'stop'}],
+              'usage':{'total_tokens':3}}
+        return httpx.Response(200,text='data: '+json.dumps(data)+'\ndata: [DONE]\n')
+    with httpx.Client(transport=httpx.MockTransport(respond),trust_env=False)as http:
+        result=transport.stream_completion(http,'http://test.invalid/v1/chat/completions',{},payload,17)
+    assert result['model']=='kimi-k2.6'
+    assert payload['model']=='phanthy.com/deepseek-v4'
+
+
 @pytest.mark.parametrize('body', ['data: {"error":{"message":"unavailable"}}\n', 'data: [DONE]\n'])
 def test_stream_errors_are_not_returned_as_success(body):
     with httpx.Client(transport=httpx.MockTransport(lambda _: httpx.Response(200, text=body)), trust_env=False) as http:

@@ -26,6 +26,8 @@ def case(tmp_path, monkeypatch):
              'source_quote': 'empty pool'} for c in clips]
     atomic_write_json(ctx.work_dir/'output/first-frames.json', {'frames': rows})
     monkeypatch.setattr('novel_manga.application.agents.episode.first_frames.validate_existing_request', lambda *a: None)
+    monkeypatch.setattr('novel_manga.application.agents.episode.first_frames.review_opening_sources',
+                        lambda *a: {}, raising=False)
     return ctx, clips
 
 
