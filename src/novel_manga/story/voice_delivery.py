@@ -103,6 +103,18 @@ def native_speech_errors(clip, *, prompt='', audios=None, syntax='h3'):
     return problems
 
 
+def _request_syntax(profile,clip,request=None):
+    """Which grammar the actual request follows. SD normal-reference editions carry
+    no h3_input_mode and their clips carry no prompt_h3: they were being audited
+    with H3 [Shot]/<d> grammar and falsely rejected (zhiyao EP02A clips 01/03/05,
+    2026-10-23). First-frame SD and any H3 clip keep the H3 checks."""
+    if profile.get('sd_input_mode')=='first-frame':
+        return 'sd'
+    if profile.get('h3_input_mode')=='first-frame' or clip.get('prompt_h3'):
+        return 'h3'
+    return 'sd'
+
+
 def require_native_speech(ctx,clip,request=None):
     """Guard profile/clip agreement and real audio inputs before cache or submission."""
     from novel_manga.util import read_json
@@ -112,7 +124,7 @@ def require_native_speech(ctx,clip,request=None):
         raise ValueError('H3 speech policy changed or was dropped; repack this clip before using its request/cache')
     errors=native_speech_errors(clip,prompt=(request or {}).get('prompt',clip.get('prompt_h3','')),
                                 audios=(request or {}).get('reference_audios'),
-                                syntax='sd'if profile.get('sd_input_mode')=='first-frame'else'h3')
+                                syntax=_request_syntax(profile,clip,request))
     if errors:raise ValueError('; '.join(errors))
 
 
@@ -138,7 +150,7 @@ def episode_native_speech_errors(directory,media):
                 errors.append('selected native take has no preserved request to verify speech policy')
         else:
             errors.extend(native_speech_errors(clip,prompt=request.get('prompt',''),audios=request.get('reference_audios'),
-                syntax='sd'if profile.get('sd_input_mode')=='first-frame'else'h3'))
+                syntax=_request_syntax(profile,clip,request)))
         if errors:results[cid]=list(dict.fromkeys(errors))
     if not plan.get('clips'):results['episode']=['speech policy requires a current clip plan']
     return results
