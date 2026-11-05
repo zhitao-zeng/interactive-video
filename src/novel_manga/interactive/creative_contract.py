@@ -140,9 +140,31 @@ def read_evidence(work_dir):
     return reads
 
 
-def export(episode, manifest, destination, *, notes=None):
+def export(episode, manifest, destination, *, notes=None, style_source=None):
     destination.mkdir(parents=True, exist_ok=True)
     (destination / 'owner').write_text('Unified creator / text-only creative candidate; no media generated.\n')
+    if manifest.get('selected_style'):
+        if style_source is None:
+            raise ValueError('export requires the selected frozen style_source')
+        import shutil
+        style_source = Path(style_source)
+        work = style_source.parent.parent
+        style = json.loads(style_source.read_text())
+        for example in style.get('examples', []):
+            if example.get('kind') in {'original_style_board', 'historical_style_frame'} and example.get('path'):
+                source = work / example['path']
+                relative = Path('style-examples') / source.name
+                (destination / relative).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, destination / relative)
+                example['path'] = relative.as_posix()
+            for field in ('review', 'evidence'):
+                if example.get(field):
+                    evidence = work / example[field]
+                    evidence_target = Path('style-examples') / evidence.name
+                    (destination / evidence_target).parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(evidence, destination / evidence_target)
+                    example[field] = evidence_target.as_posix()
+        (destination / 'style.json').write_text(json.dumps(style, ensure_ascii=False, indent=2) + '\n')
     shots = episode['chapter_script']['shots']
     for name, data in [('episode', episode), ('chapter_script', episode['chapter_script']),
                        ('interaction', episode['interaction']), ('spatial_plan', episode['spatial_plan']),
@@ -160,6 +182,10 @@ def export(episode, manifest, destination, *, notes=None):
         board.extend([f'## {heading}\n', f'目的：{shot["purpose"]}',
             f'起始：{shot["start_state"]}', f'画面与行动：{shot["event"]}',
             f'机位与运动：{shot["camera"]}', f'结果：{shot["end_state"]}'])
+        if shot.get('visual_prompt'):
+            board.append('视觉重点：' + str(shot['visual_prompt']))
+        if shot.get('light'):
+            board.append('场景光线：' + str(shot['light']))
         for turn in shot.get('turns', []):
             mode = {'visible_dialogue': '现场对白', 'offscreen_dialogue': '画外声'}[turn['delivery_mode']]
             speech = f'{turn["speaker_name"]}（{mode}）：{turn["text"]}'

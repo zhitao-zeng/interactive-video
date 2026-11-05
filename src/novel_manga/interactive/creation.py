@@ -58,10 +58,17 @@ def prepare(task_path, run_dir):
     skill, refs = _install_skill(SimpleNamespace(work_dir=work))
     genre = {'adventure': 'travel_authoring', 'romance': 'romance_authoring',
              'suspense': 'suspense_authoring'}[project]
+    selected_style = None
+    style_reads = []
+    if task.get('style'):
+        from novel_manga.style_packs import freeze_selected_style
+        selected_style, style_images = freeze_selected_style(task['style'], work)
+        assets.extend(style_images)
+        style_reads.append(selected_style['file'])
     required = [skill, 'input/manifest.json', 'input/brief.md', 'input/creation-methods.json',
                 *[refs[k] for k in ('output_contract', 'creative_authoring', 'authoring', 'dialogue_craft',
                                    'camera_language', 'spatial_blockout', genre, 'repair_playbook')],
-                *sources, *[r['path'] for r in assets]]
+                *sources, *style_reads, *[r['path'] for r in assets]]
     target = task.get('target_seconds', [180, 300])
     if len(target) != 2 or not 0 < target[0] <= target[1]:
         raise ValueError('target_seconds requires a positive minimum/maximum pair')
@@ -74,6 +81,8 @@ def prepare(task_path, run_dir):
         'available_tools': ['Read', 'Write', 'Edit', 'Glob', 'Grep'],
         'output_contract': 'output/episode.json; creator contract, no H3 prompts/render request',
         'authority': 'Current brief governs permitted adaptation; original package remains source evidence.'}
+    if selected_style:
+        manifest['selected_style'] = selected_style
     atomic_write_json(work / 'input/manifest.json', manifest)
     atomic_write_json(work / 'input/current-task.json', {'phase': 'creation_only',
         'goal': 'Complete screenplay, storyboard, interactive options and spatial design in one author session',
@@ -118,6 +127,12 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
                   'passages and refreshed references for the current revision. Preserve valid '
                   'work, write the complete corrected output/episode.json and self_review, '
                   'and finish the draft. File operations only; no media generation.')
+    style_task = (' Read selected_style frozen rules and style-reference images; reuse them if already read. '
+                  'Use them to choose the scene\'s visual focus, palette, material and light in camera/light/visual_prompt; '
+                  'these examples do not supply character identities, story events, layout or a new camera POV. '
+                  'Keep source-backed identities, wardrobe, story facts and authored time of day.'
+                  if manifest.get('selected_style') else '')
+    prompt += style_task
     if feedback is not None:
         if not resume:
             raise ValueError('Feedback revises the same author; use resume=True')
@@ -161,7 +176,8 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
         if not attempt.ok:
             return state
         if not issues:
-            export(candidate, manifest, run_dir / 'delivery', notes=work/'output/creative-notes.md')
+            export(candidate, manifest, run_dir / 'delivery', notes=work/'output/creative-notes.md',
+                   style_source=work/manifest['selected_style']['file'] if manifest.get('selected_style') else None)
             state['delivery'] = str(run_dir / 'delivery')
             atomic_write_json(state_path, state)
             return state
@@ -169,7 +185,7 @@ def run(task_path, run_dir, *, config=None, resume=False, feedback=None):
             resume = True
             prompt = ('Continue this same creator session and the existing output/episode.json. '
                       'Read input/creative-validation.json, correct all named issues while preserving '
-                      'valid choices, finish the full draft and self-review. Use only file tools; no media.')
+                      'valid choices, finish the full draft and self-review. Use only file tools; no media.') + style_task
     return state
 
 
