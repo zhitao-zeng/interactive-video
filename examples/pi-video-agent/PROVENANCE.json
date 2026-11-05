@@ -144,13 +144,15 @@
       "path": "template/tools/audio_service.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/tools/audio_service.py",
       "source_sha256": "32cddda5773f2588c5e9b228bdb9567168b01e7f2cc7d5f3b1047fbb0391d255",
-      "merged_sha256": "32cddda5773f2588c5e9b228bdb9567168b01e7f2cc7d5f3b1047fbb0391d255"
+      "merged_sha256": "5f4b74bd6a66bc952e4ae9ec0f70fd2b2df312f8e239016ad27dc85523aac238",
+      "note": "Current project audio question forwarding and bounded CPU fallback; upstream attribution retained"
     },
     {
       "path": "template/tools/audio_worker.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/tools/audio_worker.py",
       "source_sha256": "c8847e0422444d73ba5810dd074c4916106aa3607425c8b92a2a0a4af65bc4a2",
-      "merged_sha256": "c8847e0422444d73ba5810dd074c4916106aa3607425c8b92a2a0a4af65bc4a2"
+      "merged_sha256": "64be39bf5d3f6768551e2d0350fdedf0bc4b35fd73cc509c67e128e31ae7742c",
+      "note": "Current project audio question forwarding and bounded CPU fallback; upstream attribution retained"
     },
     {
       "path": "template/tools/batch.py",
@@ -174,7 +176,8 @@
       "path": "template/tools/media.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/tools/media.py",
       "source_sha256": "0307bf9b1beda097f4fb66b03bd1c015356be26f5a5260fa98e6c8ac5402e3ff",
-      "merged_sha256": "dfc7e483bdf6fc2a6ea0784ad160c39fbec63daa69029aa8828acc7878da56f0"
+      "merged_sha256": "01900a8e96f186362ca59fbf50db10c89e8b6c2e46d4d5400a30c9b58b1fbf6d",
+      "note": "Current project audio question forwarding and bounded CPU fallback; upstream attribution retained"
     },
     {
       "path": "template/tools/plan.example.py",
