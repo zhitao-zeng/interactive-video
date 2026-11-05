@@ -145,6 +145,59 @@ def labelled_delivery(tmp_path,monkeypatch):
     return SimpleNamespace(ctx=ctx,report=report,commands=commands,destination=tmp_path/'delivery')
 
 
+def test_approved_short_screenplay_keeps_media_and_exact_card_gates(labelled_delivery,monkeypatch):
+    import json
+    from types import SimpleNamespace
+    from novel_manga.interactive import delivery
+    case=labelled_delivery
+    groups=case.ctx.episode_dir/'authored_groups.json'
+    groups.write_text(json.dumps([{'shot_indexes':[1,2]}]))
+    final_frames=1257
+    def probe(command,**kwargs):
+        frames=1182 if command[-1].endswith('/body.mp4') else final_frames
+        return json.dumps({'streams':[
+            {'codec_type':'video','codec_name':'h264','width':1080,'height':1920,
+             'r_frame_rate':'25/1','nb_frames':str(frames)},
+            {'codec_type':'audio','codec_name':'aac'}]})
+    monkeypatch.setattr(delivery.subprocess,'check_output',probe)
+    runner=SimpleNamespace(context=case.ctx)
+    receipt=delivery.deliver(runner,case.report,case.destination)
+    assert receipt['duration']==50.28
+    assert receipt['technical_passed'] is True
+    final_frames=1256
+    assert delivery.deliver(runner,case.report,case.destination)['technical_passed'] is False
+    final_frames=1257
+    groups.unlink()
+    assert delivery.deliver(runner,case.report,case.destination)['technical_passed'] is False
+
+
+def test_cached_short_delivery_rechecks_old_technical_failure_without_encoding(labelled_delivery,monkeypatch):
+    import json
+    from pathlib import Path
+    from types import SimpleNamespace
+    from novel_manga.interactive import delivery
+    case=labelled_delivery
+    (case.ctx.episode_dir/'authored_groups.json').write_text('[]')
+    def probe(command,**kwargs):
+        return json.dumps({'streams':[
+            {'codec_type':'video','codec_name':'h264','width':1080,'height':1920,
+             'r_frame_rate':'25/1','nb_frames':'1182' if command[-1].endswith('/body.mp4') else '1257'},
+            {'codec_type':'audio','codec_name':'aac'}]})
+    monkeypatch.setattr(delivery.subprocess,'check_output',probe)
+    runner=SimpleNamespace(context=case.ctx)
+    receipt=delivery.deliver(runner,case.report,case.destination)
+    movie=Path(receipt['final_video']);movie.write_bytes(b'original encoded movie')
+    receipt.update(technical_passed=False,export_context=delivery.export_context(runner,case.report))
+    (case.destination/'delivery.json').write_text(json.dumps(receipt))
+    monkeypatch.setattr('novel_manga.application.review.final_cut.review_assembly',
+        lambda *a,**k:{'movie':str(movie),'complete':True,'passed':True})
+    before=len(case.commands)
+    delivery.reviewed_delivery(runner,case.report,case.destination)
+    assert json.loads((case.destination/'delivery.json').read_text())['technical_passed'] is True
+    assert movie.read_bytes()==b'original encoded movie'
+    assert not any('-c:v' in c for c in case.commands[before:])
+
+
 @pytest.mark.parametrize('manifest',[None,[],{}, {'surfaces':[]}])
 def test_empty_evidence_surfaces_keep_authored_labels_and_actual_clip_timing(labelled_delivery,monkeypatch,manifest):
     import json

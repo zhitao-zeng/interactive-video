@@ -1,0 +1,119 @@
+{
+  "name": "制度科幻实景",
+  "render_family": "photo",
+  "visual_style": "真人科幻电影摄影，以可信的公共机构、工作空间与真实物理材料呈现陌生秩序",
+  "render_direction": "自然皮肤与真实布料，哑光涂层、玻璃、金属各有清楚质感；服装、年龄、身体特征和道具状态沿用本场事实",
+  "scene_style": "可使用、可通行的制度科幻实景，空间尺度和设备功能可辨",
+  "scene_direction": "用结构重复、材质分区和少量重点色组织注意；日夜、天气、光源、地理与摄影视角服从本场，不把所有场景统一压成蓝黑",
+  "h3_style_line": "Live-action institutional science-fiction with natural skin, tactile practical materials and legible spatial scale. Organize attention through restrained material zones, repeated architectural shapes and a motivated focal accent. Preserve the authored time of day, light sources, wardrobe, action, geography and camera viewpoint.",
+  "location_empty_suffix": "无人场景参考，保留空间结构、通路与实际光源；不出现人物、人影或镜中人；文字、徽标与显示内容按项目的明确呈现方案处理",
+  "pack_version": "2026-10-19.2",
+  "card_suffix": "",
+  "prompt_fingerprint": false,
+  "tidy_prompts": true,
+  "art_direction": {
+    "intent": "让观众相信这个空间真的有人使用，再由秩序、尺度和人的行动感到异常。这里只选择视觉表达；不新增制度、设备能力、事件、人员或剧情规则。",
+    "suitable_for": [
+      "机构调查与近未来悬疑",
+      "科研、行政与公共设施中的人物戏",
+      "强调人和系统关系的科幻",
+      "需要真实材质和空间路线的探索"
+    ],
+    "palette": {
+      "base": [
+        "矿物灰与暖白",
+        "灰绿或灰蓝构件",
+        "真实木色与金属本色"
+      ],
+      "accent": [
+        "与事件有关的暖橙或红",
+        "由本场物件决定的少量高辨识色"
+      ],
+      "use": "基色负责场所可信度；重点色落在正在被观察或操作的既有物件上。白天可以明亮，重要服装和剧情色保持原色，不凭风格擅自加警报红。"
+    },
+    "lighting": [
+      "以窗、顶灯、台灯等本场可解释光源分配明暗；人脸和手部动作可读。",
+      "让观察目标与背景有一处明确分离，利用亮度、色温或反光材质中的一种即可。",
+      "保留所在时段的曝光与天气；明亮公共空间也能通过秩序和留白形成压力。"
+    ],
+    "composition": [
+      "先看清人、工作面、入口的关系，再安排设备与装饰。",
+      "结构重复建立秩序；只有本场已有的异常才打断这种秩序。",
+      "使用人物和普通物件作尺度标记；按场面需要选择近距离交流或被环境包围。",
+      "手与关键道具的关系优先于装饰细节；单个镜头不同时争夺多个视觉中心。"
+    ],
+    "motifs": [
+      "沿既有场所重复门框、隔窗或工作台的形状，使空间具有共同语汇。",
+      "同一机构的已存在设备保持相近材质与操作尺度；不为了统一风格凭空增设屏幕。",
+      "物件状态的前后变化用于承接事件，图形和颜色不另造隐藏线索。"
+    ],
+    "asset_guidance": {
+      "character": [
+        "自然成年人体比例与可辨的面部结构；风格不改变角色年龄、身份或身体事实。",
+        "衣物呈现真实重量、接缝与使用程度；不同人物仍按原设定穿着。",
+        "手的轮廓、视线对象和握持姿态在道具附近保持清楚。"
+      ],
+      "location": [
+        "场景参考交代可走地面、门窗和工作面的关系，避免只有无法使用的设备墙。",
+        "玻璃、涂漆墙和金属的反射强度分层；年代感不等于整面污损。",
+        "空场图保持本场光照与材质，不借参考图加入新角色、徽章或情节。"
+      ],
+      "prop": [
+        "关键物件先定轮廓、尺寸和使用方向，再补必要接口或表面磨损。",
+        "道具功能只取自源稿；普通纸条可以就是纸条，不强加发光界面。",
+        "关键状态单独说清，例如折叠未打开、递出未接收；材质不会替代动作状态。"
+      ]
+    },
+    "pitfalls": [
+      "不要把科幻等同于全蓝、全暗、满屏灯带和雾。",
+      "不要用密集设备遮住人物行动，也不要让所有表面同时高反光。",
+      "参考中的军舰、外星巨构和制服不是本包必须生成的内容。",
+      "样张通过只说明该张图的表现；不能据此宣称视频运动、对白或全片连续性通过。"
+    ],
+    "references": [
+      {
+        "title": "《她将继续流浪》完整版",
+        "url": "https://www.bilibili.com/video/BV13JPezGEDH/",
+        "observed_method": "2026-10-19实际审看18张全时轴3秒网格、356帧及8张原帧；未连续播放听审。",
+        "lesson": "约00:18–00:39用桌面、座位和档案建立办事空间；06:00–08:24用红船、飞机与巨构比较尺度；11:00后明亮白草空间说明科幻不必全暗。",
+        "limits": "取空间、重点色与尺度的组织原则，不复制人物、军徽、载具或世界设定；本包尚未做模型样张或视频验证。"
+      }
+    ],
+    "sample_prompt": "One complete cinematic frame, 16:9, live-action institutional science-fiction. Two original adult strangers stand across a small counter in a modest public-service interior. One adult, wearing a plain slate-gray jacket, holds out one plain folded note above the counter; the other adult, in an unbranded warm-ivory shirt, has not yet accepted it, with both hands remaining on their own side. The offered note, the holding fingers and the gap to the recipient are unobstructed. A window is visible behind them on the left and a closed door on the right. Soft afternoon window light, warm-white plaster, muted gray-green painted metal and a restrained brushed-aluminum counter edge. Use material and value separation to guide attention to the note and the two faces. Natural skin, realistic fabric, practical human scale. A single scene, no panels, no captions, no readable text, no logos, no borrowed character likeness."
+  },
+  "examples": [
+    {
+      "kind": "original_style_board",
+      "path": "assets/style-library/2026-10-19/institutional-sci-fi/board.png",
+      "scope": "style_only_not_character_identity",
+      "status": "reviewed",
+      "review": "assets/style-library/2026-10-19/institutional-sci-fi/image-review.json"
+    }
+  ],
+  "validation": {
+    "image": "reviewed",
+    "video": "short_sample_reviewed",
+    "notes": [
+      "规则与样图只指导色光、材质、构图；源素材的人物身份、事实、衣装、空间与已定机位优先。",
+      "只实际审看这一张生成图片；没有视频、声音、运动、动作完成过程或跨镜身份验证。",
+      "单帧只能显示此刻未接收，无法证明前后动作的因果、犹豫节拍或物件持续一致。",
+      "‘陌生人’是该原创场景的设定，单张图无法独立验证人物此前是否认识；未见明显借用身份，不是全球相似性检索结论。",
+      "白色纸件的信封式折线使普通便条的具体折法存在歧义，不能直接当精确道具资产。这里不因此发起额外生成。",
+      "本次仅完成图片人工视觉审阅，未改配置的验证状态，也未提交新API请求。",
+      "本版补齐三张新样图，并登记七种画风的8步H3短小样；美术规则未变，旧任务保持原快照。",
+      "小样取样审阅不等于完整动作、整集、声音或长时连续性通过；具体偏差见附带审阅。",
+      "仍标needs_revision的唯美/纸艺静帧继续保留问题状态，不因视频风格保持而自动成为可用作者参考。"
+    ],
+    "video_sample": {
+      "path": "delivery/style-h3-h100-20261019/institutional-sci-fi/sample.mp4",
+      "review": "delivery/style-h3-h100-20261019/review-institutional-paper.json",
+      "mode": "H100 H3 Ref2VA / 8step acceleration LoRA / strength1",
+      "seconds": 5.207,
+      "short_edge": 768,
+      "seed": 2101,
+      "num_inference_steps": 9,
+      "scope": "单种子5秒小样，21张4fps样本及关键原帧审阅；非整集、连续播放或声音验收。",
+      "source_config_version": "2026-10-19.1"
+    }
+  }
+}

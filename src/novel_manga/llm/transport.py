@@ -16,6 +16,10 @@ def stream_completion(client: httpx.Client, url: str, headers: dict, payload: di
     reasoning_effort field is set instead.
     """
     request = {k: v for k, v in payload.items() if k != "chat_template_kwargs"}
+    # Preserve the DS API caller's thinking intent for both supported releases.
+    if (request.get('model') in {'deepseek-v4.1-flash', 'deepseek-v4.1-flash-1017'}
+            and (payload.get('chat_template_kwargs') or {}).get('enable_thinking') is False):
+        request.setdefault('thinking', {'type': 'disabled'})
     request.update({"stream": True, "stream_options": {"include_usage": True}})
     request.setdefault("reasoning_effort", settings.reasoning if settings else os.environ.get("QWEN38_LOCAL_REASONING", "low"))
     # The callers' budgets fit the local model's context window; a platform

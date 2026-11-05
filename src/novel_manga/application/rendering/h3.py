@@ -26,7 +26,7 @@ from novel_manga.llm.client import ask_json, image_part
 from novel_manga.application.profiles import h3_compile_inputs, h3_prompt_outdated, h3_source_digest, h3_stamp
 from novel_manga.application.production.runs import corrections
 
-from novel_manga.util import atomic_write_json  # noqa: E402
+from novel_manga.util import atomic_write_json, read_json  # noqa: E402
 from novel_manga.story.h3 import request_issues, stages_of, subject_lines, asset_subjects, compose, tag_names, CJK, CHARACTER_TRAIT, REQUEST_CONTENT_RULES
 
 ENGLISH_CHARACTERS = r'[^\u4e00-\u9fff]'
@@ -150,7 +150,19 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
     # seating; a bare stamp from before is compared under the old formula instead.
     from novel_manga.application.profiles import h3_stamp
     stamp = h3_stamp(clip, note)
-    if clip.get("prompt_h3_of") == stamp and clip.get("prompt_h3") and not request_issues(clip):
+    reference_rejection = ''
+    if episode_dir is not None and clip.get('prompt_h3'):
+        saved = read_json(episode_dir/'work/request_checks'/f"{clip['clip_id']}.json", {})
+        answer = saved.get('answer') or {}
+        if (saved.get('inputs', {}).get('english') == clip['prompt_h3']
+                and (answer.get('consistent') is not True or answer.get('problems'))):
+            from novel_manga.application.preparation.request_check import current_request
+            checked = current_request(episode_dir, clip)
+            if checked.get('consistent') is not True or checked.get('problems'):
+                reference_rejection = 'Request/reference validation rejected the previous English: ' + '; '.join(
+                    checked.get('problems') or ['Request and references are not consistent'])
+    if (clip.get("prompt_h3_of") == stamp and clip.get("prompt_h3") and not request_issues(clip)
+            and not reference_rejection):
         return False
     stages = stages_of(prompt)
     if not stages and clip.get('prompt_compiler') == 'romance_conversation_v1':
@@ -242,7 +254,7 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
                         ['', *[re.escape(m) for m in markers], '']) + '$'}
         directions.append(contract)
     schema['properties']['shots'].update(prefixItems=directions, items=False)
-    problem = ''
+    problem = reference_rejection
     endpoint = h3_translation_endpoint()
     run_id = time.strftime('%Y%m%d-%H%M%S')
     for attempt in range(1, tries + 1):
@@ -291,6 +303,11 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
             conflicts = request_issues({**clip, 'prompt_h3': candidate})
             if conflicts:
                 raise ValueError('; '.join(conflicts))
+            if reference_rejection:
+                checked = current_request(episode_dir, {**clip, 'prompt_h3': candidate})
+                if checked.get('consistent') is not True or checked.get('problems'):
+                    raise ValueError('Request/reference validation: ' + '; '.join(
+                        checked.get('problems') or ['Request and references are not consistent']))
             clip['prompt_h3'] = candidate
             clip['prompt_h3_of'] = stamp
             merge_correction_into_prompt()

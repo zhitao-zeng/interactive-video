@@ -24,6 +24,19 @@ def video_seconds(stream: dict) -> float:
     return int(stream['nb_frames']) / float(Fraction(stream['r_frame_rate']))
 
 
+def technical_result(ctx, movie: Path, body_frames: int) -> tuple[float, bool]:
+    decode=subprocess.run(['ffmpeg','-v','error','-i',str(movie),'-f','null','-'],capture_output=True,text=True)
+    info=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(movie)],text=True))
+    video=next(s for s in info['streams'] if s['codec_type']=='video')
+    audio=next(s for s in info['streams'] if s['codec_type']=='audio')
+    duration=video_seconds(video)
+    passed=(decode.returncode==0 and not decode.stderr.strip() and video['width']==ctx.settings.width and video['height']==ctx.settings.height
+            and video['codec_name']=='h264' and video['r_frame_rate']=='25/1' and audio['codec_name']=='aac'
+            and ((ctx.episode_dir/'authored_groups.json').is_file() or 180<=duration<=300)
+            and int(video['nb_frames'])-body_frames==75)
+    return duration,passed
+
+
 def requested_sampling(provider,profile):
     # The framed H3 adapter owns the local sampler; its inherited image/video
     # profile resolution is the hosted lane's tier, not the H3 short edge.
@@ -250,14 +263,7 @@ def deliver(runner, report: dict, destination: Path) -> dict:
     if cover.is_file():shutil.copy2(cover,destination/'cover.jpeg')
     if packaging.get('cover'):shutil.copy2(packaging['cover'],destination/'cover.jpeg')
     elif publication:shutil.copy2(destination/'world-introduction.jpeg',destination/'cover.jpeg')
-    decode=subprocess.run(['ffmpeg','-v','error','-i',str(final),'-f','null','-'],capture_output=True,text=True)
-    info=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(final)],text=True))
-    video=next(s for s in info['streams'] if s['codec_type']=='video')
-    audio=next(s for s in info['streams'] if s['codec_type']=='audio')
-    duration=video_seconds(video)
-    technical=(decode.returncode==0 and not decode.stderr.strip() and video['width']==ctx.settings.width and video['height']==ctx.settings.height
-               and video['codec_name']=='h264' and video['r_frame_rate']=='25/1' and audio['codec_name']=='aac'
-               and 180<=duration<=300 and int(video['nb_frames'])-int(body_info['nb_frames'])==75)
+    duration,technical=technical_result(ctx,final,int(body_info['nb_frames']))
     # Clean delivery uses the native join, and publication inserts its own cards.
     # The assembly's normalized audio is a different track, not this film's QC.
     media_report=destination/'media-quality.json'
@@ -330,6 +336,10 @@ def reviewed_delivery(runner,report,destination):
         version=versions/f'export-{len(list(versions.glob("export-*")))+1:03d}'
         receipt=deliver(runner,pending,version)
         receipt['export_context']=inputs
+    elif receipt.get('technical_passed') is False:
+        # Recheck a cached failure under the current rules without re-encoding its movie.
+        _,receipt['technical_passed']=technical_result(runner.context,Path(receipt['final_video']),
+            round(receipt['actual_body_seconds']*25))
     if not receipt.get('final_video'):
         return {'movie':str(Path(destination)/'episode01.mp4'),'complete':False,'passed':False,
                 'issues':[],'frames':[],'errors':['No current assembled movie available for delivered review']}

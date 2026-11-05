@@ -10,5 +10,124 @@
   "card_suffix": "",
   "prompt_fingerprint": false,
   "tidy_prompts": true,
-  "location_empty_suffix": "空场参考，画面内无人，没有人影或剪影；牌面和屏幕不生成文字，由后期添加"
+  "location_empty_suffix": "空场参考，画面内无人，没有人影或剪影；牌面和屏幕不生成文字，由后期添加",
+  "pack_version": "2026-10-19.2",
+  "art_direction": {
+    "intent": "把架空城市作为有真实材质和使用逻辑的地点拍摄，让旅行者的观察、路线与规则后果可跟踪。与通用现代写实相比，本包侧重同一城市的地标、路线和不同状态；不替作者增加规则、改变事实、角色、服装、日夜或机位。",
+    "suitable_for": [
+      "架空城市旅行与规则探索",
+      "同一街区表里世界或前后状态对照",
+      "车站、旅店、码头等含路线取舍的冒险"
+    ],
+    "palette": {
+      "base": [
+        "暖白建筑与浅石色",
+        "青绿建筑和地点固有色",
+        "自然肤色、木棕与现实织物色"
+      ],
+      "accent": [
+        "本场关键地标或目标物的颜色",
+        "已定规则物件的局部点色",
+        "实际光源与天气带来的颜色变化"
+      ],
+      "use": "色彩先帮助认路与辨认对象。作者需要里世界时才使用同一地点的灰暗破损状态，仍留可对应的材质和地标，不把整座城市无条件统一调成夜色。"
+    },
+    "lighting": [
+      "严格跟随本场时刻、天气和可见光源，日场可明亮，夜场有明确光源，风格不预设永夜。",
+      "把路口、入口、台阶和规则物件照到可判断，危险可以来自遮挡、距离或后果。",
+      "同一地点变换状态时保留足够可比较的光照与结构依据，不只换一层颜色滤镜。"
+    ],
+    "composition": [
+      "每到新地点先看清来路、目标与可走区域，旅行者与地标共享可理解的尺度。",
+      "选择前让选项对应到已出现的门、道路或物件，避免只有漂亮街景而没有方向。",
+      "特写提供判断细节，较宽景恢复人物与路线关系；构图随观察与行动改变。",
+      "按作者确定的摄像方式保留视点边界，不擅自把手机视点变成空中全知跟拍。"
+    ],
+    "motifs": [
+      "用本作已有的建筑形、路面、门窗或地标建立城市语汇，不任意更换城貌。",
+      "让同一地标在前后状态中可辨认，异常来自哪里改变而不只来自新奇造型。",
+      "规则物件必须参与观察或行动；不为了丰富美术临时编造危险或处罚。"
+    ],
+    "asset_guidance": {
+      "character": [
+        "旅行者沿用素材身份、衣物与装备，现代真实皮肤和衣料不等于统一职业造型。",
+        "体力与反应通过当下的停步、核对和操作体现，不让造型先宣布人物已知答案。",
+        "道具穿戴与持有状态明确，样板的陌生人外观不能替代作品既定演员。"
+      ],
+      "location": [
+        "地标、门窗、路口和楼层关系有对应，必要时为同一地点提供不同已定状态。",
+        "架空造型仍有可信石材、金属、木料和尺度，出入口可以实际使用。",
+        "只做剧情需要的损坏、潮湿或异变，保留城市自身的美感与生活设施。"
+      ],
+      "prop": [
+        "规则物件有明确持有人、位置和状态，外形帮助辨认而不偷加设定。",
+        "重要牌面、票据或容器在目标画幅里能看清；无关摆设保持较低优先级。",
+        "精确规则文字、编号与选项走项目可靠文字流程，不依赖模型随机拼字。"
+      ]
+    },
+    "pitfalls": [
+      "不要把架空城市等同于霓虹赛博夜景、废墟或所有场景同一滤镜。",
+      "不要为了奇观换掉地标和空间关系，或让前后状态失去可比较对象。",
+      "不要让背景标识抢过正在核对的物件，也不要用新增规则解释美术变化。",
+      "不要把来源故事中的服装、怪物、处罚与结局借作风格包默认内容。"
+    ],
+    "references": [
+      {
+        "title": "The Backrooms (Found Footage)",
+        "url": "https://www.bilibili.com/video/BV1LL4y1s7eE/",
+        "observed_method": "授权中文字幕版全时间轴3秒抽帧及关键帧；03:15—03:39可见路标痕迹，06:39—06:57可见逃生门路线结果。",
+        "lesson": "普通路线标识与门窗先形成行动期待，再由具体结果改变判断。",
+        "limits": "非AI线性片；未验证互动公平性，不能把该片警告直接当新作已证规则。"
+      },
+      {
+        "title": "零号档案第3集",
+        "url": "https://www.douyin.com/video/7645916838001511743",
+        "observed_method": "全时间轴3秒抽帧与04:39、07:39局部单帧，未连续听审。",
+        "lesson": "大空间靠明确出口组织行动，熟悉小房间与巨大外界保留同一尺度锚点。",
+        "limits": "只学方向与尺度关系，不移植门、机构、异类或具体人物。"
+      }
+    ],
+    "sample_prompt": "One complete cinematic frame, 16:9 landscape. Two original adult strangers stand on opposite sides of a small counter. One offers a plain folded note across the counter; the other has not yet accepted it, with the receiving hand still clearly separated from the note. A window and a door remain visible in the background. One eye-level oblique medium two-shot shows both faces, both hands and the note. Live-action cinematic travel realism in a physically built fictional city: a modest reception counter, warm-white stonework, restrained teal architectural details and believable modern clothing. Soft daytime window light gives natural skin and wood, stone and fabric their separate physical textures. The background window and door establish the city's consistent architectural language and a readable route, while the folded note remains the immediate focus. Preserve everyday scale and practical construction; introduce no extra rules, fantasy mechanisms or unexplained destruction. No panels, text, logos or borrowed character identities."
+  },
+  "examples": [
+    {
+      "kind": "original_style_board",
+      "path": "assets/style-library/2026-10-19/travel-live/board.png",
+      "scope": "style_only_not_character_identity",
+      "status": "reviewed",
+      "review": "assets/style-library/2026-10-19/travel-live/image-review-remaining-20261019.json"
+    },
+    {
+      "kind": "historical_style_frame",
+      "path": "assets/style-library/2026-10-19/travel-live/historical-frame.jpg",
+      "scope": "style_only_not_character_identity",
+      "status": "reviewed",
+      "source_label": "《笑之国》Sol原预算H3候选2026-10-16；历史候选，不是整片验收通过声明",
+      "timecode": "00:03",
+      "note": "旧片静帧仅展示历史色光、材质；不是本版规则或视频验收。",
+      "evidence": "assets/style-library/2026-10-19/travel-live/historical-example.json"
+    }
+  ],
+  "validation": {
+    "image": "reviewed",
+    "video": "short_sample_reviewed",
+    "notes": [
+      "规则与样图只指导色光、材质、构图；源素材的人物身份、事实、衣装、空间与已定机位优先。",
+      "附已实际查看的旧片静帧；不复制原片演员、衣装、机位、布局或剧情。",
+      "本版补齐三张新样图，并登记七种画风的8步H3短小样；美术规则未变，旧任务保持原快照。",
+      "小样取样审阅不等于完整动作、整集、声音或长时连续性通过；具体偏差见附带审阅。",
+      "仍标needs_revision的唯美/纸艺静帧继续保留问题状态，不因视频风格保持而自动成为可用作者参考。"
+    ],
+    "video_sample": {
+      "path": "delivery/style-h3-remaining-20261019/travel-live/sample.mp4",
+      "review": "delivery/style-h3-remaining-20261019/video-review-travel-live.json",
+      "mode": "H100 H3 Ref2VA / 8step acceleration LoRA / strength1",
+      "seconds": 5.207,
+      "short_edge": 768,
+      "seed": 2101,
+      "num_inference_steps": 9,
+      "scope": "单种子5秒小样，21张4fps样本及关键原帧审阅；非整集、连续播放或声音验收。",
+      "source_config_version": "2026-10-19.1"
+    }
+  }
 }

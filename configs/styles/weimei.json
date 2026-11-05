@@ -11,5 +11,116 @@
   "location_empty_suffix": "画面里没有任何人：不出现人物、人影、人形剪影，也不出现画中人或镜中人",
   "source_en": "Style: beautified semi-realistic 3D CG in the look of a 3D otome-game cutscene, rendered like Image 1: an idol-like beautified face with smooth luminous porcelain skin and a soft sheen, moderately enlarged expressive eyes with clear irises and soft catchlights, a small refined nose, soft lips, hair in large soft clumps with fine strands catching the light; fabrics, leather and metal detailed but clean and softly lit; no outlines. Not a flat cartoon, not a plain 3D game model, not a photograph.",
   "source_ref": "experiments/agent-skill-sandbox/assets/STYLE_APPROVED.md §2 风格块（原文）",
-  "review": "中文措辞是英文原文的中译草稿，正在用样卡复核；source_en 是用户认可的原文，不要改"
+  "review": "中文措辞是英文原文的中译草稿，正在用样卡复核；source_en 是用户认可的原文，不要改",
+  "pack_version": "2026-10-19.2",
+  "art_direction": {
+    "intent": "保留已认可的乙女游戏美型半写实三维CG，以精致人物、柔光和可辨认的关系动作为吸引力。以下只指导美术组织，不改原作事实、角色身份、既定服装、场景时刻或机位。",
+    "suitable_for": [
+      "恋爱与关系短剧",
+      "多人相处和道具传情",
+      "需要美型人物与细腻实物共存的幻想日常"
+    ],
+    "palette": {
+      "base": [
+        "珍珠白与象牙白",
+        "按地点选择的柔和暖灰或冷灰",
+        "自然肤色与材质固有色"
+      ],
+      "accent": [
+        "角色既定服装色",
+        "本场关键道具的少量点色",
+        "克制的金属与发丝亮边"
+      ],
+      "use": "先决定本场要先看到谁或什么，再安排色块。关键道具与背景拉开色相、明度或虚实中的一种即可；恋爱题材不必全片粉色，也不把所有场景染成金色。"
+    },
+    "lighting": [
+      "柔光保留眼神光、面部体块和瓷肌质感，避免均匀发白吞掉五官。",
+      "窗口、灯具与反射提供可辨认的光源方向；日夜和冷暖服从当前场景。",
+      "关键回应与道具得到局部优先级，背景亮点不与手、脸和递交物同时争夺注意。"
+    ],
+    "composition": [
+      "先用双人或多人景建立相处距离，再按谁发起、谁接住、谁看见来选择近景。",
+      "递物时看清发起者的手、物件与接收者的回应；留白属于尚未完成的动作，不提前拍成已经接受。",
+      "保留家具与植物的空间层次，关键时刻让装饰退后；前景不遮住需要辨认的脸、手或物件。",
+      "宽窄随关系变化，不把所有人整齐摆成同一种正脸展示；沿用作者已经确定的空间和机位。"
+    ],
+    "motifs": [
+      "从本作已有物件里选择可回收的细节，如纸、花或杯，先让人物真实使用，再赋予关系意义。",
+      "同一物件可以从纪念、试探变成邀请，但持有人和状态变化必须接得上。",
+      "人物共同经历过的细节优先于无来由的浪漫装饰，不给每件摆设强加寓意。"
+    ],
+    "asset_guidance": {
+      "character": [
+        "美型、瓷肌、清晰虹膜和无描边CG按原风格保留，不改成真人照片或平面卡通。",
+        "在已定角色范围内，用发型轮廓、衣领、姿态和配饰拉开辨识度，不让所有人只有服装颜色不同。",
+        "角色图服务身份与外观；关系通过本场动作呈现，不把参考样板人物借成新作演员。"
+      ],
+      "location": [
+        "建筑和器物体块清楚，提供可用的门、窗、座位与行动通道。",
+        "材质精致但有所区分：织物有柔软褶皱，木料有方向，玻璃和金属反光克制。",
+        "空场资产保留角色将要活动的区域；地点不固定为花房、咖啡馆或金色黄昏。"
+      ],
+      "prop": [
+        "承载关系的物件在目标画幅里有可辨认的形状、颜色和手持尺度。",
+        "准备实际需要的持有、放下或打开状态，避免只做一张好看的静物图。",
+        "精确文字按项目可靠的文字流程呈现，样板道具保持无字。"
+      ]
+    },
+    "pitfalls": [
+      "不要为了电影感取消已认可的美型CG，也不要把全片柔光变成没有体块的磨皮。",
+      "不要用满屏花草、散景和高光遮住当前事件，也不把装饰繁多直接等同于精致。",
+      "不要以统一漂亮正脸替代人物差异、关注方向和关系动作。",
+      "不要让风格包替人物决定接受、心动或配对；未接受的邀请仍须保持未完成。"
+    ],
+    "references": [
+      {
+        "title": "Paperman《纸人》",
+        "url": "https://www.bilibili.com/video/BV1FB4y1F74H/",
+        "observed_method": "完整时间轴每3秒抽帧及关键帧；00:51、04:21、05:12可见唇印物件回收，未连续听审。",
+        "lesson": "关键物件的色彩和多次使用持续引导注意；学习功能，不复制唇印飞机。",
+        "limits": "非AI动画；灰阶与夸张比例不是本包的必需画风，未证明新包生成效果。"
+      },
+      {
+        "title": "零号档案第3集",
+        "url": "https://www.douyin.com/video/7645916838001511743",
+        "observed_method": "全时间轴3秒抽帧及06:42单帧，实际查看多人同场位置，未连续听审。",
+        "lesson": "多人宽景让动作与不同人物的回应连成同一事件。",
+        "limits": "只借鉴关注链和空间组织，不引入该片武器、角色或世界设定。"
+      }
+    ],
+    "sample_prompt": "One complete cinematic frame, 16:9 landscape. Two original adult strangers stand on opposite sides of a small counter. One offers a plain folded note across the counter; the other has not yet accepted it, with the receiving hand still clearly separated from the note. A window and a door remain visible in the background. One eye-level oblique medium two-shot shows both faces, both hands and the note. Beautified semi-realistic 3D CG in the look of a refined otome-game cutscene, without outlines: luminous porcelain skin with soft volume, moderately enlarged expressive eyes, clear irises, refined noses and soft lips; large soft hair clumps with fine illuminated strands. Distinct original silhouettes, clean detailed fabric, wood and ceramic materials. Soft directional window light and gentle fill give faces readable form. Keep the plain note and the gap between the two hands visually clear; quieter background detail supports the interaction. No panels, text, logos or borrowed character identities."
+  },
+  "examples": [
+    {
+      "kind": "original_style_board",
+      "path": "assets/style-library/2026-10-19/weimei/board.png",
+      "scope": "style_only_not_character_identity",
+      "status": "needs_revision",
+      "review": "assets/style-library/2026-10-19/weimei/image-review.json"
+    }
+  ],
+  "validation": {
+    "image": "needs_revision",
+    "video": "short_sample_reviewed",
+    "notes": [
+      "规则与样图只指导色光、材质、构图；源素材的人物身份、事实、衣装、空间与已定机位优先。",
+      "这是单幅原创风格样板，允许展示本次实际结果并注明细节未全通过；不作为角色身份参考。",
+      "不能证明递交动作、口型、连续表演、声音或实际视频生成效果。",
+      "本次只作图像审阅，没有修图、修改风格配置或再次提交生成。",
+      "本版补齐三张新样图，并登记七种画风的8步H3短小样；美术规则未变，旧任务保持原快照。",
+      "小样取样审阅不等于完整动作、整集、声音或长时连续性通过；具体偏差见附带审阅。",
+      "仍标needs_revision的唯美/纸艺静帧继续保留问题状态，不因视频风格保持而自动成为可用作者参考。"
+    ],
+    "video_sample": {
+      "path": "delivery/style-h3-h100-20261019/weimei/sample.mp4",
+      "review": "delivery/style-h3-h100-20261019/review-modern-weimei.json",
+      "mode": "H100 H3 Ref2VA / 8step acceleration LoRA / strength1",
+      "seconds": 5.207,
+      "short_edge": 768,
+      "seed": 2101,
+      "num_inference_steps": 9,
+      "scope": "单种子5秒小样，21张4fps样本及关键原帧审阅；非整集、连续播放或声音验收。",
+      "source_config_version": "2026-10-19.1"
+    }
+  }
 }
