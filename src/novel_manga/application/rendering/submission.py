@@ -37,6 +37,9 @@ from . import requests
 
 
 def generate_clip(ctx, clip: dict, attempt: int) -> Path:
+    from novel_manga.media.first_frames import require_current
+    require_current(ctx, clip)
+    from novel_manga.story.voice_delivery import require_native_speech
     preparation_started = time.monotonic()
     if not ctx.options.cache_only:
         from novel_manga.application.preparation.readiness import reference_issues
@@ -46,12 +49,14 @@ def generate_clip(ctx, clip: dict, attempt: int) -> Path:
                 ctx.state.blocked_clips = {}
             ctx.state.blocked_clips[clip["clip_id"]] = reasons
             raise RuntimeError("request blocked before generation: " + "; ".join(reasons))
+    if ctx.settings.local_h3_base_url:require_native_speech(ctx,clip)
     ctx.state.clip(clip['clip_id']).generated = False  # set once a new video is actually made: process_clip counts only those
     directory = ctx.work / "clips" / clip["clip_id"] / f"attempt_{attempt:02d}"
     directory.mkdir(parents=True, exist_ok=True)
     output = directory / "clip.mp4"
     episode_dir = ctx.work.parent
     request, references, digests, retry = generation.build_request(ctx, clip, attempt)
+    if ctx.settings.local_h3_base_url:require_native_speech(ctx,clip,request)
     prompt = request['prompt']
     import novel_manga.application.repair.history as repair_history
     cached = cache.current_video(ctx, clip, attempt, directory, references, digests, repair_history)
@@ -121,6 +126,7 @@ def generate_clip(ctx, clip: dict, attempt: int) -> Path:
     wait_for_inflight_redraws(references)
     if ctx.options.prepared_requests_only:
         request, references, digests, retry = generation.build_request(ctx, clip, attempt)
+        if ctx.settings.local_h3_base_url:require_native_speech(ctx,clip,request)
     if generation.uses_h3_prompt(ctx, clip):
         from novel_manga.application.preparation.request_check import before_generation
         before_generation(ctx, clip, request)

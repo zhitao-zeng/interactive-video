@@ -320,7 +320,7 @@ class FramedAssetFactory:
                 continue
             directory = root / "props" / asset_id
             prompt = prop_prompt(bible, prop, family=self.style.render_family,
-                                 direction=self.style.render_direction,
+                                 direction=self.style.prop_direction or self.style.render_direction,
                                  fingerprint=self.style.prompt_fingerprint,
                                  tidy=self.style.tidy_prompts or bool(self.style.prop_brief),
                                  brief=self.style.prop_brief) + guard

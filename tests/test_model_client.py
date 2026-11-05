@@ -114,3 +114,37 @@ def test_explicit_judges_keep_endpoints_and_models_when_interleaved(monkeypatch)
     with ThreadPoolExecutor(max_workers=4) as pool:
         assert list(pool.map(ask, settings*4)) == [{'model':'judge-a'},{'model':'judge-b'}]*4
     assert original == {k: os.environ[k] for k in original}
+
+
+@pytest.mark.parametrize('model,template,explicit,expected', [
+    ('deepseek-v4.1-flash-1017', {'enable_thinking': False}, None, {'type': 'disabled'}),
+    ('deepseek-v4.1-flash-1017', {'enable_thinking': True}, None, None),
+    ('deepseek-v4.1-flash-1017', None, None, None),
+    ('deepseek-v4.1-flash-1017', {'enable_thinking': False}, {'type': 'enabled'}, {'type': 'enabled'}),
+    ('deepseek-v4.1-flash', {'enable_thinking': False}, None, {'type': 'disabled'}),
+    ('deepseek-v4.1-flash', {'enable_thinking': True}, None, None),
+    ('deepseek-v4.1-flash', None, None, None),
+    ('phanthy.com/phancy-35b', {'enable_thinking': False}, None, None),
+    ('glm-5.3-flash', {'enable_thinking': False}, None, None),
+    ('deepseek-v4.1-flash', {'enable_thinking': False}, {'type': 'enabled'}, {'type': 'enabled'}),
+])
+def test_stream_preserves_supported_ds_non_thinking_intent_without_raising_budget(model, template, explicit, expected):
+    import copy
+    from novel_manga.llm import transport
+    from novel_manga.llm.config import JsonEndpoint
+    sent = []
+    def respond(request):
+        sent.append(json.loads(request.content))
+        event = {'choices': [{'delta': {'content': '{"ok":true}'}, 'finish_reason': 'stop'}]}
+        return httpx.Response(200, text='data: ' + json.dumps(event) + '\n\ndata: [DONE]\n\n')
+    payload = {'model': model, 'max_tokens': 200, 'messages': []}
+    if template is not None: payload['chat_template_kwargs'] = template
+    if explicit is not None: payload['thinking'] = explicit
+    before = copy.deepcopy(payload)
+    settings = JsonEndpoint(model, ('http://test.invalid/v1',), '', stream=True, min_max_tokens=0)
+    with httpx.Client(transport=httpx.MockTransport(respond)) as client:
+        answer = transport.stream_completion(client, 'http://test.invalid/v1/chat/completions', {}, payload, 17, settings=settings)
+    assert sent[0].get('thinking') == expected
+    assert sent[0]['max_tokens'] == 200 and payload == before
+    assert answer['choices'][0]['finish_reason'] == 'stop'
+

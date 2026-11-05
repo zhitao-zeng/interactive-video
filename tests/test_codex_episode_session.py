@@ -1,5 +1,6 @@
 """Codex login uses the existing episode contract without API credentials or new takes."""
 import json
+import os
 from pathlib import Path
 import uuid
 import time
@@ -23,12 +24,17 @@ def codex_config(tmp_path, monkeypatch):
     return {'backend': 'codex', 'image': 'agent-sandbox:test', 'model': 'gpt-6-luna', 'effort': 'low'}
 
 
-def cli(monkeypatch, work, *, identity=None, outputs=None, exit_code=0, handoff=False, failed=False):
+def cli(monkeypatch, work, *, identity=None, outputs=None, exit_code=0, handoff=False, failed=False, environments=None):
     identity = identity or str(uuid.uuid4())
     calls = []
     def call(command, *, stdin, stdout, stderr, env):
         calls.append(command)
-        assert stdin.read().startswith('You are the whole-episode production Agent.')
+        if environments is not None:
+            environments.append(dict(env))
+        delivered = stdin.read()
+        assert delivered.startswith('For text reads, including SKILL.md and the manifest, use python3')
+        assert '/work/.claude/skills/episode-production/scripts/read-text.py' in delivered
+        assert 'You are the whole-episode production Agent.' in delivered
         events = [{'type': 'thread.started', 'thread_id': identity}]
         if handoff:
             events.append({'type': 'item.completed', 'item': {'type': 'command_execution', 'exit_code': 0,
@@ -76,6 +82,23 @@ def test_codex_resume_keeps_actual_thread_and_prior_candidates(tmp_path, monkeyp
     assert second.record['session_id'] == identity and second.produced == []
     assert (second.directory/'output-before/requests.json').read_text() == 'retained'
     assert (first.directory/'output-after/requests.json').read_text() == 'retained'
+
+
+def test_codex_proxy_is_child_scoped_and_preserves_internal_bypass(tmp_path, monkeypatch, codex_config):
+    monkeypatch.setenv('HTTPS_PROXY', 'http://download-proxy:8080')
+    monkeypatch.setenv('NO_PROXY', 'localhost,127.0.0.1')
+    before = dict(os.environ)
+    environments = []
+    _, calls = cli(monkeypatch, tmp_path/'episode', environments=environments)
+    session.run_session(tmp_path/'episode', 'Continue', config={
+        **codex_config, 'codex_proxy_url': 'http://codex-proxy:8081'})
+    for name in ('HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY',
+                 'http_proxy', 'https_proxy', 'all_proxy'):
+        assert environments[0][name] == 'http://codex-proxy:8081'
+        assert name in calls[0]
+    assert environments[0]['NO_PROXY'] == before['NO_PROXY']
+    assert dict(os.environ) == before
+    assert 'http://codex-proxy:8081' not in calls[0]
 
 
 def test_codex_cannot_reinterpret_claude_uuid_as_codex_thread(tmp_path, monkeypatch, codex_config):

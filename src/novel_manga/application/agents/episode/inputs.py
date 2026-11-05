@@ -15,7 +15,7 @@ from .session import SKILL_SOURCE
 
 
 BOOK_FILES = ('novel.json', 'story_bible.json', 'bible_aliases.json', 'bible_growth.json', 'entity_index.json',
-              'reading_cast.json', 'cast_index.json', 'style.json', 'profile.json',
+              'reading_cast.json', 'cast_index.json', 'profile.json',
               'visual_grammar.json', 'chat_screen.json', 'asr_aliases.json', 'entity/entities.json',
               'entity/claims.json', 'entity/types.json', *IMPORTED_BOOK_FILES)
 READING_FILES = ('identity_source_reading.json', 'identity_context.json', 'source_reading.json',
@@ -24,9 +24,13 @@ SCRIPT_FILES = ('chapter_script.json', 'clip_plan.json', 'episode_plan.json', 's
                 'scene_script.json', 'clip_overrides.json', 'visor_states.json', 'posture_states.json', *EPISODE_FILES)
 SKILL_REFERENCES = {
     'output_contract': 'references/output-contract.md',
+    'production_workflow': 'references/production-workflow.md',
     'authoring': 'references/authoring.md',
     'dialogue_craft': 'references/dialogue-craft.md',
+    'sound_direction': 'references/sound-direction.md',
     'camera_language': 'references/camera-language.md',
+    'camera_selection': 'references/camera-selection.md',
+    'director_camera_styles': 'references/director-camera-styles.md',
     'spatial_blockout': 'references/spatial-blockout.md',
     'creative_authoring': 'references/creative-authoring.md',
     'travel_authoring': 'references/genres/travel.md',
@@ -47,7 +51,7 @@ SKILL_REFERENCES = {
 def _install_skill(ctx):
     """Make this code revision's rules available through the episode's sole mount."""
     relative = Path('.claude/skills/episode-production')
-    files = ('SKILL.md', *SKILL_REFERENCES.values(),
+    files = ('SKILL.md', *SKILL_REFERENCES.values(), 'scripts/read-text.py',
              'references/official/LICENSE', 'references/official/NOTICE')
     for name in files:
         source = SKILL_SOURCE / name

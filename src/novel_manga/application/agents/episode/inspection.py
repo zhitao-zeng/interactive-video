@@ -17,6 +17,11 @@ class EpisodeInspection:
         self.evidence = evidence
 
     def status(self, payload):
+        from novel_manga.application.repair.repack_budget import scope_reads
+        with scope_reads(self.ctx.episode_dir):
+            return self._status(payload)
+
+    def _status(self, payload):
         from collections import Counter
         from novel_manga.application.repair import history
         from .input_repair import repair_status, remaining_input_attempts, SHOT_FIELDS
@@ -36,7 +41,7 @@ class EpisodeInspection:
         records = input_records(self.ctx)
         input_ops = {cid: input_states.get(cid, {}).get('operations')
                      or input_operations(self.ctx, cid, records=records) for cid in clip_ids}
-        take_left = {cid: history.remaining_takes(self.ctx.episode_dir,cid,preparation=True)
+        take_left = {cid: history.remaining_takes(self.ctx.episode_dir,cid,preparation=True,counts=counts)
                      for cid in clip_ids}
         check_left = {cid: max(0, int(limit)-rechecks[cid]) for cid, limit in limits.items() if limit is not None}
         from .repair_targets import eligible_targets
@@ -96,7 +101,13 @@ class EpisodeInspection:
         scoped_editor=(manifest.get('production_mode') in {'pipeline_review','batch_review'}
             and manifest.get('agent_phase') in {'input_repair','review'}
             and (manifest.get('production_mode')=='pipeline_review' or bool(plan.get('clips'))))
-        return {'ok': True, 'execution': read_json(self.ctx.run_dir / 'execution.json', {}),
+        from .first_frames import status as first_frame_status
+        frames=first_frame_status(self.ctx,plan)
+        from .audio_mix import status as audio_mix_status
+        audio=audio_mix_status(self.ctx)
+        from .music import status as music_status
+        music=music_status(self.ctx)
+        return {'ok': True, 'audio_mix':audio,'music_selection':music, **({'first_frames':frames} if frames is not None else {}), 'execution': read_json(self.ctx.run_dir / 'execution.json', {}),
                 **({'first_pass_remaining': sorted(first_pending)} if first_pending is not None else {}),
                 'repair_capabilities': {'adopted_input': {
                     'characters': 'missing source actor cards', 'shot_fields': sorted(SHOT_FIELDS),

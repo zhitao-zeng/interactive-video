@@ -57,10 +57,10 @@ Her voice starts level, briefly hesitates at the new information, then ends quie
 She closes her mouth and listens to the other person.
 ```
 
-Prefer English vocal delivery immediately before the bound utterance, with an
-authored reaction or mouth closure after it where appropriate. This is a local
-performance convention; upstream requires delivery outside `<d>`, not this exact
-ordering. Use only details supported by the current scene.
+This example shows the final compiled prompt. With structured no-reference
+requests, the host inserts the source turn's `emotion`; do not duplicate it in
+the marker body. Follow [sound direction](sound-direction.md) for ownership and
+mode differences. Use only details supported by the current scene.
 When audio conditioning is explicitly absent, omit both Audio lines in the example,
 all audio-retention entries and the audio-reference summary label; retain `(Sx)`
 and the supplied dialogue. Confirm the host sends zero audio references rather
@@ -72,7 +72,8 @@ delivery syntax. Keep words, ownership and stage consistent with structured turn
 Complete utterances appear once in the shot body, rather than repeated in summaries
 or sound sections. Shot-specific synchronized sounds belong beside their actions;
 `overall_soundscape` summarizes the clip's environmental sound, and
-`non_diegetic_music` describes audience-only music. An empty section uses `None.`.
+`non_diegetic_music` describes explicitly native audience-only music. For postmix
+story music it is `None.`; the separate music plan drives assembly.
 
 For `inner_voice_delivery: postmix`, the clip has one thinker and only inner-voice
 turns. Select the supplied thinker character card and voice for recording. Keep
