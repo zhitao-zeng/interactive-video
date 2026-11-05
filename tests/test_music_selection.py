@@ -138,8 +138,12 @@ def test_missing_evidence_bad_range_and_source_rejection_do_not_apply(episode):
     with pytest.raises(ValueError,match='source_quote'):call(plan)
 
 
-def test_adoption_persists_before_assembly_without_generating_anything(episode):
+def test_adoption_persists_before_assembly_without_generating_anything(episode,monkeypatch):
     ctx,call,result,source=episode
+    monkeypatch.setattr('novel_manga.application.repair.ambience.apply_assembly',
+        lambda *_a,**_k: (_ for _ in ()).throw(AssertionError('no assembly exists to encode')))
+    monkeypatch.setattr('novel_manga.application.review.execution.save_result',
+        lambda *_a,**_k: (_ for _ in ()).throw(AssertionError('no assembly result exists to save')))
     outcome=call(selection(result,source))
     assert outcome['ok']and outcome['assembly_changed']is False and outcome['video_generation']is False
     policy=read_json(ctx.episode_dir/'delivery_policy.json')
@@ -207,6 +211,68 @@ def test_music_source_policy_change_rechecks_old_rejection_without_waiving_it(ep
     assert not (ctx.episode_dir/'repair_history/history.json').exists()
 
 
+@pytest.mark.parametrize('timeline', [False, True])
+@pytest.mark.parametrize('mutation', ['source', 'evidence'])
+def test_audio_bytes_invalidate_source_review_and_clip_cache_without_duplicate_work(
+        episode, monkeypatch, timeline, mutation):
+    import os
+    from novel_manga.application.agents.episode import music as agent_music
+
+    ctx, _, result, source = episode
+    plan = selection(result, source)
+    if timeline:
+        atomic_write_json(ctx.episode_dir/'chapter_script.json', {
+            'shots': [{'index': 1, 'duration_seconds': 2}, {'index': 2, 'duration_seconds': 2}]})
+        atomic_write_json(ctx.episode_dir/'clip_plan.json', {'clips': [
+            {'clip_id': 'a', 'shot_indexes': [1], 'request_seconds': 2},
+            {'clip_id': 'b', 'shot_indexes': [2], 'request_seconds': 2}]})
+        cue = {**plan, 'id': 'cue1', 'source_start_seconds': 0, 'source_seconds': 4,
+               'start': {'shot': 1, 'edge': 'start'}, 'end': {'shot': 2, 'edge': 'end'}}
+        plan = {'action': 'apply_timeline', 'source_quote': source, 'reason': 'approved cue',
+                'cues': [cue]}
+    reviews = []
+    encodes = []
+    tool = MusicOperations(ctx, NS(), source_checker=lambda *args: reviews.append(args) or {
+        'consistent': True, 'problems': []})
+    original_run = agent_music.run
+    monkeypatch.setattr(agent_music, 'run', lambda command: encodes.append(command) or original_run(command))
+
+    def apply():
+        atomic_write_json(ctx.work_dir/'output/music-selection.json', plan)
+        outcome = tool.prepare({})
+        assert outcome['ok']
+        return outcome['music']
+
+    def clip_path(music_policy):
+        asset = music_policy['cues'][0]['asset'] if timeline else music_policy['asset']
+        return asset['path']
+
+    first = clip_path(apply())
+    assert clip_path(apply()) == first
+    assert len(reviews) == len(encodes) == 1
+    saved = read_json(ctx.run_dir/'music-searches'/result['search_id']/'result.json')
+    candidate = saved['candidates'][0]
+    target = Path(candidate['path'] if mutation == 'source' else candidate['audio_evidence']['report'])
+    before = target.stat()
+    if mutation == 'source':
+        tone(target, 900)
+    else:
+        atomic_write_json(target, {'actual_audio': candidate['path'], 'response': 'Changed audio evidence.'})
+    os.utime(target, ns=(before.st_atime_ns, before.st_mtime_ns))
+    assert target.stat().st_mtime_ns == before.st_mtime_ns
+
+    changed = clip_path(apply())
+    assert changed != first
+    assert len(reviews) == len(encodes) == 2
+    assert clip_path(apply()) == changed
+    assert len(reviews) == len(encodes) == 2
+    records = read_json(ctx.run_dir/'music-decisions.json')
+    identity = records[-1]['inputs']['audio']
+    if timeline:
+        identity = identity[0]
+    assert len(identity['source_sha256']) == len(identity['audio_evidence_sha256']) == 64
+
+
 def test_declining_a_candidate_is_recorded_without_adding_music(episode):
     ctx,call,result,source=episode
     plan=selection(result,source);plan['action']='decline';plan['review'].update(status='uncertain',reason='The sampled evidence does not establish the required arc.')
@@ -221,6 +287,15 @@ def test_declining_a_candidate_is_recorded_without_adding_music(episode):
 def test_selected_but_unmixed_music_cannot_be_accepted(episode):
     ctx,call,result,source=episode;call(selection(result,source))
     assert music.episode_music_errors(ctx.episode_dir,{'assembly':{'final_video':'old.mp4'}})
+
+
+def test_story_plan_rejects_blanket_music_with_actionable_timeline_route(episode):
+    ctx,_,result,source=episode
+    atomic_write_json(ctx.episode_dir/'chapter_script.json',{'shots':[],
+        'music_plan':{'cues':[{'id':'m1'},{'id':'m2'}],'silences':[]}})
+    tool=MusicOperations(ctx,NS(),source_checker=lambda *a:pytest.fail('wrong adoption mode must not call a model'))
+    atomic_write_json(ctx.work_dir/'output/music-selection.json',selection(result,source))
+    with pytest.raises(ValueError,match='apply_timeline.*m1.*m2'):tool.prepare({})
 
 
 def test_agent_can_adopt_story_cues_and_preserves_source_gaps_and_usage_history(episode):
@@ -239,6 +314,27 @@ def test_agent_can_adopt_story_cues_and_preserves_source_gaps_and_usage_history(
     assert policy['silences']==plan['silences']and policy['cues'][0]['start']==cue['start']
     assert len(read_json(ctx.project_root/'.runtime/music-selection/usages.json'))==1
     assert call(plan)['ok']is True and len(read_json(ctx.project_root/'.runtime/music-selection/usages.json'))==1
+
+
+def test_music_source_reviewer_receives_the_effective_inherited_silences(episode,monkeypatch):
+    ctx,call,result,source=episode
+    gap={'start':{'shot':2,'edge':'start'},'end':{'shot':2,'edge':'end'},'source_quote':source,'reason':'listen'}
+    atomic_write_json(ctx.episode_dir/'chapter_script.json',{'shots':[{'index':1,'duration_seconds':2},{'index':2,'duration_seconds':2}],
+        'music_plan':{'cues':[{'id':'cue1'}],'silences':[gap]}})
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':[
+        {'clip_id':'a','shot_indexes':[1],'request_seconds':2,'music_delivery':'postmix'},
+        {'clip_id':'b','shot_indexes':[2],'request_seconds':2,'music_delivery':'postmix'}]})
+    selected=selection(result,source)
+    cue={**selected,'id':'cue1','source_start_seconds':0,'source_seconds':4,'loop':False,
+        'start':{'shot':1,'edge':'start'},'end':{'shot':2,'edge':'end'},'fade_in_seconds':.2,'fade_out_seconds':.2}
+    plan={'action':'apply_timeline','source_quote':source,'reason':'approved cue','cues':[cue]}
+    seen=[]
+    tool=MusicOperations(ctx,NS(),source_checker=lambda c,a,p:seen.append(p) or {'consistent':True,'problems':[]})
+    atomic_write_json(ctx.work_dir/'output/music-selection.json',plan)
+    assert tool.prepare({})['ok']
+    assert seen[0]['silences']==[gap]
+    assert music.source_inputs(ctx.episode_dir,ctx.run_dir/'source.txt')['planned_music_delivery']==['postmix']
+    assert 'silences' not in plan
 
 
 def test_music_and_room_tone_are_idempotent_and_keep_video_and_native_voice(episode,monkeypatch):
@@ -272,3 +368,38 @@ def test_music_and_room_tone_are_idempotent_and_keep_video_and_native_voice(epis
     assert revised['assembly']['final_video']!=str(output)
     assert revised['assembly']['episode_music_mix']['source']==first['assembly']['episode_music_mix']['source']
     assert video.exists()and output.exists()
+
+
+def test_music_choice_routes_to_agent_without_fabricating_acceptance(episode,monkeypatch):
+    from novel_manga.application.agents.episode.readiness import next_action
+    ctx,_,_,_=episode
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':[{'clip_id':'clip_01','kind':'video'}]})
+    monkeypatch.setattr('novel_manga.application.agents.episode.readiness.media_started',lambda *_:True)
+    monkeypatch.setattr('novel_manga.application.review.execution.media_matches',lambda *a,**k:True)
+    monkeypatch.setattr(music,'episode_music_errors',lambda *_:['current story music needs an authored choice'])
+    route=next_action(ctx)
+    assert route['action']=='agent' and route['required_action']=='select_music'
+    assert 'review' not in route and 'accepted' not in route
+
+
+def test_music_agent_projection_preserves_real_search_and_audio_evidence(episode):
+    from novel_manga.application.agents.episode import music as agent_music
+    from novel_manga.application.agents.episode.current_task import prepare
+    from novel_manga.application.agents.episode.prompts import resume_prompt
+    ctx,_,result,_=episode
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':[{'clip_id':'clip_01','kind':'video'}]})
+    status={'adopted':True,
+        'next_action':{'action':'agent','required_action':'select_music','reason':'choose current story music'},
+        'music_selection':agent_music.status(ctx),
+        'job':{'id':'job-search','action':'select_music','status':'completed','result':result}}
+    task=prepare(ctx,status,{'issues':[]},[])
+    operation=task['last_operation']['result']
+    assert operation['search_id']==result['search_id']
+    assert operation['candidates']==result['candidates']
+    assert operation['requires_explicit_adoption'] is True
+    assert operation['candidates'][0]['review_status']=='unreviewed'
+    assert 'music_adopted' not in operation
+    evidence=result['candidates'][0]['audio_evidence']['report']
+    assert 'input/latest-music-search.json' in task['evidence_files']
+    prompt=resume_prompt(task)
+    assert 'select_music' in prompt and evidence in prompt and 'unreviewed' in prompt

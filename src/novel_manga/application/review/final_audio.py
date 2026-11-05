@@ -9,7 +9,7 @@ import subprocess
 
 from novel_manga.util import atomic_write_json, read_json
 
-POLICY = 'eureka-final-movie-audio-review-v1'
+POLICY = 'eureka-final-movie-audio-review-v2-material-defects'
 WINDOW_SECONDS = 30
 OVERLAP_SECONDS = 2
 SAMPLE_RATE = 16000
@@ -122,6 +122,32 @@ def _source_facts(episode_dir: Path):
     return facts, facts
 
 
+def freshness(ctx, audio, movie):
+    from pathlib import Path
+    directory = getattr(ctx, 'episode_dir', None)
+    if directory is None:
+        return {'policy': POLICY}
+    identity = audio.get('identity') or {}
+    model_path = (identity.get('model') or {}).get('path')
+    current_identity = {
+        'movie': _file_state(Path(movie).resolve()) if movie else None,
+        'model': _model_state(Path(model_path)) if model_path else identity.get('model'),
+        'audio_source_root': identity.get('audio_source_root'),
+    }
+    current_source, _ = _source_facts(directory)
+    saved_source = audio.get('source_identity')
+    return {
+        'policy': POLICY,
+        'saved_policy': audio.get('policy'),
+        'saved_identity': identity,
+        'identity': current_identity,
+        'saved_source_identity': saved_source,
+        'source_identity': current_source,
+        'fresh': (audio.get('policy') == POLICY and identity == current_identity
+                  and saved_source == current_source),
+    }
+
+
 def _duration(movie: Path):
     result = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration',
                              '-of', 'json', str(movie)], check=True, capture_output=True, text=True)
@@ -151,9 +177,18 @@ def _judge(facts, windows):
     from novel_manga.llm.client import ask_json, obj
     from novel_manga.review.endpoints import judge_settings
     prompt = ('按本集原稿、clip plan、时间线、配乐/声景意图和下列整片音频窗口原始Eureka响应，'
-              '判断最终电影中可由证据确认的具体音频问题。每个问题必须有电影全局秒数、明确证据与原稿依据。'
-              '没有配乐、原稿要求安静或声音模型未提及某事，都不能单独算错；不得推断声音真实/AI来源。'
-              '不要把模型自然语言直接当成通过。无具体问题时issues为空。该模型分析不等于人工听审。\n' +
+              '判断有证据确认、实质影响对白理解、剧情必要声音信息或基本收听体验的音频问题。'
+              'issues只列这样的阻断问题；每项必须有可核对的电影全局秒数、明确证据与原稿依据。'
+              'sfx或音效计划未列出某种声音，不等于禁止该自然声音。轻微环境声或拟音的缺失、强弱和音色偏差，'
+              '以及近似金属声、门声的差异，未造成上述实质影响时不进issues，可在summary说明，不为补齐音效清单要求重拍。'
+              '声音模型的声源标签不是具体画面动作的证明；把声音称为门响、机械声或金属声，不能据此断言门已开关或发生了额外动作。'
+              '窗口start/end是覆盖范围；响应中估计的时间点可能不可靠，不能仅靠该时间猜测声画错位或动作先后。'
+              '只有与原稿和实际时间线能明确对应的证据才支持具体动作或时间硬伤；证据不足不编造冲突。'
+              '保留可证的对白丢失、对白不可懂、音轨损坏、明显破音或持续严重刺耳干扰等真实问题；'
+              '剧情必须依赖的声音线索明确缺失并妨碍理解时也应报告，不能以轻微拟音为由放过。'
+              '没有配乐、原稿要求安静、静音比例偏高或声音模型未提及某事，都不能单独算错；'
+              '不得推断声音真实/AI来源，不要把模型自然语言直接当成通过或失败。'
+              '无上述可证实质问题时issues为空。该模型分析不等于人工听审。\n' +
               json.dumps({'episode_facts': facts, 'audio_windows': windows}, ensure_ascii=False))
     issue = obj({'start': {'type': 'number'}, 'end': {'type': 'number'},
                  'problem': {'type': 'string'}, 'evidence': {'type': 'string'},
@@ -309,5 +344,7 @@ def review_audio(root, episode_dir, movie, *, runtime=None) -> dict:
             _save_judgment(directory, history, history_path)
             raise
     except Exception as error:
+        from novel_manga.service_errors import service_failure
         result['errors'].append(f'{type(error).__name__}: {error}')
+        result.update(service_failure(error))
         return save()

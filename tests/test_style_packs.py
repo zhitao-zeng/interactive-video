@@ -171,3 +171,96 @@ def test_style_and_example_export_without_creative_notes(library, tmp_path, kind
     assert json.loads((destination / frozen['examples'][0]['review']).read_text())['status'] == 'reviewed'
     assert '信件前方留空' in (destination / '分镜.md').read_text()
     assert '原场景窗光' in (destination / '分镜.md').read_text()
+
+
+def test_style_examples_reach_material_edition_and_agent_novel_dir(library,tmp_path):
+    def authored():
+        return {'title':'fixture','logline':'A visitor waits.','chapter_script':{'shots':[
+            {'index':1,'scene_id':'room','location':'门厅','characters':['访客'],'in_frame':['访客'],
+             'purpose':'观察门','start_state':'站在门旁','event':'访客抬头看门','end_state':'停住',
+             'camera':'固定近景','shot_scale':'近景','duration_seconds':6,'sfx':'鞋底停下的摩擦声',
+             'opening_frame':{'image_prompt':'An adult stands beside a closed door.','visible_characters':['访客']},
+             'turns':[{'speaker_name':'访客','text':'门刚才动了吗？','delivery_mode':'visible_dialogue',
+                       'emotion':'The question ends quietly as the visitor notices the door.'}]},
+            {'index':2,'scene_id':'room','location':'门厅','characters':['访客'],'in_frame':['访客'],
+             'purpose':'等待回应','start_state':'停住','event':'访客安静看着门','end_state':'仍未开门',
+             'camera':'固定近景','shot_scale':'近景','duration_seconds':6,'sfx':'远处风声','turns':[],
+             'opening_frame':{'image_prompt':'The same adult watches the closed door.','visible_characters':['访客']}}]},
+            'clips':[{'shot_indexes':[1],'request_seconds':6},{'shot_indexes':[2],'request_seconds':6}],
+            'interaction':{'question':'下一步？','selected':None,'options':[
+                {'id':'A','label':'等候','reason':'听回应','next_step':'继续等待'},
+                {'id':'B','label':'离开','reason':'出口在身后','next_step':'离开门厅'}]},
+            'spatial_plan':{'scenes':[{'scene_id':'room','anchors':['门'],'placed':['访客'],
+                                      'assumptions':[],'shot_indexes':[1,2]}]},
+            'production_design':{'palette':'纸白、靛青','characters':[{'name':'访客','appearance':'成年，短黑发',
+                'wardrobe':'靛青外套'}],'locations':[{'name':'门厅','description':'一扇关闭木门，左侧有窗'}],
+                'props':[],'continuity_rules':['门保持关闭']}}
+    from novel_manga.application.agents.episode.context import create_context
+    from novel_manga.application.agents.episode.inputs import prepare_inputs
+    from novel_manga.interactive import creative_material
+    from novel_manga.interactive.authored import pack_authored,prepare_authored
+    root,_=library
+    task=tmp_path/'task.json'
+    write(task,{'mode':'original','project':'romance','brief':'两个成年人交换一封信。',
+        'style':'test-look','h3_input_mode':'first-frame','target_seconds':[12,20]})
+    run=tmp_path/'creator'
+    manifest=creation.prepare(task,run)
+    material=creative_material.write_material(authored(),manifest,tmp_path/'material',
+        style_source=run/'sandbox/input/style.json')
+    frozen=json.loads((material/'style.json').read_text())
+    relative=frozen['examples'][0]['path']
+    expected=(root/'assets/example.png').read_bytes()
+    assert (material/relative).read_bytes()==expected
+
+    def snapshot():
+        files=[material/'style.json',*sorted(path for path in (material/'style-examples').rglob('*') if path.is_file())]
+        return {str(path.relative_to(material)):(path.read_bytes(),path.stat().st_mtime_ns) for path in files}
+    import os
+    os.utime(material/'style.json',(1,1))
+    before=snapshot()
+    creative_material.write_material(authored(),manifest,material,style_source=run/'sandbox/input/style.json')
+    assert snapshot()==before
+    source_image=run/'sandbox/input/style-examples/test-look-01.png'
+    Image.new('RGB',(96,64),'red').save(source_image)
+    with pytest.raises(ValueError,match='new edition'):
+        creative_material.write_material(authored(),manifest,material,style_source=run/'sandbox/input/style.json')
+    assert snapshot()==before
+    source_image.write_bytes(expected)
+    extra=material/'style-examples/unexpected.json';extra.write_text('{}')
+    with pytest.raises(ValueError,match='new edition'):
+        creative_material.write_material(authored(),manifest,material,style_source=run/'sandbox/input/style.json')
+    extra.unlink()
+
+    episode=prepare_authored(material,tmp_path/'edition',family='romance')
+    book=episode.parent
+    assert (book/relative).read_bytes()==expected
+    pack_authored(episode)
+    ctx=create_context(book,1,output_root=tmp_path/'agent-output',input_mode='script')
+    prepare_inputs(ctx)
+    assert (ctx.novel_dir/relative).read_bytes()==expected
+    assert json.loads((ctx.novel_dir/'style.json').read_text())['examples'][0]['path']==relative
+
+
+def test_export_style_resolves_input_and_root_snapshot_layouts(library,tmp_path):
+    from novel_manga.interactive.creative_contract import export_style
+    root,_=library
+    task=tmp_path/'task.json'
+    write(task,{'mode':'original','project':'romance','brief':'交换一封信。','style':'test-look'})
+    run=tmp_path/'creator';creation.prepare(task,run)
+    first=tmp_path/'first';second=tmp_path/'second'
+    export_style(run/'sandbox/input/style.json',first)
+    export_style(first/'style.json',second)
+    assert json.loads((first/'style.json').read_text())==json.loads((second/'style.json').read_text())
+    relative=json.loads((second/'style.json').read_text())['examples'][0]['path']
+    assert (second/relative).read_bytes()==(root/'assets/example.png').read_bytes()
+
+
+def test_profile_only_edition_does_not_expand_global_style_examples(library,tmp_path,monkeypatch):
+    from support.first_frame_cases import case
+    from novel_manga.media.first_frames import compile_opening
+    ctx,clips=case(tmp_path,monkeypatch);clip=clips[0]
+    write(ctx.novel_dir/'profile.json',{'style':'test-look','h3_input_mode':'first-frame'})
+    assert not (ctx.novel_dir/'style.json').exists()
+    compiled=compile_opening(ctx,clip,{'clip_id':'clip_01'})
+    assert [ref.path for ref in compiled.references]==['scene.png']
+    assert all(ref.role!='style-reference' for ref in compiled.references)

@@ -33,7 +33,11 @@ def service_contracts():
        calls=[];answers=iter(copy.deepcopy(answers))
        def ask(parts,schema,**kwargs):
         calls.append({'parts':parts,'schema':schema,'options':kwargs});return next(answers)
-       with patch.object(model_client,'ask_json',ask):
+       judge=flow.semantic_review.bindings
+       def judged_bindings(*args,**kwargs):
+        corrected,review=judge(*args,**kwargs)
+        return corrected,{**review,'policy':flow.semantic_review.REVIEW_POLICY}
+       with patch.object(model_client,'ask_json',ask),patch.object(flow.semantic_review,'bindings',judged_bindings):
         try:
          value=flow.resolve_chapter(directory)
          cached=flow.resolve_chapter(directory)==value

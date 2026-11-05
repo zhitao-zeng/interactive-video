@@ -187,7 +187,12 @@ def source_budget(directory, cid, *, preparation=False, grants=None):
 def remaining_takes(directory, cid, *, preparation=False, counts=None):
     limit=preparation_limit(directory,cid) if preparation else generation_limit(directory,cid)
     counts=generation_counts(directory) if counts is None else counts
-    own=max(0,limit-counts.get(cid,0))
+    # No task ID does not prove a failed submission was free. Keep its original
+    # slot reserved while allowing a distinct, authorized take in another slot.
+    uncertain=sum(bool((task:=read(p,{})).get('submit_uncertain_at')) and not task.get('task_id')
+                  and not (p.parent/'clip.mp4').is_file()
+                  for p in (Path(directory)/'work/clips'/cid).glob('attempt_*/clip.mp4.task.json'))
+    own=max(0,limit-counts.get(cid,0)-uncertain)
     budget=source_budget(directory,cid,preparation=preparation)
     return min(own,budget['remaining']) if budget['roots'] else own
 

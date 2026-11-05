@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 import subprocess
+import pytest
 
 from novel_manga.application.review import final_audio
 
@@ -228,3 +229,54 @@ def test_config_failure_is_unfinished(tmp_path):
     movie = _movie(tmp_path / 'final.mp4')
     result = final_audio.review_audio(tmp_path, ep, movie, runtime={})
     assert not result['complete'] and not result['passed'] and result['errors']
+
+
+@pytest.mark.parametrize('serious', [False, True])
+def test_new_audio_scale_rejudges_same_windows_and_preserves_real_rejection(tmp_path, monkeypatch, serious):
+    from novel_manga.llm import client
+    ep = tmp_path/'episode'
+    _episode(ep)
+    movie = _movie(tmp_path/'final.mp4', seconds=4)
+    runtime = _runtime(tmp_path)
+    _fake_worker(monkeypatch)
+    old_issue = {'start':0.5, 'end':1.0, 'problem':'A small metallic sound was not listed in sfx.',
+                 'evidence':'The audio model labels a faint sound as a door.',
+                 'source_basis':'The sfx list does not mention a door.'}
+    with monkeypatch.context() as previous:
+        previous.setattr(final_audio, 'POLICY', 'eureka-final-movie-audio-review-v1')
+        previous.setattr(final_audio, '_judge', lambda *a: {'summary':'Old strict judgment.', 'issues':[old_issue]})
+        old = final_audio.review_audio(tmp_path, ep, movie, runtime=runtime)
+    assert old['complete'] and not old['passed']
+    directory = next((ep/'work/final-audio-review').iterdir())
+    retained = {p:p.read_bytes() for p in directory.iterdir() if p.is_file()}
+    monkeypatch.setattr(final_audio, '_run_worker', lambda *a: pytest.fail('Existing raw audio must not be reviewed again'))
+    original_run = subprocess.run
+    def no_redecode(command, **kwargs):
+        assert not (command[0]=='ffmpeg' and 'f32le' in command), 'Same waveform must reuse its decode'
+        return original_run(command, **kwargs)
+    monkeypatch.setattr(final_audio.subprocess, 'run', no_redecode)
+    serious_issue = {'start':0.5, 'end':1.0, 'problem':'Required dialogue is unintelligible.',
+                    'evidence':'A sustained piercing noise masks the required words.',
+                    'source_basis':'The screenplay requires intelligible dialogue.'}
+    calls = []
+    def judge(parts, schema, **kwargs):
+        calls.append(kwargs['name'])
+        prompt = parts[0]['text']
+        assert '轻微环境声或拟音' in prompt and '未列出' in prompt
+        assert '声源标签' in prompt and '时间' in prompt and '不可懂' in prompt
+        evidence = json.loads(prompt.split('\n')[-1])
+        assert evidence['audio_windows']==old['windows']
+        return {'summary':'Material audio evidence reviewed.', 'issues':[serious_issue] if serious else []}
+    monkeypatch.setattr(client, 'ask_json', judge)
+    result = final_audio.review_audio(tmp_path, ep, movie, runtime=runtime)
+    assert calls == ['final_movie_audio_review']
+    assert result['policy'] != old['policy']
+    assert result['complete'] and result['passed'] is not serious
+    assert result['windows'] == old['windows']
+    assert all(p.read_bytes()==data for p,data in retained.items())
+    assert len(list(directory.glob('review_*.json'))) == 2
+    if serious:
+        assert result['issues'][0]['problem'] == serious_issue['problem']
+        assert result['issues'][0]['clip_ids'] == ['clip-a']
+    else:
+        assert result['issues'] == []

@@ -4,7 +4,7 @@ import pytest
 
 from novel_manga.application.agents.episode.readiness import review_is_current, next_action
 from novel_manga.review.storage import take_identity
-from novel_manga.util import atomic_write_json
+from novel_manga.util import atomic_write_json, read_json
 
 
 def test_current_review_policy_does_not_certify_an_old_selected_take(tmp_path, monkeypatch):
@@ -85,3 +85,161 @@ def test_current_visual_pass_with_failed_audio_still_blocks_for_agent(tmp_path, 
     result=next_action(ctx)
     assert result['action']=='agent'
     assert 'full-audio review' in result['reason']
+
+
+@pytest.mark.parametrize(('error','retryable','http_status'), [
+    ('RuntimeError: task submission returned HTTP 503: service unavailable',True,503),
+    ('visual evidence is insufficient to resolve the candidate',False,None),
+])
+def test_review_error_routes_back_to_review_not_content_repair(
+        tmp_path,monkeypatch,error,retryable,http_status):
+    ctx=_readiness_ctx(tmp_path,monkeypatch,visual_passed=True,audio={})
+    video=ctx.episode_dir/'selected.mp4';video.write_bytes(b'current take')
+    media=read_json(ctx.episode_dir/'thin_media_report.json')
+    media['clips']=[{'clip_id':'clip_01','selected':{'video':str(video)}}]
+    atomic_write_json(ctx.episode_dir/'thin_media_report.json',media)
+    atomic_write_json(ctx.episode_dir/'episode_review.json',{'clips':{
+        'clip_01':{'video':str(video),'take':take_identity(video),'severity':'review_error','error':error}}})
+    monkeypatch.setattr('novel_manga.application.agents.episode.readiness.review_is_current',lambda *_:True)
+    result=next_action(ctx)
+    assert result['action']=='review' and result['retryable'] is retryable
+    assert result['blocked']==['clip_01']
+    if http_status is None:
+        assert 'service_interrupted' not in result
+    else:
+        assert result['service_interrupted']['http_status']==http_status
+
+
+def test_mixed_review_errors_keep_credential_stop_conservative(tmp_path,monkeypatch):
+    ctx=_readiness_ctx(tmp_path,monkeypatch,visual_passed=True,audio={})
+    video=ctx.episode_dir/'selected.mp4';video.write_bytes(b'current take')
+    media=read_json(ctx.episode_dir/'thin_media_report.json')
+    media['clips']=[{'clip_id':'clip_01','selected':{'video':str(video)}}]
+    atomic_write_json(ctx.episode_dir/'thin_media_report.json',media)
+    atomic_write_json(ctx.episode_dir/'episode_review.json',{'clips':{
+        'clip_01':{'video':str(video),'take':take_identity(video),'severity':'review_error',
+                   'error':'RuntimeError: HTTP 503 service unavailable'},
+        'clip_02':{'video':str(video),'take':take_identity(video),'severity':'review_error',
+                   'error':'RuntimeError: HTTP 401 unauthorized'}}})
+    monkeypatch.setattr('novel_manga.application.agents.episode.readiness.review_is_current',lambda *_:True)
+    result=next_action(ctx)
+    assert result['action']=='review' and result['retryable'] is False
+    assert result['blocked']==['clip_01','clip_02']
+
+
+def test_current_content_fail_still_requires_authored_decision(tmp_path,monkeypatch):
+    ctx=_readiness_ctx(tmp_path,monkeypatch,visual_passed=True,audio={})
+    video=ctx.episode_dir/'selected.mp4';video.write_bytes(b'current take')
+    media=read_json(ctx.episode_dir/'thin_media_report.json')
+    media['clips']=[{'clip_id':'clip_01','selected':{'video':str(video)}}]
+    atomic_write_json(ctx.episode_dir/'thin_media_report.json',media)
+    atomic_write_json(ctx.episode_dir/'episode_review.json',{'clips':{
+        'clip_01':{'video':str(video),'take':take_identity(video),'severity':'fail','feedback':'wrong actor'}}})
+    monkeypatch.setattr('novel_manga.application.agents.episode.readiness.review_is_current',lambda *_:True)
+    result=next_action(ctx)
+    assert result['action']=='agent' and 'service_interrupted' not in result
+
+
+@pytest.mark.parametrize('stage', ['final_cut', 'final_audio'])
+@pytest.mark.parametrize(('http_status','retryable'), [(503,True), (401,False), (402,False)])
+def test_current_final_service_failure_routes_to_finish_not_authored_repair(
+        tmp_path, monkeypatch, stage, http_status, retryable):
+    from novel_manga.application.agents.episode import readiness
+
+    from novel_manga.application.review import final_cut
+
+    ctx = _readiness_ctx(tmp_path, monkeypatch, visual_passed=True, audio={})
+    plan = read_json(ctx.episode_dir/'clip_plan.json')
+    plan['clips'][0]['first_frame'] = {'path':'frame.png'}
+    atomic_write_json(ctx.episode_dir/'clip_plan.json', plan)
+    movie = ctx.episode_dir/'movie.mp4'
+    movie.write_bytes(b'current exported movie')
+    failure = {'http_status':http_status,
+               'detail':'service unavailable' if http_status == 503 else 'account stopped'}
+    row = {'movie':str(movie), 'complete':False, 'passed':False,
+           'errors':[f'RuntimeError: HTTP {http_status}'],
+           'service_interrupted':failure, 'retryable':retryable}
+    media = read_json(ctx.episode_dir/'thin_media_report.json')
+    atomic_write_json(ctx.episode_dir/'episode_review.json', {'clips':{}})
+    media['assembly']['final_video'] = str(movie)
+    visual = media['final_cut_review']
+    visual.update(movie=str(movie), policy=final_cut.POLICY)
+    visual['context'] = final_cut.context(ctx.episode_dir, media, movie)
+    if stage == 'final_cut':
+        row.update(policy=final_cut.POLICY, context=visual['context'])
+        media['final_cut_review'] = row
+    else:
+        visual.update(complete=True, passed=True)
+        media['final_audio_review'] = row
+    atomic_write_json(ctx.episode_dir/'thin_media_report.json', media)
+
+    result = readiness.next_action(ctx)
+    assert result['action'] == 'finish'
+    assert result['retryable'] is retryable
+    assert result['service_interrupted'] == failure
+    automatic = readiness.automatic_request(ctx, {'adopted':True, 'job':None})
+    if retryable:
+        assert automatic is not None and automatic['action'] == 'finish'
+    else:
+        assert automatic is None
+
+
+def test_explicit_nonretryable_render_failure_does_not_reopen_paid_review(tmp_path, monkeypatch):
+    from novel_manga.application.agents.episode import readiness
+
+    ctx = _readiness_ctx(tmp_path, monkeypatch, visual_passed=True, audio={})
+    video = ctx.episode_dir/'selected.mp4'
+    video.write_bytes(b'current take')
+    media = read_json(ctx.episode_dir/'thin_media_report.json')
+    media['clips'] = [{'clip_id':'clip_01', 'selected':{'video':str(video)}}]
+    atomic_write_json(ctx.episode_dir/'thin_media_report.json', media)
+    atomic_write_json(ctx.episode_dir/'episode_review.json', {'clips':{
+        'clip_01':{'video':str(video), 'take':take_identity(video), 'severity':'review_error',
+                   'error':'RuntimeError: HTTP 503 service unavailable'}}})
+    monkeypatch.setattr(readiness, 'review_is_current', lambda *_:True)
+    job = {'action':'render', 'status':'completed',
+           'result':{'ok':False, 'error':'render stopped', 'retryable':False}}
+    route = readiness.next_action(ctx, {'job':job})
+    assert route['action'] == 'render'
+    assert route['retryable'] is False
+    assert route['error'] == 'media_execution_failed'
+    monkeypatch.setattr(readiness, 'next_action', lambda *_:route)
+    assert readiness.automatic_request(ctx, {'adopted':True, 'job':job}) is None
+
+
+def test_persisted_generation_protocol_failure_stops_without_content_repair(tmp_path, monkeypatch):
+    from novel_manga.application.agents.episode import readiness
+    from novel_manga.media.retries import failure_result
+
+    ctx = _readiness_ctx(tmp_path, monkeypatch, visual_passed=True, audio={})
+    video = ctx.episode_dir/'selected.mp4'
+    video.write_bytes(b'current take')
+    plan = read_json(ctx.episode_dir/'clip_plan.json')
+    plan['clips'].append({'clip_id':'clip_02', 'kind':'video'})
+    atomic_write_json(ctx.episode_dir/'clip_plan.json', plan)
+    failure = failure_result('clip_02', [], ValueError('local H3 returned no task id'))
+    assert failure['retryable'] is False and failure['selected'] is None
+    media = read_json(ctx.episode_dir/'thin_media_report.json')
+    media.update(clips=[{'clip_id':'clip_01', 'selected':{'video':str(video)}}, failure],
+                 failed_clips=['clip_02'])
+    atomic_write_json(ctx.episode_dir/'thin_media_report.json', media)
+    atomic_write_json(ctx.episode_dir/'episode_review.json', {'clips':{
+        'clip_01':{'video':str(video), 'take':take_identity(video), 'severity':'pass'}}})
+    monkeypatch.setattr(readiness, 'review_is_current', lambda *_:True)
+
+    route = readiness.next_action(ctx)
+    assert route['action'] == 'render' and route['retryable'] is False
+    assert route['error'] == 'media_execution_failed'
+    assert route['service_failure_clips'] == ['clip_02']
+    assert readiness.automatic_request(ctx, {'adopted':True, 'job':None}) is None
+
+
+def test_generation_protocol_failure_keeps_original_error_in_host_receipt():
+    from novel_manga.application.agents.episode.media_operations import service_failure_result
+    from novel_manga.media.retries import failure_result
+
+    failed = failure_result('clip_02', [], ValueError('local H3 returned no task id'))
+    outcome = service_failure_result({'clips':[failed]})
+    assert outcome is not None and outcome['retryable'] is False
+    assert outcome['error'] == 'media_execution_failed'
+    assert 'local H3 returned no task id' in outcome['clips']['clip_02']['error']

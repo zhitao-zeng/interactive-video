@@ -95,6 +95,11 @@ def request_matches(ctx, clip: dict, saved: dict, references, digests: list[str]
         base = generation.clip_base(ctx, clip)
         english = generation.uses_h3_prompt(ctx, clip)
         forms = {base} if english else {base, soften_prompt(base, getattr(ctx, "softening_rules", None))}
+        if not english and clip.get('prompt_h3'):
+            from novel_manga.application.profiles import h3_stamp
+            if clip.get('prompt_h3_of') == h3_stamp(clip, str(ctx.feedback.get(clip['clip_id'], '')).strip()):
+                voices = [position for position, _ in generation.chosen_voices(ctx, clip)[0]]
+                forms.add(generation.renumber_audio(clip['prompt_h3'], voices))
         tail = RETRY_TAIL_H3 if english else RETRY_TAIL
         prompt = str(saved.get("prompt", ""))
         variants = [prompt] + ([prompt[: -len(COMPLIANCE_SUFFIX)]] if prompt.endswith(COMPLIANCE_SUFFIX) and not english else [])

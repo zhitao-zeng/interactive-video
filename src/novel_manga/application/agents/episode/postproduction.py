@@ -18,6 +18,23 @@ def _identity(path):
     return {'path': str(Path(path).resolve()), 'size': stat.st_size, 'mtime_ns': stat.st_mtime_ns}
 
 
+def persist_audio_policy(context, media, *, policy_key, policy_value):
+    policy = read_json(context.episode_dir/'delivery_policy.json', {})
+    policy[policy_key] = policy_value
+    atomic_write_json(context.episode_dir/'delivery_policy.json', policy)
+    report = read_json(context.episode_dir/'thin_media_report.json', {})
+    before = (report.get('assembly') or {}).get('final_video')
+    if before:
+        from novel_manga.application.repair.ambience import apply_assembly
+        from novel_manga.application.review.execution import save_result
+        report = apply_assembly(context.episode_dir, report, context=media.runner().context)
+        report = save_result(context.episode_dir, report,
+            read_json(context.episode_dir/'episode_review.json', {}),
+            plan=read_json(context.episode_dir/'clip_plan.json', {}))
+        atomic_write_json(context.episode_dir/'thin_media_report.json', report)
+    return report, before
+
+
 def _probe(path):
     result = subprocess.run(['ffprobe', '-v', 'error', '-show_streams', '-show_format',
                              '-of', 'json', str(path)], check=True, capture_output=True, text=True)
@@ -155,7 +172,7 @@ def current_task_summary(episode_dir):
         'source':endpoint('source'),'target':endpoint('target'),
         'reason':decision.get('reason'),'binding_id':binding.get('binding_id') or None,
         'plan_file':'input/postproduction-plan.json',
-        'next_action':'Call finish; the host applies this registered cutaway during normal assembly.'}
+        'next_action':'Follow readiness.next_action; when it selects finish, normal assembly applies this registered cutaway.'}
 
 
 def _bind_candidate(ctx, report, candidate):

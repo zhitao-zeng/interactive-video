@@ -20,8 +20,9 @@ import novel_manga.application.identity.flow as identity_flow_thin
 
 def frozen_preparation():
     results={}
-    for mode in ['ready','local','full','incomplete','existing']:
+    for mode in ['ready','local','full','incomplete','existing','legacy_local','legacy_full','legacy_incomplete']:
      with tempfile.TemporaryDirectory(prefix='nmv-prep-freeze-') as tmp:
+      base_mode=mode.removeprefix('legacy_');legacy=mode.startswith('legacy_')
       d=Path(tmp)/'book/book_1';plan={'limits':{'max_clip_seconds':15},'clips':[{'clip_id':'clip_01','kind':'video','shot_indexes':[1],'cast':[],'references':[],'prompt':'角色转身'}]}
       # a current v2 stamp: translation is provably ready, and the convert() stub stays uncalled
       from novel_manga.application.profiles import h3_stamp
@@ -29,15 +30,16 @@ def frozen_preparation():
       script={'shots':[{'index':1,'characters':[]}]}
       for name,value in [('clip_plan.json',plan),('chapter_script.json',script),('segments.json',[{'segment_id':'seg_1','text':'李明转身告诉王刚，今天要下雨。'}])]:atomic_write_json(d/name,value)
       atomic_write_json(d.parent/'novel.json',{'source':'source.txt'})
-      if mode=='existing':(d/'book_1.mp4').write_bytes(b'existing')
+      if base_mode=='existing':(d/'book_1.mp4').write_bytes(b'existing')
       calls=[];statuses=[];original_record=store.record
-      issue={'kind':'missing_event' if mode=='full' else 'action','stage':0 if mode=='full' else 1,'source_quote':'李明转身告诉王刚','problem':'动作错人','correction':'改回原文主体'}
-      answers=iter([{'source_readable':True,'issues':[] if mode=='ready' else [issue]}, {'source_readable':True,'issues':[]}])
+      issue={'kind':'missing_event' if base_mode=='full' else 'action','stage':0 if base_mode=='full' else 1,'source_quote':'李明转身告诉王刚','problem':'动作错人','correction':'改回原文主体'}
+      answers=iter([{'source_readable':True,'issues':[] if base_mode=='ready' else [issue]}, {'source_readable':True,'issues':[]}])
       def audited(directory):calls.append('audit');return next(answers)
       def tool(args,timeout=1200):calls.append(args)
       def record(directory,status,**kw):statuses.append(status);return original_record(directory,status,**kw)
-      proposal={'changed':[],'why':'incomplete'} if mode=='incomplete' else {'changed':['clip_01'],'proposal':{'script':script,'plan':plan,'notes':{},'changes':{}}}
-      with patch.object(actions,'audit',audited),patch.object(actions,'run_tool',tool),patch.object(flow,'record',record),patch.object(actions,'record',record),patch.object(clip_readiness,'inspect_episode',lambda *a,**kw:(plan,{})),patch.object(thin_profile,'h3_prompt_outdated',lambda *a,**k:False),patch.object(build_h3_prompts,'convert',lambda *a,**k: (_ for _ in ()).throw(AssertionError('no translation needed'))),patch.object(repair_flow_thin,'repair_episode',lambda *a,**k:proposal):value=flow.prepare_one(d)
+      proposal={'changed':[],'why':'incomplete'} if base_mode=='incomplete' else {'changed':['clip_01'],'proposal':{'script':script,'plan':plan,'notes':{},'changes':{}}}
+      environment={'NOVEL_LEGACY_PREPARATION_REPAIR':'1' if legacy else '0','NOVEL_AGENT_MANAGED':'0'}
+      with patch.dict(os.environ,environment),patch.object(actions,'audit',audited),patch.object(actions,'run_tool',tool),patch.object(flow,'record',record),patch.object(actions,'record',record),patch.object(clip_readiness,'inspect_episode',lambda *a,**kw:(plan,{})),patch.object(thin_profile,'h3_prompt_outdated',lambda *a,**k:False),patch.object(build_h3_prompts,'convert',lambda *a,**k: (_ for _ in ()).throw(AssertionError('no translation needed'))),patch.object(repair_flow_thin,'repair_episode',lambda *a,**k:proposal):value=flow.prepare_one(d)
       value={k:v for k,v in value.items() if k not in {'at','inputs','retry_after'}}
       results[mode]={'result':value,'calls':calls,'statuses':statuses,'script':json.loads((d/'chapter_script.json').read_text()),'history':(d/'repair_history/history.json').exists()}
       results[mode]=json.loads(json.dumps(results[mode]).replace(str(Path(tmp)),'<root>'))

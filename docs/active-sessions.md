@@ -280,3 +280,94 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | ZCode #12+会话退化修复 | ①create_context目录发现:无显式output_root时探测firstframes/music/agent三约定既有run,CLI retry续真状态(冒烟已验:verify edition解析到firstframes真实目录);②默认作者配置切快速档(thinking off+effort low+16k,修复线同款),传导链有测试;2新测试,全量4053连两轮绿 | main(783b0c4) | context.py、configs/agent_sandbox.json、tests/test_agent_run_discovery.py | 2026-10-22 | 已提交;verify edition下次resume即用快速档;并行瞬态(一轮11败)已定位为与sd线资源竞争,复跑全绿 |
 
 | Codex 10小时协助ZCODE20261023 | 用户授权给原ZCODE会话指令并协助完成今早10点前知遥20集成片；协助窗口至11:56 | codex/zcode-supervision-20261023 | 仅自有协调runtime/必要独立诊断；生产单写者ZCODE，旧恋综暂不处理 | 2026-10-23 01:56 | 在途：原ZCODE已收到指令并ACK，34项相关独立回归过；定位原会话session_7acef82aafd79b10dac6e5f434e1cf08，核对真实隔离产线；不清额度/历史，不把candidate或blocked误称accepted；以20个完整导出文件验收。 |
+
+| Codex 官方KEY实测20261023 | 原official key的DS4.1/K3/GLM实测完成 | codex/official-key-probe-20261023 | 仅自有runtime，main c698b64真实run_session | 2026-10-23 | 三模型main Agent首次+同会话续跑6/6、main JSON3/3通过。协议层15例中DS两次JSON混入ds_safety导致内容失败、GLM首次95.626秒超时，K3全部通过；三者显式禁思考下首次SDK仍返回thinking块，不能声称彻底关闭。key与原运行环境内存比较相同。证据本树.runtime/official-key-probe-20261023/REPORT.md与summary.json。零媒体生成、不改默认/生产、不提交push。 |
+
+| Codex 资源与思考统一20261023 | 用户授权清点资源/共享额度、稳定免费优先、按任务思考含Luna | codex/resource-policy-20261023 | 独立资源登记/角色策略/既有入口接线/离线回归；避开其他会话music/readiness/generation等WIP | 2026-10-23 | 已完成并冷接main，未提交/push；相关218项与最后51项通过（有重叠），SD三条离线全链路过；全量4074过/2个既有失败已在无资源改动基线复现。Codex Agent续跑/medium/JSON/双图实测过；旧片/次数/历史/在跑任务不动。免费网关45测过，自有补丁留档未启用，原8789未重启。详情docs/model-resources.md及.runtime/resource-policy-integration-20261023/REPORT.md。 |
+
+| Codex 免费网关接通20261023 | 用户授权启用零费率路由补丁并实测免费Agent稳定性 | codex/free-routing-20261023 + codex/resource-policy-20261023 | 仅网关自有3文件、独立Agent夹具与资源资格；不热换生产任务 | 2026-10-23 | 已完成：网关45测过，空闲重启1次/5.334秒，无在途请求中断；原KEY与用量前缀保留。免费DS Agent内容10/11、JSON3/3，Phancy4/5；均不自动晋升Agent，默认保留Luna，免费DS启用JSON。续跑null存档修复、最终相关232项过；代码全量4081过/2既有失败。旧片/次数/历史/在跑任务不动，无媒体生成/提交/push。详.runtime/free-gateway-integration-20261023/REPORT.md。 |
+
+| Codex 免费Agent根因20261023 | 用户要求区分模型波动/网关/SDK适配，能修则修且不靠重试 | codex/resource-policy-20261023 + codex/free-routing-20261023 | 只读原失败、隔离离线协议回放、必要时有界单次对照；不热换生产 | 2026-10-23 | 已完成：DS错误在Write参数生成前，35B原回复为文本模拟工具；未发现本地网关/SDK损坏。离线修后4回放/14保真检查、固定协议4/4单次通过；两别名原始响应均自报kimi-k2.6。补请求/响应模型独立记录，相关235项通过；原小样本不作总体不稳定结论，上游内部因果边界留档。默认/在跑任务/片/次数/历史不改，无网关重启/媒体生成/提交push。详.runtime/free-agent-cause-integration-20261023/REPORT.md。 |
+
+| Codex 知遥ModelScope数据集20261023 | 用户授权公开数据集收录20集；先传既有13个完整delivery导出，后续同步 | codex/zhiyao-modelscope-20261023 | 仅scripts/ops/zhiyao_modelscope_sync.py与自有.runtime；不动生产/计数/源码WIP | 2026-10-23 | 在途：目标Flame4pd/zhiyao-episodes，复用ms_venv登录，媒体硬链接暂存，不上传私有源文/日志/环境。 |
+
+| Codex 自转主线整合与3集无人验证20261023 | 用户批准主线整合、自动恢复、3集无人干预；人工接管算失败 | codex/autonomous-production-20261023 | 独立main基线+保留现有main WIP；只整合本轮通用修复/正常入口/故障回放，不改旧20集 | 2026-10-23 18:07 | 在途：实施计划与修复来源盘点；保留资源策略/其他会话WIP，不代提交；验证将锁定版本与原始素材，新故障修通用代码后重验，不改单集文件兜底。 |
+
+| Codex 自转验证进展 | 主线已冷整合；3集原包正式批入口实跑 | codex/autonomous-production-20261023 | 81个任务增量；保留其他作者WIP，无提交推送 | 2026-10-23T19:27:19.450651+08:00 | 全量4181过，主线关键93过，独立审查缺陷修复；服务novel-autonomous-validation-20261023，冻结执行树，真实结果待验。 |
+
+| Codex 三集优先完整闭环20261024 | root统一冷整合与生产；canary_entry仅batch.py/CLI/batch tests；budget_actual_audit只读实际额度/引用 | codex/autonomous-production-v4-20261023 | 保留原额度、单入口按edition恢复；无手改内容 | 2026-10-24 01:30 | 在途：v7全部退出，0视频/0成片；v8/v9已主线，安全冷切换后先W10；其余集先核对实际图片预算。 |
+
+| Codex 三集恢复验证结果 | 通用修复已主线并冷上线v11；实际恢复验证失败于旧图内容与原图片额度 | codex/autonomous-production-v4-20261023 | 所有在途已收完，单入口停止派发，全部历史/余额保留 | 2026-10-24T01:46:18.511822+08:00 | W10 0/25、W12 0/18、W06 0/27视频，0成片/上传；衣装引用恢复与时序误审修复有真实证据；非从头无人成功。无新增生图/视频、无提交/push。见自有runtime recovery-results-v11.json。 |
+
+| Kimi 确定性生产简化20261025 | 执行八阶段简化计划；先代码与定向回归，后分层真实验证；不重启旧任务 | codex/autonomous-production-v4-20261023 | identity/opening/first-frame/input/recovery/postproduction及对应tests；保留基线全部WIP | 2026-10-25 | 本轮停止：Tasks 1–7及全仓回归通过，A/B/C小样通过；A3/A4/A5整集均未通过，未形成从头无人成功。A5 0/20视频、0 accepted、0上传，剩余源时序/新增动作与clip_04输入额度耗尽；旧证据保留，不继续重建。 |
+| Kimi W10有限闭环20261026 | 按已审定八类问题实施三项修复；子代理逐任务实现与独立复核；不重启旧任务、不提交推送 | codex/autonomous-production-v4-20261023 | Tasks1–7实现完成；当前整分支组合修正：创作审核/物化绑定、引用freshness、宿主终态/整片审核服务分流、测试环境隔离；保留全部既有WIP | 2026-10-26 | 在途：各任务独立复核已准入，联合定向回归exit0；整分支交叉审查发现组合边界，修正并复核前不启动真实媒体或新整集。 |
+
+| Codex 本会话接管W10闭环20261026 | 用户要求在此继续；接管Tasks1–7后的组合复验、真实分层验证与冻结W10；唯一生产调度 | codex/autonomous-production-v4-20261023 | 先复验现有13:47组合修正；只读子代理最终审查及入口核对；原WIP快照保留 | 2026-10-26 14:33 | 在途：当前0/20有效视频、0accepted/上传；旧任务只读，无在途请求；不提交推送。 |
+
+| Codex 接管W10真实审核验证20261026 | 主线已集成；现有审核门按真实失败修正，作者/媒体尚未启动 | main + codex/autonomous-production-v4-20261023 | 源审协议/共享规则及入口初始化；保留资源顺序和全部旧任务 | 2026-10-26 | 在途：主线相关回归绿，Sol历史负例验证收尾；0/20有效视频，0accepted/上传；不提交push。 |
+
+| Codex W10本会话继续20261026晚间 | frozen三项收口，先小媒体链后原包B1 | codex/autonomous-production-v4-20261023 → main；停止后冷更新F | identity typed scope已MAIN集成并真实通过；request-check内容拒绝分流最小修复中；不改内容/额度 | 2026-10-26 19:32 | 小样3/3首帧、2/3基础有效视频、0完整/accepted/上传；worker03停止，在途收齐；B1未启动，不提交push。 |
+
+| Codex W10本会话最终核实 2026-10-26T21:51:46 | 通用修复已MAIN集成及真实恢复验证；媒体质量在原额度内停止 | codex/autonomous-production-v4-20261023 → main；冻结执行F | 本次owner源码/测试/文档；全部旧任务不动 | 2026-10-26T21:51:46 | 小样3/3基础/视觉视频、每镜3/3额度、整片视觉pass/声音fail；accepted0/上传0，B1未启动；未提交push。 |
+
+| Codex 声音标准调整及从头无人验证 2026-10-26T23:31:27 | 用户授权移除静音比例门、轻微拟音不阻断；先小样验收上传再新B1 | codex/autonomous-production-v4-20261023 → main / stopped F | quality.py/final_audio.py/media_operations.py及相关回归；原片/计数/回执不手改 | 2026-10-26T23:31:27 | 在途：D相关80绿，MAIN相关待完成；生产仍停止，先冷切后正常入口复核。 |
+
+| Codex 全新W10 B1无人验证 2026-10-26T23:59:56 | 用户调整后的声音标准；原包从头到私有数据集 | frozen F / zhiyao-auto-b1-EP04C_W10_失物海 | 源码已冻结；唯一produce-batch、标准额度、4并发，root只读监控 | 2026-10-26T23:59:56 | 在途：创作/源审，视频0、成片0、上传0；独立小样accepted+verified1仅算恢复。 |
+
+| Codex 全新W10 B2无人验证 2026-10-27T00:27:52 | 地点物化引用校验修复后，干净代码/原包从头 | execution-code-b2 / zhiyao-auto-b2-EP04C_W10_失物海 | 源码冻结、唯一produce-batch、原5400/3图3take2input、4并发，root监控 | 2026-10-27T00:27:52 | 在途：创作。B1失败保留不救，小样accepted+verified1仅恢复成功。 |
+
+| Codex 全新W10 B3无人验证 2026-10-27T00:59:29 | v12音乐留白执行语义经真实复核；原包从头到私有数据集 | execution-code-b3 / zhiyao-auto-b3-EP04C_W10_失物海 | 冻结源码、唯一produce-batch、原标准额度、4并发；无旧稿会话媒体继承 | 2026-10-27T00:59:29 | 在途：创作；B1/B2失败不恢复，小样accepted+verified1仅恢复。 |
+
+| Codex 全新W10 B4无人验证 2026-10-27T01:28:57 | v13宿主真实字段证据+独立确认真实复核通过；原包从头到私有数据集 | execution-code-b4 / zhiyao-auto-b4-EP04C_W10_失物海 | 冻结源码、唯一produce-batch、原标准额度、4并发；无旧稿会话媒体继承 | 2026-10-27T01:28:57 | 在途：创作；B1/B2/B3失败不恢复，小样accepted+verified1仅恢复。 |
+
+| Codex 全新W10 B5无人验证 2026-10-27T01:54:18 | v14所有制作字段引用归宿主；两份完整新审核资格通过后原包从头 | execution-code-b5 / zhiyao-auto-b5-EP04C_W10_失物海 | 冻结源码、唯一produce-batch、原标准额度、4并发，无旧稿会话媒体继承 | 2026-10-27T01:54:18 | 在途：创作；B1–4失败保留不恢复，小样accepted+verified1仅恢复。 |
+
+| Codex 全新W10 B7无人验证 2026-10-27T03:23:17 | 单帧真实原双图资格通过，校正绝对入口后原包从头 | execution-code-b7 / zhiyao-auto-b7-EP04C_W10_失物海 | 冻结正确源码，cwd/实际loadedmodule/state.root均核实；唯一produce-batch，原预算，4并发 | 2026-10-27T03:23:17 | 在途创作；B5失败保留，B6人为错目录启动已中止未生媒体；不计成功。 |
+
+| Codex B7真实道具上下文缺口20261027 | 首帧真实图审把知遥同一个包脑补成两个包；新增派发暂停，保留10张在途与全部旧计数 | codex/autonomous-production-v4-20261023 → main，live B7冻结不热换 | media/first_frames.py由独立agent；application/agents/episode/first_frames.py由root；相关回归及真实同图复核 | 2026-10-27 | 在途：B7源审已过、35组、0视频/accepted/上传；B8仅准备未启动；先最小通用修复与真实验证，不手改旧任务。 |
+
+| Codex 全新W10 B8无人验证 2026-10-27T04:51:40 | v7具名剧情道具实例+同源prop事实，正常重试预算修复；原生Sol6视觉真实正反例资格后原包从头 | execution-code-b8 / zhiyao-auto-b8-EP04C_W10_失物海 | 源码冻结、唯一produce-batch，绝对入口及actual state.root已核；原额度、4并发，root只读监控 | 2026-10-27T04:51:40 | 在途创作，0视频/accepted/上传；B7保留不救，v6新图假阳性有独立assessment；不是整集成功；未提交push。 |
+
+| Codex 源审字段选择v15 2026-10-27T05:06:42 | B8真实路径漏层级失败后，basis改选真实叶字段编号；不放宽内容审查 | codex/autonomous-production-v4-20261023 → main | application/preparation/audit.py、planning/preparation.py policy及相关测试，保留旧任务 | 2026-10-27T05:06:42 | Main相关回归及独立审查通过，B8/B3两份完整新native源审资格正在跑；B9仅准备未启动；整集0accepted/上传。 |
+
+| Codex 全新W10 B9无人验证 2026-10-27T05:13:57 | v15源审真实字段编号选择+实际音乐语义，完整native审查资格后从原包开始 | execution-code-b9 / zhiyao-auto-b9-EP04C_W10_失物海 | 源码冻结、唯一produce-batch，guard与actualstate.root已核；原writer/额度、4并发、显式Sol6审核与private publisher | 2026-10-27T05:13:57 | 在途创作，0视频/accepted/上传；B8失败保留不救；第三源审资格也正常完成，仍不算整集成功；未提交push。 |
+
+| Codex 全新W10 B10无人验证 2026-10-27T06:46:34 | native H3 schema/坏JSON/阶段归属及cached候选冷恢复通用修复后，实际正常H3编译和单视频资格已过 | execution-code-b10 / zhiyao-auto-b10-EP04C_W10_失物海 | 源码冻结；唯一produce-batch，绝对入口/实际root核实，原writer/额度/四并发/私有发布配置 | 2026-10-27T06:46:34 | 在途创作0视频/accepted/上传；单视频10.157s仅资格，监督组合为合成故障回归；B9失败保留不救；未提交push。 |
+
+| Codex 全新W10 B11无人验证 2026-10-27T07:08:43 | 创作canonical字段类型精确反馈+Skill说明修复后原包从头 | execution-code-b11 / zhiyao-auto-b11-EP04C_W10_失物海 | 代码冻结，唯一produce-batch，绝对guard与actualroot核实，原额度/四并发/正式视觉声音门 | 2026-10-27T07:08:43 | 在途创作0video/accepted/upload；B10未生成媒体就因类型错误失败保留不救；旧B8/B9真实合法稿完整纯compile30/27可用；未提交push。 |
+
+| Codex W10后台参数反馈闭环 2026-10-27T10:07:25 | B12最后后台权限参数错误未递回原Agent；仅修现有参数反馈和实证当前retake grant续接 | codex/autonomous-production-v4-20261023 → main | first_frames.py、flow.py、test_first_frame_argument_recovery.py；b7实现/root统一集成/独立review | 2026-10-27T10:07:25 | B12终态18/27有效首帧、41图、0video/accepted/upload；正确reuse拒绝保留，不救旧任务；B13只准备未启动，待相关回归+真实packet零付费资格后冻结原包从头。未提交push。 |
+
+| Codex B13已证实空间编号校验漏项 2026-10-27T10:41:41 | 保留真实稿隔离复现现有layout.scene_id与shot_indexes对应契约，证据足才最小前置校验 | codex/autonomous-production-v4-20261023 | b7拥有interactive/creative_contract.py既有函数及新test_spatial_scene_membership.py；Root统一集成 | 2026-10-27T10:41:41 | B13正常运行冻结不改/不新增整集；无API/内容手改/原脚本修改/次数变更/扩机制。 |
+
+| Codex B13时间输出协议收口v17 2026-10-27T10:58:26 | 两次真实unknown-time=null故障，仅收紧现有有basis输出时间枚举；无basis原文保留optional | codex/autonomous-production-v4-20261023 → main | b7拥有preparation/audit.py、planning/preparation.py policy、新test_creative_time_protocol.py及test_h3_book_preparation.py单结构断言；Root唯一集成 | 2026-10-27T10:58:26 | 四份历史raw隔离回放拒绝已核；相关回归/真实一次native审查待收尾。B13frozen未改，正常source_assets；空间硬门因契约不明确未实现。不开B14/不重复媒体与上传资格，无API手改内容/次数。 |
+
+| Codex B13 selector参数反馈收口 2026-10-27T12:03:29 | 真实job5把新候选03误当已拒父候选，reserve普通错误导致终止；隔离修复不重开整集 | codex/autonomous-production-v4-20261023 → main | b7 ownsfirst_frames.py及参数回归；budget_actual_audit只读review，Root真实原packet零API资格/集成 | 2026-10-27T12:03:29 | B13终态6/28FF、53图、0视频/accepted/upload；尚余候选/2336sec，非额度耗尽。不恢复旧任务、不B14、不改未知状态/权限/额度，不扩机制。 |
+
+| Codex B13排查收口 2026-10-27T12:13:44 | 原任务终态保留，源审时间v17与selector参数反馈通用修复已进主线 | codex/autonomous-production-v4-20261023 → main | 已有职责结束；无在产任务，代码未提交推送 | 2026-10-27T12:13:44 | B13有效首帧6/28、53图、视频/accepted/upload全0；并非额度耗尽。v17真实normal源审资格、selector原22行零API资格、相关回归和独立审查均过；新整集尚未验证，不恢复B13、未开B14。prompt/盲像素/QA解盲证据在R/b13-prompt-vs-review。 |
+
+| Codex continuity_design 2026-10-27T12:30:33 | 已授权修同场连续首帧事实遗漏的现有创作源审交接 | codex/autonomous-production-v4-20261023 | preparation/audit.py、planning/preparation.py、creative-authoring.md、test_opening_continuity_source.py | 2026-10-27T12:30:33 | 只接入独立确认后的有依据continuity_omission；不改旧稿/生产、不生图/API、不创建状态表；Root独立集成和真实资格。 |
+
+| Codex 首帧审核疑点确认 2026-10-27T12:30:41 | 现有审核仅对已报告contradiction用同像素与同参考做逐项确认 | codex/autonomous-production-v4-20261023 → main | /root/review_design拥有episode/first_frames.py的check/review记录、media/first_frames.py的REVIEW_POLICY、tests/test_first_frame_review_confirmation.py；Root整合 | 2026-10-27T12:30:41 | B13只读，保留原图和原初审，确认未完成不通过/不出重拍授权；真实调用由Root执行，不增媒体次数。 |
+
+| 首帧确认关联mock 2026-10-27T12:31:27 | Root已授权仅调整 test_first_frame_review_facts.py 中原有单次外部审核mock，验证二次同图同参考 | codex/autonomous-production-v4-20261023 | /root/review_design | 当前 | 其他测试不改；不触碰生产数据 |
+
+| 首帧确认 source origin 兼容测试 2026-10-27T12:39:18 | Root已授权仅更新 test_first_frame_source_origin.py 单次审核mock，保留两源字段与原origin断言 | codex/autonomous-production-v4-20261023 | /root/review_design | 当前 | 其他代码不改，不触碰生产数据 |
+
+| 首帧审核确认与冷恢复收工 2026-10-27T12:48:32 | D patch完成并交Root整合；真实可重试服务故障冷启动后复用同一候选 | codex/autonomous-production-v4-20261023 | /root/review_design已停笔；文件清单见 .runtime/first-frame-review-confirmation-20261027/scoped.patch | 当前 | 9组关联回归与独立冷复现通过；旧B13未改、无新增生产/API、未提交推送；真实同图资格待Root执行。 |
+
+| 首帧确认光照歧义收口 2026-10-27T12:54:27 | 真实04复核仍把光照下深浅差异硬拒；限定可解释的同款色调差异为uncertain | codex/autonomous-production-v4-20261023 | /root/review_design仅first_frames.py确认提示和其专项test；Root统一集成 | 2026-10-27T12:54:27 | 04同图保留双包确认；不按镜号/单一颜色写死，不改生产，不额外生图。 |
+
+| 首帧确认光照歧义收工 2026-10-27T12:55:43 | v8→v9单句确认边界及policy增量已交Root | codex/autonomous-production-v4-20261023 → main | /root/review_design已停笔，patch在 .runtime/first-frame-colour-confirm-20261027/scoped.patch | 当前 | 明确款式/显著色系和双包仍确认，色调不足证据可uncertain；旧已通过帧保留，关联回归通过；真实04同图验证待Root，未改旧生产/API/提交推送。 |
+
+| Codex 首帧连续性与误报小对照结束 2026-10-27T13:17:31 | 原镜真实源审/同图双模型对照未通过，禁止启动完整集 | codex/autonomous-production-v4-20261023 → main | 实验补丁保留D/.runtime；Main已精确回退本次未合格代码，未提交push | 2026-10-27T13:17:31 | B13仍6/28有效首帧、53图、0视频/accepted/upload；本轮0生图/视频/上传，源审漏07且图审颜色不稳定；没有启动新作者或B14。先解决有证据的审查可靠性再继续。 |
+
+| Codex review_minimal evidence class 2026-10-27T14:00:03 | 已授权复用一次图审确认，独立模型结果+有据不确定分流 | codex/autonomous-production-v4-20261023 | review_minimal独占episode/first_frames.py确认与QA tests；Root独占media policy | 2026-10-27T14:00:03 | 不动B13、无新增图片/API/第三LLM；需Root独立review与真实同图资格。 |
+
+| Codex continuity_minimal 2026-10-27T14:02:37 | 同场历史精确引文的预审澄清及最小input授权 | codex/autonomous-production-v4-20261023 | 我只改 episode/opening_source.py、input_contracts.py 和新test_opening_continuity_preflight.py；Root拥有media和总路由 | 2026-10-27 | B13只读、不生成/API、无额外额度；后继缓存miss由Root统一路由审查。 |
+
+| Codex 首帧连续性单路由 2026-10-27T14:05:38 | 既有preflight识别真实同场澄清；仅对已记录且历史变化的相邻后镜复核文本，并复用已通过帧 | codex/autonomous-production-v4-20261023 → main | Root owns readiness.py、media/first_frames.py 标签及新test；source agent owns opening_source.py/input_contracts.py，QA agent owns episode/first_frames.py/tests；Root统一集成 | 2026-10-27T14:05:38 | 先RED/GREEN和现有镜头真实preflight，无新图/视频/旧任务写；不新增路由类型/状态文件/加次数。 |
+
+| Codex continuity_minimal 收工 2026-10-27T14:12:53 | 同场文本预审、原字段证据和当前镜input授权 | codex/autonomous-production-v4-20261023 | owned patch .runtime/opening-continuity-preflight-20261027/scoped.patch，已停笔 | 当前 | 局部及关联回归通过；真实模型预审、完整路由集成、后继缓存重审由Root验证；0 API/生图/B13旧数据更改，未提交push。 |
+
+| Codex review_minimal evidence class 收工 2026-10-27T14:16:25 | QA单次确认证据分类与旧拒绝状态投影 | codex/autonomous-production-v4-20261023 | review_minimal停笔；episode/first_frames.py及相关测试交Root审；不含media policy | 2026-10-27T14:16:25 | 相关回归、实际邻镜复用与旧accepted保留回归通过；未调用API/生图/旧任务写入，未提交推送；实际小样由Root执行。 |

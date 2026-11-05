@@ -14,12 +14,7 @@ from novel_manga.story.voice_delivery import native_speech_errors, require_nativ
 from novel_manga.util import atomic_write_json
 
 
-def case(offscreen=False):
-    return {'clip_id':'clip_01','request_seconds':5,'shot_indexes':[1],
-        'shot_timing':[{'seconds':5}], 'h3_speech_policy':NATIVE_SPEECH_POLICY,
-        'references':[{'role':'character','name':'A','path':'actor.png'}],
-        'dialogue_bindings':[{'stage':1,'speaker_name':'A','delivery_mode':'offscreen_dialogue'if offscreen else'visible_dialogue',
-            'text':'先等等。','emotion':'Her voice drops briefly as she notices the step, then ends firmly.'}]}
+from support.native_speech import case
 
 
 @pytest.mark.parametrize('offscreen',[False,True])
@@ -233,6 +228,7 @@ def test_final_receipt_checks_selected_native_request_even_after_visual_pass(tmp
     atomic_write_json(book/'profile.json',{'h3_speech_policy':NATIVE_SPEECH_POLICY})
     atomic_write_json(episode/'clip_plan.json',{'clips':[clip]})
     raw=episode/'work/clips/clip_01/attempt_01';raw.mkdir(parents=True);movie=raw/'clip.mp4';movie.write_bytes(b'video')
+    (raw/'cover.jpeg').write_bytes(b'cover')
     atomic_write_json(raw/'request.json',{'prompt':clip['prompt_h3'],'reference_audios':audio_input})
     report={'clips':[{'clip_id':'clip_01','selected':{'video':str(movie)}}],
         'assembly':{'final_video':str(movie),'thin_passed':True},'quality_review':{'passed':True,'content_passed':True},

@@ -4,6 +4,8 @@ import json
 import os
 from pathlib import Path
 import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'src'))
+from novel_manga.llm.policy import chat_options
 
 
 async def run(request):
@@ -26,8 +28,8 @@ async def run(request):
     from services.recommendation_execution import RecommendationExecution,RecommendationModels,execution_scope
     from langchain_openai import ChatOpenAI
     common={'model':model,'base_url':base,'api_key':key,'timeout':80}
-    intent=ChatOpenAI(**common,max_tokens=8192,temperature=.3)
-    prose=ChatOpenAI(**common,max_tokens=4000,temperature=.7)
+    intent=ChatOpenAI(**common,**chat_options(model,'check'),max_tokens=8192,temperature=.3)
+    prose=ChatOpenAI(**common,**chat_options(model,'music'),max_tokens=4000,temperature=.7)
     # Reuse the existing real graph/dense index; this adapter never constructs a library.
     data=Path(config['data_dir']);data.mkdir(parents=True,exist_ok=True)
     os.chdir(data)

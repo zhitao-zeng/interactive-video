@@ -51,7 +51,9 @@ def prop_assets_on_disk(novel_dir) -> dict[str, set[str]]:
 def build_references(cast: list[str], location_short: str | None, bible: StoryBible, location_map: dict[str, str], speakers: tuple[str, ...] = (), novel_dir: Path | None = None, chapter: int | None = None, *, settings=None, identity_data=None, body_refs=None, props: list[str] | None = None, props_index: dict | None = None, props_on_disk: set[str] | None = None, worn_overrides: dict[str, str | None] | None = None, faceplate_closed: set[str] | frozenset = frozenset(), faceplate_closed_only: set[str] | frozenset = frozenset()) -> tuple[list[dict], list[str], str]:
     settings = settings or compiler_options()
     character_index = {character.name: index for index, character in enumerate(bible.characters, start=1)}
-    location_index = {full.split("：", 1)[0].strip(): index for index, full in enumerate(bible.locations, start=1)}
+    # Use the same ordered locations as the asset factory. An exact duplicate
+    # must not bind a card number the factory can never create.
+    location_index = {full.split("：", 1)[0].strip(): index for index, full in enumerate(dict.fromkeys(bible.locations), start=1)}
     # The leads carry the story and were the most often face- or costume-swapped
     # in review; they always get their expressions sheet as a second view when
     # it exists on disk, whatever the tier.
@@ -121,7 +123,8 @@ def build_references(cast: list[str], location_short: str | None, bible: StoryBi
         # An imported face crop may occupy the historical turnaround.jpeg seat.
         # Its supplied scope, rather than that filename, defines what it can bind.
         card = novel_dir / references[-1]['path'] if novel_dir is not None else None
-        portrait_only = card is not None and read_json(card.with_suffix(card.suffix + '.origin.json'), {}).get('reference_scope') == 'identity_portrait'
+        from novel_manga.media.reference_views import scope_of
+        portrait_only = card is not None and scope_of(novel_dir,references[-1]) == 'identity_portrait'
         if portrait_only:
             references[-1].update(reference_scope='identity_portrait', wardrobe=look.wardrobe)
         sheet = novel_dir is not None and (novel_dir / "series_assets" / "characters" / asset / "expressions.jpeg").is_file()

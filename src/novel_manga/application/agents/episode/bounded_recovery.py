@@ -10,6 +10,18 @@ from .input_effects import effects
 
 def evidence(ctx,cid):
     source=(ctx.run_dir/'source.txt').read_text() if (ctx.run_dir/'source.txt').is_file() else ''
+    approval_path=ctx.episode_dir/'work/input_authorizations'/f'{cid}.json'
+    approval=read_json(approval_path,{})
+    candidate=approval.get('candidate')
+    if (approval.get('status')=='approved' and isinstance(approval.get('authorization'),str)
+            and approval['authorization'].strip() and approval.get('source_text')==source
+            and isinstance(candidate,dict) and candidate.get('clip_id')==cid and candidate.get('action')=='input'
+            and isinstance(candidate.get('source_quote'),str) and candidate['source_quote'].strip()
+            and candidate['source_quote'] in source):
+        return {'kind':'user_approved_input','evidence_path':str(approval_path),
+                'authorization':approval['authorization'],'allowed_kinds':['input'],
+                'reason':approval.get('reason')or'User approved this exact input revision once',
+                'candidate':copy.deepcopy(candidate)}
     paths=sorted((ctx.episode_dir/'work/input_repairs').glob('clip_*-*.json'),key=lambda p:p.stat().st_mtime_ns)
     for path in reversed(paths):
         record=read_json(path,{})
@@ -45,13 +57,15 @@ def grant(ctx,cid,proof,*,kind):
     if kind not in {'input','time'}:raise ValueError('recovery grants input or time, never video')
     verified=evidence(ctx,cid)
     if not verified or verified!=proof:raise ValueError('recovery requires current host-owned evidence')
+    if kind not in verified.get('allowed_kinds',['input','time']):
+        raise ValueError('this user authorization permits input only, not time, image or video')
     path=ctx.episode_dir/'repair_budget_grants.json'
     with (ctx.episode_dir/'repair_budget_grants.lock').open('a')as lock:
         fcntl.flock(lock,fcntl.LOCK_EX);grants=read_json(path,{})
         entries=grants.setdefault(cid,{}).setdefault('upstream_recovery',{})
         if entries.get(kind):return copy.deepcopy(entries[kind])
         item={'evidence':verified,'candidate':verified['candidate'],'consumed':False,
-              'authorization':'approved-upstream-recovery-20261009','reason':verified['reason']}
+              'authorization':verified.get('authorization')or'approved-upstream-recovery-20261009','reason':verified['reason']}
         entries[kind]=item;atomic_write_json(path,grants);return copy.deepcopy(item)
 
 
@@ -71,27 +85,26 @@ def input_operation(ctx,cid,row,*,consume=False):
         return {'allowed':allowed,'grant':copy.deepcopy(item)}
 
 
-def resume_window(ctx,saved):
+def plan_window(ctx,saved):
     if saved.get('upstream_recovery') or saved.get('passed') or (saved.get('job')or{}).get('status')in {'accepted','running'}:return None
     if float(saved.get('remaining_seconds',1)or 0)>0:return None
     grants=read_json(ctx.episode_dir/'repair_budget_grants.json',{})
     for cid,entry in grants.items():
         item=entry.get('upstream_recovery',{}).get('time')or{}
         if not item or item.get('consumed'):continue
-        # A grant is written only after verifying evidence; recheck while the plan still exists.
         if (ctx.episode_dir/'clip_plan.json').exists() and evidence(ctx,cid)!=item['evidence']:continue
         seconds=600 if read_json(ctx.episode_dir/'clip_plan.json',{}).get('clips')else 1200
-        with (ctx.episode_dir/'repair_budget_grants.lock').open('a')as lock:
-            fcntl.flock(lock,fcntl.LOCK_EX);current=read_json(ctx.episode_dir/'repair_budget_grants.json',{})
-            marker=current[cid]['upstream_recovery']['time']
-            if marker.get('consumed'):continue
-            marker['consumed']=True;atomic_write_json(ctx.episode_dir/'repair_budget_grants.json',current)
         window={'seconds':seconds,'proposals':0,'evidence':item['evidence'],'prior_remaining_seconds':saved.get('remaining_seconds',0)}
         result={**saved,'upstream_recovery':window,'status':'deferred','phase':'ready_agent',
                 'reason':'Continue the evidenced recovery once','remaining_seconds':seconds,'deadline':time.time()+seconds,
                 'no_progress':0,'fallback_invocations':0,'updated_at':time.strftime('%F %T')}
-        atomic_write_json(ctx.run_dir/'agent-run.json',result);return result
+        return result, {'kind':'upstream_window','cid':cid,'seconds':seconds,'evidence':item['evidence']}
     return None
+
+
+def resume_window(ctx,saved):
+    planned = plan_window(ctx,saved)
+    return planned[0] if planned else None
 
 
 def record_proposal(ctx):

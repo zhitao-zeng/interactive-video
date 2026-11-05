@@ -88,16 +88,11 @@ class AudioMixOperations:
         folder=ctx.episode_dir/'work/ambience-assets';folder.mkdir(parents=True,exist_ok=True)
         target=folder/(entry['id']+asset.suffix)
         if target.resolve()!=asset.resolve():shutil.copy2(asset,target)
-        policy=read_json(ctx.episode_dir/'delivery_policy.json',{})
-        policy['episode_ambience']={'asset':{**copy.deepcopy(entry),'path':str(target.resolve()),
+        policy={'asset':{**copy.deepcopy(entry),'path':str(target.resolve()),
             'source_path':str(asset.resolve())},'gain_db':gain,'source_quote':quote,'reason':plan['reason'],'source_review':review}
-        atomic_write_json(ctx.episode_dir/'delivery_policy.json',policy)
-        from novel_manga.application.repair.ambience import apply_assembly
-        report=apply_assembly(ctx.episode_dir,report,context=self.media.runner().context)
-        from novel_manga.application.review.execution import save_result
-        report=save_result(ctx.episode_dir,report,read_json(ctx.episode_dir/'episode_review.json',{}),
-            plan=read_json(ctx.episode_dir/'clip_plan.json',{}))
-        atomic_write_json(ctx.episode_dir/'thin_media_report.json',report)
+        from . import postproduction
+        report,_=postproduction.persist_audio_policy(context=ctx,media=self.media,
+            policy_key='episode_ambience',policy_value=policy)
         outcome={'ok':True,'assembly_changed':True,'video_generation':False,
             'technical_passed':(report.get('assembly')or{}).get('thin_passed'),
             'media_checks':(report.get('assembly')or{}).get('media_qc'),

@@ -122,7 +122,7 @@ def test_error_finishing_during_adoption_stops_next_dispatch(tmp_path, monkeypat
     class Pool(ThreadPoolExecutor):
         def submit(self,fn,*task):
             future=super().submit(fn,*task)
-            futures[task[0]['clip_id']]=future
+            futures[task[0].row['clip_id']]=future
             return future
     monkeypatch.setattr(first_frames,'ThreadPoolExecutor',Pool)
     def build(ctx,row,path):
@@ -142,3 +142,47 @@ def test_error_finishing_during_adoption_stops_next_dispatch(tmp_path, monkeypat
     operation=FirstFrameOperations(ctx,builder=build,checker=check,on_accepted=accepted)
     with pytest.raises(RuntimeError,match='503'):operation.prepare({})
     assert not (ctx.novel_dir/'first_frames/book_1/clip_03/candidate_01').exists()
+
+
+@pytest.mark.parametrize('second_failure', ['credential', 'uncertain'])
+def test_parallel_service_failures_are_aggregated_conservatively(tmp_path, monkeypatch, second_failure):
+    import httpx
+    from novel_manga.application.agents.episode import first_frames
+    from novel_manga.application.agents.episode.tools import EpisodeTools
+    from novel_manga.providers.phanrouter_tasks import SubmissionUncertain
+    monkeypatch.setenv('NOVEL_MEDIA_WORKERS', '2')
+    ctx, _ = case(tmp_path, monkeypatch)
+    started = 0
+    both = threading.Event()
+    lock = threading.Lock()
+    calls = []
+    def http_error(status):
+        request = httpx.Request('POST', 'https://service.test/image')
+        response = httpx.Response(status, request=request, json={'error': 'failure'})
+        return httpx.HTTPStatusError(f'HTTP {status}', request=request, response=response)
+    def build(ctx, row, path):
+        nonlocal started
+        cid = row.row['clip_id'] if hasattr(row, 'row') else row['clip_id']
+        with lock:
+            started += 1
+            calls.append(cid)
+            if started == 2:
+                both.set()
+        assert both.wait(3)
+        if cid == 'clip_01':
+            raise http_error(503)
+        if second_failure == 'credential':
+            raise http_error(401)
+        raise SubmissionUncertain('task submission unconfirmed (HTTP 502): not sent again')
+    monkeypatch.setattr(first_frames, 'build', build)
+    result = EpisodeTools(ctx).dispatch('first_frames', {})
+    assert sorted(calls) == ['clip_01', 'clip_02']
+    assert result['ok'] is False and result['retryable'] is False
+    assert result['clips']['clip_01']['service_interrupted']['http_status'] == 503
+    assert result['clips']['clip_01']['retryable'] is True
+    assert result['clips']['clip_02']['retryable'] is False
+    if second_failure == 'credential':
+        assert result['clips']['clip_02']['service_interrupted']['http_status'] == 401
+    else:
+        assert result['clips']['clip_02']['service_interrupted']['submission_uncertain'] is True
+        assert result['required_action'] == 'reconcile_submission'

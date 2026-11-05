@@ -127,3 +127,73 @@ def test_music_bus_leaves_real_gap_and_native_audio_remains_while_video_is_copie
     assert revised['assembly']['final_video']!=str(output)
     assert signal(Path(revised['assembly']['final_video']),4.2,.5,300)<signal(output,4.2,.5,300)/10
     assert output.exists()and video.exists()
+
+
+def test_explicit_source_offset_can_cross_a_cut_without_changing_silence(episode):
+    directory,policy,timeline=episode
+    source={'start':anchor(1),'end':anchor(1,'end',1.5)}
+    script=read_json(directory/'chapter_script.json');script['music_plan']={'silences':[source]}
+    atomic_write_json(directory/'chapter_script.json',script)
+    original=copy.deepcopy(script)
+    resolved=resolve(directory,policy,timeline)
+    assert {'start':0.,'end':4.5} in resolved['silences']
+    timeline[0]['end']=4;timeline[1].update(start=4,end=7)
+    assert {'start':0.,'end':5.5} in resolve(directory,policy,timeline)['silences']
+    assert read_json(directory/'chapter_script.json')==original
+
+
+@pytest.mark.parametrize('point',[anchor(1,'start',-.1),anchor(2,'end',.1)])
+def test_explicit_offset_cannot_leave_actual_episode(episode,point):
+    directory,policy,timeline=episode
+    policy['silences']=[{'start':anchor(1),'end':point}]
+    with pytest.raises(ValueError,match='leaves the episode'):
+        resolve(directory,policy,timeline)
+
+
+def test_authored_end_card_silence_is_silent_without_extending_music_bus(episode):
+    directory,policy,timeline=episode
+    atomic_write_json(directory/'interaction.json',{'seconds':3})
+    tail={'id':'tail','start':anchor(2,'end'),'end':anchor(2,'end',2)}
+    script=read_json(directory/'chapter_script.json');script['music_plan']={'silences':[tail]}
+    atomic_write_json(directory/'chapter_script.json',script)
+    result=resolve(directory,policy,timeline)
+    assert result['duration']==6 and result['silences']==[{'start':3.,'end':4.}]
+    assert read_json(directory/'chapter_script.json')==script
+    policy['cues'][0]['end']=anchor(2,'end',2)
+    with pytest.raises(ValueError,match='cue cue1.*leaves the episode'):resolve(directory,policy,timeline)
+
+
+def test_silence_can_cross_into_declared_card_but_not_beyond_it(episode):
+    directory,policy,timeline=episode
+    atomic_write_json(directory/'interaction.json',{'seconds':3})
+    policy['silences']=[{'id':'tail','start':anchor(2,'end',-1),'end':anchor(2,'end',2)}]
+    assert resolve(directory,policy,timeline)['silences']==[{'start':5.,'end':6.}]
+    policy['silences'][0]['end']=anchor(2,'end',4)
+    with pytest.raises(ValueError,match='silence tail.*leaves the episode'):resolve(directory,policy,timeline)
+
+
+@pytest.mark.parametrize('ambience',['shot','independent'])
+def test_card_audio_source_is_not_assumed_silent_for_tail_music_acceptance(episode,ambience):
+    directory,policy,timeline=episode
+    atomic_write_json(directory/'interaction.json',{'seconds':3,**({'ambience_shot_index':2}if ambience=='shot'else{})})
+    if ambience=='independent':atomic_write_json(directory/'delivery_policy.json',{'interaction_ambience':{'id':'existing'}})
+    policy['silences']=[{'id':'tail','start':anchor(2,'end'),'end':anchor(2,'end',2)}]
+    with pytest.raises(ValueError,match='silence tail.*leaves the episode'):resolve(directory,policy,timeline)
+
+
+def test_music_bed_cache_tracks_source_bytes_without_duplicate_encoding(episode,monkeypatch):
+    import os
+    from novel_manga.application import music_timeline
+
+    directory,policy,timeline=episode;report={'assembly':{'timeline':timeline}}
+    encodes=[];original_run=music_timeline.run
+    monkeypatch.setattr(music_timeline,'run',lambda command:encodes.append(command)or original_run(command))
+    first=prepare_bed(directory,report,policy)
+    assert prepare_bed(directory,report,policy)==first and len(encodes)==1
+    source=Path(policy['cues'][0]['asset']['path']);before=source.stat()
+    tone(source,900)
+    os.utime(source,ns=(before.st_atime_ns,before.st_mtime_ns))
+    changed=prepare_bed(directory,report,policy)
+    assert changed['asset']['path']!=first['asset']['path']and len(encodes)==2
+    assert changed['music_timeline']['cues'][0]['source_sha256']!=first['music_timeline']['cues'][0]['source_sha256']
+    assert prepare_bed(directory,report,policy)==changed and len(encodes)==2

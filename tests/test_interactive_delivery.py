@@ -11,6 +11,54 @@ def test_failed_content_cannot_be_accepted():
     assert delivery_status(report, True) == 'accepted'
 
 
+def test_media_runner_binds_the_current_agent_run_dir(tmp_path,monkeypatch):
+    from types import SimpleNamespace
+    from novel_manga.application.agents.episode.media_operations import MediaOperations
+    from novel_manga.application.rendering import flow
+    from novel_manga.config import Settings
+    from novel_manga.models.bible import StoryBible
+    from novel_manga.util import atomic_write_json
+    novel=tmp_path/'book';episode=novel/'book_1';episode.mkdir(parents=True)
+    run=tmp_path/'agent-run'
+    ctx=SimpleNamespace(novel_dir=novel,episode_dir=episode,run_dir=run,project_root=tmp_path)
+    atomic_write_json(novel/'profile.json',{})
+    atomic_write_json(novel/'story_bible.json',{})
+    monkeypatch.setattr(Settings,'from_env',classmethod(lambda cls,**kwargs:object()))
+    monkeypatch.setattr(StoryBible,'model_validate',classmethod(lambda cls,value:value))
+    runner=SimpleNamespace(context=SimpleNamespace(options=SimpleNamespace()))
+    monkeypatch.setattr(flow,'ThinMediaRunner',lambda **kwargs:runner)
+    for name in ('NOVEL_RENDER_WORKERS','NOVEL_RENDER_INFLIGHT','NOVEL_AGENT_MANAGED'):
+        monkeypatch.delenv(name,raising=False)
+    assert MediaOperations(ctx,None,None).runner().context.run_dir == run
+
+
+def test_first_frame_delivery_runner_binds_the_current_agent_run_dir(tmp_path,monkeypatch):
+    from types import SimpleNamespace
+    from novel_manga.application.agents.episode import context,flow
+    from novel_manga.interactive import delivery,first_frame_entry,runtime
+    from novel_manga.story.voice_delivery import NATIVE_SPEECH_POLICY
+    from novel_manga.util import atomic_write_json
+    novel=tmp_path/'book';episode=novel/'book_1';episode.mkdir(parents=True)
+    run=tmp_path/'agent-run'
+    ctx=SimpleNamespace(novel_dir=novel,episode_dir=episode,run_dir=run,
+                        work_dir=run/'sandbox',source_novel_dir=novel)
+    atomic_write_json(novel/'profile.json',{'h3_input_mode':'first-frame',
+                                            'h3_speech_policy':NATIVE_SPEECH_POLICY})
+    atomic_write_json(episode/'thin_media_report.json',{'assembly':{'final_video':'existing'}})
+    monkeypatch.setattr(runtime,'configure',lambda *args,**kwargs:None)
+    monkeypatch.setattr(context,'create_context',lambda *args,**kwargs:ctx)
+    monkeypatch.setattr('novel_manga.application.agents.episode.postproduction.transfer_cutaway',lambda *args:None)
+    monkeypatch.setattr(flow,'run_episode',lambda *args,**kwargs:{'status':'finished','passed':True})
+    runner=SimpleNamespace(context=SimpleNamespace(episode_dir=episode))
+    monkeypatch.setattr(runtime,'runner_for',lambda *args,**kwargs:runner)
+    monkeypatch.setattr(delivery,'finish_reviewed_delivery',lambda actual,*args:{
+        'status':'accepted','run_dir':str(actual.context.run_dir)})
+    result=first_frame_entry.run(tmp_path,novel,project='adventure',
+                                 destination=tmp_path/'delivery/one',config={})
+    assert result['run_dir'] == str(run)
+    assert result['agent_run_dir'] == str(run)
+
+
 def test_tail_is_exactly_three_seconds_of_actual_timeline():
     assert interaction_window(178.32) == {'start':178.32, 'end':181.32, 'seconds':3.0}
 
@@ -62,6 +110,7 @@ def test_controlled_native_publication_keeps_reviewed_export_receipt_current(lab
     case=labelled_delivery;ctx=case.ctx;runner=SimpleNamespace(context=ctx)
     candidate=ctx.episode_dir/'repair_candidate/native.mp4';candidate.parent.mkdir();candidate.write_bytes(b'native')
     case.destination.mkdir();exported=case.destination/'episode01.mp4';exported.write_bytes(b'reviewed native with final captions and card')
+    (case.destination/'cover.jpeg').write_bytes(b'cover')
     report=copy.deepcopy(case.report);report['assembly'].update(final_video=str(candidate),pending_publish=True)
     for clip in ctx.clip_plan['clips']:clip['kind']='video'
     atomic_write_json(ctx.episode_dir/'clip_plan.json',ctx.clip_plan)
@@ -314,3 +363,60 @@ def test_world_card_change_invalidates_cached_export(labelled_delivery,monkeypat
     (case.ctx.episode_dir/'publication.json').write_text(json.dumps({'world_card':{'text':'new card'}}))
     after=delivery.export_context(runner,case.report)
     assert before!=after
+
+
+def _first_frame_terminal_case(tmp_path, monkeypatch, agent_result):
+    from types import SimpleNamespace
+    from novel_manga.application.agents.episode import context, flow
+    from novel_manga.interactive import delivery, first_frame_entry, runtime
+    from novel_manga.story.voice_delivery import NATIVE_SPEECH_POLICY
+    from novel_manga.util import atomic_write_json
+
+    novel = tmp_path/'book'
+    episode = novel/'book_1'
+    episode.mkdir(parents=True)
+    run = tmp_path/'agent-run'
+    ctx = SimpleNamespace(novel_dir=novel, episode_dir=episode, run_dir=run,
+                          work_dir=run/'sandbox', source_novel_dir=novel)
+    atomic_write_json(novel/'profile.json', {'h3_input_mode':'first-frame',
+                                            'h3_speech_policy':NATIVE_SPEECH_POLICY})
+    atomic_write_json(episode/'thin_media_report.json', {
+        'assembly':{'final_video':'existing.mp4'}})
+    monkeypatch.setattr(runtime, 'configure', lambda *args, **kwargs:None)
+    monkeypatch.setattr(context, 'create_context', lambda *args, **kwargs:ctx)
+    monkeypatch.setattr('novel_manga.application.agents.episode.postproduction.transfer_cutaway',
+                        lambda *args:None)
+    monkeypatch.setattr(flow, 'run_episode', lambda *args, **kwargs:agent_result)
+    runner = SimpleNamespace(context=SimpleNamespace(episode_dir=episode))
+    monkeypatch.setattr(runtime, 'runner_for', lambda *args, **kwargs:runner)
+    calls = []
+    monkeypatch.setattr(delivery, 'finish_reviewed_delivery', lambda *args:(
+        calls.append(1) or {'status':'accepted', 'content_passed':True,
+                            'run_dir':str(run), 'final_video':'existing.mp4'}))
+    return first_frame_entry, run, calls
+
+
+def test_blocked_host_cannot_be_overridden_by_an_existing_assembly(tmp_path, monkeypatch):
+    entry, _, calls = _first_frame_terminal_case(tmp_path, monkeypatch, {
+        'status':'blocked', 'passed':False, 'retryable':False,
+        'invalid_fields':{'clip_01':['image_references']},
+        'argument_errors':{'clip_01':['registered reference is missing']}})
+    result = entry.run(tmp_path, tmp_path/'book', project='adventure',
+                       destination=tmp_path/'delivery', config={})
+    assert result['status'] == 'blocked'
+    assert result['invalid_fields'] == {'clip_01':['image_references']}
+    assert result['argument_errors'] == {'clip_01':['registered reference is missing']}
+    assert calls == []
+
+
+def test_outer_acceptance_requires_current_formal_acceptance_status(tmp_path, monkeypatch):
+    entry, run, _ = _first_frame_terminal_case(tmp_path, monkeypatch, {
+        'status':'finished', 'passed':True})
+    monkeypatch.setattr('novel_manga.review.acceptance.acceptance_status', lambda *_: {
+        'status':'candidate', 'passed':False, 'reason':'formal acceptance bundle is missing'})
+    result = entry.run(tmp_path, tmp_path/'book', project='adventure',
+                       destination=tmp_path/'delivery', config={})
+    assert result['status'] == 'candidate'
+    assert result['content_passed'] is False
+    assert result['acceptance_status']['reason'] == 'formal acceptance bundle is missing'
+    assert result['agent_run_dir'] == str(run)

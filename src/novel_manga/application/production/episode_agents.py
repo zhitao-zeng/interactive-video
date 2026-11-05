@@ -143,12 +143,6 @@ def _observe(conductor, row, processes):
         row.update(status='blocked', phase='blocked', reason=row['external_context_error'])
         return
     if result.get('status') in TERMINAL | {'paused', 'deferred'}:
-        if not conductor.agent_pause.is_file() and row.get('source_episode'):
-            from novel_manga.application.agents.episode.recovery import resume_source_review,resume_protocol
-            from novel_manga.application.agents.episode.input_repair import repair as validate_input
-            episode_dir = Path(row['run_dir'])/conductor.novel_dir.name/Path(row['source_episode']).name
-            result = resume_source_review(row['run_dir'], episode_dir, result) or result
-            result = resume_protocol(row['run_dir'], episode_dir, result,validate_input=validate_input) or result
         reason = result.get('reason') or ''
         if result['status'] == 'finished_with_issues' and not reason:
             quality = (result.get('finish') or {}).get('quality_review') or {}
@@ -221,6 +215,19 @@ def _retry_due(conductor, row):
                 and row.get('key') in conductor.keys)
 
 
+def _automatic_resume(conductor, row):
+    if conductor.agent_pause.is_file() or not row.get('run_dir') or not row.get('source_episode'):
+        return False
+    from novel_manga.application.agents.episode.recovery import plan_resume
+    ctx = create_context(conductor.novel_dir, row['episode'], output_root=row.get('output_root'),
+                         input_mode=row.get('input_mode', 'auto'))
+    saved = read_json(Path(row['run_dir'])/'agent-run.json', {})
+    planned = plan_resume(ctx, saved, {}, False)
+    resumed = planned['saved']
+    return bool(planned['actions'] or resumed.get('status') != saved.get('status')
+                or resumed.get('job') != saved.get('job'))
+
+
 def tick(conductor):
     from .control import processes
     rows = processes()
@@ -235,9 +242,13 @@ def tick(conductor):
         conductor_capacity.tick_aimd(conductor, name, key, chapters)
     paused = conductor.agent_pause.is_file()
     active = [row for row in conductor.agents.values() if row.get('pid')]
+    automatic_resume = {row['episode'] for row in conductor.agents.values()
+                        if not row.get('pid') and row['episode'] in review_eligible
+                        and row['status'] in TERMINAL and _automatic_resume(conductor, row)}
     candidates = [row for row in conductor.agents.values() if not row.get('pid')
                   and row['episode'] in review_eligible
-                  and (row['status'] not in TERMINAL or _retry_due(conductor, row))]
+                  and (row['status'] not in TERMINAL or row['episode'] in automatic_resume
+                       or _retry_due(conductor, row))]
     first_priority = conductor.agent_settings.get('first_pass_priority', False)
     first_supply = first_priority and (any(agent_preparation.normal_work(conductor, r) for r in active)
         or any(agent_preparation.normal_work(conductor, r) and not agent_preparation.assets_waiting(conductor, r)
@@ -252,7 +263,8 @@ def tick(conductor):
             if not any(available.values()):
                 break
             retry = _retry_due(conductor, row)
-            if row.get('pid') or (row['status'] in TERMINAL and not retry):
+            if row.get('pid') or (row['status'] in TERMINAL and not retry
+                                  and row['episode'] not in automatic_resume):
                 continue
             if agent_preparation.assets_waiting(conductor,row):continue
             if not batch_review.may_dispatch(conductor,row,candidates):continue
@@ -326,7 +338,8 @@ def tick(conductor):
             available[kind] -= 1
     active = [row for row in conductor.agents.values() if row.get('pid')]
     pending = [row for row in conductor.agents.values() if row['episode'] in review_eligible
-               and (row['status'] not in TERMINAL or _retry_due(conductor, row))]
+               and (row['status'] not in TERMINAL or row['episode'] in automatic_resume
+                    or _retry_due(conductor, row))]
     blocked = [row for row in conductor.agents.values() if row['status'] in {'blocked', 'finished_with_issues'}]
     status = ('pausing' if active else 'paused') if paused else (
         'running' if pending else 'blocked' if blocked else 'complete')

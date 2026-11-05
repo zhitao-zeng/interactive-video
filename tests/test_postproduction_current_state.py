@@ -29,6 +29,8 @@ def test_registered_cutaway_is_published_and_preserved_in_resume(tmp_path, monke
     assert summary['source']=={'clip_id':'clip_20','range_seconds':[1.2,2.0],'range_frames':[30,50]}
     assert summary['target']=={'clip_id':'clip_21','range_seconds':[0.4,1.2],'range_frames':[10,30]}
     assert summary['binding_id']=='binding-001'
+    assert summary['next_action'].startswith('Follow readiness.next_action')
+    assert not summary['next_action'].startswith('Call finish')
     published=ctx.work_dir/'input/postproduction-plan.json'
     assert read_json(published)==plan
     assert 'input/postproduction-plan.json' in task['evidence_files']

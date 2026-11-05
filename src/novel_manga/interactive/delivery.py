@@ -1,5 +1,6 @@
 """Deterministic evidence labels, three-second voting card and measured delivery receipt."""
 from pathlib import Path
+import hashlib
 import json
 import shutil
 import subprocess
@@ -383,7 +384,7 @@ def deliver(runner, report: dict, destination: Path) -> dict:
 
 def reviewed_delivery(runner,report,destination):
     """Export the actual captions/card first; return its failures to the shared loop."""
-    from novel_manga.application.review.final_cut import review_assembly
+    from novel_manga.application.review.final_cut import review_assembly, blocking_issues
     from novel_manga.util import read_json
     destination=Path(destination)
     pending={**report,'quality_review':{**report.get('quality_review',{}),'passed':False,'content_passed':False}}
@@ -406,7 +407,7 @@ def reviewed_delivery(runner,report,destination):
     final=review_assembly(runner,report,receipt=receipt)
     final['final_audio_review_required'] = True
     receipt['final_audio_review_required'] = True
-    if final.get('complete') is True and final.get('passed') is True and not final.get('issues') and not final.get('errors'):
+    if final.get('complete') is True and final.get('passed') is True and not blocking_issues(final.get('issues') or []) and not final.get('errors'):
         movie = Path(final.get('movie') or '')
         try:
             from novel_manga.application.review.final_audio import review_audio
@@ -417,8 +418,10 @@ def reviewed_delivery(runner,report,destination):
             runtime = {key: configured[key] for key in ('python','audio_source_root','audio_model_dir')}
             audio = review_audio(code_root, runner.context.episode_dir, movie, runtime=runtime)
         except Exception as error:
+            from novel_manga.service_errors import service_failure
             audio = {'movie':str(movie.resolve()) if movie else '', 'complete':False, 'passed':False,
-                     'issues':[], 'errors':[f'{type(error).__name__}: {error}'], 'coverage':[]}
+                     'issues':[], 'errors':[f'{type(error).__name__}: {error}'], 'coverage':[],
+                     **service_failure(error)}
         final['audio_review'] = audio
         receipt['final_audio_review'] = audio
         receipt['final_audio_review_passed'] = bool(audio.get('movie') == final.get('movie')
@@ -457,7 +460,7 @@ def export_context(runner,report):
 
 def record_native_publication(runner,report,destination,previous_inputs):
     """Rebind cached export inputs after the publisher's unchanged native-movie copy."""
-    from novel_manga.application.review.final_cut import current
+    from novel_manga.application.review.final_cut import current, blocking_issues
     from novel_manga.util import read_json
     path=Path(destination)/'delivery.json';receipt=read_json(path,{})
     final=report.get('final_cut_review')or{}
@@ -469,7 +472,7 @@ def record_native_publication(runner,report,destination,previous_inputs):
 
 def finish_reviewed_delivery(runner,report,destination):
     """Close the receipt for the exact reviewed movie without encoding it again."""
-    from novel_manga.application.review.final_cut import current
+    from novel_manga.application.review.final_cut import current, blocking_issues
     from novel_manga.util import read_json
     destination=Path(destination);receipt=read_json(destination/'delivery.json',{})
     final=report.get('final_cut_review') or {}
@@ -477,16 +480,19 @@ def finish_reviewed_delivery(runner,report,destination):
            and receipt.get('final_video')==final.get('movie')
            and current(runner.context.episode_dir,report,final)
            and final.get('complete') is True and final.get('passed') is True
-           and not final.get('issues') and not final.get('errors'))
+           and not blocking_issues(final.get('issues') or []) and not final.get('errors'))
     audio_review = (report.get('final_audio_review') or final.get('audio_review')
                     or receipt.get('final_audio_review') or {})
     audio_required = (report.get('final_audio_review_required') is True
                       or final.get('final_audio_review_required') is True
                       or receipt.get('final_audio_review_required') is True)
-    audio_valid = (not audio_required or
-        (audio_review.get('movie') == final.get('movie')
-         and audio_review.get('complete') is True and audio_review.get('passed') is True
-         and not audio_review.get('issues') and not audio_review.get('errors')))
+    audio_valid = not audio_required
+    if audio_required:
+        from novel_manga.application.review.final_audio import freshness as _audio_freshness
+        audio_valid = (audio_review.get('movie') == final.get('movie')
+            and audio_review.get('complete') is True and audio_review.get('passed') is True
+            and not audio_review.get('issues') and not audio_review.get('errors')
+            and _audio_freshness(runner.context, audio_review, final.get('movie')).get('fresh') is True)
     valid = valid and audio_valid
     if audio_required:
         receipt['final_audio_review'] = audio_review
@@ -506,9 +512,32 @@ def finish_reviewed_delivery(runner,report,destination):
         receipt['speech_policy_errors']=speech_errors
         valid=False
     else:receipt.pop('speech_policy_errors',None)
+    movie = Path(receipt.get('final_video') or final.get('movie') or '')
+    cover = movie.parent/'cover.jpeg'
+    frozen = receipt.get('accepted_export') or {}
+    if frozen:
+        current_hashes = {
+            'video_sha256': hashlib.sha256(movie.read_bytes()).hexdigest() if movie.is_file() else '',
+            'cover_sha256': hashlib.sha256(cover.read_bytes()).hexdigest() if cover.is_file() else '',
+        }
+        if any(frozen.get(key) != value for key, value in current_hashes.items()):
+            valid = False
+    if not cover.is_file():
+        valid = False
     receipt['content_passed']=bool(valid and report.get('quality_review',{}).get('content_passed'))
     receipt['final_cut_review_passed']=bool(valid)
     receipt['status']=delivery_status(report,receipt.get('technical_passed') is True) if valid else 'candidate'
+    receipt['episode_dir'] = str(runner.context.episode_dir)
+    receipt['run_dir'] = str(getattr(runner.context, 'run_dir', ''))
+    receipt['acceptance_protocol'] = 'current-export-v1'
+    if receipt['status'] == 'accepted':
+        receipt['accepted_export'] = {
+            'movie': str(movie),
+            'video_sha256': hashlib.sha256(movie.read_bytes()).hexdigest(),
+            'cover_sha256': hashlib.sha256(cover.read_bytes()).hexdigest(),
+            'visual_context': final.get('context'),
+            'audio_movie': audio_review.get('movie'),
+        }
     if final.get('complete'):receipt['final_evidence_review_pending']=False
     atomic_write_json(destination/'delivery.json',receipt)
     return receipt

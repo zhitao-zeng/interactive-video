@@ -124,9 +124,12 @@ Read the returned plan, new image references and remaining budget before the
 next `render`. Stop when image generation, source checking or the unchanged
 video allowance blocks the repair.
 
-After adoption, `shots` can correct `in_frame`, `extras`, `listeners`, `actions`,
-`start_state`, `event`, `end_state` and `sfx`. `speaker_map` explicitly maps a wrong
-old speech owner to the source-correct name while keeping the original words.
+After adoption, use the complete current `repair_capabilities.adopted_input.shot_fields`
+rather than an older partial field list. It includes `opening_frame`, `shot_scale`,
+`camera`, `visual_prompt`, `in_frame`, `extras`, `listeners`, `actions`, `start_state`,
+`event`, `end_state` and `sfx`. For first-frame source conflicts, correct every cited
+field; `visual_prompt` is not a substitute for `opening_frame`. `speaker_map` explicitly
+maps a wrong old speech owner to the source-correct name while keeping the original words.
 For a real dialogue/knowledge-boundary defect, `shots[].turns` supplies the
 source-correct ordered turns for that shot, including speaker_name, delivery_mode,
 text and optional inner_monologue. It can remove invented speech or correct a

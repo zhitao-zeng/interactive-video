@@ -71,14 +71,25 @@ def agent_route(env, config):
     """
     api = {'base_url': env.get('QWEN38_LOCAL_BASE_URL'),
            'model': env.get('QWEN38_LOCAL_MODEL'),
-           'key_var': env.get('QWEN38_LOCAL_API_KEY_VAR')}
+           'key_var': env.get('QWEN38_LOCAL_API_KEY_VAR'),
+           'transport':{key:env[key] for key in TRANSPORT_ENV if key in env}}
     preset = next((name for name, values in ENDPOINTS.items()
                    if all(values.get(key) == env.get(key) for key in
                           ('QWEN38_LOCAL_BASE_URL', 'QWEN38_LOCAL_MODEL',
                            'QWEN38_LOCAL_API_KEY_VAR'))), None)
     agent = {'provider': config.get('provider') or 'phanrouter-sandbox',
              'model': config.get('model'), 'base_url': config.get('base_url'),
-             'key_var': config.get('key_var')}
+             'key_var': config.get('key_var'),
+             'transport':config.get('codex_transport') or config.get('backend') or 'http'}
+    if config.get('backend'):
+        agent['backend'] = config['backend']
+    for key in ('codex_parallel','codex_slots_reserved_for_tools','codex_inflight_dir','codex_transport','resource_id','resource_billing','task_reasoning'):
+        if key in config:
+            agent[key] = config[key]
+    if 'refusal_fallback' in config or config.get('backend') == 'codex':
+        fallback = config.get('refusal_fallback')
+        agent['refusal_fallback'] = ({k:v for k,v in fallback.items() if k in
+            {'endpoint','model','base_url','key_var','backend','provider'}} if isinstance(fallback,dict) else None)
     roles = {}
     for role, variable in (('planner', 'NOVEL_PLANNER_ENDPOINT'),
                            ('preparation', 'NOVEL_PREPARATION_ENDPOINT'),
@@ -91,7 +102,9 @@ def agent_route(env, config):
             continue
         values = ENDPOINTS.get(name, {})
         roles[role] = {'endpoint': name, 'model': values.get('QWEN38_LOCAL_MODEL'),
-                       'base_url': values.get('QWEN38_LOCAL_BASE_URL')}
+                       'base_url': values.get('QWEN38_LOCAL_BASE_URL'),
+                       'key_var':values.get('QWEN38_LOCAL_API_KEY_VAR'),
+                       'transport':{key:values[key] for key in TRANSPORT_ENV if key in values}}
     # The image-capable judge is a configuration fact here; this task makes no
     # live image call while recording it, so that part stays unverified.
     vision = roles.get('review')
@@ -111,6 +124,13 @@ def apply_agent_route(runtime, config, route):
         return config
     for key in ('base_url', 'model', 'key_var', 'provider'):
         if agent.get(key):
+            config[key] = agent[key]
+    if agent.get('backend'):
+        config['backend'] = agent['backend']
+    elif agent.get('provider') != 'codex-saved-login':
+        config.pop('backend', None)
+    for key in ('codex_parallel','codex_slots_reserved_for_tools','codex_inflight_dir','codex_transport','resource_id','resource_billing','task_reasoning','refusal_fallback'):
+        if key in agent:
             config[key] = agent[key]
     api = route.get('api') or {}
     for key, value in (('QWEN38_LOCAL_BASE_URL', api.get('base_url')),
@@ -133,7 +153,32 @@ def apply_agent_route(runtime, config, route):
             runtime[variable] = endpoint
         else:
             runtime.pop(variable, None)
+    runtime['NOVEL_RESOLVED_ROUTE'] = json.dumps(route,ensure_ascii=False,sort_keys=True)
     return config
+
+
+def assert_route_compatible(current, recorded):
+    budget_changes=[]
+    def compare(left, right, label):
+        for key in ('provider','model','base_url','backend','transport','endpoint'):
+            if left.get(key) is not None and right.get(key) is not None and left[key] != right[key]:
+                if key=='transport' and isinstance(left[key],dict) and isinstance(right[key],dict):
+                    field='QWEN38_LOCAL_MIN_MAX_TOKENS'
+                    before,after=right[key].get(field),left[key].get(field)
+                    same_route=all(left.get(k)==right.get(k) for k in
+                        ('provider','model','base_url','backend','endpoint','key_var'))
+                    same_transport=({k:v for k,v in left[key].items() if k!=field}
+                                    =={k:v for k,v in right[key].items() if k!=field})
+                    try:increased=before is not None and after is not None and 0<=int(before)<=int(after)
+                    except (TypeError,ValueError):increased=False
+                    if same_route and same_transport and increased:
+                        budget_changes.append({'role':label,'field':field,'before':before,'after':after})
+                        continue
+                raise ValueError(f'explicit route migration required for {label}.{key}')
+    compare(current.get('agent') or current, recorded.get('agent') or recorded, 'agent')
+    for role, values in (current.get('roles') or {}).items():
+        compare(values,(recorded.get('roles') or {}).get(role) or {},f'roles.{role}')
+    return budget_changes
 
 
 def resolve_agent_environment(ctx, config):
@@ -150,7 +195,12 @@ def resolve_agent_environment(ctx, config):
                 metadata = read_json(ctx.source_novel_dir/'novel.json', {})
             profile = metadata.get('profile', {})
         review_mode = str(profile.get('review_mode') or repair_settings(ctx.project_root)['review_mode'])
-    if not env.get('NOVEL_LOCAL_H3_URL', '').strip():
+    remote_selected = (not env.get('NOVEL_LOCAL_H3_URL', '').strip()
+        and os.environ.get('NOVEL_VIDEO_MODEL') in {'MiniMax-H3', 'sd2.0-fast', 'sd2.0-mini', 'sd2.5'}
+        and bool(os.environ.get('PHANROUTER_VIDEO_KEY_VAR')))
+    if remote_selected:
+        env.setdefault('NOVEL_RENDER_INFLIGHT', '4')
+    elif not env.get('NOVEL_LOCAL_H3_URL', '').strip():
         env, settings = repair_environment(ctx.project_root, ctx.run_dir)
         # The pool belongs to the service, not this episode's sandbox directory.
         key = next((row for row in pipeline.get('resources', {}).get('video_keys', {}).values()
@@ -169,7 +219,7 @@ def resolve_agent_environment(ctx, config):
     for name, value in model_resources_environment(ctx.project_root, pipeline).items():
         env.setdefault(name, value)
     base = config['base_url'].rstrip('/')
-    if not base.endswith('/v1'):
+    if not base.endswith('/v1') and not base.startswith('codex://'):
         base += '/v1'
     defaults = {'QWEN38_LOCAL_BASE_URL': base, 'QWEN38_LOCAL_MODEL': config['model'],
                 'QWEN38_LOCAL_API_KEY_VAR': config['key_var'], 'QWEN38_LOCAL_STREAM': '0'}

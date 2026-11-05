@@ -15,6 +15,21 @@ class RetryState:
     privacy_repairs: int = 0
 
 
+def starting_attempt(work: Path, clip: dict) -> int:
+    """A new authorized retake must not overwrite an older unknown submission."""
+    from novel_manga.util import read_json
+    attempt = 1
+    root = work / 'clips' / clip['clip_id']
+    for path in sorted(root.glob('attempt_*/clip.mp4.task.json')):
+        task = read_json(path, {})
+        request = read_json(path.parent / 'request.json', {})
+        if (task.get('submit_uncertain_at') and not task.get('task_id')
+                and not (path.parent / 'clip.mp4').is_file()
+                and int(request.get('repair_take', 0)) < int(clip.get('repair_take', 0))):
+            attempt = max(attempt, int(path.parent.name.rsplit('_', 1)[1]) + 1)
+    return attempt
+
+
 @dataclass(frozen=True)
 class GenerationOutcome:
     video: Path | None = None
@@ -70,7 +85,15 @@ def selected_take(attempts):
 
 
 def failure_result(clip_id, attempts, error):
+    from novel_manga.service_errors import UnsupportedInput, service_failure
     message = f'{type(error).__name__}: {str(error)[:600]}'
+    rejection=getattr(error,'request_check',None)
+    if isinstance(error,UnsupportedInput) and isinstance(rejection,dict):
+        failure={'request_check':rejection,'blocked':['request: '+p for p in rejection['problems']]}
+    else:
+        failure=service_failure(error)
     if attempts and not isinstance(error, CacheMiss):
-        return {'clip_id': clip_id, 'attempts': attempts, 'retake_error': message, 'selected': selected_take(attempts)}
-    return {'clip_id': clip_id, 'attempts': attempts, 'selected': attempts[-1] if attempts else None, 'error': message}
+        return {'clip_id': clip_id, 'attempts': attempts, 'retake_error': message,
+                'selected': selected_take(attempts), **failure}
+    return {'clip_id': clip_id, 'attempts': attempts,
+            'selected': attempts[-1] if attempts else None, 'error': message, **failure}

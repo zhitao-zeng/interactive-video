@@ -24,14 +24,13 @@ def eligible_rows(rows,inspect):
 
 
 def inspect_row(row,novel_dir):
-    from novel_manga.application.production.runs import episode_status
     from novel_manga.application.production.common import pid_alive
     from novel_manga.application.agents.episode.recovery import upstream_route
+    from novel_manga.review.acceptance import acceptance_status
     ctx=context(row,novel_dir);saved=read_json(ctx.run_dir/'agent-run.json',{})
-    media=read_json(ctx.episode_dir/'thin_media_report.json',{});manifest=read_json(ctx.run_dir/'final-candidate/manifest.json',{})
     lock=ctx.source_episode_dir/'.render.lock';owner=lock.read_text().strip()if lock.exists()else ''
     live=bool(owner.isdigit() and int(owner)>0 and pid_alive(int(owner)))
-    accepted=manifest.get('passed')is True and (media.get('quality_review')or{}).get('passed')is True and episode_status(ctx.episode_dir,True)=='done'
+    accepted=acceptance_status(ctx.episode_dir,ctx.run_dir)['passed']
     failed=bool(saved.get('upstream_recovery')and saved.get('status')in {'blocked','finished_with_issues'})
     # Full status only distinguishes the two ordinary non-upstream fallbacks;
     # neither is eligible here. The route reads its concrete candidates itself.
@@ -96,16 +95,15 @@ def execute_row(row,novel_dir,out):
                     proof=bounded_recovery.evidence(ctx,decision['clip_id'])
                     if proof:
                         bounded_recovery.grant(ctx,decision['clip_id'],proof,kind='time')
-                        saved=bounded_recovery.resume_window(ctx,saved)or saved
                 handoff=result.get('input_apply') or applied
                 if handoff.get('ok') and (handoff.get('changed') or handoff.get('input_repaired')):
-                    # A batch operation happened before the bridge started. Carry
-                    # its actual receipt into the normal applied_repair→render path.
                     saved=read_json(ctx.run_dir/'agent-run.json',{})
                     if (saved.get('job')or{}).get('status')not in {'accepted','running'}:
-                        saved['job']={'id':f'upstream-batch-{time.time_ns()}','action':'apply',
-                            'status':'completed','payload':{'file':path},'result':handoff}
-                        atomic_write_json(ctx.run_dir/'agent-run.json',saved)
+                        handoff_id=f'upstream-batch-{time.time_ns()}'
+                        atomic_write_json(ctx.run_dir/'upstream-handoff.json',{
+                            'id':handoff_id,
+                            'job':{'id':handoff_id,'action':'apply','status':'completed',
+                                   'payload':{'file':path},'result':handoff}})
             else:saved=read_json(ctx.run_dir/'agent-run.json',{})
     remaining=remaining_at_stop(saved)
     if remaining>0:

@@ -228,13 +228,14 @@ def test_explicit_issue_retry_archives_old_session_and_preserves_media_budget(ct
     atomic_write_json(budget, {'prior_generation_counts': {'clips': {'clip_01': 3}}})
     before = budget.read_bytes()
     saved = {'status': 'finished_with_issues', 'passed': False, 'deadline': 1,
-             'fallback_invocations': 3, 'no_progress': 3,
+             'remaining_seconds': 20, 'fallback_invocations': 3, 'no_progress': 3,
              'job': {'id': 'job-7', 'action': 'finish', 'status': 'completed', 'result': {'passed': False}}}
     atomic_write_json(ctx.run_dir/'agent-run.json', saved)
     atomic_write_json(ctx.work_dir/'episode-session.json', {'session_id': 'old-session'})
     atomic_write_json(ctx.work_dir/'input/latest-finish.json', {
         'passed': False, 'author_session': {'session_id': 'old-session'}})
     assert flow.run_episode(ctx, config=config)['status'] == 'finished_with_issues'
+    before_retry = read_json(ctx.run_dir/'agent-run.json')
     calls = []
     bridges = []
     original_bridge = flow.EpisodeBridge
@@ -266,7 +267,11 @@ def test_explicit_issue_retry_archives_old_session_and_preserves_media_budget(ct
     assert budget.read_bytes() == before
     archived = list((ctx.run_dir/'retries').iterdir())
     assert len(archived) == 1
-    assert read_json(archived[0]/'agent-run.json') == saved
+    archived_run = read_json(archived[0]/'agent-run.json')
+    route_fields = {'initial_route', 'effective_route', 'route_history'}
+    assert {k: v for k, v in archived_run.items() if k not in route_fields} == before_retry
+    assert archived_run['initial_route'] == archived_run['effective_route']
+    assert archived_run['route_history'] == []
     assert read_json(archived[0]/'episode-session.json')['session_id'] == 'old-session'
 
 
@@ -274,6 +279,8 @@ def test_explicit_issue_retry_archives_old_session_and_preserves_media_budget(ct
 def test_issue_retry_never_reruns_an_accepted_episode(ctx, monkeypatch, config, preserve_session):
     install_fake_runtime(monkeypatch, ctx)
     atomic_write_json(ctx.run_dir/'agent-run.json', {'status': 'finished', 'passed': True})
+    monkeypatch.setattr('novel_manga.review.acceptance.acceptance_status',
+                        lambda *a: {'status': 'accepted', 'passed': True})
     monkeypatch.setattr(episode_turns, 'run_session', lambda *a, **k: pytest.fail('accepted episode must remain cached'))
     assert flow.run_episode(ctx, config={**config, 'resume_session_on_retry': preserve_session},
                             retry_issues=True)['passed'] is True
@@ -291,6 +298,48 @@ def test_finish_existing_uses_host_acceptance_without_new_agent_or_render(ctx, m
     assert result['passed'] and calls==['finish']
     assert result['attempts']==['previous'] and result['agent_seconds']==90
     assert read_json(ctx.work_dir/'episode-session.json')['session_id']=='old-session'
+
+
+@pytest.mark.parametrize('with_session', [False, True])
+def test_finish_existing_rejects_stale_manifest(ctx, monkeypatch, config, with_session):
+    calls = install_fake_runtime(monkeypatch, ctx)
+    original = flow.EpisodeTools
+    author = {'session_id': 'old-session'} if with_session else {}
+    manifest_path = ctx.work_dir/'input/latest-finish.json'
+    atomic_write_json(manifest_path, {
+        'passed': True, 'technical_passed': True, 'author_session': author})
+    before = manifest_path.read_bytes()
+    if with_session:
+        atomic_write_json(ctx.work_dir/'episode-session.json', author)
+    atomic_write_json(ctx.run_dir/'agent-run.json', {
+        'status': 'finished_with_issues', 'passed': False, 'deadline': 1})
+
+    class Tools(original):
+        def dispatch(self, action, payload):
+            if action == 'finish':
+                calls.append(action)
+                return {'ok': True, 'action': action, 'passed': True}
+            return super().dispatch(action, payload)
+
+    monkeypatch.setattr(flow, 'EpisodeTools', Tools)
+    result = flow.run_episode(ctx, config={**config, 'finish_existing': True})
+    assert result['status'] == 'blocked' and result['passed'] is False
+    assert result['exit_code'] == 2 and calls == ['finish']
+    assert manifest_path.read_bytes() == before
+
+
+def test_finish_existing_propagates_typed_service_failure(ctx, monkeypatch):
+    import httpx
+    from novel_manga.application.agents.episode import lifecycle
+    tools=flow.EpisodeTools(ctx)
+    request=httpx.Request('POST','https://service.test/finish')
+    response=httpx.Response(503,request=request,json={'error':'service unavailable'})
+    error=httpx.HTTPStatusError('HTTP 503',request=request,response=response)
+    monkeypatch.setattr(tools.completion,'finish',lambda payload: (_ for _ in ()).throw(error))
+    result=lifecycle.finish_existing(ctx,{'status':'running'},{},lambda _:tools)
+    assert result['status']=='blocked' and result['retryable'] is True
+    assert result['service_interrupted']['http_status']==503
+    assert result['job']['result']['service_interrupted']['http_status']==503
 
 
 def test_project_root_scoped_for_runtime_data_and_restored(ctx, monkeypatch, capsys):
@@ -372,6 +421,26 @@ def test_old_finish_manifest_does_not_complete_new_invocation(ctx, monkeypatch, 
     assert result['exit_code'] != 0 and len(sessions) == 2
     assert all(kw['resume'] for kw in sessions)
     assert read_json(ctx.work_dir / 'input/latest-finish.json')['passed'] is True
+
+
+def test_host_finish_without_session_requires_fresh_current_matching_manifest(ctx):
+    path = ctx.work_dir/'input/latest-finish.json'
+    manifest = {'passed': True, 'technical_passed': True, 'author_session': {}}
+    atomic_write_json(path, manifest)
+    job = {'id': 'job-3', 'action': 'finish', 'status': 'completed',
+           'result': {'ok': True, 'passed': True}}
+
+    assert episode_lifecycle.current_finish(ctx, None, job) is None
+    assert episode_lifecycle.current_finish(ctx, None, job, allow_host=True) == manifest
+    stamp = episode_progress.file_stamp(path)
+    assert episode_lifecycle.current_finish(ctx, stamp, job, allow_host=True) is None
+    assert episode_lifecycle.current_finish(ctx, None, {**job, 'status': 'running'}, allow_host=True) is None
+    assert episode_lifecycle.current_finish(ctx, None, {**job, 'action': 'review'}, allow_host=True) is None
+    assert episode_lifecycle.current_finish(
+        ctx, None, {**job, 'result': {'ok': True, 'passed': False}}, allow_host=True) is None
+
+    atomic_write_json(path, {**manifest, 'author_session': {'session_id': 'stale-session'}})
+    assert episode_lifecycle.current_finish(ctx, None, job, allow_host=True) is None
 
 
 def test_nonzero_session_stops_and_restores_process_environment(ctx, monkeypatch, config):

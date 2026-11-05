@@ -11,7 +11,7 @@ def completion(request,*,timeout):
     from novel_manga.application.configuration import project_root
     from novel_manga.application.agents.sandbox import load_config
     from novel_manga.application.agents.episode.codex_session import run_session
-    from novel_manga.util import atomic_write_json,read_json
+    from novel_manga.util import atomic_write_json
     if timeout<=0:raise TimeoutError('Codex model request budget exhausted')
     root=project_root();work=root/'.runtime/codex-json'/str(uuid.uuid4());(work/'input').mkdir(parents=True)
     (work/'owner').write_text('One explicit Codex JSON/vision request; saved login; no media generation\n')
@@ -20,6 +20,8 @@ def completion(request,*,timeout):
         content=message.get('content',[])
         if not isinstance(content,list):continue
         for part in content:
+            if part.get('type')=='video_url':
+                raise ValueError('Codex JSON/image adapter cannot inspect raw video_url; use a verified native-video endpoint or the existing frame-review path')
             if part.get('type')!='image_url':continue
             url=part.get('image_url',{}).get('url','')
             if not url.startswith('data:image/')or';base64,'not in url:
@@ -30,15 +32,28 @@ def completion(request,*,timeout):
     atomic_write_json(work/'input/manifest.json',{'phase':'model_json'})
     atomic_write_json(work/'input/request.json',payload)
     config={**load_config(root/'configs/agent_sandbox.json'),'backend':'codex','model':request['model'],
-            'effort':'low','codex_attached_images':images}
+            'effort':request.get('reasoning_effort', 'low'),'codex_attached_images':images,
+            'task_reasoning':{'json':request.get('reasoning_effort', 'low')},
+            'codex_parallel':2,'codex_inflight_dir':'/mnt/disk1/zengzhitao/tmp/model-inflight/codex-saved-login'}
     schema=(request.get('response_format',{}).get('json_schema')or{}).get('schema')
     if schema:
         atomic_write_json(work/'input/schema.json',schema);config['codex_output_schema']='input/schema.json'
     prompt='Return the final JSON response for this structured request. Preserve all role/source constraints and use the actual attached images in their listed order.\n'+json.dumps(payload,ensure_ascii=False)
     attempt=run_session(work,prompt,timeout=max(1,int(timeout)),config=config,expected_output='response.json')
     if not attempt.ok or'response.json'not in attempt.produced:
+        events = Path(attempt.directory)/'codex-events.jsonl'
+        if events.is_file():
+            for line in events.read_text().splitlines():
+                try:
+                    event = json.loads(line)
+                except ValueError:
+                    continue
+                message = (event.get('error') or {}).get('message') if event.get('type') == 'turn.failed' else event.get('message')
+                if event.get('type') in {'error', 'turn.failed'} and 'Selected model is at capacity' in str(message):
+                    raise ConnectionError('Selected model is at capacity; preserved evidence: '+str(attempt.directory))
         raise RuntimeError('Codex request did not complete; preserved evidence: '+str(attempt.directory))
-    answer=read_json(work/'output/response.json');assert isinstance(answer,dict)
-    return {'choices':[{'message':{'content':json.dumps(answer,ensure_ascii=False)},'finish_reason':'stop'}],
+    response_path=work/'output/response.json'
+    return {'choices':[{'message':{'content':response_path.read_text(encoding='utf-8')},'finish_reason':'stop'}],
             'usage':attempt.record.get('usage',{}),
-            'codex_execution':{'seconds':attempt.record.get('seconds',0),'attempt':str(getattr(attempt,'directory',work))}}
+            'codex_execution':{'seconds':attempt.record.get('seconds',0),'attempt':str(getattr(attempt,'directory',work)),
+                               'response_path':str(response_path)}}

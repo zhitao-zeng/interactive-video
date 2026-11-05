@@ -15,6 +15,46 @@ from .tool_inputs import input_file
 from .tool_state import record_state
 
 
+from novel_manga.service_errors import (
+    service_failure, service_failure_from_saved, is_terminal_failure, service_vote)
+
+
+def _preserve_service_result(result):
+    if not isinstance(result, dict):
+        return result
+    outcome = dict(result)
+    outage = outcome.get('service_interrupted')
+    if outage and 'retryable' not in outcome:
+        status = outage.get('http_status')
+        detail = outage.get('detail') or outage.get('error') or ''
+        text = f'HTTP {status}: {detail}' if status else str(detail)
+        error = TimeoutError(text) if 'timeout' in text.lower() else RuntimeError(text)
+        outcome['retryable'] = service_failure(error)['retryable']
+    failed = []
+    clip_rows = outcome.get('clips')
+    if not isinstance(clip_rows, dict):
+        clip_rows = {}
+    for cid, row in clip_rows.items():
+        if not is_terminal_failure(row) and not row.get('service_interrupted'):
+            continue
+        current = dict(row)
+        if current.get('service_interrupted'):
+            current['service_interrupted'] = {**current['service_interrupted'],
+                'clip_id': current['service_interrupted'].get('clip_id', cid)}
+        failed.append(current)
+    service_rows = [row for row in failed if row.get('service_interrupted')]
+    if failed:
+        outcome.update(service_vote(failed))
+    if any(row['service_interrupted'].get('submission_uncertain') or row.get('required_action') == 'reconcile_submission'
+           for row in service_rows):
+        outcome.update(retryable=False, required_action='reconcile_submission')
+    elif outage and outage.get('submission_uncertain'):
+        outcome.update(retryable=False, required_action='reconcile_submission')
+    if not outage and not failed:
+        return result
+    return outcome
+
+
 class EpisodeTools:
     """The eight public commands compose owned episode services."""
 
@@ -33,7 +73,7 @@ class EpisodeTools:
                 raise ValueError('tool payload requires an object')
             if action not in {'check', 'adopt', 'render', 'review', 'apply', 'finish', 'status', 'doctor', 'first_frames', 'mix_audio','select_music'}:
                 raise ValueError('unknown episode tool action')
-            result = getattr(self, action)(payload or {})
+            result = _preserve_service_result(getattr(self, action)(payload or {}))
             if action in {'apply', 'finish'}:
                 from . import recovery
                 diagnosis = read_json(self.ctx.run_dir/'recovery-diagnosis.json', {})
@@ -44,7 +84,7 @@ class EpisodeTools:
             return {'action': action, **result}
         except Exception as error:
             return {'ok': False, 'action': action,
-                    'error': f'{type(error).__name__}: {error}'}
+                    'error': f'{type(error).__name__}: {error}', **service_failure(error)}
 
 
     def check(self, payload):
@@ -82,7 +122,8 @@ class EpisodeTools:
                 result=operation.prepare(payload)
             except Exception as error:
                 result={'ok':False,**getattr(operation,'partial_outcome',{}),
-                        'error':type(error).__name__+': '+str(error)}
+                        'error':type(error).__name__+': '+str(error),**service_failure(error)}
+            result=_preserve_service_result(result)
             atomic_write_json(self.ctx.work_dir/'input/latest-first-frames.json',result)
             return result
         draft=input_file(self.ctx,payload,'output/first-frames.json')

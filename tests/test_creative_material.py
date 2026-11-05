@@ -37,12 +37,18 @@ def manifest():
 def test_handoff_preserves_authored_content_and_is_ready_for_existing_packer(tmp_path):
     from novel_manga.interactive.creative_material import material, write_material
     from novel_manga.interactive.authored import prepare_authored, pack_authored
-    draft=authored();original=copy.deepcopy(draft)
+    draft=authored()
+    for shot in draft['chapter_script']['shots']:
+        shot['visual_prompt']='STALE_VISUAL_MUST_NOT_SURVIVE'
+        shot['motion_prompt']='STALE_MOTION_MUST_NOT_SURVIVE'
+    original=copy.deepcopy(draft)
     value,source=material(draft,manifest())
     assert draft==original
     for old,new in zip(draft['chapter_script']['shots'],value['script']['shots']):
         for key in ('turns','camera','event','start_state','end_state','opening_frame','duration_seconds'):
             assert new[key]==old[key]
+        assert new['visual_prompt']==new['start_state']==old['start_state']
+        assert new['motion_prompt']==new['event']==old['event']
         assert new['source_quote'] in source
     assert value['voice_specs']=={} and not value.get('reference_audios')
     write_material(draft,manifest(),tmp_path/'material')
@@ -84,6 +90,12 @@ def test_full_entry_resumes_same_edition_and_passes_config_without_rebuilding_as
         atomic_write_json(directory/'creator-state.json',{'status':'creative_candidate'})
         return {'status':'creative_candidate'}
     monkeypatch.setattr(creation,'run',create)
+    from novel_manga.application.preparation.audit import creative_fingerprint
+    def review(episode,sources,**kwargs):
+        answer={'source_readable':True,'source_problem':'','issues':[]}
+        return {'fingerprint':creative_fingerprint(episode,sources),'answer':answer,
+                'raw':copy.deepcopy(answer),'confirmation':None}
+    monkeypatch.setattr('novel_manga.application.preparation.audit.creative_audit',review)
     monkeypatch.setattr(runtime,'configure',lambda *a,**k:None)
     assets=[];calls=[]
     monkeypatch.setattr(runtime,'runner_for',lambda *a,**k:SimpleNamespace(build_assets=lambda:assets.append('built')))

@@ -1,6 +1,22 @@
 """Regression tests must supply a simulated HTTP transport, never a production model."""
+import os
+from unittest.mock import patch
+
 import httpx
 import pytest
+
+
+@pytest.fixture(autouse=True)
+def isolated_process_environment():
+    """Direct process environment updates must not leak between tests."""
+    with patch.dict(os.environ):
+        yield
+
+
+@pytest.fixture(autouse=True)
+def isolated_resource_quota_state(monkeypatch, tmp_path):
+    """Simulated quota rejections must never write a production account stop."""
+    monkeypatch.setenv('NOVEL_SHARED_QUOTA_DIR', str(tmp_path/'shared-resource-quota'))
 
 
 @pytest.fixture(autouse=True)
