@@ -137,7 +137,8 @@ class ThinMediaRunner:
             return {"clip_id": clip["clip_id"], "attempts": [], "selected": None,
                     "error": "request blocked before generation", "blocked": reasons}
         attempts: list[dict] = []
-        state = clip_retries.RetryState(attempt=1, limit=self.context.options.max_attempts)
+        state = clip_retries.RetryState(attempt=clip_retries.starting_attempt(self.context.work, clip),
+                                       limit=self.context.options.max_attempts)
         try:
             from novel_manga.story.voice_delivery import postmixed
             if postmixed(clip):
@@ -159,6 +160,8 @@ class ThinMediaRunner:
                 cached = {**cached, "generated_this_run": False}
                 log(f"{clip['clip_id']}: reusing a matching passed take; no new request despite the old duration estimate")
                 return {"clip_id": clip["clip_id"], "attempts": [cached], "selected": cached}
+            if state.attempt > state.limit:
+                raise ValueError('attempt limit used; preserve the prior unconfirmed submissions')
             while state.attempt <= state.limit:
                 outcome = clip_attempts.generate_attempt(self, clip, state.attempt)
                 if outcome.error is not None:

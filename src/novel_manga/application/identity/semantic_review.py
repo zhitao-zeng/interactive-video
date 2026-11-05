@@ -43,6 +43,7 @@ def close(candidate, context, schema, *, name, cached=None, settings=None, valid
             '删除确实重复或虚构的主体用removed_source_ids；同一人两个叫法应合并forms、保留一个source_id并删除另一个，不强求共享人编号的两个主体。'
             '人物、群体、物件和声源分别登记。此候选没有relations字段，不负责补齐全书亲属关系或归并历史档案；未登记背景关系不构成本章绑定错误。'
             '只被提及且不出场的未知身份允许保留，不能以此否决规划。个体按individual理解，count=0不表示没有这个演员。'
+            '群体的count=0表示原文没有指定数量，仍按group呈现；不能误判成零个身体，也不能要求编造原文未给的具体数量。'
             '引用对应章节/段落原句，已有确证身份保持。'
             + demand + '\n'
             + json.dumps({'evidence': context, 'candidate': current,'planning_view':view}, ensure_ascii=False))
@@ -183,7 +184,9 @@ def bindings(directory, answer, catalog, segments, mapped, *, cached=None, alias
     candidate = {'actors': answer['actors'], 'bindings': [
         {'source_id': sid, 'entity_id': old.get(sid, 'UNKNOWN'),
          'entity_kind': None,
-         'decision': 'catalogue' if old.get(sid, 'UNKNOWN') != 'UNKNOWN' else 'unknown',
+         'decision': ('catalogue' if old.get(sid, 'UNKNOWN') != 'UNKNOWN' else
+                      'extra' if next(a for a in answer['actors'] if a['source_id']==sid).get('presence')
+                      in {'on_stage', 'voice'} else 'unknown'),
          'paragraphs': next(a['paragraphs'] for a in answer['actors'] if a['source_id']==sid), 'reason': ''}
         for sid in sorted(ids)]}
     target_schema = client.obj({'source_id': {'type':'integer'},

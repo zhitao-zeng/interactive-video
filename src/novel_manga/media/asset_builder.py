@@ -34,13 +34,15 @@ def load_location_time(novel_dir) -> dict:
 class FramedAssetFactory:
     """Asset factory whose scene-card prompt names the frame instead of 9:16."""
 
-    def __init__(self, settings, provider, *, style: AssetStyle | None = None, location_time: dict | None = None):
+    def __init__(self, settings, provider, *, style: AssetStyle | None = None, location_time: dict | None = None,
+                 empty_retry_seeds: tuple | None = None):
         self.settings, self.provider = settings, provider
         self.style = style or AssetStyle()
         # visual_grammar.json's location_time, which review/verify.py checks a rendered clip against.
         # Without it here the card is drawn at whatever hour the model picks, and the review then
         # faults the clip for an hour nobody ever asked the card for.
         self.location_time = dict(location_time or {})
+        self.empty_retry_seeds = self.EMPTY_RETRY_SEEDS if empty_retry_seeds is None else empty_retry_seeds
 
     def _location_prompt(self, bible, location):
         prompt = location_prompt(bible, location, family=self.style.render_family,
@@ -86,7 +88,7 @@ class FramedAssetFactory:
         local model drew in this run is counted by the judge; with people in it, it is set aside and
         drawn again at another seed, twice at most.  The count stays beside the card, where the
         pre-render check reads it, so a card still holding people stops the clips that use it."""
-        for attempt, seed in enumerate((None, *self.EMPTY_RETRY_SEEDS)):
+        for attempt, seed in enumerate((None, *self.empty_retry_seeds)):
             if seed is not None:
                 rejected = output.with_name(f"{output.stem}.people-rejected-{attempt}{output.suffix}")
                 meta = output.with_suffix(output.suffix + ".request.json")

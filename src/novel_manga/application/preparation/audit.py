@@ -46,6 +46,7 @@ def audit(directory, *, concerns=None):
               '〔身份注〕是已核定的姓名关联，属于阅读辅助而非原文剧情；同一实体的两种名字不能报成缺人或错人。'
               '每个问题必须给对应stage编号、支撑问题的原文区段编号、具体矛盾和修正办法。'
               '填写source_segment区段编号，source_quote必须留空，程序会直接取未加注的真实原文。'
+              'source_segment只能填一个现有seg编号，例如seg_11；不得用分号、顿号或逗号拼接多个编号。'
               '说话者错误归speaker，已有镜头动作错误归action，地点错误归location；不能统统标missing_event。'
               '核心事件完全没拍、现有镜头无法承载时才用stage=0。不要因省略修饰或一般支线标missing_event。'
               '原文如果大段字序打乱而无法理解，source_readable=false，说明原因，禁止编造还原。'
@@ -58,11 +59,13 @@ def audit(directory, *, concerns=None):
     atomic_write_json(directory / 'pre_render_story_audit_raw.json', answer)
     try:
         grounded_issues(answer, script, segments)
-    except ValueError:
+    except ValueError as error:
         answer = ask_json([{'type': 'text', 'text': prompt + '\n上次回答的原文引用或阶段编号无效，请纠正。'
-                           'source_segment填现有seg编号，source_quote留空；不要拼接不存在的原文。\n'
+                           'source_segment只填一个现有seg编号（不许列表或用标点拼接多个编号），source_quote留空；不要拼接不存在的原文。'
+                           + '\n具体校验错误：' + str(error) + '\n'
                            + json.dumps(answer, ensure_ascii=False)}], audit_schema(), name='pre_render_audit_evidence',
                           max_tokens=3000, timeout=240)
+        atomic_write_json(directory / 'pre_render_story_audit_evidence_raw.json', answer)
         grounded_issues(answer, script, segments)
     if answer['source_readable'] and answer['issues']:
         from novel_manga.llm.client import obj
