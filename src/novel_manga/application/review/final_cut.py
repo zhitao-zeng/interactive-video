@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import json
 import os
+import re
 import subprocess
 import time
 from pathlib import Path
@@ -37,9 +38,14 @@ def apply_feedback(directory, review, final):
     review['final_cut_feedback']={}
     if not final:return review
     review['final_cut_review']={k:final.get(k) for k in ('movie','context','complete','passed','errors')}
-    if final.get('complete') is not True:return review
+    issues=final.get('issues',[])
+    if final.get('complete') is not True:
+        from . import independent
+        known=independent.confirmed_failure(directory,final)
+        if not known or final.get('independent_review')!=known:return review
+        issues=known['issues']
     grouped={}
-    for issue in final.get('issues',[]):
+    for issue in issues:
         for cid in issue['clip_ids']:grouped.setdefault(cid,[]).append(issue)
     for cid,issues in grouped.items():
         if cid not in review.get('clips',{}):continue
@@ -67,6 +73,12 @@ def caption_cues(path):
     return result
 
 
+def _nonproblem_issue(issue):
+    """An explicit no-problem label contradicts membership in issues, not a visual verdict."""
+    return bool(re.match(r'^(?:无问题(?:[：:，,；;。.!！\s]|$)|未发现(?:明确)?(?:违规|违反))',
+                         issue.get('problem','').strip()))
+
+
 def validate_group(answer, selected):
     if (not isinstance(answer.get('passed'),bool) or not isinstance(answer.get('observations'),list)
             or not answer['observations'] or not isinstance(answer.get('issues'),list)
@@ -78,6 +90,8 @@ def validate_group(answer, selected):
                 or not issue.get('frame_numbers') or not issue.get('problem')
                 or not issue.get('evidence') or not issue.get('source_basis')):
             raise ValueError('final reviewer did not bind the issue to visible clips/source evidence')
+        if _nonproblem_issue(issue):
+            raise ValueError('final reviewer placed an explicit non-problem in issues; correct the judgment/list protocol')
         if any(not isinstance(n,int) or isinstance(n,bool) or not 1<=n<=len(selected)
                for n in issue['frame_numbers']):
             raise ValueError('final reviewer cited an unavailable frame')
@@ -135,9 +149,11 @@ def review_assembly(runner, media, *, receipt=None):
     (root/'owner').write_text('existing reviewed pipeline: final movie observations; no manual shot repair\n')
     before=context(directory,media,movie)
     cached=read_json(directory/'final_cut_review.json',{})
+    automatic=cached.get('automatic_review',cached)
     from . import independent
     if (cached.get('context')==before and cached.get('policy')==POLICY
-            and cached.get('automatic_review',cached).get('complete') is True):
+            and automatic.get('complete') is True
+            and not any(_nonproblem_issue(issue) for issue in automatic.get('issues',[]))):
         cached=independent.combine(directory,cached)
         atomic_write_json(directory/'final_cut_review.json',cached)
         return cached
@@ -193,7 +209,9 @@ def review_assembly(runner, media, *, receipt=None):
         settings=endpoint_settings(endpoint) if endpoint in ENDPOINTS else None
         for group,start in enumerate(range(0,len(final['frames']),MAX_IMAGES-2),1):
             selected=final['frames'][start:start+MAX_IMAGES];ids=sorted({r['clip_id'] for r in selected})
-            current_requests=[{k:clips[cid].get(k) for k in ('clip_id','shot_indexes','references')}
+            current_requests=[{**{k:clips[cid].get(k) for k in ('clip_id','shot_indexes','references')},
+                               'source_shots':[s for s in ctx.script.get('shots',[])
+                                               if s.get('index') in clips[cid].get('shot_indexes',[])]}
                               for cid in ids]
             schema=model.obj({'passed':{'type':'boolean'},'observations':{'type':'array','minItems':1,'items':{'type':'string'}},
                 'issues':{'type':'array','items':model.obj({
@@ -206,9 +224,13 @@ def review_assembly(runner, media, *, receipt=None):
                               model.image_part(Path(row['path']),768)])
             parts.append({'type':'text','text':
                 '审核真正组装后的影片，逐张写实际观察，再对照批准源文、台词、人物与机位约束判定。只指认给出的帧/clip，不猜未显示的画面。'
+                '没有实际违规时返回passed=true、issues=[]；正常观察和正确对照只放observations，不在issues写“无问题”或“未发现明确违规”。'
                 '重点看目标与画面是否自相矛盾、动作因果、同一空间/服装/道具/摄影机的跨镜连续性、字幕和互动结尾。'
+                '每个clip按映射的shot_indexes对应当前script.shots的index，不能把原组号、shot_id中的数字或别镜机位套到本镜。'
                 '原稿若明确单人单手机第一人称，就不能从外部拍到正在录像的同一手机；若没有该限制，合理第三人称镜头允许。'
                 '大空间、倒影、正常摇晃、剪近景、湿衣/光照轻微色差、遮挡及作者明确的异象不自动算错。'
+                '没展示不等于不存在；包内物、出画的杆体或连接处无法仅凭这些帧确认，不能把未知写成可见缺失。'
+                '第一人称里自己的手脚可入画，自拍未展示握持手臂本身也不能证明第三机位；仍须核对清晰可见的实际矛盾。'
                 '身体左右、画面左右、自拍镜像要分清；俯拍不自动等于垂直90度。衣鞋款式、凭空设备、出口数量变化要有可见证据。'
                 '批准字幕/标记/水印允许，不能当作ghost text；但同一句出现原生和正式两层应报告。'
                 '这是后期成片，生成阶段不要字幕/水印的约束不适用于已批准的后期层。单层吻合expected_captions的字幕完全合法，'
@@ -233,6 +255,7 @@ def review_assembly(runner, media, *, receipt=None):
                     parts.append({'type':'text','text':'上一份完整回复：'+json.dumps(answer,ensure_ascii=False)+
                         '\n格式校验失败：'+str(error)+'。保留有依据的实际观察与问题，纠正响应协议。'
                         'observations须非空；passed须严格等于issues为空；所有clip_ids必须来自本组并有对应所引用帧。'
+                        '显式无问题的条目应作为正常观察，完整重新给出判定；没有实际违规时passed=true、issues=[]。'
                         '若真有问题请passed=false并写issues，不得为了通过协议删除问题或凭空补证据。'})
             for issue in answer['issues']:
                 issue['frame_paths']=[selected[n-1]['path'] for n in issue['frame_numbers']]

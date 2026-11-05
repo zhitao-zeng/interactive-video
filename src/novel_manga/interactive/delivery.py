@@ -6,7 +6,7 @@ import subprocess
 from novel_manga.media.quality import inspect_media
 from fractions import Fraction
 from PIL import Image, ImageDraw, ImageFont, ImageColor
-from novel_manga.util import atomic_write_json, media_duration, run
+from novel_manga.util import atomic_write_json, media_duration, run, read_json
 from novel_manga.review.verdicts import invalid_verdict_ids
 
 
@@ -24,6 +24,38 @@ def video_seconds(stream: dict) -> float:
     return int(stream['nb_frames']) / float(Fraction(stream['r_frame_rate']))
 
 
+def cfr_body_frames(stream: dict) -> int:
+    """Cover the video timeline at 25 fps, excluding container/audio padding.
+
+    The native join can be VFR even when r_frame_rate advertises 25. Its stored
+    frame count is not the number of frames after CFR delivery conversion.
+    """
+    rate=Fraction(stream['r_frame_rate'])
+    average=Fraction(stream.get('avg_frame_rate') or stream['r_frame_rate'])
+    if rate==average==25 and stream.get('nb_frames') not in (None,'N/A'):
+        return int(stream['nb_frames'])
+    if stream.get('duration_ts') is not None and stream.get('time_base'):
+        seconds=Fraction(stream['duration_ts'])*Fraction(stream['time_base'])
+    elif stream.get('duration') not in (None,'N/A'):
+        seconds=Fraction(stream['duration'])
+    else:
+        seconds=Fraction(int(stream['nb_frames']),1)/rate
+    return (seconds*25).__ceil__()
+
+
+def technical_result(ctx, movie: Path, body_frames: int) -> tuple[float, bool]:
+    decode=subprocess.run(['ffmpeg','-v','error','-i',str(movie),'-f','null','-'],capture_output=True,text=True)
+    info=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(movie)],text=True))
+    video=next(s for s in info['streams'] if s['codec_type']=='video')
+    audio=next(s for s in info['streams'] if s['codec_type']=='audio')
+    duration=video_seconds(video)
+    passed=(decode.returncode==0 and not decode.stderr.strip() and video['width']==ctx.settings.width and video['height']==ctx.settings.height
+            and video['codec_name']=='h264' and video['r_frame_rate']=='25/1' and audio['codec_name']=='aac'
+            and ((ctx.episode_dir/'authored_groups.json').is_file() or 180<=duration<=300)
+            and int(video['nb_frames'])-body_frames==75)
+    return duration,passed
+
+
 def requested_sampling(provider,profile):
     # The framed H3 adapter owns the local sampler; its inherited image/video
     # profile resolution is the hosted lane's tier, not the H3 short edge.
@@ -39,23 +71,14 @@ def evidence_events(overlays, script, plan, timeline, *, shot_spans=None):
         return [{**{k:v for k,v in labels[span['index']].items() if k in {'text','placement'}},
                  'start':span['start'], 'end':span['end']}
                 for span in shot_spans if span['index'] in labels]
-    seconds = {s.get('index', i): float(s['duration_seconds']) for i, s in enumerate(script['shots'], 1)}
-    clips = {c['clip_id']:c for c in plan['clips']}
+    from novel_manga.story.timing import shot_spans as actual_shot_spans
     result = []
-    for span in timeline:
-        clip = clips.get(span['unit_id'])
-        if not clip:
-            continue
-        indexes = clip['shot_indexes']
-        total = sum(seconds[i] for i in indexes)
-        cursor = float(span['start'])
-        for index in indexes:
-            end = cursor + (span['end']-span['start'])*seconds[index]/total
-            if index in labels:
-                event={'text':labels[index]['text'], 'start':round(cursor,3), 'end':round(end,3)}
-                if labels[index].get('placement'):event['placement']=labels[index]['placement']
-                result.append(event)
-            cursor = end
+    for span in actual_shot_spans(script,plan,timeline):
+        index=span['index']
+        if index in labels:
+            event={'text':labels[index]['text'],'start':round(span['start'],3),'end':round(span['end'],3)}
+            if labels[index].get('placement'):event['placement']=labels[index]['placement']
+            result.append(event)
     return result
 
 
@@ -131,6 +154,11 @@ def deliver(runner, report: dict, destination: Path) -> dict:
         atomic_write_json(destination/'delivery.json',receipt)
         return receipt
     interaction=json.loads((ctx.episode_dir/'interaction.json').read_text())
+    if interaction.get('art_direction'):
+        from .interaction_card import prepare as prepare_artwork
+        from novel_manga.application.configuration import project_root
+        prepare_artwork(project_root(),ctx.novel_dir,interaction['art_direction'])
+        interaction=read_json(ctx.episode_dir/'interaction.json')
     review_path=ctx.episode_dir/'episode_review.json'
     review=json.loads(review_path.read_text()) if review_path.is_file() else {}
     review_errors=invalid_verdict_ids(review.get('clips',{}))
@@ -159,37 +187,47 @@ def deliver(runner, report: dict, destination: Path) -> dict:
                            shot_spans=postproduction['shot_spans'] if postproduction is not None else None)
     overlay=destination/'evidence.ass'
     if extra_overlays:_overlay_ass(overlay,events,ctx.settings.width,ctx.settings.height)
-    body=destination/'body.mp4'
     # cwd-relative fixed filename avoids filesystem path escaping in the filter language.
     filters='ass=evidence.ass' if extra_overlays else 'ass=subtitles.ass'
     ass=Path(assembly.get('ass',''))
+    audio_source=source
     if not extra_overlays:
         # The pre-caption join has native audio, no loudness processing or scene overlays.
         source=ctx.work/'joined.mp4'
+        audio_source=source
         if not source.is_file() or not ass.is_file():
             raise FileNotFoundError('Clean delivery requires the native joined video and dialogue subtitles')
+        if assembly.get('audio_repair') or assembly.get('episode_ambience_mix') or assembly.get('episode_music_mix'):
+            audio_source=Path(assembly['final_video'])
         shutil.copy2(ass,destination/'subtitles.ass')
     if postproduction is not None and ass.is_file():
         shutil.copy2(ass,destination/'subtitles.ass')
         filters+=',ass=subtitles.ass'
-    subprocess.run(['ffmpeg','-y','-v','error','-threads','4','-i',str(source),'-vf',filters,
-                    '-c:v','libx264','-preset','fast','-crf','19','-r','25','-pix_fmt','yuv420p',
-                    '-c:a','aac','-ar','48000','-ac','2','-b:a','192k',str(body)],cwd=destination,check=True)
+    source_info=json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0',
+                         '-show_streams','-of','json',str(source)],text=True))['streams'][0]
+    source_frames=cfr_body_frames(source_info)
+    source_seconds=source_frames/25
+    body_frames=source_frames
     publication_path=ctx.episode_dir/'publication.json'
     publication=None
     if publication_path.is_file():
-        from novel_manga.interactive.packaging import package_body
+        from novel_manga.interactive.packaging import prepare_publication
         publication_config=json.loads(publication_path.read_text())
         boundary=next(c for c in ctx.clip_plan['clips'] if c['clip_id']==publication_config['world_card']['after_clip_id'])
         boundary_has_speech=any(t.get('text') for s in ctx.script['shots'] if s['index'] in boundary['shot_indexes']
                                 for t in s.get('turns',[]))
-        body,publication=package_body(body,publication_config,assembly.get('timeline',[]),
+        publication=prepare_publication(publication_config,assembly.get('timeline',[]),
                                     destination,ctx.settings.font_path,ctx.settings.width,ctx.settings.height,
                                     boundary_has_speech=boundary_has_speech)
+        body_frames+=round(publication['world_card']['seconds']*25)
         from novel_manga.interactive.packaging import shift_events
         events=shift_events(events,publication['world_card']['start'],publication['world_card']['seconds'])
     card=destination/'interaction.jpeg'
-    _card(card,interaction,ctx.settings.font_path,ctx.settings.width,ctx.settings.height)
+    if interaction.get('artwork'):
+        from .interaction_card import render as render_artwork
+        render_artwork(card,interaction,ctx.novel_dir,ctx.settings.width,ctx.settings.height)
+    else:
+        _card(card,interaction,ctx.settings.font_path,ctx.settings.width,ctx.settings.height)
     tail=destination/'interaction.mp4'
     tail_audio=['-f','lavfi','-i','anullsrc=r=48000:cl=stereo']
     ambience_source=None
@@ -206,13 +244,14 @@ def deliver(runner, report: dict, destination: Path) -> dict:
         tail_audio=['-i',str(ambient)]
     elif interaction.get('ambience_shot_index'):
         start,length=ambience_window(interaction['ambience_shot_index'],ctx.script,ctx.clip_plan,assembly.get('timeline',[]))
+        source_start=start
         if publication and start>=publication['world_card']['start']:
             start+=publication['world_card']['seconds']
         ambience_source={'start':start,'end':start+length,
                          'clip_id':next(c['clip_id'] for c in ctx.clip_plan['clips']
                                         if interaction['ambience_shot_index'] in c.get('shot_indexes',[]))}
         ambient=destination/'interaction-ambience.wav'
-        run(['ffmpeg','-y','-v','error','-ss',str(start),'-i',str(body),'-t',str(length),
+        run(['ffmpeg','-y','-v','error','-ss',str(source_start),'-i',str(audio_source),'-t',str(length),
              '-vn','-ar','48000','-ac','2','-c:a','pcm_s16le',str(ambient)])
         tail_audio=['-i',str(ambient)]
     run(['ffmpeg','-y','-v','error','-threads','4','-loop','1','-i',str(card),
@@ -222,20 +261,38 @@ def deliver(runner, report: dict, destination: Path) -> dict:
     packaging=policy.get('packaging') or {}
     watermark=packaging.get('watermark')
     if watermark:(destination/'watermark.txt').write_text(watermark['text'])
+    body_seconds=body_frames/25
+    inputs=['-i',str(source)];audio_index=0
+    if audio_source!=source:
+        inputs+=['-i',str(audio_source)];audio_index=1
+    tail_index=audio_index+1
+    inputs+=['-i',str(tail)]
+    # Normalize the actual video timeline before burning source-time captions.
+    # Retain a final partial VFR frame; never use AAC/container padding as footage.
+    graph=(f'[0:v]setpts=PTS-STARTPTS,fps=25:round=up,tpad=stop_mode=clone:stop_duration=0.04,'
+           f'trim=end_frame={source_frames},format=yuv420p,setsar=1,{filters}[body_video];'
+           f'[{audio_index}:a]aresample=48000,aformat=channel_layouts=stereo,atrim=end={source_seconds},'
+           f'asetpts=PTS-STARTPTS,apad,atrim=end={source_seconds}[body_audio];')
+    body_video='body_video';body_audio='body_audio'
+    if publication:
+        from novel_manga.interactive.packaging import publication_graph
+        inputs+=['-loop','1','-framerate','25','-i',str(destination/'world-introduction.jpeg'),
+                 '-loop','1','-framerate','25','-i',str(destination/'series-watermark.png')]
+        graph+=publication_graph(publication,tail_index+1,tail_index+2)+';'
+        body_video='published_video';body_audio='published_audio'
     # Trim audio padding at each join so the card occupies exactly the final 75 frames.
-    body_info=json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0',
-                         '-show_streams','-of','json',str(body)],text=True))['streams'][0]
-    body_seconds=video_seconds(body_info)
-    graph=(f'[0:v]setpts=PTS-STARTPTS[v0];[0:a]atrim=0:{body_seconds},asetpts=PTS-STARTPTS[a0];'
-                          '[1:v]trim=duration=3,setpts=PTS-STARTPTS[v1];[1:a]atrim=duration=3,asetpts=PTS-STARTPTS[a1];'
+    graph+=(f'[{body_video}]setpts=PTS-STARTPTS[v0];'
+                          f'[{body_audio}]atrim=0:{body_seconds},asetpts=PTS-STARTPTS[a0];'
+                          f'[{tail_index}:v]trim=end_frame=75,setpts=PTS-STARTPTS[v1];'
+                          f'[{tail_index}:a]atrim=duration=3,asetpts=PTS-STARTPTS[a1];'
                           f'[v0][a0][v1][a1]concat=n=2:v=1:a=1[{"plain" if watermark else "v"}][a]')
     if watermark:
         graph+=f';[plain]drawtext=fontfile={watermark["fontfile"]}:textfile={destination/"watermark.txt"}:'
         graph+=':'.join(f'{k}={watermark[k]}' for k in ('fontsize','fontcolor','borderw','bordercolor','x','y'))+'[v]'
-    run(['ffmpeg','-y','-v','error','-threads','4','-i',str(body),'-i',str(tail),
+    subprocess.run(['ffmpeg','-y','-v','error','-threads','4',*inputs,
          '-filter_complex',graph,
          '-map','[v]','-map','[a]','-c:v','libx264','-preset','fast','-crf','19','-r','25','-pix_fmt','yuv420p',
-         '-c:a','aac','-ar','48000','-ac','2','-b:a','192k','-movflags','+faststart',str(final)])
+         '-c:a','aac','-ar','48000','-ac','2','-b:a','192k','-movflags','+faststart',str(final)],cwd=destination,check=True)
     run(['ffmpeg','-y','-v','error','-i',str(final),'-vn','-c:a','pcm_s16le',str(destination/'episode_audio.wav')])
     ass=Path(assembly.get('ass',''))
     if ass.is_file():
@@ -250,14 +307,7 @@ def deliver(runner, report: dict, destination: Path) -> dict:
     if cover.is_file():shutil.copy2(cover,destination/'cover.jpeg')
     if packaging.get('cover'):shutil.copy2(packaging['cover'],destination/'cover.jpeg')
     elif publication:shutil.copy2(destination/'world-introduction.jpeg',destination/'cover.jpeg')
-    decode=subprocess.run(['ffmpeg','-v','error','-i',str(final),'-f','null','-'],capture_output=True,text=True)
-    info=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(final)],text=True))
-    video=next(s for s in info['streams'] if s['codec_type']=='video')
-    audio=next(s for s in info['streams'] if s['codec_type']=='audio')
-    duration=video_seconds(video)
-    technical=(decode.returncode==0 and not decode.stderr.strip() and video['width']==ctx.settings.width and video['height']==ctx.settings.height
-               and video['codec_name']=='h264' and video['r_frame_rate']=='25/1' and audio['codec_name']=='aac'
-               and 180<=duration<=300 and int(video['nb_frames'])-int(body_info['nb_frames'])==75)
+    duration,technical=technical_result(ctx,final,body_frames)
     # Clean delivery uses the native join, and publication inserts its own cards.
     # The assembly's normalized audio is a different track, not this film's QC.
     media_report=destination/'media-quality.json'
@@ -285,6 +335,13 @@ def deliver(runner, report: dict, destination: Path) -> dict:
              'audio':'native mixed episode audio, not isolated vocals',
              'delivery_policy':{'extra_visual_overlays':extra_overlays,'dialogue_subtitles':True,'interaction_card':True},
              'source_report':str(ctx.episode_dir/'thin_media_report.json'),'packaging':packaging}
+    if policy.get('episode_music'):
+        receipt['music_selection']=policy['episode_music']
+        from novel_manga.application.music_selection import selected_assets
+        assets=selected_assets(policy['episode_music'])
+        credits=destination/'music-credits.txt'
+        credits.write_text('\n\n'.join(asset.get('attribution')or'\n'.join(str(asset.get(k)or'')for k in ('title','artist','source_url','license_id','license_url'))for asset in assets)+'\n\nActual edits:\n'+json.dumps({k:policy['episode_music'].get(k)for k in ('source_interval','cues','silences')},ensure_ascii=False)+'\n')
+        receipt['music_credits']=str(credits)
     if publication:
         receipt['publication']=publication
         receipt['planned_body_seconds']+=publication['world_card']['seconds']
@@ -312,6 +369,13 @@ def deliver(runner, report: dict, destination: Path) -> dict:
         # The native take's verdict does not certify newly composited evidence.
         receipt['status']='candidate'
         receipt['final_evidence_review_pending']=True
+    from novel_manga.story.voice_delivery import episode_native_speech_errors
+    speech_errors=episode_native_speech_errors(ctx.episode_dir,report)
+    if speech_errors:
+        receipt.update(status='candidate',content_passed=False,speech_policy_errors=speech_errors)
+    from novel_manga.application.music_selection import episode_music_errors
+    music_errors=episode_music_errors(ctx.episode_dir,report)
+    if music_errors:receipt.update(status='candidate',content_passed=False,music_selection_errors=music_errors)
     atomic_write_json(destination/'interactions.json',receipt['interaction'])
     atomic_write_json(destination/'delivery.json',receipt)
     return receipt
@@ -330,6 +394,10 @@ def reviewed_delivery(runner,report,destination):
         version=versions/f'export-{len(list(versions.glob("export-*")))+1:03d}'
         receipt=deliver(runner,pending,version)
         receipt['export_context']=inputs
+    elif receipt.get('technical_passed') is False:
+        # Recheck a cached failure under the current rules without re-encoding its movie.
+        _,receipt['technical_passed']=technical_result(runner.context,Path(receipt['final_video']),
+            round(receipt['actual_body_seconds']*25))
     if not receipt.get('final_video'):
         return {'movie':str(Path(destination)/'episode01.mp4'),'complete':False,'passed':False,
                 'issues':[],'frames':[],'errors':['No current assembled movie available for delivered review']}
@@ -358,6 +426,18 @@ def export_context(runner,report):
     return inputs
 
 
+def record_native_publication(runner,report,destination,previous_inputs):
+    """Rebind cached export inputs after the publisher's unchanged native-movie copy."""
+    from novel_manga.application.review.final_cut import current
+    from novel_manga.util import read_json
+    path=Path(destination)/'delivery.json';receipt=read_json(path,{})
+    final=report.get('final_cut_review')or{}
+    if (receipt.get('export_context')==previous_inputs and receipt.get('final_video')==final.get('movie')
+            and current(runner.context.episode_dir,report,final)):
+        receipt['export_context']=export_context(runner,report)
+        atomic_write_json(path,receipt)
+
+
 def finish_reviewed_delivery(runner,report,destination):
     """Close the receipt for the exact reviewed movie without encoding it again."""
     from novel_manga.application.review.final_cut import current
@@ -369,6 +449,17 @@ def finish_reviewed_delivery(runner,report,destination):
            and current(runner.context.episode_dir,report,final)
            and final.get('complete') is True and final.get('passed') is True
            and not final.get('issues') and not final.get('errors'))
+    from novel_manga.story.voice_delivery import episode_native_speech_errors
+    speech_errors=episode_native_speech_errors(runner.context.episode_dir,report)
+    from novel_manga.application.music_selection import episode_music_errors
+    music_errors=episode_music_errors(runner.context.episode_dir,report)
+    if music_errors:
+        receipt['music_selection_errors']=music_errors;valid=False
+    else:receipt.pop('music_selection_errors',None)
+    if speech_errors:
+        receipt['speech_policy_errors']=speech_errors
+        valid=False
+    else:receipt.pop('speech_policy_errors',None)
     receipt['content_passed']=bool(valid and report.get('quality_review',{}).get('content_passed'))
     receipt['final_cut_review_passed']=bool(valid)
     receipt['status']=delivery_status(report,receipt.get('technical_passed') is True) if valid else 'candidate'

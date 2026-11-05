@@ -41,7 +41,7 @@ def adopt(directory,clip,decision):
     return {'assembly_changed':True,'audio_asset':value,'changed':[]}
 
 
-def apply_assembly(directory,report,*,context=None):
+def _apply_clip_ambience(directory,report,*,context=None):
     """Replace only authored silent clips in a novel assembly; copy video unchanged."""
     import copy
     from novel_manga.review.storage import take_identity
@@ -50,7 +50,7 @@ def apply_assembly(directory,report,*,context=None):
     assembly=report.get('assembly')or{}
     if not assembly.get('final_video') or not Path(assembly['final_video']).is_file():return report
     previous=assembly.get('audio_repair')or{}
-    source=Path(previous.get('source')or assembly.get('final_video',''))
+    source=Path(previous.get('source')or (assembly.get('episode_ambience_mix')or{}).get('source')or assembly.get('final_video',''))
     signature={'source':str(source),'source_take':take_identity(source),'policy':policy,
                'assets':{key:take_identity(validate(asset)) for key,asset in policy.items()},
                'timeline':assembly.get('timeline',[])}
@@ -107,7 +107,9 @@ def _refresh_checks(context,assembly):
     other=[row.get('passed') for key,row in qc.get('checks',{}).items() if key!='long_freeze']
     assembly.update(media_qc=qc,media_qc_passed=qc.get('passed') is True,max_hold_seconds=freeze,
                     thin_passed=bool(other) and all(other) and freeze<=MAX_HOLD_SECONDS)
-    assembly['audio_repair']['qc_checked']=True
+    if assembly.get('audio_repair'):assembly['audio_repair']['qc_checked']=True
+    if assembly.get('episode_ambience_mix'):assembly['episode_ambience_mix']['qc_checked']=True
+    if assembly.get('episode_music_mix'):assembly['episode_music_mix']['qc_checked']=True
 
 
 def _silent_clip(directory,clip):
@@ -117,3 +119,75 @@ def _silent_clip(directory,clip):
     shots=[s for i,s in enumerate(script.get('shots',[]),1) if s.get('index',i) in clip.get('shot_indexes',[])]
     if not shots or any(any(t.get('delivery_mode')!='silent_action' for t in s.get('turns',[])) for s in shots):
         raise ValueError('clip ambience requires source silent_action and no dialogue')
+
+
+def apply_assembly(directory,report,*,context=None):
+    """Reapply adopted layers from their retained source, without stacking old mixes."""
+    import copy
+    assembly=report.get('assembly')or{};music=assembly.get('episode_music_mix')or{}
+    if music and assembly.get('final_video')==music.get('output'):
+        report=copy.deepcopy(report);report['assembly']['final_video']=music.get('input_source',music['source'])
+    report=_apply_clip_ambience(directory,report,context=context)
+    policy=read_json(directory/'delivery_policy.json',{});bed=policy.get('episode_ambience')
+    current=(report.get('assembly')or{}).get('final_video')
+    if not current or not Path(current).is_file():return report
+    if bed:report=_mix_episode(directory,report,bed,context=context)
+    if policy.get('episode_music'):
+        music=policy['episode_music']
+        if 'cues'in music:
+            from novel_manga.application.music_timeline import prepare_bed
+            music=prepare_bed(directory,report,music)
+        report=_mix_episode(directory,report,music,context=context,music=True)
+    return report
+
+
+def _mix_episode(directory,report,bed,*,context=None,music=False):
+    import copy,math
+    from novel_manga.review.storage import take_identity
+    if music:
+        if bed['asset'].get('review',{}).get('status')!='accepted':raise ValueError('music needs an accepted Agent review')
+        asset=Path(bed['asset']['path'])
+        if not asset.is_file():raise ValueError('adopted music asset is missing')
+    else:asset=validate(bed['asset'])
+    key='episode_music_mix'if music else'episode_ambience_mix'
+    prefix='episode-music'if music else'episode-ambience'
+    gain=bed['gain_db']
+    if type(gain)not in {int,float} or not math.isfinite(gain) or not -36<=gain<=0:
+        raise ValueError('environment bed gain_db must be between -36 and 0')
+    assembly=report.get('assembly')or{};current=Path(assembly.get('final_video')or'')
+    if not current.is_file():raise ValueError('assemble the native episode before mixing an environmental bed')
+    previous=assembly.get(key)or{}
+    same_input=(str(current)==previous.get('input_source')and take_identity(current)==previous.get('input_take'))
+    reuse_source=bool(previous and (str(current)==previous.get('output')or same_input))
+    source=Path(previous['source'])if reuse_source else current
+    signature={'source':str(source),'source_take':take_identity(source),'asset':take_identity(asset),
+               'asset_id':bed['asset']['id'],'gain_db':gain,'timeline':assembly.get('timeline',[])}
+    if bed.get('music_timeline')is not None:signature['music_timeline']=bed['music_timeline']
+    if previous.get('inputs')==signature and Path(previous.get('output','')).is_file():
+        result=copy.deepcopy(report);result['assembly']['final_video']=previous['output']
+        if context is not None and not previous.get('qc_checked'):_refresh_checks(context,result['assembly'])
+        return result
+    folder=directory/'repair_candidate';folder.mkdir(parents=True,exist_ok=True)
+    version=len(list(folder.glob(prefix+'-*.mp4')))+1
+    # Revisions always start from an immutable pre-bed movie, never stack another bed.
+    if not reuse_source:
+        saved=folder/f'{prefix}-source-{version:03d}.mp4';shutil.copy2(source,saved);source=saved
+        signature.update(source=str(source),source_take=take_identity(source))
+    from novel_manga.util import media_duration
+    duration=media_duration(source);output=folder/f'{prefix}-{version:03d}.mp4'
+    graph=(f'[1:a]volume={gain:g}dB,aresample=48000,atrim=duration={duration:.6f},asetpts=PTS-STARTPTS[bed];'
+           '[0:a][bed]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.98:level=false[audio]')
+    loop=[]if bed.get('music_timeline')is not None else['-stream_loop','-1']
+    command=['ffmpeg','-y','-v','error','-threads','4','-i',str(source),*loop,'-i',str(asset),
+             '-filter_complex',graph,'-map','0:v:0','-map','[audio]','-c:v','copy','-c:a','aac','-b:a','192k',
+             '-t',f'{duration:.6f}','-movflags','+faststart',str(output)]
+    run(command)
+    result=copy.deepcopy(report);result['assembly'].update(final_video=str(output),pending_publish=True,
+        thin_passed=False,media_qc_passed=False,
+        media_qc={'passed':False,'checks':{},'reason':'Changed audio requires current media checks'})
+    result['assembly'][key]={'source':str(source),'output':str(output),'inputs':signature,'video_reencoded':False,
+            'input_source':previous.get('input_source',str(current))if str(current)==previous.get('output')else str(current),
+            'input_take':previous.get('input_take')if str(current)==previous.get('output')else take_identity(current),
+            'original_audio':'retained additively','gain_db':gain,'qc_checked':False,'command':command}
+    if context is not None:_refresh_checks(context,result['assembly'])
+    return result

@@ -33,14 +33,15 @@ class FramedPhanRouter(PhanRouterMediaProvider):
                                     additional_references=additional_references,
                                     aspect_ratio=aspect_ratio)
 
-    def create_video(self, prompt, image, output, duration, additional_images=(), reference_audios=()):
+    def create_video(self, prompt, image, output, duration, additional_images=(), reference_audios=(), *, first_frame=None):
         # A name the platform's text filter refuses (e.g. one shared with a
         # politician) is respelled in the text sent and nowhere else: the plan,
         # the request record and the subtitles keep the book's spelling, so
         # reuse matching and captions do not change.
         for old, new in self.prompt_aliases.items():
             prompt = prompt.replace(old, new)
-        return super().create_video(prompt, image, output, duration, additional_images=additional_images, reference_audios=reference_audios)
+        return super().create_video(prompt, image, output, duration, additional_images=additional_images, reference_audios=reference_audios,
+                                    **({'first_frame': first_frame} if first_frame is not None else {}))
 
 class FramedLocalH3(FramedPhanRouter):
     """Cards through PhanRouter as before; video from the local H3 service.
@@ -57,9 +58,10 @@ class FramedLocalH3(FramedPhanRouter):
     def sampling_parameters(self) -> dict:
         return self.local.sampling_parameters()
 
-    def create_video(self, prompt, image, output, duration, additional_images=(), reference_audios=(), seed_variant=0):
+    def create_video(self, prompt, image, output, duration, additional_images=(), reference_audios=(), seed_variant=0, first_frame=None):
         for old, new in self.prompt_aliases.items():
             prompt = prompt.replace(old, new)
         self.local.before_video_submit = getattr(self, 'before_video_submit', None)
         return self.local.create_video(prompt, image, output, duration,
-                                       additional_images=additional_images, reference_audios=reference_audios, seed_variant=seed_variant)
+                                       additional_images=additional_images, reference_audios=reference_audios, seed_variant=seed_variant,
+                                       **({"first_frame":first_frame} if first_frame is not None else {}))

@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "notes": [
+    {
+      "topic": "interview_corner_window",
+      "status": "current_reference_accepted",
+      "note_zh": "interview.jpg左侧可见窗，采访角参考仍可用。EP01只规定采访角位于同一小屋，没有无窗要求；撤销scene-plan/layout自行加入的‘无可见窗’假定。"
+    },
+    {
+      "topic": "terrace_dinner_and_dining_room_function",
+      "status": "follow_EP01",
+      "note_zh": "正式晚餐在露台长桌进行，六人围桌；露台不平桌腿下放同一块深灰垫片并在后续保持。餐厅承担入住任务卡/分组说明、厨房与露台之间的过渡等原稿功能。餐厅参考中的室内桌与露台长桌属于不同空间用途，不合并为同一张桌，也不据两张图推断这是不同集。"
+    },
+    {
+      "topic": "terrace_spatial_continuity",
+      "status": "reference_candidate",
+      "note_zh": "露台修复候选沿用已接受的海边露台、木长桌及固定餐厅东侧门口至南向海面的关系。空场参考不加入嘉宾；六把椅子表达未来晚餐所需座位，不作为原图中座位数不足的断言。"
+    }
+  ]
+}

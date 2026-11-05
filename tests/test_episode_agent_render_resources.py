@@ -36,7 +36,8 @@ def test_standalone_retains_two_workers_and_existing_retry_profile(runner_argume
     runner = tools.media.runner()
     assert calls[0]['workers'] == 2 and calls[0]['inflight'] == 0
     assert calls[0]['max_attempts'] == 1
-    assert calls[0]['profile'] == {'speech_gate': 'enforce', 'frame': 'portrait'}
+    assert calls[0]['profile'] == {'speech_gate': 'enforce', 'frame': 'portrait',
+                                   'repair_backend': 'sandbox_agent'}
     assert runner.context.asr_helper == tools.ctx.project_root / 'scripts/thin_asr_segments.py'
 
 
