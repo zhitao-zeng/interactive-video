@@ -50,7 +50,8 @@ def prepare_operations(ctx, bridge, state):
             bridge.handle('apply', {'file': 'output/resume-structured-repairs.json'})
             bridge.update_state(phase='tool_running')
             continued_inputs = True
-    if not native_mode and not continued_inputs and (not saved or saved.get('status') == 'retrying') and not lifecycle.paused():
+    from novel_manga.media.first_frames import enabled as first_frame_mode
+    if not first_frame_mode(ctx) and not native_mode and not continued_inputs and (not saved or saved.get('status') == 'retrying') and not lifecycle.paused():
         bridge.update_state(phase='preparing_requests')
         if ((remaining := state.deadline-time.monotonic()) > 0 and not
                 (ctx.input_mode == 'source' and config.get('agent_instructions')

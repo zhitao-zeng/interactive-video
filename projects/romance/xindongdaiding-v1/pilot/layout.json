@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "evidence_status": "Relative proposed staging only. No Blender input, measured survey, or existing white model was supplied.",
+  "rooms": {
+    "kitchen": "North counter and soup station; refrigerator west; south doorway directly faces dining room. Camera axis from south looking north.",
+    "dining": "Central six-seat table; kitchen doorway north, only terrace door east, broad window south. Near side left-to-right Tao Ran, Xia Ning, Qiao Yi; opposite Zhou Xu, Lu Chuan, Cheng Yue.",
+    "terrace": "Entered from dining east side door. Long table aligned north-south; single dark-gray shim stays under the same uneven left-side leg. Vase inner-center; clips fix two windward cloth corners.",
+    "interview": "Southwest interior nook of dining room; chair faces east, camera southeast looking northwest; fixed floor lamp behind subject left."
+  },
+  "fixed_objects": [
+    "Six-seat table and chairs remain fixed during dinner.",
+    "Terrace table receives exactly one deep-gray shim under its uneven left-side leg.",
+    "Xia Ning’s mild-spice dish is set aside by Lu Chuan and remains hers."
+  ],
+  "relative_only": true
+}

@@ -29,9 +29,13 @@ def voice_clip(clip):
         raise RuntimeError('后期心声缺少说话人的角色卡或音色参考')
     rows = [{**row, 'stage': 1, 'delivery_mode': 'visible_dialogue', 'inner_monologue': False}
             for row in clip.get('dialogue_bindings', []) if row.get('text')]
-    return {**clip, 'audio_delivery': 'native', 'references': [character[0], *voices],
+    recording={**clip, 'audio_delivery': 'native', 'references': [character[0], *voices],
             'cast': [speaker], 'dialogue_bindings': rows, 'shot_timing': [{'seconds': clip['request_seconds']}],
             'spoken_text': info['text']}
+    # This is an independent recording, not the film's speech-free visual request.
+    for key in ('h3_speech_policy','first_frame','first_frame_opening','h3_input_mode'):
+        recording.pop(key,None)
+    return recording
 
 
 def cached_recording(ctx, clip):

@@ -104,13 +104,23 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
         return {"short_edge": getattr(self, 'short_edge', SHORT_EDGE), "aspect_ratio": self.ratio,
                 "num_inference_steps": 9, "flow_shift": 12.0, "audio_flow_shift": 3.0}
 
-    def _payload(self, prompt: str, images: list[Path], audios: tuple[Path, ...], duration: float) -> dict:
+    def _payload(self, prompt: str, images: list[Path], audios: tuple[Path, ...], duration: float, *, first_frame: Path | None = None) -> dict:
         sampling = self.sampling_parameters()
         seconds = max(MIN_SECONDS, min(MAX_SECONDS, math.ceil(duration)))
-        conditions = [{"type": "image", "role": "reference", "uri": self._image_data_url(path)}
+        def image_uri(path):
+            if first_frame is not None and Path(path) == Path(first_frame):
+                with Image.open(path) as source:
+                    mime = Image.MIME.get(source.format, 'image/png')
+                return 'data:'+mime+';base64,'+base64.b64encode(Path(path).read_bytes()).decode('ascii')
+            return self._image_data_url(path)
+        conditions = [{"type": "image", "role": "reference", "uri": image_uri(path)}
                       for path in images]
         conditions += [{"type": "audio", "role": "reference", "uri": audio_data_url(path)}
                        for path in audios]
+        if first_frame is not None:
+            if not images or Path(images[0]) != Path(first_frame):
+                raise ValueError('first frame must also be the first ordinary reference')
+            conditions.append({'type': 'image', 'role': 'keyframe', 'frame_index': 0, 'uri': image_uri(first_frame)})
         return {
             "model": self.settings.video_model,
             "task": "ref2va",
@@ -177,6 +187,7 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
         reference_audios: tuple[Path, ...] = (),
         seed_variant: int = 0,
         seed: int | None = None,
+        first_frame: Path | None = None,
     ) -> Path:
         call_started = time.monotonic()
         timing = {'call_started_at': time.time(), 'pool_wait_s': 0.0, 'submission_s': 0.0}
@@ -184,7 +195,7 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
         for path in (*images, *reference_audios):
             if not Path(path).is_file():
                 raise FileNotFoundError(path)
-        payload = self._payload(prompt, images, tuple(reference_audios), duration)
+        payload = self._payload(prompt, images, tuple(reference_audios), duration, **({"first_frame": first_frame} if first_frame is not None else {}))
         if seed is not None:
             if not isinstance(seed, int) or not 0 <= seed < 2 ** 31:
                 raise ValueError('H3 seed must be an integer in [0, 2**31)')
@@ -239,6 +250,12 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
         submitted = time.monotonic()
         timing['resumed'] = bool(task_id)
 
+        def fail_task(state):
+            detail = json.dumps(state.get("error") or state, ensure_ascii=False)[:400]
+            if task_path.exists():
+                task_path.replace(task_path.with_suffix(".failed.json"))
+            raise RuntimeError(f"local H3 task {task_id} {state.get('status')} on {base}: {detail}")
+
         def download_completed(state):
             nonlocal slot
             # A completed GPU task needs no instance slot during its download.
@@ -269,13 +286,17 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
                     state = self._state(task_id, base)
                 except (httpx.TransportError, InstanceUnavailable) as error:
                     self.pool.cool_down(base, self.pool.unreachable_cooldown, f"lost while resuming: {type(error).__name__}")
-                    state = None
+                    # A failed status lookup does not establish that a submitted
+                    # task disappeared. Keep its receipt and poll the same id.
+                    state = {"status": "unreachable"}
                 status = str((state or {}).get("status", "")).lower()
                 if state is None:
                     task_id = None
                 elif status in {"completed", "succeeded", "success"}:
                     return download_completed(state)
-                elif status not in {"failed", "error", "cancelled", "canceled"}:
+                elif status in {"failed", "error", "cancelled", "canceled"}:
+                    fail_task(state)
+                else:
                     from novel_manga.resource_waits import QueueWait
                     waiting = time.monotonic()
                     with QueueWait('h3_instance') as queue:
@@ -342,10 +363,10 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
                 except (httpx.TransportError, InstanceUnavailable) as error:
                     if not self.pool:
                         raise
-                    # The instance went away mid-clip - a night lease handed back, a restart: cool it
-                    # down for every runner and give the clip to another instance.
+                    # Keep a known task through transient network failures. It
+                    # may finish while this client cannot reach the instance.
                     self.pool.cool_down(base, self.pool.unreachable_cooldown, f"lost while polling: {type(error).__name__}")
-                    task_id = None
+                    time.sleep(POLL_SECONDS)
                     continue
                 if state is None:
                     # The service keeps its task index in memory, so a restart loses every id we
@@ -356,23 +377,17 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
                 if status in {"completed", "succeeded", "success"}:
                     return download_completed(state)
                 if status in {"failed", "error", "cancelled", "canceled"}:
-                    detail = json.dumps(state.get("error") or state, ensure_ascii=False)[:400]
                     # A failed task is history, not one to resume: set its record aside, or every later call
                     # reads the same failure back instead of asking again.
-                    if task_path.exists():
-                        task_path.replace(task_path.with_suffix(".failed.json"))
-                    raise RuntimeError(f"local H3 task {task_id} {status}: {detail}")
-                if self.pool and self.pool.problem(base):
-                    # It stopped answering, its service holds no GPU, or its GPUs sat idle with jobs
-                    # waiting (the pool has already cooled it down): the clip goes elsewhere now.
-                    task_id = None
-                    continue
+                    fail_task(state)
+                # Shared admission health governs NEW jobs, not a known task
+                # whose own status endpoint just answered. A cached health
+                # failure must not discard that id and create a duplicate.
                 if self.pool and time.monotonic() - submitted > self.pool.stuck_seconds:
                     # An instance that takes work and never finishes it (GPU003-B, 2026-09-11 14:36).
                     self.pool.cool_down(base, self.pool.stuck_cooldown,
                                         f"task {task_id} still {status} after {self.pool.stuck_seconds / 60:.0f} min")
-                    task_id = None
-                    continue
+                    raise TimeoutError(f"local H3 task {task_id} remains {status}; receipt retained, not resubmitted")
                 time.sleep(POLL_SECONDS)
             raise TimeoutError(f"local H3 task {task_id} still {status} after {self.settings.poll_timeout:.0f}s")
         finally:
