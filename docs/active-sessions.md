@@ -280,3 +280,45 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | ZCode #12+会话退化修复 | ①create_context目录发现:无显式output_root时探测firstframes/music/agent三约定既有run,CLI retry续真状态(冒烟已验:verify edition解析到firstframes真实目录);②默认作者配置切快速档(thinking off+effort low+16k,修复线同款),传导链有测试;2新测试,全量4053连两轮绿 | main(783b0c4) | context.py、configs/agent_sandbox.json、tests/test_agent_run_discovery.py | 2026-10-22 | 已提交;verify edition下次resume即用快速档;并行瞬态(一轮11败)已定位为与sd线资源竞争,复跑全绿 |
 
 | Codex 10小时协助ZCODE20261023 | 用户授权给原ZCODE会话指令并协助完成今早10点前知遥20集成片；协助窗口至11:56 | codex/zcode-supervision-20261023 | 仅自有协调runtime/必要独立诊断；生产单写者ZCODE，旧恋综暂不处理 | 2026-10-23 01:56 | 在途：原ZCODE已收到指令并ACK，34项相关独立回归过；定位原会话session_7acef82aafd79b10dac6e5f434e1cf08，核对真实隔离产线；不清额度/历史，不把candidate或blocked误称accepted；以20个完整导出文件验收。 |
+
+| Codex Pi轨迹优化20261028 | W24已交片，四集独立复盘与Skill更新收工 | codex/pi-agent-efficiency-20261028 | experiments/pi-agent-kit-v2-20261028/；.runtime/pi-agent-efficiency-20261028/retrospective/SUMMARY.md | 已收工 2026-10-29 | W24 v11为307.56秒，195/256请求、10163.79秒，原预算内自动完成；自有音频服务已释放。前三集+W24独立看片/完整轨迹复盘完成，仅更新Skill入口、SYSTEM和导演反馈参考（README同步验证现状），无新流程/无旧片重拍；新文字未实拍对照。模板复制/frontmatter/链接/独立措辞复核过。全部未提交、未合主线、未推送。 |
+
+| Codex 原片20部学习与改写对照20261029 | 20片研究、Skill更新及两版W25短片对照已完成 | codex/pi-agent-efficiency-20261028 | experiments/pi-agent-kit-v2-20261028/template/；.runtime/pi-agent-efficiency-20261028/reference-research-20261029/COMPARISON.md | 已收工 2026-10-29 | A108.56s/80请求/2817.204s/18视频+8图；B108.20s/108请求/2269.615s/15视频+5图；同素材工具额度且均无人工内容续接。盲看略偏A，B问询更充分；仅Skill提示更新与README结果，无新流程/工具代码。试用后措辞补充未再生成；自有音频已停。未提交、未合主线、未推送。 |
+
+| Codex W25 K3剧本试写20261029 | 原因核实与K3文学初稿《桥口没有蓝》已交付 | codex/pi-agent-efficiency-20261028 | .runtime/pi-agent-efficiency-20261028/reference-research-20261029/k3-script-only-20261029/{script.md,CAUSES.md,delivery.json} | 已收工 2026-10-29 | 请求与响应均kimi-k3，1次文本请求206.853秒；完整原稿+创作/对白知识，规则/情节允许重构；原文稿未由协调者改写，生图/视频/配音0；无旧任务/Skill/生产代码/额度改动，未提交推送。 |
+
+| Codex v2深析资料吸收20261030 | 92页/20片结构化内容阅读对照与既有Skill增量已完成 | codex/pi-agent-efficiency-20261028 | template/SKILL.md、skill-extra/references/reference-film-craft.md；.runtime/pi-agent-efficiency-20261028/reference-research-20261029/v2-reading/REVIEW.md | 已收工 2026-10-30 | 核对20/275/134与PDF92页；只补等待回报、局部终局、时序责任/修改代价及历史说明。未重看原视频/听审、未调用K3/DS新写稿或媒体生成、不改旧K3/电影，不加流程。未新制作验证、未提交合并。 |
+
+| Codex 开源编剧方法调研20261030 | 已完成：核对真实Skill/许可/测试、一手作者方法与V2机制映射 | codex/pi-agent-efficiency-20261028 | .runtime/pi-agent-efficiency-20261028/reference-research-20261029/open-methods-research-20261030/REPORT.md | 已收工 2026-10-30 | 重点核对jtydhr88场景/对白、danjdewhurst scene-craft、August/Mazin/Bordwell及skill-creator；说明策略/反馈、观众推断、道具关系与体验组织。只读研究，未安装或改Skill/稿/旧片，无新K3/DS或媒体生成请求。 |
+
+| Codex 创作Skill重构与文本测试20261030 | 已完成重构与同K3纯文字对照，保留局部收益与短板 | codex/pi-agent-efficiency-20261028 | template/SKILL.md、SYSTEM.md、reference-film-craft.md、director-feedback.md、h3-pitfalls.md；.runtime/pi-agent-efficiency-20261028/reference-research-20261029/skill-refactor-test-20261030/RESULTS.md | 已收工 2026-10-30 | 首轮5组10稿：两名模型匿名复核3组同偏新/1同偏旧/1分歧；只修一段信息来源说明，再用封存题2稿比较v1/v2，偏好分歧。总12 K3调用、0媒体、原稿未润色；最终创作包与受测v2一致，产品工具未改，不加生产流程。未证明整集/成片稳定提升，原监视器题未重跑；旧版/样本/票变均保留。未提交合并推送。 |
+
+| Codex 信息传递补充与定向复测20261030 | 已完成单段补充与6次K3文字对照，保留局部失败 | codex/pi-agent-efficiency-20261028 | template/skill-extra/references/reference-film-craft.md；.runtime/pi-agent-efficiency-20261028/reference-research-20261029/information-transfer-test-20261030/RESULTS.md | 已收工 2026-10-30 | 原题+两道独立迁移题，6稿244.162秒、0重试/媒体；两位匿名读者均偏原题新稿、另两题旧稿。迁移四稿信息成立，原题新稿虽交代实际通路仍有“排除到只剩风”依据不足；不报全过，不人工改稿/追加次数，不加流程。最终源文件等于受测after，无在途任务，未提交合并推送。 |
+
+| Codex 20片视觉Skill与画面对照20261030 | 视觉Skill/静态已完成，SD失败保留，授权H3已独立补测 | codex/pi-agent-efficiency-20261028 | template/SKILL.md、reference-film-visual-craft.md及两处导航；.runtime/pi-agent-efficiency-20261028/reference-research-20261029/visual-craft-ab-20261030/RESULTS.md | 已收工 2026-10-30 | 20片原帧/重点原MP4核对；4K3设计/3内置图，静态盲看略偏旧。原SD3POST403+3本地拦/0受理保持；后续用户选H3另测6首轮镜已完成见新目录。未报普遍提升，不加生产流程；未提交合并推送。 |
+
+| Codex 本地H3视觉对照20261030 | 已完成6个首轮镜头与18/19秒两版独立对照 | codex/pi-agent-efficiency-20261028 | .runtime/pi-agent-efficiency-20261028/reference-research-20261029/visual-craft-h3-ab-20261030/RESULTS.md | 已收工 2026-10-30，无在途任务 | 同GPU16实例/同真实附图/配对seed与采样，6镜164.55秒、0重拍/新增K3/生图；两匿名模型评阅最终偏新，中段邀请仍弱，旧静态略偏旧与SD失败保留。0–6/7秒按原计划剪，源尾核对未藏关键回应。未改Skill追测、未提交合并推送，无新生产流程。 |
+
+| Codex 梦的游牧H3无首帧复现20261030 | 已交付10镜60.84秒生成候选与原片拼屏 | codex/pi-agent-efficiency-20261028 | .runtime/pi-agent-efficiency-20261028/reference-research-20261029/dream-nomad-h3-no-first-frame-20261030/RESULTS.md | 已收工 2026-10-30，无在途任务 | 10个首轮H3镜269.361秒，0重拍/新图/K3；全片1普通风格参考、0首帧/续接/音频参考，真实POST附件已核。原1460帧节奏保留再25fps；源音轨视觉版与H3原生声分开。独立复核气质/尺度/5→6亮区成立，3/4/9几何与5/8光线未原样复现。未改产品工具/Skill、不加流程、未提交合并推送。 |
+
+| Codex 地牢酒馆H3无首帧复现20261030 | 已交付4镜约27秒首轮生成与原片选段对照 | codex/pi-agent-efficiency-20261028 | .runtime/pi-agent-efficiency-20261028/reference-research-20261029/dungeon-tavern-h3-no-first-frame-20261030/RESULTS.md | 已收工 2026-10-30，无在途任务 | 4个H3首轮114.796秒，1普通中性参考、0首帧/续接/重拍/新图/K3；全画面保留27.04秒，参考选段25.6秒，拼屏静音。实际独立密帧核对低多边形/尺度及付款、咬肉、举降桶、退后倒地可读；酒渍消失/小道具偏差保留。未改Skill或产品工具、不加流程、未提交合并推送。 |
+
+| Codex 月亮牧场原稿与改写实拍对照20261030 | 两版60–90秒新拍，原稿精简vs新Skill自由改编 | codex/pi-agent-efficiency-20261028 | .runtime/pi-agent-efficiency-20261028/reference-research-20261029/moon-pasture-rewrite-ab-20261030/ | 收工 2026-10-30 | A75.64秒/7视频任务（6首拍+1自主补镜），B65.16秒/6首拍；同8任务上限，共用4补图、本地H3无首帧。两匿名画面/字幕评阅偏A探索层次，B空间/近景较好，未证实大改更好。实际附图/回执/原稿/旧版/未用额度全保留；非Pi无人整集验收。未改产品工具或Skill、未提交/合主线/推送。 |
+
+| Codex 月亮牧场救援段重设计20261030 | 20–30秒新H3片与旧B对应连续段对照，空间/节奏/口语 | codex/pi-agent-efficiency-20261028 | .runtime/pi-agent-efficiency-20261028/reference-research-20261029/moon-rescue-redesign-20261030/ | 收工 2026-10-30 | 新20.24秒、旧29.12秒、静音左右对照齐；3首拍/0补拍/0新图，H3批次126.664秒。真实上下岩台与接应/试攀可见，提拉承重及失败原因仍不明确，未宣称人类接受/人耳听审。旧历史/计数全保留，未改产品代码或Skill、不加流程、未提交合并推送。 |
+
+| Codex 月亮牧场局部主观镜头实拍20261030 | 22.12秒主观与侧面版及旧20.24秒同屏对照已交付 | codex/pi-agent-efficiency-20261028 | .runtime/pi-agent-efficiency-20261028/reference-research-20261029/moon-rescue-pov-20261030/ | 收工 2026-10-30 | 4首拍/0补拍，H3批次130.531秒；实际18图附件逐个源字节相符，无锁首帧/续尾/音频参考。此次拍出站到蹲，连续手部尝试轻裁露头，剪掉P04站姿重置；羊抵壁受力仍不明确。两片原声字幕及静音拼屏齐，完整解码通过，未宣称人类接受。未改产品代码/Skill、不加流程、未提交合并推送。 |
+
+| Codex 完整Skill与原片救羊实拍20261030 | 完整Skill/原片实看后自主新拍22.60秒v2，与旧22.12秒对照齐 | codex/pi-agent-efficiency-20261028 | .runtime/pi-agent-efficiency-20261028/reference-research-20261029/moon-rescue-full-skill-20261030/ | 收工 2026-10-30 | 34Skill文件交付/31正文实际返回全覆盖，3原片选段30秒/26真实图块已核；原导演自主改搭板过沟。3首拍/0补拍，137.232秒H3批次；15实际附件源字节一致，无首帧/音频参考。v1首字切点错误和草稿拼屏保留，v2纠正入点并完整解码。原始历史/计数未动，无新生产流程/代码/Skill修改，未提交合并推送，观看质量未冒称人类接受。 |
+
+| Codex 月亮牧场全程主观视角20261030 | 全POV25.16秒及混合22.60秒对照已完成并发Mini | codex/pi-agent-efficiency-20261028 | .runtime/pi-agent-efficiency-20261028/reference-research-20261029/moon-rescue-all-pov-20261030/ | 已收工 | 同原导演/已验证完整Skill上下文，3首拍/0补拍，136.785秒H3批次；15实际图片源字节相符，未附知遥外部肖像。原始三take/最终自查均人物视点、羊朝自身过板可读；两片完整解码，Mini新片+对照sender均exit0。保留规划中断及全部历史/预算，不冒称一镜到底/从头无人整集成功；无代码或Skill/生产流程变化，未提交合并推送。 |
+
+| Codex W27风筝浮城第一视角样片20261031 | 32.72秒视觉候选已交付Mini；原调平设计未达 | codex/pi-agent-efficiency-20261028 | .runtime/pi-agent-efficiency-20261028/reference-research-20261029/w27-first-person-20261031/ | 本轮收工，保留未达项 | 全新原文/实际3图已交导演，4首拍+1预留修复，全部5任务15图附件真实源字节一致；POV/空间/操盘/入桥可见，房桥回平未拍清，补镜整条弃用，不报剧情成功。未兑现台词和误触段删，原片/失败/unused均保；Mini sender exit0，无新流程/代码/Skill修改，未提交合并推送，不计整集accepted。 |
+
+| Codex W27运动失败原因调研20261102 | 调研完成：参考状态/几何与多物联动软控制不匹配，补镜未解前置缺口 | codex/pi-agent-efficiency-20261028 | .runtime/pi-agent-efficiency-20261028/reference-research-20261029/w27-motion-diagnosis-20261102/REPORT.md | 已收工 2026-11-02 | 独立核对真实图/请求/原片/旧服务及官方论文；排除已查具体漏图/错序/2048截断/少一步。收窄塔方向判读为形态变化与视差，仍无明确歪正反馈。核12/6文档冲突但发布者推荐12，不改共享参数；仅提6–8秒单对象验证未执行。无新媒体推理/旧任务或源码修改，未提交推送，并发WIP全保留。 |
+
+| Codex W27单屋回正最小验证20261102 | 8秒单屋回正可见，轻微形态漂移；已展示产物并发Mini | codex/pi-agent-efficiency-20261028 | .runtime/pi-agent-efficiency-20261028/reference-research-20261029/w27-single-house-probe-20261102/ | 已收工 2026-11-02 | 1图+1H3/0重试，36.638秒H3批次；异常起点经作者/独立盲看确认，唯一普通ref真实字节匹配，无首帧/对白/联动。原始完整8秒保，近柱不随屋转，回正可读但非精确刚体。Mini sender exit0，不把组合简化归因单因素或回写旧联动成功，未改程序/Skill/服务，未提交推送。 |
+
+| Codex 视角启动三档20261102 | 按用户选择接现有Pi启动入口，首条导演任务实际注入；不增加流程或改旧任务 | codex/pi-agent-efficiency-20261028 | experiments/pi-agent-kit-v2-20261028/{starter.py,test_starter.py,template/tools/agent.mjs,README.md} | 2026-11-02 | 已收工：三档与auto默认已接当前kit，PRODUCTION实入首次请求、resume保留原上下文；23项相关测试通过且独立只读复核无阻断；CLI帮助/README一致。未新拍验证视角遵从，未提交/合并/推送。 |
+
+| Codex 同场景三模型生图20261102 | 风筝浮城同提示词9:16首轮各一张，GPT Image 2/Seedream5Lite/Gemini3.1FlashImage；不生成视频 | codex/pi-agent-efficiency-20261028 | .runtime/pi-agent-efficiency-20261028/reference-research-20261029/scene-model-comparison-20261102/ | 2026-11-02 | 已收工：同prompt/无ref/各1POST三图全成功（GPT58.386s、Seedream43.414s、Gemini27.616s）；原图/请求/回执/独立实际看图报告/比较板全保，Seedream请求Lite与响应版本名差异明示；比较板及三原图发Mini sender均exit0，不报远端落盘路径。无新视频/Skill/服务改动，未提交合并推送。 |

@@ -1,0 +1,8 @@
+{
+  "python": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/.runtime/douyin-bgm-pilot-20261019/.venv-full312/bin/python",
+  "audio_source_root": "/mnt/disk1/zengzhitao/music/Eureka-Audio",
+  "audio_model_dir": "/mnt/disk1/zengzhitao/interactive-video-worktrees/romance-sd25-continuity/.runtime/douyin-bgm-pilot-20261019/vendor/eureka-cpu-adapter",
+  "device": "cuda",
+  "cuda_visible_devices": "6",
+  "max_new_tokens": 256
+}

@@ -61,6 +61,12 @@ This example shows the final compiled prompt. With structured no-reference
 requests, the host inserts the source turn's `emotion`; do not duplicate it in
 the marker body. Follow [sound direction](sound-direction.md) for ownership and
 mode differences. Use only details supported by the current scene.
+Give each speaking Subject one stable English voice phrase in its
+`subject_definitions` entry and keep it identical in every shot. The example's
+"starts level, briefly hesitates" is that shot's delivery, not the character's
+voice identity; without an Audio reference the phrase is the only voice identity
+the request carries. See
+[sound direction](sound-direction.md#per-character-voice-definition).
 When audio conditioning is explicitly absent, omit both Audio lines in the example,
 all audio-retention entries and the audio-reference summary label; retain `(Sx)`
 and the supplied dialogue. Confirm the host sends zero audio references rather
