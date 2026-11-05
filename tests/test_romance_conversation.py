@@ -15,6 +15,39 @@ def sample():
     return clip,shot
 
 
+def test_fast_keeps_its_own_validation_without_compiling_an_unused_h3_request():
+    clip,shot=sample();shot['authored_frame']='甲 stands at the counter. <DIALOGUE_1> <DIALOGUE_2> <DIALOGUE_3>'
+    with pytest.raises(ValueError,match='Chinese outside bound dialogue'):
+        compile_conversation_clip(clip,shot,performance={'正常接话':'Reply naturally.'})
+    fast=compile_conversation_clip(clip,shot,performance={},include_h3=False)
+    assert 'prompt_h3'not in fast
+    for turn in shot['turns']:assert turn['text'] in fast['prompt']
+    shot['authored_frame']='An incomplete draft with no dialogue slots.'
+    with pytest.raises(ValueError,match='dialogue slots'):
+        compile_conversation_clip(clip,shot,performance={},include_h3=False)
+
+
+def test_offscreen_announcer_is_not_looked_up_as_a_pictured_character(tmp_path,monkeypatch):
+    from novel_manga.application.packing import service
+    from novel_manga.models.bible import StoryBible,Character
+    from tests.test_scene_compilation import options
+    _,shot=sample();shot.update(location='房间',duration_seconds=13,props=[],characters=['甲','乙','丙','节目组'])
+    shot['turns']=[{'speaker_name':'节目组','delivery_mode':'offscreen_dialogue','text':'请慢慢选择。'}]
+    packed={'kind':'video','location':'房间','shots':[shot],'seconds':13,'request_seconds':13,
+            'shot_timing':[{'seconds':13}],'reference_cast':['甲','乙','丙']}
+    bible=StoryBible(novel_title='测试',genre='generic',visual_style='真人',palette='木色',style_fingerprint='test',
+        locations=['房间'],characters=[Character(name=name,appearance='成年嘉宾',wardrobe='普通衬衫')for name in ['甲','乙','丙']])
+    class BoundaryReached(Exception):pass
+    def references(pictured,*args,**kwargs):
+        assert '节目组'not in pictured
+        assert '节目组'in kwargs['speakers']
+        raise BoundaryReached
+    monkeypatch.setattr(service,'build_references',references)
+    with pytest.raises(BoundaryReached):
+        service.clip_entry(packed,'clip_01',{'bible':bible,'compiler_options':options(15),'overrides':{},
+            'profile':{'h3_speech_policy':'no_reference_performance_first'},'location_map':{},'episode_dir':tmp_path/'book_1'})
+
+
 def test_continuous_prompt_keeps_state_silent_person_and_every_line():
     c,s=sample();before=copy.deepcopy((c,s));out=compile_conversation_clip(c,s,performance={'正常接话':'Respond naturally.'})
     assert (c,s)==before

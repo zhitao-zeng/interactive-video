@@ -33,10 +33,13 @@
     "max_attempts": 2,
     "workers_by_lane": {
       "h3": 2,
-      "sd25": 4
+      "sd25": 4,
+      "sd20-fast": 1,
+      "sd20-mini": 1
     }
   },
   "services": {
+    "music_selection_config": ".runtime/music-selection/runtime.json",
     "text_endpoint": "phanthy-ds41",
     "asset_publish_dir": "outputs/.published"
   },
@@ -71,7 +74,7 @@
         }
       },
       "services": {
-        "text_endpoint": "qwen-gpu52-current",
+        "text_endpoint": "phanthy-ds41",
         "asset_publish_dir": "/mnt/disk1/zengzhitao/interactive-video-studio/outputs/.published"
       }
     },

@@ -41,6 +41,43 @@ def test_independent_failure_overrides_qwen_pass_and_exports_real_frames(tmp_pat
     assert (inputs.parent/evidence['frames'][0]['path']).read_bytes() == b'actual reviewed movie frame'
 
 
+def test_completed_independent_failure_reaches_repair_when_primary_service_is_incomplete(tmp_path,monkeypatch):
+    runner,media,final,raw=setup(tmp_path,monkeypatch)
+    final.update(complete=False,passed=False,errors=['primary HTTP524'])
+    atomic_write_json(tmp_path/'final_cut_review.json',final)
+    independent.register(tmp_path,media,raw)
+    refreshed=tmp_path/'second-review-frame.jpg';refreshed.write_bytes(b'new extraction of the same actual movie')
+    final['frames']=[{**final['frames'][0],'path':str(refreshed)}]
+    monkeypatch.setattr(independent,'observe',lambda *a:pytest.fail('completed current independent evidence needs no new service'))
+    combined=independent.combine(tmp_path,final)
+    assert not combined['complete'] and not combined['passed'] and combined['errors']==['primary HTTP524']
+    review=final_cut.apply_feedback(tmp_path,read_json(tmp_path/'episode_review.json'),combined)
+    assert 'recording phone visible' in review['feedback']['a']
+    assert review['clips']['a']['final_cut']['frames'][0]['path']==raw['frames'][0]['path']
+    events=[]
+    monkeypatch.setattr(reviewed.managed,'candidates',lambda d,r:(list(r['feedback']),{}))
+    def repair(d,ids):
+        events.append(ids)
+        return {'skip_render':True,'blocked':{'a':'repair service unavailable'}}
+    monkeypatch.setattr(reviewed.managed,'prepare',repair)
+    result=reviewed.run(runner,repair_existing=True,final_review=lambda m:independent.combine(tmp_path,final))
+    assert events==[['a']] and not result['quality_review']['passed']
+    assert result['quality_review']['final_cut_complete']is False
+    Path(final['movie']).write_bytes(b'a genuinely different current movie')
+    fresh={**final,'context':final_cut.context(tmp_path,media,final['movie'])}
+    review=final_cut.apply_feedback(tmp_path,read_json(tmp_path/'episode_review.json'),independent.combine(tmp_path,fresh))
+    assert review['final_cut_feedback']=={}
+
+
+def test_independent_pass_cannot_complete_missing_primary_review(tmp_path,monkeypatch):
+    runner,media,final,raw=setup(tmp_path,monkeypatch)
+    final.update(complete=False,passed=False,errors=['primary HTTP524'])
+    atomic_write_json(tmp_path/'final_cut_review.json',final)
+    raw.update(passed=True,issues=[])
+    with pytest.raises(ValueError,match='current reviewed movie'):
+        independent.register(tmp_path,media,raw)
+
+
 def test_independent_failure_actually_enters_repair_and_new_movie_is_rechecked(tmp_path, monkeypatch):
     runner, media, final, raw = setup(tmp_path, monkeypatch); events = []
     independent.register(tmp_path, media, raw)
