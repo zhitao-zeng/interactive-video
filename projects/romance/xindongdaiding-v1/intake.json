@@ -1,0 +1,20 @@
+{
+  "source_package": "心动待定-视频制作包-v1.0",
+  "ep01_turns": 90,
+  "source_shot_groups": 29,
+  "stages_including_silent_inserts": 93,
+  "full_scope": "prepared H3 first-frame source only; no full episode generated",
+  "pilot_scope": "24 seconds;6 unchanged consecutive source lines;2 groups of12seconds;H3/Fast/Mini share same scenes and cast",
+  "scene_assets": {
+    "kitchen": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/.runtime/xindong-pilot-20261020/scenes/kitchen.png",
+    "dinner": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/.runtime/xindong-pilot-20261020/scenes/dinner.png",
+    "interview": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/.runtime/xindong-pilot-20261020/scenes/interview.png",
+    "terrace": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/.runtime/xindong-pilot-20261020/scenes-v2/terrace.png"
+  },
+  "scene_review_priority": "Original EP01 and actual accepted scene evidence govern; original layout is a relative proposal, reviewed scene-layout-review-notes resolves its added window/room-use assumptions",
+  "full_first_frame_groups": "exported from existing select_mode, not manual reframing",
+  "reviews": {
+    "initial": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/.runtime/xindong-pilot-20261020/scene-review/sandbox/output/assessment.json",
+    "terrace": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/.runtime/xindong-pilot-20261020/terrace-review/sandbox/output/assessment.json"
+  }
+}

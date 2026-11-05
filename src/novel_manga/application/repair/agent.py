@@ -39,7 +39,7 @@ class CandidateRejected(ValueError):
 
 
 def enabled(directory: Path) -> bool:
-    return (os.environ.get('NOVEL_INTERACTIVE_REPAIR_LANE') in {'h3','sd25'}
+    return (os.environ.get('NOVEL_INTERACTIVE_REPAIR_LANE') in {'h3','sd25','sd20-fast','sd20-mini'}
             or read_json(directory.parent/'profile.json', {}).get('repair_backend') == 'sandbox_agent')
 
 
@@ -50,13 +50,13 @@ def request_lane(clip):
 
 def check_request(clip, novel_dir):
     from novel_manga.application.preparation.request_check import request_consistency
-    if request_lane(clip) == 'sd25':
+    if request_lane(clip) != 'h3':
         clip = {**clip, 'prompt_h3': ''}
     return request_consistency(clip, novel_dir)
 
 
 def validate_request(clip, prompt):
-    if request_lane(clip) == 'sd25':
+    if request_lane(clip) != 'h3':
         from novel_manga.application.repair.sd_request import validate
         validate(clip, prompt)
     else:
@@ -233,7 +233,8 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
     config = {**config, 'extra_body':{**(config.get('extra_body') or {}),
                 'tool_choice':(config.get('extra_body') or {}).get('tool_choice') or
                               {'type':'auto','disable_parallel_tool_use':True}},
-              'extra_args': [*config.get('extra_args', []), '--tools', 'Read,Bash,Write', '--include-partial-messages']}
+              'extra_args': [*config.get('extra_args', []), '--tools', 'Read,Bash,Write', '--include-partial-messages',
+                             '--max-turns', '20']}
     lane=request_lane(clip)
     field='prompt_h3' if lane=='h3' else 'prompt'
     if lane=='h3':sections(clip.get(field, ''))
@@ -398,6 +399,8 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
                                  'input/evidence.json retains complete history and whole-episode evidence; read it only to resolve a specific remaining question. '
                                  'Read history or whole-episode documents only when they resolve a specific contradiction; do not exhaust the file list. '
                                  'Once current frames, request and selected reference support a decision, write the final output immediately. '
+                                 'This invocation has at most 20 turns: reserve the last two for writing the final decision and prompt. '
+                                 'Do not spend that window auditing unrelated source documents or listing the workspace. '
                                  'For edit, write the complete prompt.txt and decision.json, then finish immediately. Use one tool call per response; sequential Write calls are allowed. '
                                  'Read any host rejection in primary.rejections: each contains the exact failed validation, '
                                  'the prior decision and, for edits, an input/rejected-candidate-N.txt file with the complete rejected request. '

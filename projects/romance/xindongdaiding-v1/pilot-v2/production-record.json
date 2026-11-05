@@ -1,0 +1,29 @@
+{
+  "source": "pilot-v2",
+  "owner_worktree": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-prompt-fix-20261020",
+  "runtime": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-prompt-fix-20261020/.runtime/xindong-prompt-fix-20261020",
+  "same_source_dialogue_turns": 6,
+  "request_seconds": 24,
+  "models": [
+    "h3",
+    "sd2.0-fast",
+    "sd2.0-mini"
+  ],
+  "shared_code_validation": {
+    "isolated": 109,
+    "main": 109
+  },
+  "visual_review": {
+    "h3": "pass",
+    "sd20-fast": "pass",
+    "sd20-mini": "pass"
+  },
+  "review_scope": "sampled native images and targeted join strips",
+  "audio_naturalness": "uncertain",
+  "new_video_tasks": 9,
+  "technical_seed_replay_counted": true,
+  "original_versions_preserved": true,
+  "delivery": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-prompt-fix-20261020/delivery/romance/xindong-prompt-fixed-final-20261020",
+  "committed": false,
+  "pushed": false
+}

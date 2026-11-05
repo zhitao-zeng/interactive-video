@@ -112,9 +112,12 @@ def _blocked(ctx, problems, *, source_audit=None):
     return answer
 
 
-def before_render(ctx):
+def source_gate(ctx):
+    """Audit source inputs; adopting another opening image does not alter the story."""
     plan=read_json(ctx.episode_dir/'clip_plan.json')
-    stamp=inputs(ctx.episode_dir)
+    stamp=inputs(ctx.episode_dir)['files']
+    bible=ctx.novel_dir/'story_bible.json'
+    stamp={**stamp,str(bible):[bible.stat().st_mtime_ns,bible.stat().st_size] if bible.is_file() else None}
     cache_path=ctx.run_dir/'local-source-check.json'
     cached=read_json(cache_path,{})
     if cached.get('inputs')==stamp:
@@ -132,6 +135,13 @@ def before_render(ctx):
         if not blocked:
             blocked={c['clip_id']:'Source audit contains an unresolved input issue' for c in plan['clips']}
         return _blocked(ctx,blocked,source_audit=answer)
+    return None
+
+
+def before_render(ctx):
+    blocked=source_gate(ctx)
+    if blocked is not None:return blocked
+    plan=read_json(ctx.episode_dir/'clip_plan.json')
     try:
         ensure_assets(ctx)
     except Exception as error:

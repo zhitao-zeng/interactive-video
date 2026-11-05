@@ -49,6 +49,48 @@ def test_real_source_conflict_remains_blocked_with_evidence(monkeypatch):
     assert len(calls) == 2
 
 
+def test_source_review_receives_before_changes_and_native_siblings(monkeypatch):
+    import json
+    from novel_manga.application.agents.episode.input_repair import _source_review_shot_context
+
+    before = [
+        {'index': 18, 'source_shot': 12, 'source_kind': 'native', 'turns': [
+            {'speaker_name': '甲', 'text': '原句', 'emotion': '平静'}]},
+        {'index': 19, 'source_shot': 12, 'source_kind': 'native', 'turns': [
+            {'speaker_name': '甲', 'text': '保留句', 'emotion': '平静'}]},
+        {'index': 24, 'source_shot': 16, 'source_kind': 'native', 'action': '先拆机'},
+        {'index': 25, 'source_shot': 16, 'source_kind': 'native', 'action': '再探水'},
+    ]
+    after = {s['index']: dict(s) for s in before}
+    after[19] = {**after[19], 'turns': [{'speaker_name': '甲', 'text': '保留句', 'emotion': '焦急'}]}
+    after[24] = {**after[24], 'action': '先拆机', 'opening_frame': {'image_prompt': 'phone in hand'}}
+    context = _source_review_shot_context(before, after, {19, 24})
+    assert context[0]['changed_fields'] == ['turns[0].emotion']
+    assert context[0]['before']['turns'][0]['text'] == context[0]['after']['turns'][0]['text']
+    assert [s['index'] for s in context[0]['source_group']] == [18, 19]
+    assert [s['index'] for s in context[1]['source_group']] == [24, 25]
+    calls = invoke(monkeypatch, [{'consistent': True, 'problems': []}])
+    input_repair.source_check(SOURCE, '甲说', PATCHES, {}, scoped_shots=context,
+                              review_reason='稳定前置表达意图')
+    prompt = calls[0][0][0]['text']
+    payload_start = prompt.rfind('\n{') + 1
+    payload = json.loads(prompt[payload_start:])
+    assert payload['reason'] == '稳定前置表达意图'
+    assert payload['affected_shots'][0]['changed_fields'] == ['turns[0].emotion']
+    assert payload['affected_shots'][0]['source_group'][0]['index'] == 18
+
+
+def test_source_policy_rechecks_only_old_saved_rejection_once():
+    from novel_manga.application.agents.episode.input_records import SOURCE_REVIEW_POLICY
+    from novel_manga.application.agents.episode.input_recovery_policy import source_review_recoverable
+    saved = {'status': 'rejected', 'step': 'source', 'decision': {'shots': []},
+             'published': False, 'source_review_policy': 2}
+    assert SOURCE_REVIEW_POLICY == 3
+    assert source_review_recoverable(saved)
+    saved['source_review_policy'] = SOURCE_REVIEW_POLICY
+    assert not source_review_recoverable(saved)
+
+
 @pytest.mark.parametrize('confirmation', [TimeoutError('judge unavailable'),
     {'conflicts': [{'source_quote': '不存在的原文', 'problem': '衣服矛盾'}]}])
 def test_missing_confirmation_or_false_quote_cannot_approve(monkeypatch, confirmation):

@@ -1,0 +1,372 @@
+{
+  "profile": {
+    "frame": "9:16",
+    "resolution": "480p",
+    "native_h3_short_edge": 768,
+    "h3_speech_policy": "no_reference_performance_first",
+    "expressions": false,
+    "two_views": "off",
+    "genre": "generic",
+    "style": "modern-live"
+  },
+  "bible": {
+    "novel_title": "《心动待定》EP01｜今晚很合拍，明天换个人？",
+    "genre": "写实恋爱观察综艺",
+    "visual_style": "现代真人恋综摄影；真实自然肤质与织物，海边小屋厨房的暖木柜、浅色墙砖和室内尺度，使用晚间实用灯光。",
+    "palette": "soft warm neutrals, graphite gray, muted green, brick red, natural wood and realistic evening whites",
+    "style_fingerprint": "xindong-waiting-real-reality-v1",
+    "characters": [
+      {
+        "name": "夏宁",
+        "role": "餐饮品牌策划",
+        "gender": "女",
+        "age": "27",
+        "appearance": "柔和方圆鹅蛋脸，深棕杏眼，深栗棕7:3侧分过肩直发，左眼外下方有极小浅褐痣。",
+        "wardrobe": "奶白细针织短袖上衣、墨绿过膝A字裙、珍珠耳钉、米白平底鞋。",
+        "visual_archetype": "成年中国嘉宾；身份与脸按独立脸部参考锁定。",
+        "face_anchors": [
+          "柔和方圆鹅蛋脸，深棕杏眼，深栗棕7:3侧分过肩直发，左眼外下方有极小浅褐痣。"
+        ],
+        "voice_profile_id": ""
+      },
+      {
+        "name": "乔伊",
+        "role": "小剧场灯光师",
+        "gender": "女",
+        "age": "26",
+        "appearance": "高颧菱形偏心形脸，略上挑深棕杏眼，红调深栗棕8:2侧分上胸松卷，一侧露耳。",
+        "wardrobe": "砖红无袖上衣、米白直筒长裤、细长金色耳饰、深棕低跟短靴。",
+        "visual_archetype": "成年中国嘉宾；身份与脸按独立脸部参考锁定。",
+        "face_anchors": [
+          "高颧菱形偏心形脸，略上挑深棕杏眼，红调深栗棕8:2侧分上胸松卷，一侧露耳。"
+        ],
+        "voice_profile_id": ""
+      },
+      {
+        "name": "陶然",
+        "role": "旧家具修复师",
+        "gender": "女",
+        "age": "29",
+        "appearance": "偏长鹅蛋脸，狭长深棕眼，黑色中分无刘海长发固定低马尾。",
+        "wardrobe": "灰蓝棉麻衬衫卷至前臂、米白直筒裤、灰白低帮帆布鞋、小银耳钉。",
+        "visual_archetype": "成年中国嘉宾；身份与脸按独立脸部参考锁定。",
+        "face_anchors": [
+          "偏长鹅蛋脸，狭长深棕眼，黑色中分无刘海长发固定低马尾。"
+        ],
+        "voice_profile_id": ""
+      },
+      {
+        "name": "程越",
+        "role": "自由摄影师",
+        "gender": "男",
+        "age": "28",
+        "appearance": "窄长脸，灵动深棕眼，黑色蓬松短发与碎直刘海，干净无胡须。",
+        "wardrobe": "浅蓝棉质衬衫作外搭、白T恤、海军蓝直筒长裤、白色低帮鞋。",
+        "visual_archetype": "成年中国嘉宾；身份与脸按独立脸部参考锁定。",
+        "face_anchors": [
+          "窄长脸，灵动深棕眼，黑色蓬松短发与碎直刘海，干净无胡须。"
+        ],
+        "voice_profile_id": ""
+      },
+      {
+        "name": "陆川",
+        "role": "建筑设计师",
+        "gender": "男",
+        "age": "30",
+        "appearance": "宽矩形脸与方下颌，平直浓眉，黑色短直8:2偏分且完整露额。",
+        "wardrobe": "深石墨灰开领短袖衬衫、黑色直筒长裤、左腕黑皮圆面表、黑色乐福鞋。",
+        "visual_archetype": "成年中国嘉宾；身份与脸按独立脸部参考锁定。",
+        "face_anchors": [
+          "宽矩形脸与方下颌，平直浓眉，黑色短直8:2偏分且完整露额。"
+        ],
+        "voice_profile_id": ""
+      },
+      {
+        "name": "周叙",
+        "role": "小烘焙店主",
+        "gender": "男",
+        "age": "27",
+        "appearance": "偏圆暖眼，短黑C卷发，面部干净。",
+        "wardrobe": "米色圆领T恤、深灰长裤、灰白运动鞋；厨房甜点操作时穿深棕围裙。",
+        "visual_archetype": "成年中国嘉宾；身份与脸按独立脸部参考锁定。",
+        "face_anchors": [
+          "偏圆暖眼，短黑C卷发，面部干净。"
+        ],
+        "voice_profile_id": ""
+      }
+    ],
+    "locations": [
+      "厨房：小屋西侧封闭式备餐区；厨房主门正对餐厅北墙中心。冰箱沿西墙，料理台沿北墙；汤锅与菜板固定在北台面。厨房门内看向餐厅时，餐厅在正前方。",
+      "餐厅：厨房门正对餐厅北侧；六人长桌位于餐厅中央，露台侧门在东墙。晚餐近镜一侧从左至右陶然、夏宁、乔伊；对面从左至右周叙、陆川、程越。桌面中心为菜与花瓶。",
+      "露台：由餐厅东墙侧门进入；长桌沿南北轴，朝海的一侧无遮挡。靠厨房方向的长桌左侧桌腿下固定一块深灰垫片；花瓶置桌面中央偏内，桌布夹子固定迎风两角。",
+      "采访角：与餐厅同一小屋，设在餐厅西南内墙一处独立安静角；单人坐面朝东，镜头从东南方向拍向西北内墙，背景为暖灰墙和一盏固定落地灯；不改变其他房间门窗。"
+    ],
+    "props": [
+      {
+        "name": "晚餐桌椅",
+        "appearance": "餐厅中央六人长桌与六把固定椅，按固定座次摆放。",
+        "category": "其他"
+      },
+      {
+        "name": "深灰垫片",
+        "appearance": "单块深灰色小垫片，放在露台长桌左侧一条不平桌腿下并全片保持。",
+        "category": "其他"
+      },
+      {
+        "name": "露台桌布与夹子",
+        "appearance": "浅色桌布和两只普通夹子，夹住迎风两角。",
+        "category": "其他"
+      },
+      {
+        "name": "微辣小碟",
+        "appearance": "夏宁个人微辣份小碟，由陆川先行留出，不被他人尝用。",
+        "category": "其他"
+      }
+    ],
+    "continuity_rules": [
+      "厨房门正对餐厅；露台只能由餐厅东侧门进入；采访角在同一小屋内。",
+      "晚餐近镜侧陶然、夏宁、乔伊；对面周叙、陆川、程越，座位不互换。",
+      "露台长桌左侧同一条不平桌腿持续使用同一块深灰垫片。",
+      "陆川先放下空碗再扶桌；乔伊决定保留露台，程越取夹子固定桌布两角。",
+      "陆川先替夏宁留微辣小碟；程越只提醒她坐下吃饭并端汤。",
+      "人物、事件与关系只按EP01发生；邀请已接受但尚未出发，互动投票未揭晓。"
+    ]
+  },
+  "script": {
+    "video_title": "厨房里先问自己的口味｜EP01小样",
+    "source_title": "EP01｜今晚很合拍，明天换个人？",
+    "episode_index": 1,
+    "profile": {
+      "frame": "9:16",
+      "resolution": "480p",
+      "native_h3_short_edge": 768,
+      "h3_speech_policy": "no_reference_performance_first",
+      "expressions": false,
+      "two_views": "off",
+      "genre": "generic",
+      "style": "modern-live"
+    },
+    "shots": [
+      {
+        "index": 1,
+        "origin_index": null,
+        "shot_id": "PILOT-CONV-01",
+        "label": "PILOT-CONV-01",
+        "segment_id": "ep01_turn_14-16",
+        "source_quote": "陆川：辣椒放多少？\n夏宁：大家都能吃吗？乔伊刚说想吃辣，陶然呢？我去问问。\n陆川：等等，我问你呢。",
+        "source_shot": "原镜组06—07",
+        "source_turn_indexes": [
+          14,
+          15,
+          16
+        ],
+        "location": "厨房",
+        "scene_id": "kitchen",
+        "scene_time": "入住第1天，晚餐准备期间；镜组06—07的厨房分工，不是采访也不是冷开场。",
+        "characters": [
+          "夏宁",
+          "陆川"
+        ],
+        "in_frame": [
+          "夏宁",
+          "陆川"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {
+          "夏宁": "奶白/象牙白不透明细针织短袖圆领上衣，细密竖向织纹，衣摆收进墨绿长款哑光A字裙；裙摆有分量，长度到小腿中下段；每耳一枚极小淡奶白珍珠耳钉，穿米白皮质平底乐福鞋。",
+          "陆川": "深石墨灰、略带哑光棉混纺的开领短袖休闲衬衫，普通领上方自然敞开一粒，衣摆收进纯黑直筒长裤；简洁黑腰带；解剖左腕戴细银色表壳、深色表面、黑皮表带的圆表；黑色皮质乐福鞋。"
+        },
+        "props": [],
+        "visual_prompt": "厨房现场双人交流，人物外貌分别取本人独立肖像；服装只按本段明确文字执行。奶白/象牙白不透明细针织短袖圆领上衣，细密竖向织纹，衣摆收进墨绿长款哑光A字裙；裙摆有分量，长度到小腿中下段；每耳一枚极小淡奶白珍珠耳钉，穿米白皮质平底乐福鞋。 深石墨灰、略带哑光棉混纺的开领短袖休闲衬衫，普通领上方自然敞开一粒，衣摆收进纯黑直筒长裤；简洁黑腰带；解剖左腕戴细银色表壳、深色表面、黑皮表带的圆表；黑色皮质乐福鞋。 夏宁在北侧料理台西段，陆川在东段；从厨房南侧门口朝北看，夏宁画面左侧、陆川画面右侧。菜谱、葱碗、辣椒碗、菜板和汤锅的位置清楚，沿用同一小屋厨房参考图的暖木柜、浅色墙砖与室内尺度。",
+        "start_state": "陆川正在北侧料理台东段备菜；夏宁站在西段看菜谱。葱碗在夏宁手边，辣椒碗和菜板在陆川一侧，汤锅在东侧灶上。两人尚未分出微辣小碟。The same established compact seaside-house kitchen, viewed from its south doorway toward the north counter. Xia Ning (<Subject 1>) stays at the west section of the counter, screen left; Lu Chuan (<Subject 2>) stays at the east section, screen right, about an arm’s length apart. The recipe book and scallion bowl remain at Xia Ning’s west station; the chili bowl and cutting board stay at Lu Chuan’s east station; the soup pot remains on the stove between them toward the east. Xia Ning wears an opaque ivory fine-knit short-sleeved crew-neck top with fine vertical ribs, tucked into a dark forest-green matte A-line skirt with weight and a hem at mid-to-lower calf, tiny pearl studs and ivory flat leather loafers. Lu Chuan wears a charcoal-grey matte cotton-blend short-sleeved open-collar shirt tucked into straight black trousers with a plain black belt, black leather loafers, and a round dark-faced watch with a slim silver case and black leather strap on his anatomical left wrist. The waist-to-mid-calf vertical framing keeps both faces, the full skirt shape and hem, Lu Chuan’s trousers and working left wrist reasonably visible while they cook; it is a natural conversation frame, not a fashion pose.",
+        "event": "陆川询问辣椒用量；夏宁先核对全桌口味并说要去问乔伊、陶然，手离开菜谱边、肩与目光朝南侧厨房门方向偏转但脚未迈出；陆川停下切菜并转向她，温和叫住她；夏宁在离位前停下、回看他。",
+        "motion_prompt": "一个连续交流：陆川在东段菜板旁问一次辣椒用量；夏宁仍留在西段，短看料理台与南侧门方向，把其他人的口味说完；她说“我去问问”时只抬手离开菜谱并稍转肩，不迈步。陆川让刀停在菜板上，转头叫住她；她停止转向并看回陆川。动作只发生一次，句间保留自然反应时间。",
+        "end_state": "夏宁已经停下并面向陆川，仍站在料理台西段；菜谱与葱碗未移动，陆川的刀已平放菜板，辣椒碗、菜和汤锅位置未变，尚未盛出任何一份。",
+        "camera": "竖屏南侧门口朝北的单一连续双人中远景，人物从头部拍到小腿中下段；夏宁稳定在画面左、西侧，陆川在画面右、东侧。两人脸、菜谱与料理台同处画面；全段不切单人正脸、不换轴，最多轻微稳定靠近以保留接话关系。",
+        "light": "海边小屋厨房的室内傍晚实用灯光，暖木与浅色瓷砖按参考图呈现；脸部有自然阴影与真实肤质，不改成白天户外光。",
+        "shot_scale": "竖屏双人中远景，头部至小腿中下段；完整辨认裙摆长度和两人站位。",
+        "duration_seconds": 12.0,
+        "sfx": "连续轻微厨房环境声、菜刀停在菜板上的轻声与室内底噪；清楚保留三句原声，不加音乐。",
+        "avoid": "",
+        "turns": [
+          {
+            "speaker_name": "陆川",
+            "delivery_mode": "visible_dialogue",
+            "text": "辣椒放多少？",
+            "emotion": "Asks an ordinary cooking question while staying with the prep task; calm, practical, genuinely waiting for Xia Ning’s answer."
+          },
+          {
+            "speaker_name": "夏宁",
+            "delivery_mode": "visible_dialogue",
+            "text": "大家都能吃吗？乔伊刚说想吃辣，陶然呢？我去问问。",
+            "emotion": "Starts briskly from the needs of the whole table; the question about Tao Ran lands as a real check, then her pace softens as she says she will go ask."
+          },
+          {
+            "speaker_name": "陆川",
+            "delivery_mode": "visible_dialogue",
+            "text": "等等，我问你呢。",
+            "emotion": "“Wait” is clear and gently insistent, without reprimand; he wants her own answer, not a report about the others."
+          }
+        ],
+        "authored_frame": "One uninterrupted 12-second take, with no editorial cuts. <Subject 3> is the same compact seaside-house kitchen shown in <Picture 3>, including the pale tiled walls, warm wood cabinets and north counter. From the south doorway, look north in a vertical 9:16 medium-long two-shot. Keep Xia Ning (<Subject 1>) at the west station and screen left, and Lu Chuan (<Subject 2>) at the east station and screen right; both remain in the frame together at a natural arm’s-length distance. Frame both from head to mid-lower calf so their faces, Xia Ning’s complete skirt silhouette and hem, and Lu Chuan’s working left wrist are readable during the ordinary task. Use the supplied portrait pictures for their respective faces and hair only; follow the clothing written here. The same established compact seaside-house kitchen, viewed from its south doorway toward the north counter. Xia Ning (<Subject 1>) stays at the west section of the counter, screen left; Lu Chuan (<Subject 2>) stays at the east section, screen right, about an arm’s length apart. The recipe book and scallion bowl remain at Xia Ning’s west station; the chili bowl and cutting board stay at Lu Chuan’s east station; the soup pot remains on the stove between them toward the east. Xia Ning wears an opaque ivory fine-knit short-sleeved crew-neck top with fine vertical ribs, tucked into a dark forest-green matte A-line skirt with weight and a hem at mid-to-lower calf, tiny pearl studs and ivory flat leather loafers. Lu Chuan wears a charcoal-grey matte cotton-blend short-sleeved open-collar shirt tucked into straight black trousers with a plain black belt, black leather loafers, and a round dark-faced watch with a slim silver case and black leather strap on his anatomical left wrist. The waist-to-mid-calf vertical framing keeps both faces, the full skirt shape and hem, Lu Chuan’s trousers and working left wrist reasonably visible while they cook; it is a natural conversation frame, not a fashion pose. At the opening, Lu Chuan continues vegetable prep beside the cutting board and asks Xia Ning about the chili, making one small gesture toward the chili bowl. <DIALOGUE_1> Xia Ning checks the food and recipe area while answering about the others; on her final phrase she lifts her hand from the recipe and turns her gaze and one shoulder toward the south doorway, but does not take a step or leave her station. <DIALOGUE_2> Before she moves away, Lu Chuan rests the knife flat on the board and turns his head and upper body toward her to call her back in a normal, gently direct manner. Xia Ning stops the turn and looks back at him. <DIALOGUE_3> End with Xia Ning already stopped and facing Lu Chuan. The recipe, scallion bowl, chili bowl, cutting board and soup pot stay in their starting places; no serving portion has been separated yet.",
+        "opening_frame": {
+          "image_prompt": "Edit the exact original empty-kitchen photograph supplied as IMAGE 1. Add only Xia Ning and Lu Chuan and the few small cooking props described below into that existing photographed room. This is an additive photo edit using image 1 as the fixed background plate, not a new kitchen rendering or a renovation. Preserve the original photograph’s camera viewpoint from the south doorway, doorway edges, room size, ceiling planks with small recessed lights, small horizontal west window, refrigerator, tiled walls, floor, north-wall transverse worktop, lower cabinets, original sink/tap area, stove and pot positions. Preserve the plain east/right wall and open aisle. There is one existing rear/north transverse worktop: both people must work at that same existing surface. Do not invent left or right side counters extending toward the camera, a preparation ledge, a peninsula, an island, upper cupboards or a new table. Do not enlarge the window or change the ceiling fixture. IMAGE 2 supplies Xia Ning’s face and shoulder-length chestnut hair; IMAGE 3 supplies Lu Chuan’s face and short dark hair. Their frontal portraits establish identity only, not a requirement for frontal faces or frontal body poses in the edited scene. Keep the original background camera and let both bodies face naturally toward the north worktop, viewed mainly from behind and from their back/side three-quarter angles. A natural partial profile or side face is enough; do not turn the worktop or add a new front-facing work surface to display both faces. Xia Ning stands at the west/left end of the existing north worktop, east of the refrigerator, reading an open recipe lying on that original worktop, her hand near its page. A small scallion bowl is beside the book on that same rear worktop. Lu Chuan stands at the east/right end of that same north worktop, holding a knife close above a small cutting board on the original rear worktop; the chili bowl is beside the board. He glances slightly sideways toward her as he is about to ask his ordinary cooking question. They remain at separate west/east stations, with a natural gap, their bodies not merged with the counter. The original stove and pot remain at their original northern position. A small clean white serving dish beside that stove is clearly empty. No portion has been served. The camera can see full clothing from these back/side angles; the counter stays beyond their bodies toward the north wall, never newly in front of their legs. Do not move the camera closer merely to make the faces large. Xia Ning wears an opaque ivory fine-knit short-sleeved crew-neck top tucked into a dark forest-green matte A-line skirt with a weighted hem at mid-to-lower calf, tiny pearl studs and ivory flat leather loafers. Lu Chuan wears a charcoal-grey matte cotton-blend short-sleeved open-collar shirt tucked into straight black trousers, a plain black belt, black leather loafers and a slim silver-cased round dark-faced watch with black leather strap on his anatomical left wrist. Their face profiles and hair should remain recognizable when visible; backs and hair are allowed to occlude part of a face during ordinary work. The output is one realistic quiet evening cooking moment in exactly that original kitchen, with the same warm practical light, no other people, no panel layout, inset portrait, caption, text overlay, logo or watermark.",
+          "visible_characters": [
+            "夏宁",
+            "陆川"
+          ]
+        }
+      },
+      {
+        "index": 2,
+        "origin_index": null,
+        "shot_id": "PILOT-CONV-02",
+        "label": "PILOT-CONV-02",
+        "segment_id": "ep01_turn_17-19",
+        "source_quote": "夏宁：我啊？微辣。刚才差点又说都行。\n陆川：那我记住了。你的先盛，剩下的再加。\n夏宁：你很适合跟我一起干活。",
+        "source_shot": "原镜组06—07",
+        "source_turn_indexes": [
+          17,
+          18,
+          19
+        ],
+        "location": "厨房",
+        "scene_id": "kitchen",
+        "scene_time": "紧接前一段，同一入住第1日晚餐准备期间；同一厨房机位轴与站位。",
+        "characters": [
+          "夏宁",
+          "陆川"
+        ],
+        "in_frame": [
+          "夏宁",
+          "陆川"
+        ],
+        "extras": [],
+        "listeners": [],
+        "wears": {
+          "夏宁": "奶白/象牙白不透明细针织短袖圆领上衣，细密竖向织纹，衣摆收进墨绿长款哑光A字裙；裙摆有分量，长度到小腿中下段；每耳一枚极小淡奶白珍珠耳钉，穿米白皮质平底乐福鞋。",
+          "陆川": "深石墨灰、略带哑光棉混纺的开领短袖休闲衬衫，普通领上方自然敞开一粒，衣摆收进纯黑直筒长裤；简洁黑腰带；解剖左腕戴细银色表壳、深色表面、黑皮表带的圆表；黑色皮质乐福鞋。"
+        },
+        "props": [],
+        "visual_prompt": "承接前段结束状态：夏宁已经停下、面向陆川；陆川已停刀转向她。不重演转身或叫停。两人仍分别位于北侧料理台西段和东段。夏宁服装：奶白/象牙白不透明细针织短袖圆领上衣，细密竖向织纹，衣摆收进墨绿长款哑光A字裙；裙摆有分量，长度到小腿中下段；每耳一枚极小淡奶白珍珠耳钉，穿米白皮质平底乐福鞋。 陆川服装：深石墨灰、略带哑光棉混纺的开领短袖休闲衬衫，普通领上方自然敞开一粒，衣摆收进纯黑直筒长裤；简洁黑腰带；解剖左腕戴细银色表壳、深色表面、黑皮表带的圆表；黑色皮质乐福鞋。 身份取本人独立肖像，衣着取以上文字；沿用厨房参考图中的室内空间、暖木柜和浅色砖墙。",
+        "start_state": "完全承接上一镜末态：夏宁站在西段并已面向陆川，未离开厨房；陆川站在东段，刀平放菜板。双方站位、南北机位轴和菜谱、葱碗、辣椒碗、汤锅都未变。微辣份还未盛出。The same established compact seaside-house kitchen, viewed from its south doorway toward the north counter. Xia Ning (<Subject 1>) stays at the west section of the counter, screen left; Lu Chuan (<Subject 2>) stays at the east section, screen right, about an arm’s length apart. The recipe book and scallion bowl remain at Xia Ning’s west station; the chili bowl and cutting board stay at Lu Chuan’s east station; the soup pot remains on the stove between them toward the east. Xia Ning wears an opaque ivory fine-knit short-sleeved crew-neck top with fine vertical ribs, tucked into a dark forest-green matte A-line skirt with weight and a hem at mid-to-lower calf, tiny pearl studs and ivory flat leather loafers. Lu Chuan wears a charcoal-grey matte cotton-blend short-sleeved open-collar shirt tucked into straight black trousers with a plain black belt, black leather loafers, and a round dark-faced watch with a slim silver case and black leather strap on his anatomical left wrist. The waist-to-mid-calf vertical framing keeps both faces, the full skirt shape and hem, Lu Chuan’s trousers and working left wrist reasonably visible while they cook; it is a natural conversation frame, not a fashion pose.",
+        "event": "夏宁说出自己的微辣口味并自嘲差点又说都行；陆川明确记住后只做一次分份动作：将尚未加辣的菜先盛一小份到干净小碟，放在夏宁西段台面，再留待给其余菜加辣；夏宁看到小碟落稳后说他适合一起干活。",
+        "motion_prompt": "连续一镜内自然接话。夏宁已面对陆川，不再转身或走向门口；她短暂意识到问题是问自己的，然后说微辣和“差点又说都行”。陆川听完回应记住了，转身幅度只到东侧灶台，把一小份尚未加辣的菜盛进干净小碟，稳稳放在夏宁西段台面；其余菜暂不加辣。镜头沿原轴平滑轻俯摇到锅沿、陆川的手和小碟，确认小份确实放稳后平滑回到双人中景。夏宁看见后说最后一句；陆川抬眼听她说完，给一个克制、自然的笑，不补台词。动作仅分份一次。",
+        "end_state": "夏宁微辣小碟已独立放稳在她所在的西段台面；其余菜仍留待加辣。辣椒碗在东侧锅旁，菜谱、葱碗不动。夏宁和陆川保持原站位并在同一画面中结束交流。",
+        "camera": "从前段同一南门朝北的竖屏双人中远景开始，人物仍在左西、右东，头部至小腿中下段。全程为一个连续镜头：对白开始时保持双人构图；陆川分份时仅顺轴平滑俯摇/短推至锅沿、手与小碟，声音不间断；小碟放稳后回到原双人构图。没有剪辑切至、反打换轴或重复动作。",
+        "light": "与上一段一致的厨房室内傍晚实用灯光；灶台光不夸张，不改变脸部色温或衣物颜色。",
+        "shot_scale": "连续双人中远景，单次顺轴俯摇至锅边手部细节后回双人景；不作服装展示式停留。",
+        "duration_seconds": 12.0,
+        "sfx": "连续轻微厨房底噪、一次盛菜与小碟落台的真实轻声；台词清楚，锅边细节不中断声音，无音乐。",
+        "avoid": "",
+        "turns": [
+          {
+            "speaker_name": "夏宁",
+            "delivery_mode": "visible_dialogue",
+            "text": "我啊？微辣。刚才差点又说都行。",
+            "emotion": "A brief note of surprise at being asked about herself, then a relaxed, specific answer; the self-aware joke has a small smile, not embarrassment."
+          },
+          {
+            "speaker_name": "陆川",
+            "delivery_mode": "visible_dialogue",
+            "text": "那我记住了。你的先盛，剩下的再加。",
+            "emotion": "Even, matter-of-fact warmth; he makes the practical choice audible without turning it into a romantic performance."
+          },
+          {
+            "speaker_name": "夏宁",
+            "delivery_mode": "visible_dialogue",
+            "text": "你很适合跟我一起干活。",
+            "emotion": "Sincerely appreciative with a light teasing edge; she is responding to his concrete consideration, not making a declaration."
+          }
+        ],
+        "authored_frame": "One uninterrupted 12-second take that begins exactly where the previous take ended: Xia Ning (<Subject 1>) is already stopped and facing Lu Chuan (<Subject 2>); Lu Chuan has already laid the knife flat on the board and turned toward her. Do not replay her turn toward the doorway or his call to stop. Keep the same vertical south-doorway-to-north-counter axis, the same west/screen-left and east/screen-right positions, and the same clothes and room. <Subject 3> is the kitchen in <Picture 3>. Frame the pair naturally from head to mid-lower calf, with faces and the skirt hem readable during their conversation. Xia Ning wears an opaque ivory fine-knit short-sleeved crew-neck top with fine vertical ribs tucked into a dark forest-green matte A-line skirt reaching mid-to-lower calf, tiny pearl studs and ivory flat leather loafers. Lu Chuan wears a charcoal-grey matte cotton-blend short-sleeved open-collar shirt tucked into straight black trousers with a plain black belt, black leather loafers and a round dark-faced watch with a slim silver case and black leather strap on his anatomical left wrist. The portrait references guide only each person’s face and hair; this written clothing description determines their outfits. Xia Ning, already facing him, briefly registers that he asked about her own taste, then names her mild preference and catches her own habit of saying whatever works. <DIALOGUE_1> Lu Chuan listens, then says he will remember. During that line he turns only to the east-side stove, serves one small portion of the not-yet-spiced food into a clean small dish, and sets it down securely on the west counter at Xia Ning’s station. Do not repeat the serving; keep the remaining food unseasoned until this portion is set aside. As he serves, make one gentle continuous tilt/push down along the established camera axis to show the pot rim, his hand and the small dish, with the dialogue and kitchen room tone uninterrupted. <DIALOGUE_2> Return smoothly to the original two-shot. Xia Ning notices the dish at her station and tells him he is well suited to working with her. Lu Chuan looks up and gives a restrained natural smile while listening; he says no additional line. <DIALOGUE_3> End with both at their original stations, the mild portion safely set aside and the rest of the food still awaiting chili.",
+        "opening_frame": {
+          "image_prompt": "Make a minimal photo edit of the ONE supplied complete scene photograph. This exact photograph is the sole reference and is already the accepted first opening of this task. Keep the photographed room, camera, lens, composition, framing and all existing objects exactly in place. Do not recreate the scene, change the architecture or compose a new portrait. Edit only the two existing people’s head/shoulder/forearm poses and the position of the single existing knife to show the very next quiet listening moment. The woman remains on exactly the same left/west floor spot with her back/side toward the camera, wearing the identical ivory short-sleeved knit top, the identical dark green calf-length A-line skirt and ivory shoes. Keep her face identity and the same shoulder-length brown hair, with the ends at the same shoulder level. She has stopped reading and turns just her head and a little of her shoulders to her right toward the man, looking at him in a natural side profile. She does not walk, move her feet, lean against another fixture or turn her entire body to face the viewer. The man remains on exactly the same right/east floor spot in the identical grey short-sleeved shirt, black trousers, shoes and left-wrist watch. Keep his same face and short hair. He has stopped cutting and looks toward the woman to his left, with only a slight head/shoulder turn. His one existing knife now lies flat on the SAME original cutting board at the same north/rear worktop, no longer held in his hand; his forearms can relax naturally by that board. Do not add a second knife or move the board. Neither person needs a frontal face: preserve the original back/side view and use only these small head/shoulder turns so they are already attending to each other. Everything else stays as photographed: the horizontal window centred on the north wall, the wood-plank ceiling and small recessed lights, the left refrigerator, the visible left-front sink surface, the one north/rear worktop and lower cabinets, the open aisle, right doorway wall and door hardware. Keep the pot and stove at the photographed far-right end of the north worktop, the clean white small serving dish in its same place beside the stove, the open recipe at the far-left/west end, the scallion bowl, chili bowl and cutting board at their exact photographed locations and with their same shapes. The white serving dish remains visibly empty: no food, soup or sauce is already served. Do not add new surfaces, projecting side counters, islands, upper cupboards or furniture, and do not move the stove or pot. Retain the same quiet warm evening light, skin, fabric and colour. Deliver one photo with only those minimal pose/knife changes, no new people, no collage, caption, graphic, logo or watermark.",
+          "visible_characters": [
+            "夏宁",
+            "陆川"
+          ]
+        }
+      }
+    ],
+    "skipped_segments": [],
+    "summary": "EP01原镜组06—07厨房连续交流小样；两个12秒连续镜头各含三句原对白。人物站位与动作按原稿承接，六句和说话人顺序逐字保留。",
+    "production_mode": "romance_conversation"
+  },
+  "groups": [
+    {
+      "source_segment": "ep01_turn_14-16",
+      "source_shot": "原镜组06—07",
+      "shot_indexes": [
+        1
+      ],
+      "request_seconds": 12,
+      "location_reference": "series_assets/locations/location_001/establishing.jpeg",
+      "reference_cast": [
+        "夏宁",
+        "陆川"
+      ],
+      "reference_props": []
+    },
+    {
+      "source_segment": "ep01_turn_17-19",
+      "source_shot": "原镜组06—07",
+      "shot_indexes": [
+        2
+      ],
+      "request_seconds": 12,
+      "location_reference": "series_assets/locations/location_001/establishing.jpeg",
+      "reference_cast": [
+        "夏宁",
+        "陆川"
+      ],
+      "reference_props": []
+    }
+  ],
+  "voice_specs": {},
+  "interaction": {
+    "id": "ep01-pilot-context",
+    "series_title": "《心动待定》EP01",
+    "question": "首张双人加场卡，给哪一组？",
+    "seconds": 3,
+    "ambience_shot_index": 2,
+    "options": [
+      {
+        "id": "A",
+        "label": "早市搭档：夏宁×程越",
+        "next": "未制作"
+      },
+      {
+        "id": "B",
+        "label": "旧物搭档：乔伊×陆川",
+        "next": "未制作"
+      }
+    ],
+    "selected": null,
+    "context": "保留整集互动选项作为项目上下文；小样没有进行到片尾投票。",
+    "art_direction": "设计一张完整的现代真人恋综互动片尾卡，竖屏9:16，1080×1920。这是一张精致编辑设计样图，所有文字都在图中准确排版，不留占位符。\n视觉：暖象牙白纸张底色，细微真实纸纤维质感，深墨绿文字，少量柔和木色。背景边缘可隐约出现真实厨房的浅色瓷砖、木质台面及清晨斜射日光，景深柔和、低对比，主体文字区域保持干净。温暖、有生活感，像高品质恋爱观察节目的片尾编辑页。不要人物、人脸照片、卡通人物、大心形、玫瑰、婚庆元素、荧光色或繁复装饰。\n版式：四周留足安全边距，正文区域不小于画面宽度的80%。顶部放节目名；上半部突出主问题；中下部纵向排列两张大小、颜色、描边、字重完全一致的选项卡，等权呈现，无默认选择、无高亮胜者、无勾选、无票数、无排名。卡片采用细墨绿边框、轻微圆角与极淡纸张层次，避免厚重投影。两张卡各分两行，搭档类型为第一层级，姓名组合为第二层级。主问题与选项必须大而清晰，让观众在3秒内迅速识别。不要用英文替代中文，不要增加说明文字。\n图中只能出现以下文字，逐字准确，保留中文标点、字母及乘号“×”：\n顶部：《心动待定》\n主问题分两行：\n首张双人加场卡，\n给哪一组？\n第一张选项卡：\nA  早市搭档\n夏宁 × 程越\n第二张选项卡：\nB  旧物搭档\n乔伊 × 陆川\n底部：评论区留下你的选择\n主问题使用清楚有力的现代中文黑体；节目名用克制优雅的中文宋体；选项及姓名使用易读黑体。深色文字与浅色底保持高对比，不用细到难辨的字体，不把文字压在照片细节上。整体清爽、留白充分，两组选项的视觉分量严格相等。\n"
+  },
+  "overlays": [],
+  "reference_images": [
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/inputs/packages/xindongdaiding-v1/心动待定-视频制作包-v1.0/01-角色参考/夏宁/脸部参考.png",
+      "path": "series_assets/characters/character_001/turnaround.jpeg",
+      "scope": "identity_portrait"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/inputs/packages/xindongdaiding-v1/心动待定-视频制作包-v1.0/01-角色参考/陆川/脸部参考.png",
+      "path": "series_assets/characters/character_005/turnaround.jpeg",
+      "scope": "identity_portrait"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/.runtime/xindong-pilot-20261020/scenes/kitchen.png",
+      "path": "series_assets/locations/location_001/establishing.jpeg",
+      "scope": "location_camera_coverage"
+    }
+  ],
+  "reference_audios": [],
+  "source_seconds": 24,
+  "source_shot_groups": 1,
+  "source_archive": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/inputs/archives/心动待定-视频制作包-v1.0.zip"
+}

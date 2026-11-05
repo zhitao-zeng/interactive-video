@@ -10,10 +10,9 @@ from novel_manga.application.repair import history
 from novel_manga.util import atomic_write_json, read_json
 
 INPUT_LIMIT = 2
-SOURCE_REVIEW_POLICY = 2
-
-
-from .input_recovery_policy import asset_configuration_recoverable, source_review_recoverable, posture_protocol_recoverable
+from .input_recovery_policy import (SOURCE_REVIEW_POLICY, asset_configuration_recoverable,
+                                    source_review_recoverable, posture_protocol_recoverable,
+                                    first_frame_recoverable)
 
 
 def latest_input_records(episode_dir):
@@ -103,6 +102,8 @@ def _standard_input_route(ctx, cid, row=None, *, records=None, image_review_poli
             return 'asset_recovery', path, record
         if posture_protocol_recoverable(record):
             return 'posture_recovery', path, record
+        if first_frame_recoverable(ctx,record):
+            return 'first_frame_recovery', path, record
         if record.get('status') not in {'checking', 'published'} and int(record.get('resume_count', 0)) >= 1:
             raise ValueError('input repair continuation allowance used; keep the incomplete candidate')
         return 'resume', path, record
@@ -176,6 +177,10 @@ def input_receipt(ctx, cid, row, *, image_review_policy=None, check_only=False):
         record[key] = {'at': time.strftime('%F %T'), 'previous_error': record.get('error'),
             'reason': 'Image endpoint configuration repaired' if route == 'asset_recovery' else 'Posture addresses are now schema-owned keys'}
         record['status'] = 'checking'
+    elif route == 'first_frame_recovery':
+        record['first_frame_recovery']={'at':time.strftime('%F %T'),'previous_error':record.get('error'),
+            'reason':'Source correction now waits for the fresh Agent opening before request compilation.'}
+        record['status']='checking'
     elif route == 'resume' and record.get('status') not in {'checking', 'published'}:
         record['resume_count'] = int(record.get('resume_count', 0)) + 1
     elif route == 'upstream_recovery':

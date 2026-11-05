@@ -1,0 +1,119 @@
+{
+  "name": "纸艺志怪",
+  "render_family": "3d",
+  "visual_style": "具有三维体积的纸艺叙事，细纤维、折痕、叠层和柔和透光组成统一材质语言",
+  "render_direction": "人物体积和身份清楚，纸质表面有克制的纤维与层次；服装轮廓、持物和身体事实保持源稿，不自动添加破裂、燃烧或异化",
+  "scene_style": "纸艺微缩实景感的三维空间，建筑与器物由清楚体块、纸层和真实接触阴影组织",
+  "scene_direction": "以纸白、纤维灰和淡矿物色建立基底，重点色按事件分配；纸层提供空间深度，门窗、路线、光源和时段仍按本场设计",
+  "h3_style_line": "Dimensional paper-crafted cinema with fine fibers, folded layers, tactile edges and restrained translucency. Keep faces, hands and objects legible; use a coherent material language and an event-relevant accent color. Preserve authored identity, wardrobe silhouette, explicit material facts, time of day, action, geography and camera viewpoint. No unrequested bodily transformation.",
+  "location_empty_suffix": "无人纸艺空间参考，建筑有体积、通路和可辨门窗；不出现人物、人影、画中人或镜中人；准确文字按项目既定呈现方案处理",
+  "pack_version": "2026-10-19.2",
+  "card_suffix": "",
+  "prompt_fingerprint": false,
+  "tidy_prompts": true,
+  "art_direction": {
+    "intent": "让纸的轻、薄、层叠和透光服务人物感受与故事物件。风格选择不是超自然机制；没有源稿依据时，纸不会自行变形或吞没人物。",
+    "suitable_for": [
+      "东方志怪与诗意短篇",
+      "寓言、回忆和梦境",
+      "以物件回收情绪的温柔故事",
+      "明确选择纸艺表达的超现实叙事"
+    ],
+    "palette": {
+      "base": [
+        "暖纸白与米灰",
+        "纤维褐与淡墨灰",
+        "克制的淡矿物色"
+      ],
+      "accent": [
+        "按本故事确定的朱红、靛青或其他重点色",
+        "原稿明确的重要物件色"
+      ],
+      "use": "让大面积纸色保持层次，重点色对应已存在的人、物或状态变化。不是每个故事都要红花，也不强行把原有彩色服装或物件褪成灰白。"
+    },
+    "lighting": [
+      "柔和侧光显出叠层、折痕和接触阴影，物件保持实体重量。",
+      "局部透光突出薄纸边缘，面部和关键道具不能被通透效果抹去。",
+      "日光、烛光或夜灯取自本场，留白不等于过曝，暗处仍保留必要层次。"
+    ],
+    "composition": [
+      "用前中后纸层建立景深，但不让装饰边缘切断人物动作。",
+      "保留能看懂的地面、门窗和物件位置，纸艺舞台也有明确空间关系。",
+      "给重要动作周围留出安静区域，让手、道具、视线成为一个注意中心。",
+      "按人物情绪选择亲近细节或舞台式全景；不把每个镜头固定成对称盆景。"
+    ],
+    "motifs": [
+      "从源稿已有物件选择一个能反复出现的形状或材质关系。",
+      "同一母题可在构图、色彩和物件状态中回收；变化须有剧情依据。",
+      "纸层、折痕和留白贯穿人物与环境，局部材质差异仍尊重明确设定。"
+    ],
+    "asset_guidance": {
+      "character": [
+        "人物以清楚体积与细纸肌理呈现，保留身份特征、年龄及既定服装形状。",
+        "脸部纹理比建筑细，五官和手指不被粗纤维、撕边覆盖。",
+        "姿势与情绪来自当前动作，静态角色参考不携带固定燃烧、碎裂或花生长状态。"
+      ],
+      "location": [
+        "建筑先有结构与出入口，再用纸层、薄边和细纤维表现表面。",
+        "控制纤维粗细与场景比例，远景不铺满与人物同样清晰的噪纹。",
+        "地点参考图保留既定天气和照明，背景装饰不提前揭示剧情结果。"
+      ],
+      "prop": [
+        "道具的轮廓、开合、折叠与持有状态优先，纸感不改变使用方式。",
+        "普通纸条应有一个清楚折面和边缘，避免多层花饰使它像另一件道具。",
+        "明示金属、玻璃等有叙事作用的材质事实保留，通过周围纸艺世界形成协调。"
+      ]
+    },
+    "pitfalls": [
+      "不要把纸艺固定成身体恐怖；温柔、明亮、日常内容同样适用。",
+      "不要把参考片中的人物、红牡丹、诗句或院落直接当本包资产。",
+      "不要让纸纤维遍布到遮脸，也不要把三维体积压成一张扫描纸。",
+      "象征性颜色可以回收情绪，不能无依据暗示新真相或新规则。"
+    ],
+    "references": [
+      {
+        "title": "《牡丹记》完整版",
+        "url": "https://www.bilibili.com/video/BV1NMokBTE7h/",
+        "observed_method": "2026-10-19实际审看8张全时轴3秒网格、160帧及6张原帧；未连续播放听审。",
+        "lesson": "约00:00–00:57纸感贯穿人、衣、帷幕和建筑；00:39–00:51与06:18–07:00以花色和物件状态回收母题。取统一材质与事件相关重点色的原则。",
+        "limits": "实验短片并非真人对白基准；其剥裂、燃烧、花体异化属于该故事，不是纸艺风格通则。本包尚无生成效果验证。"
+      }
+    ],
+    "sample_prompt": "One complete cinematic frame, 16:9, dimensional paper-crafted cinema. Two original adult strangers stand across a small counter. One adult in a muted indigo paper-textured jacket holds out one plain folded note above the counter; the other adult in an ivory layered coat has not yet accepted it, with both hands still on their own side. Keep the note, holding fingers and the unclosed gap clearly visible. A window is visible behind them on the left and a closed door on the right. Fine warm paper fibers, quiet folded edges, subtle layered construction, soft afternoon side light and tactile contact shadows. The counter and room have solid three-dimensional volume; face textures are delicate and readable. A restrained indigo accent guides attention without decorative clutter. Gentle human encounter, no supernatural event or bodily damage. One complete scene, no panels, no captions, no readable text, no logos, no borrowed identities."
+  },
+  "examples": [
+    {
+      "kind": "original_style_board",
+      "path": "assets/style-library/2026-10-19/paper-folklore/board.png",
+      "scope": "style_only_not_character_identity",
+      "status": "needs_revision",
+      "review": "assets/style-library/2026-10-19/paper-folklore/image-review.json"
+    }
+  ],
+  "validation": {
+    "image": "needs_revision",
+    "video": "short_sample_reviewed",
+    "notes": [
+      "规则与样图只指导色光、材质、构图；源素材的人物身份、事实、衣装、空间与已定机位优先。",
+      "本次实际审看原始2720×1536图片并核对prompt.txt，未听审或检查任何视频。",
+      "单帧只证明此刻未接收，不能证明动作流、先后因果、犹豫节拍或连续身份。",
+      "needs_revision只针对明确的信封替代便条，以及重点色/纸纹程度与所写意图的偏差；不表示纸艺方向不可用。",
+      "‘陌生人’无法由一张图独立证明。未见明显借用人物身份，不是相似性检索结论。",
+      "保留现有候选和证据；没有新API提交，没有改配置状态，没有用第三方影片画面替代原创样张。",
+      "本版补齐三张新样图，并登记七种画风的8步H3短小样；美术规则未变，旧任务保持原快照。",
+      "小样取样审阅不等于完整动作、整集、声音或长时连续性通过；具体偏差见附带审阅。",
+      "仍标needs_revision的唯美/纸艺静帧继续保留问题状态，不因视频风格保持而自动成为可用作者参考。"
+    ],
+    "video_sample": {
+      "path": "delivery/style-h3-h100-20261019/paper-folklore/sample.mp4",
+      "review": "delivery/style-h3-h100-20261019/review-institutional-paper.json",
+      "mode": "H100 H3 Ref2VA / 8step acceleration LoRA / strength1",
+      "seconds": 5.207,
+      "short_edge": 768,
+      "seed": 2101,
+      "num_inference_steps": 9,
+      "scope": "单种子5秒小样，21张4fps样本及关键原帧审阅；非整集、连续播放或声音验收。",
+      "source_config_version": "2026-10-19.1"
+    }
+  }
+}

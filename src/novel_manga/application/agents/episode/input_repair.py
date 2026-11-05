@@ -16,7 +16,7 @@ from .arguments import RepairArgumentError, UnsupportedInput, CompileConflict, v
 from .input_records import (INPUT_LIMIT, SOURCE_REVIEW_POLICY, _phase_groups, effects,
                            remaining_input_attempts, input_receipt, source_review_recoverable,
                            latest_input_records)
-from .input_records import asset_configuration_recoverable, posture_protocol_recoverable
+from .input_records import asset_configuration_recoverable, posture_protocol_recoverable, first_frame_recoverable
 
 from .input_contracts import normalize_arguments, expand_shared_scope, SHOT_NAMES, SHOT_FIELDS
 from .input_compilation import compile_input
@@ -84,6 +84,10 @@ def repair_status(ctx):
             row['resume_action'] = {'clip_id': cid, 'action': 'input', 'resume': True,
                 'reason': 'Continue the unchanged saved candidate after the posture protocol correction'}
             row['next_action'] = 'Resume this candidate once with schema-owned stage/person keys; reuse completed assets and preserve input/video counts.'
+        if first_frame_recoverable(ctx,record):
+            row['resume_action']={'clip_id':cid,'action':'input','resume':True,
+                'reason':'Continue the same source-checked correction into fresh first-frame preparation.'}
+            row['next_action']='Resume this unchanged candidate once after the host ordering fix; all image/video limits and earlier resume counts remain.'
     from .input_records import input_operations
     for cid, row in states.items():
         operations = input_operations(ctx, cid, records=records)
@@ -99,6 +103,52 @@ def repair_status(ctx):
 
 
 from novel_manga.application.repair.source_support import source_check
+
+
+def _source_review_shot_context(before_shots, after_shots, affected_indexes):
+    """Capture approved before-state and native source-shot siblings for source review."""
+    old = {s.get('index', i): s for i, s in enumerate(before_shots, 1)}
+    new = after_shots
+
+    def changed_fields(left, right):
+        fields = []
+        for key in sorted((set(left) | set(right)) - {'index'}):
+            if key == 'turns':
+                lturns, rturns = left.get(key) or [], right.get(key) or []
+                for n in range(max(len(lturns), len(rturns))):
+                    a = lturns[n] if n < len(lturns) else {}
+                    b = rturns[n] if n < len(rturns) else {}
+                    for turn_key in sorted(set(a) | set(b)):
+                        if a.get(turn_key) != b.get(turn_key):
+                            fields.append(f'turns[{n}].{turn_key}')
+            elif left.get(key) != right.get(key):
+                fields.append(key)
+        return fields
+
+    groups = {}
+    for index, shot in old.items():
+        if shot.get('source_shot') is not None and shot.get('source_kind') is not None:
+            groups.setdefault((shot['source_shot'], shot['source_kind']), []).append(index)
+    review = []
+    for index in sorted(affected_indexes):
+        before, after = old[index], new[index]
+        key = (before.get('source_shot'), before.get('source_kind'))
+        sibling_indexes = groups.get(key, [index]) if all(v is not None for v in key) else [index]
+        review.append({
+            **copy.deepcopy(after),
+            'index': index,
+            'before': copy.deepcopy(before),
+            'after': copy.deepcopy(after),
+            'changed_fields': changed_fields(before, after),
+            'reason': '',
+            'source_group': [
+                {'index': sibling, 'source_shot': old[sibling].get('source_shot'),
+                 'source_kind': old[sibling].get('source_kind'),
+                 'shot': copy.deepcopy(new[sibling])}
+                for sibling in sorted(sibling_indexes)
+            ],
+        })
+    return review
 
 
 from .input_assets import local_phases
@@ -280,7 +330,9 @@ def repair(ctx, row, *, check_only=False):
             record['source_review_policy'] = SOURCE_REVIEW_POLICY
             atomic_write_json(receipt, record)
             affected_indexes={i for c in plan['clips'] if c['clip_id'] in targets for i in c.get('shot_indexes',[])}
-            scoped_shots = [shots[i] for i in sorted(affected_indexes)]
+            scoped_shots = _source_review_shot_context(script['shots'], shots, affected_indexes)
+            for context in scoped_shots:
+                context['reason'] = row.get('reason') or ''
             record['source'] = source_check(source, quote, patches, phases, locations, scoped_shots,
                                             **({'characters': characters} if characters else {}))
             atomic_write_json(receipt, record)

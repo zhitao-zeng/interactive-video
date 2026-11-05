@@ -112,16 +112,40 @@ def can_resume_unsubmitted(episode: Path, report: dict) -> bool:
 
 
 def run_episode(root: Path, lane: str, *, project: str = 'adventure', resume_unsubmitted: bool = False, resume: bool = False,
-                edition: str | None = None) -> dict:
+                edition: str | None = None, h3_input_mode: str | None = None,
+                sd_input_mode: str | None = None, agent_config: dict | None = None) -> dict:
+    if sd_input_mode is not None and lane!='sd20-fast':raise ValueError('SD first-frame entry requires sd20-fast')
     if edition:
         novel=edition_directory(root,project,edition)
     else:
         novel=lane_workspace(root,lane,project)
+    if h3_input_mode is not None and lane!='h3':raise ValueError('first-frame mode requires H3')
+    if lane!='h3' and read_json(novel/'profile.json',{}).get('h3_input_mode')=='first-frame':
+        raise ValueError('first-frame mode requires H3; prepare a separate SD edition instead of switching this task')
+    if lane!='sd20-fast' and read_json(novel/'profile.json',{}).get('sd_input_mode')=='first-frame':
+        raise ValueError('Saved SD first-frame edition requires sd20-fast')
+    from .first_frame_entry import select_mode
+    select_mode(novel,h3_input_mode)
+    if sd_input_mode is not None:
+        from .sd_first_frames import select_mode as select_sd_mode
+        select_sd_mode(novel,sd_input_mode)
+    if read_json(novel/'profile.json',{}).get('sd_input_mode')=='first-frame':
+        configure(root,lane,project=project)
+        from .sd_first_frames import prepare as prepare_sd_frames
+        prepare_sd_frames(root,novel)
     episode=novel/(novel.name+'_1')
     runner=runner_for(root,novel,lane,project=project)
     report_path=episode/'thin_media_report.json'
     label=edition.removeprefix(project+'-') if edition else lane
     destination=(root/f'delivery/{project}/{label}').resolve()
+    music_plan=read_json(episode/'chapter_script.json',{}).get('music_plan')
+    if read_json(novel/'profile.json',{}).get('h3_input_mode')=='first-frame'or(lane=='h3'and music_plan):
+        if music_plan and read_json(novel/'profile.json',{}).get('h3_input_mode')!='first-frame':
+            from novel_manga.application.repair.history import generation_counts
+            if any(generation_counts(episode).values()):
+                raise ValueError('Keep this existing production and its take budgets; story-music Agent entry requires a new prepared edition')
+        from .first_frame_entry import run as run_first_frames
+        return run_first_frames(root,novel,project=project,destination=destination,resume=resume,config=agent_config)
     saved_final=read_json(episode/'final_cut_review.json',{})
     saved_movie=Path(saved_final.get('movie') or '')
     if saved_movie.is_file() and saved_movie.parent.parent.name=='versions':

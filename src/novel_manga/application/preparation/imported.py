@@ -2,4 +2,5 @@
 EPISODE_FILES = ('intake.json', 'source_trace.json', 'authored_source.md',
                  'authored_groups.json', 'interaction.json', 'overlays.json',
                  'evidence_surfaces.json', 'delivery_policy.json')
-BOOK_FILES = ('voice_specs.json', 'production-budget.json', 'imported_assets.json')
+BOOK_FILES = ('voice_specs.json', 'production-budget.json', 'imported_assets.json',
+              'layout.json', 'style.json')

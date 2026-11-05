@@ -3,7 +3,8 @@ import json
 from novel_manga.application.agents.episode.arguments import UnsupportedInput
 
 
-def source_check(source, quote, shots, phases, locations=None, scoped_shots=None, *, characters=None):
+def source_check(source, quote, shots, phases, locations=None, scoped_shots=None, *, characters=None,
+                 review_reason=None):
     from novel_manga.llm.client import ask_json, obj
     from novel_manga.review.endpoints import judge_settings
     prompt = ('核对原文与一份局部输入修复候选。判断修改后的入镜人物、群演、听者、地点、光线、外貌、穿戴和姿态衔接是否有原文依据，'
@@ -18,13 +19,20 @@ def source_check(source, quote, shots, phases, locations=None, scoped_shots=None
               'locations 是无人场景参考资产的说明，不是成片镜头；参考图无人不代表成片无人，成片入镜人物以 affected_shots 为准。'
               '资产名称是用于区分地点的标签，不要求逐字出现在原文；窗户、材质等常规美术细节只在与明确原文冲突时否定。'
               '仅核对候选实际修改的字段及其直接依赖，不因未修改的旧稿其他问题否决这项局部修复。'
+              'affected_shots中的每项包含before/after/changed_fields及source_group。before是修改前已批准镜头，after是当前候选；'
+              'changed_fields是宿主比较结果，必须据此判断真实变化。turns.emotion单独变化不是删改对白；只有turns.text、speaker_name、delivery_mode等语义/归属字段变化才需要审查对白。'
+              'source_group列出同source_shot且source_kind相同的原有拆镜及其前后顺序；将它们作为上下文，保留未修改拆镜中的对白和动作。'
+              '不要把未改字段、拆镜保留对白或父source_shot时长预算当成本次修改；仍须拒绝真实改动人物、剧情、对白或确实反转动作先后的候选。'
+              'reason是修复意图提示，不是原文证据，也不授权新增剧情。'
               '原文未逐字描述的正常衣料声、呼吸声、站位、长袍长度、发型等美术实现不是新增剧情；'
               '只拦截明确事实矛盾，不因“未明确说到”推定矛盾。称谓或同义地点标签也不等于换了地点。'
               '不支持或与原文相反的修改给出具体problems；所有修改有依据才consistent=true。'
               'problems仅填写确定的事实矛盾，不能填写“有依据”“符合要求”等肯定说明；没有矛盾必须problems=[]。\n'
               + json.dumps({'source': source, 'source_quote': quote, 'shots': shots,
                             'phases': phases, 'locations': locations or {}, 'characters': characters or {},
-                            'affected_shots': scoped_shots or []}, ensure_ascii=False))
+                            'affected_shots': scoped_shots or [],
+                            'reason': review_reason or next((s.get('reason') for s in (scoped_shots or [])
+                                                             if s.get('reason')), '')}, ensure_ascii=False))
     result = ask_json([{'type': 'text', 'text': prompt}],
         obj({'consistent': {'type': 'boolean'}, 'problems': {'type': 'array', 'items': {'type': 'string'}}}),
         name='episode_input_source', max_tokens=1200, timeout=180, settings=judge_settings())

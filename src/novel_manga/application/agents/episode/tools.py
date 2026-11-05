@@ -31,7 +31,7 @@ class EpisodeTools:
         try:
             if not isinstance(payload, dict) and payload is not None:
                 raise ValueError('tool payload requires an object')
-            if action not in {'check', 'adopt', 'render', 'review', 'apply', 'finish', 'status', 'doctor'}:
+            if action not in {'check', 'adopt', 'render', 'review', 'apply', 'finish', 'status', 'doctor', 'first_frames', 'mix_audio','select_music'}:
                 raise ValueError('unknown episode tool action')
             result = getattr(self, action)(payload or {})
             if action in {'apply', 'finish'}:
@@ -73,3 +73,37 @@ class EpisodeTools:
         report = run_doctor(self.ctx.novel_dir)
         record_state(self.ctx, 'doctor', ok=report['ok'])
         return {'ok': True, 'report': report}
+
+    def first_frames(self, payload):
+        from .first_frames import FirstFrameOperations
+        from novel_manga.util import atomic_write_json
+        def execute(operation):
+            try:
+                result=operation.prepare(payload)
+            except Exception as error:
+                result={'ok':False,**getattr(operation,'partial_outcome',{}),
+                        'error':type(error).__name__+': '+str(error)}
+            atomic_write_json(self.ctx.work_dir/'input/latest-first-frames.json',result)
+            return result
+        draft=input_file(self.ctx,payload,'output/first-frames.json')
+        if not draft.get('render_ready'):
+            return execute(FirstFrameOperations(self.ctx))
+        if draft['render_ready'] is not True:
+            raise ValueError('render_ready must be a boolean')
+        from .local_preparation import source_gate
+        blocked=source_gate(self.ctx)
+        if blocked is not None:return blocked
+        from .first_take_stream import FirstTakeStream
+        with FirstTakeStream(self.ctx,self.media) as stream:
+            result=execute(FirstFrameOperations(self.ctx,on_accepted=stream.submit))
+        result.update(stream.result())
+        atomic_write_json(self.ctx.work_dir/'input/latest-first-frames.json',result)
+        return result
+
+    def mix_audio(self,payload):
+        from .audio_mix import AudioMixOperations
+        return AudioMixOperations(self.ctx,self.media).prepare(payload)
+
+    def select_music(self,payload):
+        from .music import MusicOperations
+        return MusicOperations(self.ctx,self.media).prepare(payload)

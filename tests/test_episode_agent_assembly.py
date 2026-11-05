@@ -316,6 +316,32 @@ def test_finish_does_not_assemble_old_takes_under_a_changed_request(host):
     assert events==['render','review']
 
 
+@pytest.mark.parametrize('changed', ['h3', 'plan', 'notes'])
+def test_finish_rejects_stale_assembled_media_before_any_expensive_work(host, monkeypatch, changed):
+    ctx, tools, events, _ = host
+    tools.dispatch('render')
+    counts = history.generation_counts(ctx.episode_dir)
+    if changed == 'notes':
+        atomic_write_json(ctx.episode_dir/'review_feedback.json', {'clip_01':'current correction'})
+    else:
+        plan = read_json(ctx.episode_dir/'clip_plan.json')
+        if changed == 'h3':
+            plan['clips'][0]['prompt_h3'] += ' A close-up shows the reaction.'
+        else:
+            plan['clips'][0]['request_seconds'] += 1
+        atomic_write_json(ctx.episode_dir/'clip_plan.json', plan)
+    atomic_write_json(ctx.run_dir/'interactive-delivery.json', {'destination':str(ctx.run_dir/'delivery')})
+    monkeypatch.setattr(MediaOperations, 'assemble', lambda *a:pytest.fail('stale assembly'))
+    monkeypatch.setattr(MediaOperations, 'refresh_technical_policy', lambda *a:pytest.fail('stale technical inspection'))
+    monkeypatch.setattr('novel_manga.interactive.delivery.reviewed_delivery',
+                        lambda *a:pytest.fail('stale export or whole-movie review'))
+    result = tools.dispatch('finish')
+    assert result['ok'] is False and result['error'] == 'stale_media'
+    assert result['required_action'] == 'render'
+    assert events == ['render', 'review', 'assemble']
+    assert history.generation_counts(ctx.episode_dir) == counts
+
+
 def test_missing_take_keeps_partial_work_without_generation_or_assembly_at_finish(host):
     ctx,tools,events,state=host
     state['missing']=['clip_01']
