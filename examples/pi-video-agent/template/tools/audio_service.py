@@ -90,7 +90,7 @@ class AudioService:
                     started = time.monotonic()
                     response = self.model.generate([{'role': 'user', 'content': [
                         {'type': 'audio_url', 'audio_url': {'url': str(audio)}},
-                        {'type': 'text', 'text': '只依据实际音频转录听清的中文，描述说话人数、音乐环境声、可懂度、爆音和异常断音。听不清就说明，不推测剧情。'}]}],
+                        {'type': 'text', 'text': row.get('question') or '只依据实际音频转录听清的中文，描述说话人数、音乐环境声、可懂度、爆音和异常断音。听不清就说明，不推测剧情。'}]}],
                         max_new_tokens=int(job['runtime'].get('max_new_tokens', 256)), do_sample=False)
                     output.parent.mkdir(parents=True, exist_ok=True)
                     output.write_text(json.dumps({'model': 'Eureka-Audio-Instruct', 'device': self.device,

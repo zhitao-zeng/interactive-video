@@ -91,7 +91,7 @@
       "path": "template/audio-runtime.example.json",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/audio-runtime.example.json",
       "source_sha256": "44459bdf7f57efc661bbf37651e6ad3484901834bbb5aa6d29fab6231557e238",
-      "merged_sha256": "44459bdf7f57efc661bbf37651e6ad3484901834bbb5aa6d29fab6231557e238"
+      "merged_sha256": "5c41cafc783b6a00af3f2075be3798c99e8e6033dc3db4dab81a24046a80de0c"
     },
     {
       "path": "template/reviewer-skill/SKILL.md",
@@ -158,13 +158,13 @@
       "path": "template/tools/audio_service.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/tools/audio_service.py",
       "source_sha256": "32cddda5773f2588c5e9b228bdb9567168b01e7f2cc7d5f3b1047fbb0391d255",
-      "merged_sha256": "32cddda5773f2588c5e9b228bdb9567168b01e7f2cc7d5f3b1047fbb0391d255"
+      "merged_sha256": "5f4b74bd6a66bc952e4ae9ec0f70fd2b2df312f8e239016ad27dc85523aac238"
     },
     {
       "path": "template/tools/audio_worker.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/tools/audio_worker.py",
       "source_sha256": "c8847e0422444d73ba5810dd074c4916106aa3607425c8b92a2a0a4af65bc4a2",
-      "merged_sha256": "c8847e0422444d73ba5810dd074c4916106aa3607425c8b92a2a0a4af65bc4a2"
+      "merged_sha256": "64be39bf5d3f6768551e2d0350fdedf0bc4b35fd73cc509c67e128e31ae7742c"
     },
     {
       "path": "template/tools/bash_limits.mjs",
@@ -195,7 +195,7 @@
       "path": "template/tools/media.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/tools/media.py",
       "source_sha256": "0307bf9b1beda097f4fb66b03bd1c015356be26f5a5260fa98e6c8ac5402e3ff",
-      "merged_sha256": "7beae667f6d470b8e6cae2d35484dbb43ae5e988356924ae9be061c7d0b037c1"
+      "merged_sha256": "4a8d202eee173efecc6d5c4bfa54cf0bc30d860e472498e28f874a69f81e8134"
     },
     {
       "path": "template/tools/plan.example.py",

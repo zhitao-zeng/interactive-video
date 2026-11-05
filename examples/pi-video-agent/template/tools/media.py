@@ -225,6 +225,8 @@ def perceive_audio(request):
             subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-ss', str(start),
                 '-i', str(source), '-t', str(end-start), '-vn', '-ac', '1', '-ar', '16000', str(audio)], check=True)
         jobs.append({'audio': str(audio), 'output': str(output), 'source_window': window})
+        if request.get('question'):
+            jobs[-1]['question'] = request['question']
     if not jobs:
         raise ValueError('Supply at least one audio window.')
     def observations():
