@@ -23,9 +23,35 @@ class ReferenceMaterials:
 
     def _restore_image_url(self, image: ImageResult) -> str:
         """The reference as the video request carries it: asset://id when the asset library is on, else the hosted URL."""
+        if (getattr(self.settings, 'video_model', '') == 'MiniMax-H3'
+                and getattr(self.settings, 'phanrouter_asset_public_base', None)
+                and not self.settings.inline_reference_images):
+            return self._published_image_url(image.path)
         if getattr(self.settings, "reference_images_via_assets", False) and not self.settings.inline_reference_images:
             return self._asset_reference(image)
         return self._hosted_image_url(image)
+
+
+    def _published_image_url(self, path: Path) -> str:
+        """Cloud H3 needs HTTP references even for local cards/crops without image tasks."""
+        from urllib.parse import quote
+        from ..media.publish import publish_file, publish_root
+        root = publish_root(getattr(self.settings, 'output_root', None))
+        published = publish_file(path, root, reference=True)
+        # publish_file already computed the existing content-keyed layout.
+        # Build from its returned path rather than reading/hashing the card again.
+        relative = '/'.join(quote(part, safe='') for part in published.relative_to(root).parts)
+        url = self.settings.phanrouter_asset_public_base.rstrip('/') + '/' + relative
+        try:
+            probe = self.client.head(url, timeout=min(self.settings.request_timeout, SUBMIT_TIMEOUT_SECONDS),
+                                     headers={'ngrok-skip-browser-warning': '1'}, follow_redirects=True)
+        except httpx.HTTPError as error:
+            raise RuntimeError(f'{path.parent.name}/{path.name}: public reference probe failed '
+                               f'({type(error).__name__}); check PHANROUTER_ASSET_PUBLIC_BASE') from None
+        if probe.status_code != 200:
+            raise RuntimeError(f'{path.parent.name}/{path.name}: public reference probe HTTP {probe.status_code}; '
+                               'check PHANROUTER_ASSET_PUBLIC_BASE and its publish directory')
+        return url
 
 
     def public_card_url(self, path: Path, digest: str) -> str:

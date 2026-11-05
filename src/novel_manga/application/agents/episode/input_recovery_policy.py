@@ -4,6 +4,17 @@ from .input_effects import _phase_groups
 
 SOURCE_REVIEW_POLICY=3
 
+
+def asset_image_recoverable(record):
+    """Resume an unchanged source-approved picture failure, not its text allowance."""
+    return (record.get('status') in {'rejected', 'incomplete'}
+            and record.get('step') in {'character_assets', 'draft_assets', 'assets'}
+            and not record.get('published') and bool(record.get('decision'))
+            and (record.get('source') or {}).get('consistent') is True
+            and not (record.get('source') or {}).get('problems')
+            and not (record.get('asset_image_review') or {}).get('exhausted')
+            and 'generated asset failed image review' in str(record.get('error', '')))
+
 def asset_configuration_recoverable(ctx, record):
     """One unchanged continuation for the observed pre-request image-port failure."""
     if (record.get('status') != 'incomplete' or record.get('step') != 'assets'
