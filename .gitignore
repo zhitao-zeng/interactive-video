@@ -39,3 +39,11 @@ assets/
 /projects/**/assets
 /projects/**/series_assets
 /projects/**/source/images
+
+# Pi Agent local assets and editable run workspaces
+examples/pi-video-agent/series-assets/**/*.png
+examples/pi-video-agent/series-assets/**/*.jpg
+examples/pi-video-agent/series-assets/**/*.jpeg
+examples/pi-video-agent/series-assets/**/*.webp
+examples/pi-video-agent/**/__pycache__/
+examples/pi-video-agent/**/*.pyc

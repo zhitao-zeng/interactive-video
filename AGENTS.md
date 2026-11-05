@@ -7,10 +7,11 @@ Use temporary development branches from main. Project source files live together
 with project production/service overrides in `configs/interactive.json`. Old content worktrees retain
 historical data and already-running jobs; they are no longer separate production-code authorities.
 
-The default creation path is a complete material package or original brief → one creative Agent →
-screenplay, storyboard, interaction and spatial design. Use `scripts/interactive_video.py create`;
-do not prepend the novel reading/planning workflow or have the coordinating session write the story.
-Host workflows validate and execute; content decisions and corrections belong to the Agent.
+The default production path for new tasks is `scripts/pi_video_agent.py`: one autonomous creator/director
+Agent works in an isolated editable workspace, using the complete Pi template and original inputs.
+Legacy `create/produce/produce-batch` remain only for existing edition recovery with original paths,
+sessions and budgets; do not dispatch new production through legacy host stages or prepend the novel workflow.
+Host code protects inputs, credentials, real receipts and budgets; content decisions belong to the Agent.
 Approved structured material can enter preparation directly without rewriting it.
 
 The current user explicitly authorized local snapshots, integration into main after tests, and merging

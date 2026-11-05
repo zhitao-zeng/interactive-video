@@ -45,6 +45,30 @@ The 2026-10-15 short pilot combined front-loaded performance and removal of audi
 conditioning, and the user preferred it. This is a selected production convention,
 not proof of universal naturalness or perfect cross-clip timbre consistency.
 
+## Per-character voice definition
+
+Give each speaking character one fixed English voice phrase, written once in that
+character's `subject_definitions` entry. It covers pitch and resonance, age and
+manner, and one stable speech habit. Do not repeat it on every line and do not use
+it in place of the per-line `emotion`.
+
+- `<Subject 1> ... Her voice is a warm, clear young adult Mandarin female voice, mid-low pitch, unhurried and conversational.`
+- `<Subject 2> ... Her voice is a high-pitched, bubbly, childish girl voice that lands the last word softly.`
+
+Keep the phrase identical in every shot of the episode. The voice phrase says who
+is speaking; the per-line `emotion` says what this line is doing. Without an audio
+reference this phrase is the only voice identity the model receives. With an
+`<Audio>` reference the reference supplies timbre and prosody; the phrase still
+keeps a new take from silently re-casting the character.
+
+Evidence (2026-10-31, same service, same scene and line, P00 of the candy short):
+adding only `Her voice is a high-pitched, bubbly, childish cute girl voice.` moved
+our take from 254 Hz / 5.07 characters per second to 296 Hz / 4.67, and tightened
+pitch spread from 8.5 to 8.0 semitones (SD 2.8 to 2.5). The reference take whose
+prompt named the voice and an emotion measured 286 Hz / 3.65; that take had a
+different line count, so the cross-project number is directional. The 254 to 296
+shift is the controlled result: only the voice phrase changed.
+
 ## Physical sound and private thought
 
 Write synchronized sounds beside their actual causes. `overall_soundscape`

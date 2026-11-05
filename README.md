@@ -3,11 +3,15 @@
 探险、恋综、悬疑共用一套维护主线。正式代码入口为
 `/mnt/disk1/zengzhitao/interactive-video-worktrees/main`，通过项目参数选择内容。
 
-默认路径是：**完整素材包或创作意图 → 单个创作 Agent → 剧本、分镜与互动选择 → 制作、独立审片和修复**。
+新任务默认路径是：**原始素材包/创作意图 → 单个完全自主的创作/导演 Agent → 真实媒体、检查、修复、剪辑与交付**。
+统一入口为 `scripts/pi_video_agent.py`，详见[完全 AGENT 生产](docs/pi-agent-production.md)。
+旧 `create/produce/produce-batch` 只用于历史 edition 恢复，不再承担新任务生产。
 读书、分章及小说规划属于独立小说项目，不是这里的前置流程。
-Agent 负责内容判断；程序负责来源/格式校验、工具执行、媒体装配、预算、缓存和交付。
+Agent 负责内容判断与执行选择；程序保护来源、凭据、真实回执、预算和历史产物。
 
-## 从素材包创作
+## 旧主线创作与恢复
+
+以下入口只用于历史 edition 的原路径恢复，不是新任务默认生产线。
 
 任务 JSON 示例（由调用端保存，原始 ZIP 保留）：
 
@@ -32,21 +36,20 @@ PYTHONPATH=src .venv/bin/python scripts/interactive_video.py create \
 `--resume --feedback /path/to/review.md`；可用 `--config` 选择任务级作者配置。
 旧 `scripts/creative_agent.py` 是同一创作实现的专用入口，既有任务可以继续使用。
 
-## 制作已批准的素材
+## 旧主线生产（仅历史恢复）
 
-原创任务可直接进入完整试制，创作 Agent 同时提供人物、场景与道具设计：
+历史原创任务只能在原目录按原预算恢复：
 
 ```bash
 PYTHONPATH=src .venv/bin/python scripts/interactive_video.py produce \
   --task /path/to/original-task.json \
-  --output-dir .runtime/original-film --edition suspense-original-film
+  --output-dir .runtime/original-film --edition suspense-original-film --resume
 ```
 
-任务使用 `mode: original`、`project`、`brief`、`target_seconds` 和可选 `style`。
-这个入口授权媒体制作：自动衔接创作、素材、首帧、H3、配乐及现有审片返修。
-默认每镜新首帧、无音色参考、分段后期配乐，保留原生对白和环境音。
-失败后在同一命令追加 `--resume`，保留原作者、已生成素材、候选及拍摄额度。
-`create` 仍只交创作稿；改编、世界介绍卡或显式锁定音色继续使用已批准素材入口。
+任务使用原 `mode: original`、`project`、`brief`、`target_seconds` 和可选 `style`。
+该入口保留旧任务的创作、素材、首帧、H3、配乐及审片记录，不用于新任务。
+恢复必须追加 `--resume`，保留原作者、已生成素材、候选及拍摄额度。
+新创作与新制作统一使用上方的完全 AGENT 入口。
 
 ```bash
 PYTHONPATH=src .venv/bin/python scripts/interactive_video.py prepare \
