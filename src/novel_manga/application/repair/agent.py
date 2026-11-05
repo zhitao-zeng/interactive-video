@@ -237,6 +237,10 @@ def propose(directory: Path, clip: dict, verdict: dict, *, config=None, rejectio
             config={**config,'max_thinking_tokens':0}
         if (repair.get('output_config') or {}).get('effort'):
             config={**config,'effort':repair['output_config']['effort']}
+    from novel_manga.llm.catalog import select_agent
+    config = select_agent(config, explicit=explicit_config or bool(profile.get('repair_agent_endpoint') or model))
+    from novel_manga.llm.policy import agent_policy
+    config = {**agent_policy(config, 'repair'), 'task_role': 'repair'}
     config = {**config, 'extra_body':{**(config.get('extra_body') or {}),
                 'tool_choice':(config.get('extra_body') or {}).get('tool_choice') or
                               {'type':'auto','disable_parallel_tool_use':True}},

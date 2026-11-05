@@ -105,7 +105,7 @@ class EpisodeInspection:
         frames=first_frame_status(self.ctx,plan)
         from .readiness import next_action
         ready=next_action(self.ctx,{'job':read_json(self.ctx.run_dir/'agent-run.json',{}).get('job'),
-                                    'input_repairs':input_states})
+                                    'input_repairs':input_states,'first_frames':frames})
         from .audio_mix import status as audio_mix_status
         audio=audio_mix_status(self.ctx)
         from .music import status as music_status
