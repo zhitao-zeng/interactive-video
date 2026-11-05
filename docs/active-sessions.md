@@ -280,3 +280,5 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | ZCode #12+会话退化修复 | ①create_context目录发现:无显式output_root时探测firstframes/music/agent三约定既有run,CLI retry续真状态(冒烟已验:verify edition解析到firstframes真实目录);②默认作者配置切快速档(thinking off+effort low+16k,修复线同款),传导链有测试;2新测试,全量4053连两轮绿 | main(783b0c4) | context.py、configs/agent_sandbox.json、tests/test_agent_run_discovery.py | 2026-10-22 | 已提交;verify edition下次resume即用快速档;并行瞬态(一轮11败)已定位为与sd线资源竞争,复跑全绿 |
 
 | Codex 10小时协助ZCODE20261023 | 用户授权给原ZCODE会话指令并协助完成今早10点前知遥20集成片；协助窗口至11:56 | codex/zcode-supervision-20261023 | 仅自有协调runtime/必要独立诊断；生产单写者ZCODE，旧恋综暂不处理 | 2026-10-23 01:56 | 在途：原ZCODE已收到指令并ACK，34项相关独立回归过；定位原会话session_7acef82aafd79b10dac6e5f434e1cf08，核对真实隔离产线；不清额度/历史，不把candidate或blocked误称accepted；以20个完整导出文件验收。 |
+
+| Codex Pi可编辑初版20261028 | 可修改初版已交付，原生工具开放 | codex/pi-editable-starter-20261028 | examples/pi-video-agent/；.runtime/pi-editable-v1为现有素材工作副本 | 2026-10-28 | 已收工：7项离线验证过（Pi编辑执行及原生恢复、实际SDK附件/SD首帧/H3绑定、付费重发边界、ffmpeg新剪辑）；完整Skill+六方法已复制。新成片/模型/GPU/上传0；未提交、未合主线、未推送。下一步按具体制作任务编辑TASK.md并运行副本；不改旧任务。 |
