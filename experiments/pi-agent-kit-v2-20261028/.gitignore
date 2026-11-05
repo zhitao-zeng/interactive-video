@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+series-assets/*/*.png
+series-assets/*/*.jpg
+series-assets/*/*.jpeg
+series-assets/*/*.webp
