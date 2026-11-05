@@ -16,7 +16,7 @@ from .arguments import RepairArgumentError, UnsupportedInput, CompileConflict, v
 from .input_records import (INPUT_LIMIT, SOURCE_REVIEW_POLICY, _phase_groups, effects,
                            remaining_input_attempts, input_receipt, source_review_recoverable,
                            latest_input_records)
-from .input_records import asset_configuration_recoverable, posture_protocol_recoverable
+from .input_records import asset_configuration_recoverable, posture_protocol_recoverable, first_frame_recoverable
 
 from .input_contracts import normalize_arguments, expand_shared_scope, SHOT_NAMES, SHOT_FIELDS
 from .input_compilation import compile_input
@@ -84,6 +84,10 @@ def repair_status(ctx):
             row['resume_action'] = {'clip_id': cid, 'action': 'input', 'resume': True,
                 'reason': 'Continue the unchanged saved candidate after the posture protocol correction'}
             row['next_action'] = 'Resume this candidate once with schema-owned stage/person keys; reuse completed assets and preserve input/video counts.'
+        if first_frame_recoverable(ctx,record):
+            row['resume_action']={'clip_id':cid,'action':'input','resume':True,
+                'reason':'Continue the same source-checked correction into fresh first-frame preparation.'}
+            row['next_action']='Resume this unchanged candidate once after the host ordering fix; all image/video limits and earlier resume counts remain.'
     from .input_records import input_operations
     for cid, row in states.items():
         operations = input_operations(ctx, cid, records=records)

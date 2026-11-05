@@ -26,7 +26,7 @@ from novel_manga.llm.client import ask_json, image_part
 from novel_manga.application.profiles import h3_compile_inputs, h3_prompt_outdated, h3_source_digest, h3_stamp
 from novel_manga.application.production.runs import corrections
 
-from novel_manga.util import atomic_write_json  # noqa: E402
+from novel_manga.util import atomic_write_json, read_json  # noqa: E402
 from novel_manga.story.h3 import request_issues, stages_of, subject_lines, asset_subjects, compose, tag_names, CJK, CHARACTER_TRAIT, REQUEST_CONTENT_RULES
 
 ENGLISH_CHARACTERS = r'[^\u4e00-\u9fff]'
@@ -148,9 +148,24 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
 
     # The stamp this conversion writes is versioned ("2:<digest>") and covers the reference
     # seating; a bare stamp from before is compared under the old formula instead.
+    from novel_manga.story.voice_delivery import native_speech_errors, native_speech_selected
+    if speech_errors := native_speech_errors(clip):
+        return reject('; '.join(speech_errors))
     from novel_manga.application.profiles import h3_stamp
     stamp = h3_stamp(clip, note)
-    if clip.get("prompt_h3_of") == stamp and clip.get("prompt_h3") and not request_issues(clip):
+    reference_rejection = ''
+    if episode_dir is not None and clip.get('prompt_h3'):
+        saved = read_json(episode_dir/'work/request_checks'/f"{clip['clip_id']}.json", {})
+        answer = saved.get('answer') or {}
+        if (saved.get('inputs', {}).get('english') == clip['prompt_h3']
+                and (answer.get('consistent') is not True or answer.get('problems'))):
+            from novel_manga.application.preparation.request_check import current_request
+            checked = current_request(episode_dir, clip)
+            if checked.get('consistent') is not True or checked.get('problems'):
+                reference_rejection = 'Request/reference validation rejected the previous English: ' + '; '.join(
+                    checked.get('problems') or ['Request and references are not consistent'])
+    if (clip.get("prompt_h3_of") == stamp and clip.get("prompt_h3") and not request_issues(clip)
+            and not reference_rejection):
         return False
     stages = stages_of(prompt)
     if not stages and clip.get('prompt_compiler') == 'romance_conversation_v1':
@@ -242,7 +257,7 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
                         ['', *[re.escape(m) for m in markers], '']) + '$'}
         directions.append(contract)
     schema['properties']['shots'].update(prefixItems=directions, items=False)
-    problem = ''
+    problem = reference_rejection
     endpoint = h3_translation_endpoint()
     run_id = time.strftime('%Y%m%d-%H%M%S')
     for attempt in range(1, tries + 1):
@@ -250,7 +265,17 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
         try:
             feedback = ('\nPrevious response was rejected: ' + problem + '\n') if problem else ''
             overlay_rules=POST_OVERLAY_RULES if context.get('postproduction_overlays') else ''
-            text = (ASK + INPUT_RULES + music_rules + overlay_rules + feedback + naming + '\nInput context:\n'
+            response_rules = (f'Return a JSON object with shots containing exactly {len(visuals)} items, one per numbered input shot. '
+                'Keep the complete starting state, action and ending of each shot in that single item. '
+                'Put physical sound in the separate top-level soundscape field, never as another shots item. '
+                'Return source conflicts in the top-level conflicts array.\n')
+            acting_rules=ASK
+            if native_speech_selected(clip):
+                start=acting_rules.index('Write its vocal delivery once')
+                end=acting_rules.index('Use only supplied Subject tags')
+                acting_rules=acting_rules[:start]+('The host supplies each bound emotion as English performance immediately before its dialogue slot. '
+                    'Keep only the physical acting and dialogue marker in shots; do not repeat or paraphrase that vocal direction or move it to soundscape. ')+acting_rules[end:]
+            text = (acting_rules + INPUT_RULES + music_rules + overlay_rules + response_rules + feedback + naming + '\nInput context:\n'
                     + json.dumps(context, ensure_ascii=False) + '\nShots:\n'
                     + '\n'.join(f'{i}. {visual}' for i, visual in enumerate(visuals, 1)))
             print(f"{clip.get('clip_id', 'clip')}: h3prompt model={endpoint.model}", file=sys.stderr, flush=True)
@@ -275,7 +300,10 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
             music = answer.get('music', '') if clip.get('music_cues') else ''
             if clip.get('music_cues') and (not isinstance(music, str) or not music.strip()):
                 raise ValueError('authored music requires English music directions')
-            if len(english) != len(visuals) or not all(english):
+            if len(english) != len(visuals):
+                raise ValueError(f'shots requires exactly {len(visuals)} items; received {len(english)}. '
+                    'Keep an ending in its shot paragraph and sound in the top-level soundscape field.')
+            if not all(english):
                 raise ValueError('one nonempty direction is required for each shot')
             for i, sentence in enumerate(english):
                 if re.findall(r'<DIALOGUE_\d+>', sentence) != slots[i]:
@@ -291,6 +319,11 @@ def convert(clip: dict, tries: int = TRIES, note: str = "", *, episode_dir: Path
             conflicts = request_issues({**clip, 'prompt_h3': candidate})
             if conflicts:
                 raise ValueError('; '.join(conflicts))
+            if reference_rejection:
+                checked = current_request(episode_dir, {**clip, 'prompt_h3': candidate})
+                if checked.get('consistent') is not True or checked.get('problems'):
+                    raise ValueError('Request/reference validation: ' + '; '.join(
+                        checked.get('problems') or ['Request and references are not consistent']))
             clip['prompt_h3'] = candidate
             clip['prompt_h3_of'] = stamp
             merge_correction_into_prompt()

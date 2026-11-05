@@ -369,11 +369,27 @@ def test_dialogue_correction_argument_retains_inner_voice_and_new_words(setup):
 
 
 @pytest.mark.parametrize('correct_owner',[False,True])
-def test_source_checked_dialogue_revision_runs_real_compilation_and_preserves_other_clips(setup,monkeypatch,correct_owner):
+@pytest.mark.parametrize('frame_seconds',[None,15,3])
+def test_source_checked_dialogue_revision_runs_real_compilation_and_preserves_other_clips(setup,monkeypatch,correct_owner,frame_seconds):
     from novel_manga.application.agents.episode.requests import compose_request
     from novel_manga.application.profiles import h3_stamp
     from novel_manga.story.voice_delivery import visual_request
     ctx,before,shared=setup
+    frame=None
+    if frame_seconds is not None:
+        from novel_manga.media.first_frames import opening_contract
+        clip=before['clips'][0]
+        clip['first_frame']={'path':'opening.png','extra_references':[],'visible_characters':['甲'],
+            'source_contract':opening_contract(clip,[]),'review':{'consistent':True,'problems':[]}}
+        frame=copy.deepcopy(clip['first_frame'])
+        script=read_json(ctx.episode_dir/'chapter_script.json')
+        script['shots'][0]['duration_seconds']=frame_seconds
+        clip['request_seconds']=max(4,frame_seconds)
+        clip['shot_timing']=[{'seconds':frame_seconds,'cut':''}]
+        clip['seconds_estimate']=frame_seconds
+        atomic_write_json(ctx.episode_dir/'chapter_script.json',script)
+        atomic_write_json(ctx.episode_dir/'clip_plan.json',before)
+        atomic_write_json(ctx.novel_dir/'profile.json',{'h3_input_mode':'first-frame'})
     atomic_write_json(ctx.novel_dir/'story_bible.json',{'novel_title':'Book','genre':'fantasy',
         'visual_style':'3d','palette':'natural','style_fingerprint':'fixture','locations':['房间'],
         'characters':[{'name':n,'appearance':'adult','wardrobe':'robe'} for n in ('乙','甲')]})
@@ -411,6 +427,7 @@ def test_source_checked_dialogue_revision_runs_real_compilation_and_preserves_ot
     result=input_repair.repair(ctx,decision(shots=[{'index':1,'turns':[new_turn]}]))
     after=read_json(ctx.episode_dir/'clip_plan.json')
     assert result['changed']==['clip_01']
+    if frame is not None:assert after['clips'][0]['first_frame']==frame
     assert after['clips'][0]['lines'][0]['text'].rstrip('。.')==new_turn['text'].rstrip('。.')
     assert after['clips'][0]['lines'][0]['speaker_name']==new_turn['speaker_name']
     assert bool(after['clips'][0]['lines'][0].get('inner_monologue'))==bool(new_turn.get('inner_monologue'))
@@ -1456,3 +1473,60 @@ def test_input_operations_follow_the_same_granted_new_candidate_route(setup):
     changed = decision(shots=[{'index':1,'light':'日光'}])
     path, _ = input_repair.input_receipt(ctx, 'clip_01', changed, check_only=True)
     assert path.name == 'clip_01-2.json'
+
+
+def pending_opening(setup):
+    from novel_manga.media.first_frames import opening_contract
+    ctx,plan,_=setup
+    atomic_write_json(ctx.novel_dir/'profile.json',{'h3_input_mode':'first-frame'})
+    shots=read_json(ctx.episode_dir/'chapter_script.json')['shots']
+    c=plan['clips'][0]
+    c['first_frame']={'path':'opening.png','extra_references':[],'visible_characters':[],
+        'source_contract':opening_contract(c,[],shots=[shots[0]]),'review':{'consistent':True,'problems':[]}}
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',plan)
+    return ctx,plan,decision(shots=[{'index':1,'start_state':'站在积水台面，灰鞋尖可见'}])
+
+
+def test_source_opening_change_waits_for_agent_frame_before_any_translation(setup,monkeypatch):
+    from novel_manga.media.first_frames import require_current
+    ctx,before,row=pending_opening(setup)
+    def forbidden(*a,**kw):raise AssertionError('obsolete opening must not invoke translation')
+    monkeypatch.setattr('novel_manga.application.rendering.h3.convert',forbidden)
+    result=input_repair.repair(ctx,row)
+    after=read_json(ctx.episode_dir/'clip_plan.json')
+    assert result['changed']==['clip_01']
+    assert after['clips'][0]['first_frame']==before['clips'][0]['first_frame']
+    assert not after['clips'][0].get('prompt_h3') and after['clips'][0].get('prompt_h3_skip')
+    assert after['clips'][1:]==before['clips'][1:]
+    with pytest.raises(ValueError,match='stale'):
+        require_current(ctx,after['clips'][0])
+    assert history.generation_counts(ctx.episode_dir)=={}
+
+
+def test_observed_old_opening_translation_failure_has_one_same_candidate_recovery(setup):
+    from novel_manga.application.agents.episode import input_records
+    ctx,_,row=pending_opening(setup)
+    p=ctx.episode_dir/'work/input_repairs/clip_01-1.json'
+    record={'clip_id':'clip_01','decision':row,'source':{'consistent':True,'problems':[]},
+        'status':'incomplete','step':'translate:clip_01','resume_count':1,
+        'error':'ValueError: input repair H3 translation rejected clip_01: shots requires exactly 1 items; received 2.'}
+    atomic_write_json(p,record)
+    path,continued=input_records.input_receipt(ctx,'clip_01',row)
+    assert path==p and continued['resume_count']==1
+    assert continued['first_frame_recovery']['previous_error']==record['error']
+    assert len(list(p.parent.glob('clip_01-*.json')))==1
+    continued['status']='incomplete';atomic_write_json(p,continued)
+    with pytest.raises(ValueError,match='continuation allowance used'):
+        input_records.input_receipt(ctx,'clip_01',row)
+
+
+def test_non_frame_input_does_not_gain_opening_recovery(setup):
+    from novel_manga.application.agents.episode import input_records
+    ctx,_,row=pending_opening(setup)
+    atomic_write_json(ctx.novel_dir/'profile.json',{})
+    p=ctx.episode_dir/'work/input_repairs/clip_01-1.json'
+    atomic_write_json(p,{'clip_id':'clip_01','decision':row,'source':{'consistent':True,'problems':[]},
+        'status':'incomplete','step':'translate:clip_01','resume_count':1,
+        'error':'ValueError: input repair H3 translation rejected clip_01: invalid response'})
+    with pytest.raises(ValueError,match='continuation allowance used'):
+        input_records.input_receipt(ctx,'clip_01',row)

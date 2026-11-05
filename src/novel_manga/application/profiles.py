@@ -199,9 +199,15 @@ def plan_fingerprint(plan: dict) -> str:
          [(row.get("speaker_name"), row.get("chat_target", ""), row.get("text")) for row in clip.get("chat_lines", [])])
         for clip in plan.get("clips", [])
     ]
+    speech=[(c['clip_id'],c['h3_speech_policy'],[(r.get('stage'),r.get('speaker_name'),r.get('text'),r.get('emotion'))for r in c.get('dialogue_bindings',[])])
+            for c in plan.get('clips',[])if c.get('h3_speech_policy')]
+    if speech:material.append(('native_speech',speech))
     retakes = [(c['clip_id'],c['repair_take']) for c in plan.get('clips',[]) if c.get('repair_take')]
     if retakes:
         material.append(('repair_takes',retakes))
+    frames=[(c['clip_id'],{k:c['first_frame'].get(k) for k in ('path','extra_references','visible_characters')})
+            for c in plan.get('clips',[]) if c.get('first_frame')]
+    if frames:material.append(('first_frames',frames))
     crowds=[(c['clip_id'],c['crowd_roles']) for c in plan.get('clips',[]) if c.get('crowd_roles')]
     if crowds:
         material.append(('crowd_roles',crowds))
@@ -225,6 +231,10 @@ def h3_compile_inputs(clip: dict) -> dict:
     from novel_manga.story.voice_delivery import visual_request
     clip = visual_request(clip)
     inputs: dict = {'compiler_policy': 'h3-unified-direction-v2', 'references': [(r.get('role'), r.get('name'), r.get('path')) for r in (clip.get('references') or [])]}
+    if clip.get('h3_speech_policy'):
+        inputs['h3_speech_policy']=clip['h3_speech_policy']
+    if clip.get('first_frame'):
+        inputs['first_frame']={k:clip['first_frame'].get(k) for k in ('path','extra_references','visible_characters')}
     speakers={r.get('speaker_name')for r in clip.get('dialogue_bindings',[])}
     individual=sorted(name for name,role in (clip.get('crowd_roles')or{}).items()
                       if role.get('count')==0 and name in speakers)
