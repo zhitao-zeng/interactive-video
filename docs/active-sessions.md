@@ -475,3 +475,5 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | Codex README结构接口功能重写20261105 | 用户要求重写仓库首页，介绍当前结构/接口/功能 | codex/readme-structure-20261105 | README.md、维护记录；不改生产代码 | 2026-11-05 | 已完成README重写：组件关系图、源码/部署目录、功能、init/run/resume/batch/独审接口、路线/首帧能力、JSON工具与产物；26链接和锚点、Bash/JSON示例语法、CLI帮助核对通过。仅README及维护记录，无生产代码/任务修改；合入main发布。 |
 
 | Codex 独审并发提升20261105 | 用户要求提高本批独立审片并发，先2→4 | codex/review-concurrency-20261105 | pi_episode_lanes.py、调度回归、入口文档；只换父调度不换在途Agent | 2026-11-05 | 已上线18:32:49：Gen9独审2→4，原5制作/2审片PID、会话、运行副本与额度保全；新增03C/10C复审实际调用模型，共4场，声检队列0。36相关回归通过，--review-workers默认2、本批4，制作容量不变。主线快进推送，证据dispatch-generation-9/{handoff-result,live-verification}.json。 |
+
+| Codex 最后三部授权收尾与第二季发布20261105 | 用户批准03A30min、06C/10C各15min，45部通过后新ModelScope数据集 | codex/authorized-resume-20261105 | 原会话授权恢复入口、回归；批次授权历史与发布目录 | 2026-11-05 | 原额度/任务/会话均保留；补授权续跑不能冒充Connectionerror，走同一协调器正常resume；独审通过后按第一季40部数据集样式发布第二季45部。 |

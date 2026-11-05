@@ -547,6 +547,43 @@ def test_granted_repair_uses_grant_launcher_and_preserves_stopped_runtime(tmp_pa
     assert (work/'session-path.txt').read_text()=='original-session.jsonl'
 
 
+def test_authorized_unfinished_resume_consumes_time_via_normal_launcher_not_connection_recovery(tmp_path, monkeypatch):
+    work = tmp_path / 'original'
+    (work / 'tools').mkdir(parents=True)
+    budget = {'started_at': 123, 'deadline_at': 1, 'provider_requests': 65, 'request_limit': 256}
+    (work / 'run-budget.json').write_text(json.dumps(budget))
+    (work / 'agent-run.json').write_text('{"error":"RUN_BUDGET_EXHAUSTED"}')
+    (work / 'session-path.txt').write_text('original-session.jsonl')
+    (work / 'tools/runtime.mjs').write_text('original stopped runtime')
+    (work / 'window-grant.json').write_text('{"seconds":1800,"authorized_by":"human explicit approval"}')
+    feedback = tmp_path / 'continuation.md'
+    feedback.write_text('Finish the original existing edit and checks; preserve all limits.')
+    job = {'id':'unfinished', 'lane':'gpu16-h3', 'workspace':str(work), 'state':'resume_queued',
+           'resume_authorization':{'id':'explicit-approval', 'feedback':str(feedback)}}
+    c = state(tmp_path, [job])
+    c.runtime = tmp_path / 'fixed-tools'; c.runtime.mkdir()
+    for name in ['runtime.mjs','bash_limits.mjs']:(c.runtime / name).write_text('bounded '+name)
+    c.grant_entry = tmp_path / 'grant-aware-entry.py'
+    class Started:
+        pid=12345
+        def wait(self): return 0
+    def launch(command, **kwargs):
+        assert command[1] == str(c.grant_entry)
+        assert '--resume' in command and str(feedback) in command[-1]
+        assert '1800' in command[-1] and '连接中断' not in command[-1]
+        return Started()
+    monkeypatch.setattr(lanes.subprocess,'Popen',launch)
+    actual=c.state['jobs'][0]
+    assert c.dispatch(actual)==0
+    assert json.loads((work/'run-budget.json').read_text())==budget
+    assert (work/'session-path.txt').read_text()=='original-session.jsonl'
+    before=work/'recoveries/authorized-explicit-approval'
+    assert (before/'runtime.mjs').read_text()=='original stopped runtime'
+    assert (work/'tools/runtime.mjs').read_text()=='bounded runtime.mjs'
+    assert 'resume_authorization' not in actual
+    assert 'automatic_session_resumes' not in actual
+
+
 def test_batch_authorization_grants_only_once_and_only_for_an_existing_rejected_movie(tmp_path):
     reviewing,work,job,record=review_fixture(tmp_path,verdict='rejected',findings=[{
         'severity':'blocking','owner':'episode','what':'face obscured','seconds':[132,145]}])

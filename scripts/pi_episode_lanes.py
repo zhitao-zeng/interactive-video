@@ -161,13 +161,30 @@ class Controller:
             reason = repair_budget(workspace)
             if reason:
                 raise RepairUnavailable(reason)
-            before = workspace / 'recoveries' / f'connection-{job["automatic_session_resumes"]:03d}'
+            authorization = job.pop('resume_authorization', None)
+            label = (f'authorized-{authorization["id"]}' if authorization
+                     else f'connection-{job["automatic_session_resumes"]:03d}')
+            before = workspace / 'recoveries' / label
             before.mkdir(parents=True, exist_ok=False)
             for name in ['run-budget.json', 'agent-run.json', 'session-path.txt']:
                 shutil.copy2(workspace / name, before / name)
-            command += ['--resume', '--prompt',
-                        '上次模型连接中断。继续原任务：先核对已经受理的task_id、已有回片与工作记录，'
-                        '不重复POST、不换会话、不重置时限/额度/计次，沿用已完成素材继续正常交付。']
+            if authorization:
+                (before / 'authorization.json').write_text(json.dumps(authorization, ensure_ascii=False, indent=2) + '\n')
+                prompt = ('用户已明确授权在原会话继续原任务，具体范围：' + authorization['feedback'] +
+                          '。使用已有原稿、素材、剪辑表与回执完成交付；不改次数、不换会话、不自行续期。')
+            else:
+                prompt = ('上次模型连接中断。继续原任务：先核对已经受理的task_id、已有回片与工作记录，'
+                          '不重复POST、不换会话、不重置时限/额度/计次，沿用已完成素材继续正常交付。')
+            grant = pending_window_grant(workspace)
+            if grant:
+                command[1] = str(self.grant_entry)
+                for name in ['runtime.mjs', 'bash_limits.mjs']:
+                    old = workspace / 'tools' / name
+                    if old.exists():
+                        shutil.copy2(old, before / name)
+                    shutil.copy2(self.runtime / name, old)
+                prompt += f' 用户批准追加{int(grant["seconds"])}秒，仅由启动器一次消费；请求和媒体次数上限不变。'
+            command += ['--resume', '--prompt', prompt]
             self.update(job, state='running', resumed_at=now(), active_operation='production')
         elif job['state'] == 'repair_queued':
             reason = repair_budget(workspace)
