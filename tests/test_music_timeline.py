@@ -127,3 +127,24 @@ def test_music_bus_leaves_real_gap_and_native_audio_remains_while_video_is_copie
     assert revised['assembly']['final_video']!=str(output)
     assert signal(Path(revised['assembly']['final_video']),4.2,.5,300)<signal(output,4.2,.5,300)/10
     assert output.exists()and video.exists()
+
+
+def test_explicit_source_offset_can_cross_a_cut_without_changing_silence(episode):
+    directory,policy,timeline=episode
+    source={'start':anchor(1),'end':anchor(1,'end',1.5)}
+    script=read_json(directory/'chapter_script.json');script['music_plan']={'silences':[source]}
+    atomic_write_json(directory/'chapter_script.json',script)
+    original=copy.deepcopy(script)
+    resolved=resolve(directory,policy,timeline)
+    assert {'start':0.,'end':4.5} in resolved['silences']
+    timeline[0]['end']=4;timeline[1].update(start=4,end=7)
+    assert {'start':0.,'end':5.5} in resolve(directory,policy,timeline)['silences']
+    assert read_json(directory/'chapter_script.json')==original
+
+
+@pytest.mark.parametrize('point',[anchor(1,'start',-.1),anchor(2,'end',.1)])
+def test_explicit_offset_cannot_leave_actual_episode(episode,point):
+    directory,policy,timeline=episode
+    policy['silences']=[{'start':anchor(1),'end':point}]
+    with pytest.raises(ValueError,match='leaves the episode'):
+        resolve(directory,policy,timeline)

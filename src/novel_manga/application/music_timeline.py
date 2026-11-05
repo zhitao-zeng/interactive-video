@@ -29,12 +29,15 @@ def resolve(directory,policy,timeline):
         spans[row['index']]={'start':min(old['start'],row['start'])if old else row['start'],
                              'end':max(old['end'],row['end'])if old else row['end']}
     if not spans:raise ValueError('Music needs an actual shot timeline before assembly')
+    episode_end=max(span['end']for span in spans.values())
     def point(anchor):
         if not isinstance(anchor,dict)or type(anchor.get('shot'))is not int or anchor.get('shot')not in spans:raise ValueError('music anchor requires a current shot')
         span=spans[anchor['shot']];edge=anchor.get('edge')
         if edge not in {'start','end'}:raise ValueError('music anchor edge must be start or end')
         value=span[edge]+_number(anchor.get('offset_seconds',0),'anchor offset')
-        if not span['start']-1e-6<=value<=span['end']+1e-6:raise ValueError('music anchor offset leaves its shot')
+        # An authored "shot end + 1.5s" is a point in the following shot.
+        # Keep that explicit offset while bounding it to the actual episode.
+        if not -1e-6<=value<=episode_end+1e-6:raise ValueError('music anchor offset leaves the episode')
         return round(value,6)
     cues=[]
     for row in policy.get('cues',[]):
