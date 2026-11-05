@@ -83,6 +83,12 @@ private/native dialogue.
 
 ## Story music
 
+Unless the task explicitly requests no score, travel vlogs default to light,
+withdrawable BGM rather than silently omitting music. Plan entries, withdrawals
+and listening gaps; select actual licensed library tracks and check the final
+mixed audio, including music audibility, withdrawals and dialogue/environment
+clarity. This is a travel-vlog default, not a requirement for every genre.
+
 For `music_mode: timeline`, creation writes `chapter_script.music_plan` with
 musical queries, story reasons, shot start/end anchors, entries, withdrawals
 and listening gaps. Production uses `select_music` to select real library tracks,
