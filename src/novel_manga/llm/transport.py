@@ -28,6 +28,7 @@ def stream_completion(client: httpx.Client, url: str, headers: dict, payload: di
     if floor > 0:
         request["max_tokens"] = max(int(request.get("max_tokens") or 0), floor)
     content, reasoning, finish, usage = [], [], None, None
+    response_model = None
     with client.stream("POST", url, headers=headers, json=request, timeout=timeout) as response:
         if response.status_code >= 400:
             response.read()
@@ -44,6 +45,8 @@ def stream_completion(client: httpx.Client, url: str, headers: dict, payload: di
                 continue
             if isinstance(event, dict) and event.get("error"):
                 raise RuntimeError(f"streamed error from {url}: {json.dumps(event['error'], ensure_ascii=False)[:300]}")
+            if isinstance(event.get('model'), str) and event['model']:
+                response_model = event['model']
             for choice in event.get("choices") or []:
                 delta = choice.get("delta") or {}
                 content.append(delta.get("content") or "")
@@ -52,7 +55,8 @@ def stream_completion(client: httpx.Client, url: str, headers: dict, payload: di
             usage = event.get("usage") or usage
     if not "".join(content) and not "".join(reasoning):
         raise RuntimeError(f"empty streamed response from {url} (finish={finish}, usage={usage})")
-    return {"choices": [{"message": {"content": "".join(content), "reasoning": "".join(reasoning)}, "finish_reason": finish}], "usage": usage}
+    return {"choices": [{"message": {"content": "".join(content), "reasoning": "".join(reasoning)}, "finish_reason": finish}], "usage": usage,
+            **({'model': response_model} if response_model else {})}
 
 
 _DEFAULT_TIMEOUT = object()
@@ -72,14 +76,16 @@ _UNREACHABLE: dict[str, float] = {}
 UNREACHABLE_COOLDOWN = float(os.environ.get("NOVEL_ENDPOINT_COOLDOWN_SECONDS", "300"))
 
 
-def _meter(url: str, request: dict, body: dict) -> None:
+def _meter(url: str, request: dict, body: dict, *, quota_group=None) -> None:
     """One usage row per answered call; never raises into the transport path."""
     try:
         from . import usage as llm_usage
         rf = request.get('response_format') or {}
         name = ((rf.get('json_schema') or {}).get('name')) or rf.get('type') or 'chat'
         llm_usage.record(name=name, model=str(request.get('model') or ''),
-                         usage=body.get('usage'), url=url)
+                         usage=body.get('usage'), url=url, quota_group=quota_group,
+                         response_model=body.get('model'),
+                         reasoning={k:request[k] for k in ('reasoning_effort','thinking') if k in request})
     except Exception:  # noqa: BLE001 - metering must never break a model call
         pass
 
@@ -104,12 +110,19 @@ def post_any(client, base_urls, headers, request, *, settings=None, deadline=Non
     base_urls=list(base_urls)
     if base_urls==['codex://local']:
         from .codex import completion
-        return completion(request,timeout=budget.remaining()if budget is not None else 600)
+        body = completion(request,timeout=budget.remaining()if budget is not None else 600)
+        _meter('codex://local', request, body)
+        return body
     last = None
     for base_url in reachable_first(list(base_urls)):
+        from . import quota
+        key = settings.key if settings is not None else headers.get('Authorization', '').removeprefix('Bearer ')
+        group = quota.for_model(request.get('model'), base_url, key=key)
+        quota.check(group, key)
         try:
             waiting=time.monotonic()
             with model_slot(base_url):
+                quota.check(group, key)
                 options = {}
                 if budget is not None:
                     budget.waited(time.monotonic()-waiting)
@@ -120,18 +133,22 @@ def post_any(client, base_urls, headers, request, *, settings=None, deadline=Non
                 url = f"{base_url.rstrip('/')}/chat/completions"
                 if settings.stream if settings else streaming_wanted():
                     body = stream_completion(client, url, headers, request, settings=settings, **options)
-                    _meter(url, request, body)
+                    _meter(url, request, body, quota_group=group)
                     return body
                 response = send_json(client, url, headers, request, **options)
                 response.raise_for_status()
                 _UNREACHABLE.pop(base_url, None)   # it answered: whatever we believed about it is stale
                 body = response.json()
-                _meter(url, request, body)
+                _meter(url, request, body, quota_group=group)
                 return body
         except (httpx.ConnectError, httpx.ConnectTimeout, httpx.RemoteProtocolError) as error:
             _UNREACHABLE[base_url] = time.monotonic() + UNREACHABLE_COOLDOWN
             last = error
         except httpx.HTTPStatusError as error:
+            try:
+                quota.remember(group, error.response.status_code, error.response.json(), key=key)
+            except (ValueError, httpx.ResponseNotRead):
+                pass
             if error.response.status_code not in (502, 503, 504):
                 raise
             # a gateway that cannot reach its backend is the same situation from the caller's side
