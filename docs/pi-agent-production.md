@@ -32,12 +32,24 @@ PYTHONPATH=src .venv/bin/python scripts/pi_video_agent.py run /path/to/new-works
 
 ## 批量生产
 
-`batch` 只逐集执行 init → run 并同步等待，不调度内容或生产阶段。manifest 示例：
+`batch` 先完整校验整个 manifest，任何错误在任何 init 或生产调用前报错，且不生成 workspace 或 `batch-state.json`。校验范围包括：
+
+- `workers` 必须是正整数，默认等于集数；`0`、负数、非整数或布尔均拒绝。
+- `resume` 必须是真正的 JSON 布尔，`"false"` 等字符串拒绝。
+- 每集必须提供 `workspace`；非 resume 集必须能从顶层或单集拿到 `sdk_root` 与 `dependencies`。
+- workspace 解析后不能重叠（相同、父子目录均拒绝），siblings 允许。
+- `lane`、`first_frame`、`interaction_page`、`h3_mode`、`viewpoint`、`wall_seconds`、`max_model_requests` 等 init 选项均须合法。
+- `FastH3-Omni` 必须显式提供 `fasth3_endpoint`，且 `first_frame=required` 与其不兼容；endpoint 按 SDK 规则规范化。
+
+校验通过后，batch 获取 manifest 同级目录 `batch-state.lock` 的排他文件锁；第二个同目录批次在 init/run 前即被拒绝，锁在批次结束时释放。状态文件写入失败属于批次基础设施错误，不会冒充 accepted 或完整结果。
+
+然后按 manifest 顺序逐集 init，再用 `ThreadPoolExecutor` 并行调用各集 `run`。每集保留独立的 workspace、session 和 budgets；一集失败不会阻塞或取消其他集。
 
 ```json
 {
   "sdk_root": "/mnt/disk1/zengzhitao/interactive-video-worktrees/main",
   "dependencies": "/path/to/existing/pi/node_modules",
+  "workers": 2,
   "episodes": [
     {"workspace": "/path/to/episode-A", "input": "/path/to/input-A", "endpoint": "official-ds41"},
     {"workspace": "/path/to/episode-B", "input": "/path/to/input-B", "endpoint": "official-ds41"}
@@ -49,7 +61,17 @@ PYTHONPATH=src .venv/bin/python scripts/pi_video_agent.py run /path/to/new-works
 PYTHONPATH=src .venv/bin/python scripts/pi_video_agent.py batch /path/to/batch.json
 ```
 
-已有工作区必须显式 `resume=true`，不存在的恢复目标会拒绝。退出码只表示会话执行结果，不等于整集 accepted。
+已有工作区必须显式 `resume=true`，不存在的恢复目标会拒绝。每集完成后立即在 manifest 旁写入 `batch-state.json`（原子写），记录该集 workspace、returncode 与 completed_at；这只是进程完成状态，不是内容 accepted。最终输出保留 `episodes`/`ok` 并新增 `workers`，退出码只反映进程是否全部退出 0，不能当作内容通过。batch 不调度内容阶段，也不伪造 accepted 状态；每集结束后由协调者分别审核、恢复或上传，不按整批同步等待。
+
+使用 `FastH3-Omni` 时，UniServe 服务应在批次级常驻，Agent 只调用其 API；batch 不会为每一集单独启停服务。
+
+## 可选 FastH3-Omni lane
+
+显式选择 `--lane FastH3-Omni --fasth3-endpoint http://127.0.0.1:30027`，媒体请求使用 `action=fasth3`。batch 可在 manifest 顶层或单集设置 `fasth3_endpoint`。endpoint 会冻结到 `local.json`、`PRODUCTION.md` 和 `CAPABILITIES.json`；没有机器默认值，`h3_mode` 不影响 Fast 路由。请求 endpoint 规范化后必须等于冻结值，userinfo/query/fragment 会在写 config/request 前拒绝。此版只接受无需 Bearer 的内部 UniServe 端点，不增加密钥配置。默认 lane 及 image/video/h3 分支不变。
+
+Fast 使用 UniServe 的 `model=FastH3-Omni`、`task=ref2va`，保留原 prompt、参考顺序和图片/音频原字节 data URI，不隐藏缩放或换格式；`target.short_edge/aspect_ratio/duration_seconds` 与显式 seed 原样透传。只接受普通 reference：显式 `first_frame` 会拒绝，`first_frame_policy=required` 不兼容；`selective` 不等于已验证 keyframe。
+
+UniServe 服务必须另行启动，本代码不启停服务。请求保存 request SHA、实际 target、task id、状态历史、附件 SHA、耗时和 HTTP 错误正文；下载先写 `.partial` 再替换。相同 request SHA 且已有 task id 时只轮询原任务，服务重启会清 jobs/content，404 只表示过期并停止，不隐式重新 POST。Agent 若决定新 take，必须使用新输出名并受原任务预算约束。Fast 不代表普遍优于 Turbo；music_selection 不变。
 
 ## 验证边界
 

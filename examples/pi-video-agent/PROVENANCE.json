@@ -6,7 +6,7 @@
       "path": "README.md",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/README.md",
       "source_sha256": "056769b40cb54634cb09d3318f3823d510345b1c37c1d13fa981191a51659a59",
-      "merged_sha256": "9ce5ccd9621cb53c25ef8f85c2dd70b5e08340fc4e1af13ce89540c72f708a2d"
+      "merged_sha256": "1dc460d301ac4ea0bec6f97a70dffe28e973dd1cd584b021525d853d3cbbcdca"
     },
     {
       "path": "SNAPSHOT.md",
@@ -48,7 +48,7 @@
       "path": "starter.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/starter.py",
       "source_sha256": "8b057e04ed564a8297b7368b5cb10b25bd9e60ac2b2ecf1466146ea65e3efc17",
-      "merged_sha256": "6a7c47a39bb75adad5be335427241651327d3045c5ece0a27757e32972d01fb7"
+      "merged_sha256": "b0541f82e1bf00c2c55f715f217f34dfbd32210149cac0a2bba5f6ff1d40429e"
     },
     {
       "path": "template/CAPABILITIES.md",
@@ -78,7 +78,7 @@
       "path": "template/TOOLS.md",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/TOOLS.md",
       "source_sha256": "1554741e832ecd02a98e0732e86f708b53d348a281066e44bb4ac27993829f31",
-      "merged_sha256": "63270af90f09105097ebea9841d9590cabed605ba43a0fec2d15a669fa990c90"
+      "merged_sha256": "7e6624195a99cf4e17556a363e09b44d79e47d6564f46373b4bd4f79082d0468"
     },
     {
       "path": "template/audio-runtime.example.json",
@@ -138,7 +138,7 @@
       "path": "template/tools/assemble.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/tools/assemble.py",
       "source_sha256": "32f146314b20fc46fed43cc93f16e49e1b31596cc1b02b5e6630a07cb51efdc9",
-      "merged_sha256": "32f146314b20fc46fed43cc93f16e49e1b31596cc1b02b5e6630a07cb51efdc9"
+      "merged_sha256": "ed2f0e51d2fee9412adc54f4ccd64693c80cdb3db0eab3313ac830b48b43354b"
     },
     {
       "path": "template/tools/audio_service.py",
@@ -174,7 +174,7 @@
       "path": "template/tools/media.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/tools/media.py",
       "source_sha256": "0307bf9b1beda097f4fb66b03bd1c015356be26f5a5260fa98e6c8ac5402e3ff",
-      "merged_sha256": "c409c3abd4354689fad984252b0f1230c375b3c0d6f259165526f5d9b07e8263"
+      "merged_sha256": "dfc7e483bdf6fc2a6ea0784ad160c39fbec63daa69029aa8828acc7878da56f0"
     },
     {
       "path": "template/tools/plan.example.py",

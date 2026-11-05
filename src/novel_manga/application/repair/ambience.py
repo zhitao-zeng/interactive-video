@@ -162,6 +162,7 @@ def _mix_episode(directory,report,bed,*,context=None,music=False):
     source=Path(previous['source'])if reuse_source else current
     signature={'source':str(source),'source_take':take_identity(source),'asset':take_identity(asset),
                'asset_id':bed['asset']['id'],'gain_db':gain,'timeline':assembly.get('timeline',[])}
+    if music:signature['processing']='music-ebur128-reference--5-v1'
     if bed.get('music_timeline')is not None:signature['music_timeline']=bed['music_timeline']
     if previous.get('inputs')==signature and Path(previous.get('output','')).is_file():
         result=copy.deepcopy(report);result['assembly']['final_video']=previous['output']
@@ -175,7 +176,10 @@ def _mix_episode(directory,report,bed,*,context=None,music=False):
         signature.update(source=str(source),source_take=take_identity(source))
     from novel_manga.util import media_duration
     duration=media_duration(source);output=folder/f'{prefix}-{version:03d}.mp4'
-    graph=(f'[1:a]volume={gain:g}dB,aresample=48000,atrim=duration={duration:.6f},asetpts=PTS-STARTPTS[bed];'
+    if music and bed.get('music_timeline')is None:
+        level=f'loudnorm=I=-5:TP=-1.5:LRA=11,volume={gain:g}dB,aresample=48000'
+    else:level=f'volume={gain:g}dB'
+    graph=(f'[1:a]aresample=48000,atrim=duration={duration:.6f},asetpts=PTS-STARTPTS,{level}[bed];'
            '[0:a][bed]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.98:level=false[audio]')
     loop=[]if bed.get('music_timeline')is not None else['-stream_loop','-1']
     command=['ffmpeg','-y','-v','error','-threads','4','-i',str(source),*loop,'-i',str(asset),
@@ -188,6 +192,7 @@ def _mix_episode(directory,report,bed,*,context=None,music=False):
     result['assembly'][key]={'source':str(source),'output':str(output),'inputs':signature,'video_reencoded':False,
             'input_source':previous.get('input_source',str(current))if str(current)==previous.get('output')else str(current),
             'input_take':previous.get('input_take')if str(current)==previous.get('output')else take_identity(current),
-            'original_audio':'retained additively','gain_db':gain,'qc_checked':False,'command':command}
+            'original_audio':'retained additively','gain_db':gain,'qc_checked':False,'command':command,
+            **({'target_lufs':-5+gain,'loudness_reference_lufs':-5}if music and bed.get('music_timeline')is None else{})}
     if context is not None:_refresh_checks(context,result['assembly'])
     return result

@@ -52,7 +52,8 @@ def resolve(directory,policy,timeline):
             raise ValueError(f'music cue {row["id"]}: selected {available:g}s, but its resolved shot interval needs {end-start:.6f}s '
                              f'({start:.6f} to {end:.6f}). Select a longer source range, or explicitly loop only if consistent with the music design.')
         cues.append({'id':row['id'],'asset_id':asset['id'],'asset_path':str(path),'asset':take_identity(path),
-            'start':start,'end':end,'gain_db':gain,'fade_in_seconds':fade_in,'fade_out_seconds':fade_out,'loop':loop})
+            'start':start,'end':end,'gain_db':gain,'target_lufs':-5+gain,
+            'fade_in_seconds':fade_in,'fade_out_seconds':fade_out,'loop':loop})
     if not cues or len({r['id']for r in cues})!=len(cues):raise ValueError('music needs nonempty distinct cue ids')
     silences=[]
     # Source-authored listening gaps cannot be accidentally filled by a later cue edit.
@@ -62,7 +63,8 @@ def resolve(directory,policy,timeline):
         if end<=start:raise ValueError('music silence end must follow start')
         interval={'start':start,'end':end}
         if interval not in silences:silences.append(interval)
-    return {'cues':cues,'silences':silences,'duration':max(s['end']for s in spans.values()),'timeline':timeline}
+    return {'cues':cues,'silences':silences,'duration':max(s['end']for s in spans.values()),
+            'timeline':timeline,'processing':'music-ebur128-reference--5-v1'}
 
 
 def prepare_bed(directory,report,policy):
@@ -80,7 +82,8 @@ def prepare_bed(directory,report,policy):
         if row['loop']:command+=['-stream_loop','-1']
         command+=['-i',row['asset_path']]
         length=row['end']-row['start']
-        chain=f'[{i}:a]atrim=duration={length:.6f},asetpts=PTS-STARTPTS,aresample=48000,volume={row["gain_db"]:g}dB'
+        chain=(f'[{i}:a]atrim=duration={length:.6f},asetpts=PTS-STARTPTS,aresample=48000,'
+               f'loudnorm=I=-5:TP=-1.5:LRA=11,volume={row["gain_db"]:g}dB')
         if row['fade_in_seconds']:chain+=f',afade=t=in:st=0:d={row["fade_in_seconds"]:.6f}'
         if row['fade_out_seconds']:chain+=f',afade=t=out:st={length-row["fade_out_seconds"]:.6f}:d={row["fade_out_seconds"]:.6f}'
         chain+=f',adelay={round(row["start"]*1000)}:all=1[cue{i}]';filters.append(chain);labels.append(f'[cue{i}]')
