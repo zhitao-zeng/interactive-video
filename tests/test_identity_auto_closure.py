@@ -68,6 +68,14 @@ def actor(name='云柔'):
             'kind':'individual','count':1,'presence':'on_stage','appearance':'','paragraphs':[1]}
 
 
+def test_identity_review_requires_complete_actor_and_binding_correction(monkeypatch):
+    prompts=[]
+    monkeypatch.setattr(client,'ask_json',lambda parts,*args,**kwargs:prompts.append(parts[0]['text']) or {'approved':True,'correction':None})
+    review.close({'actors':[]},{},client.obj({}),name='test_identity_review')
+    assert '全部确定问题' in prompts[0]
+    assert 'actor.paragraphs与对应binding.paragraphs必须一致' in prompts[0]
+
+
 def test_prepare_identity_repairs_binding_and_caches_review(tmp_path,monkeypatch):
     ledger=book(tmp_path/'book');ep=ledger.novel_dir/'book_1'
     store.write_json(ledger.novel_dir/'bible_aliases.json',{'云柔':'云苍冥'})
@@ -75,15 +83,16 @@ def test_prepare_identity_repairs_binding_and_caches_review(tmp_path,monkeypatch
     corrected={'actors':[actor()], 'bindings':[{'source_id':1,'entity_id':'e001','decision':'catalogue','paragraphs':[1],'reason':'父亲身边女儿'}]}
     calls=[]
     def ask(*args,**kwargs):
-        calls.append(kwargs['name'])
+        calls.append((kwargs['name'],kwargs.get('settings')))
         if kwargs['name']=='chapter_identity_source':return {'source_readable':True,'source_problem':'','actors':[actor()]}
-        if calls.count('chapter_binding_review')==1:return {'approved':False,'reason':'旧别名错指叔父','correction':corrected}
+        if [name for name,_ in calls].count('chapter_binding_review')==1:return {'approved':False,'reason':'旧别名错指叔父','correction':corrected}
         return {'approved':True,'reason':'已校核','correction':None}
     monkeypatch.setattr(client,'ask_json',ask)
-    result=flow.resolve_chapter(ep)
+    result=flow.resolve_chapter(ep,settings='official-k3-settings')
     assert result['mentions'][0]['entity_id']=='e001'
-    assert flow.resolve_chapter(ep)==result
-    assert calls==['chapter_identity_source','chapter_binding_review','chapter_binding_review']
+    assert flow.resolve_chapter(ep,settings='official-k3-settings')==result
+    assert [name for name,_ in calls]==['chapter_identity_source','chapter_binding_review','chapter_binding_review']
+    assert {settings for _,settings in calls}=={'official-k3-settings'}
 
 
 def test_binding_discards_unsupported_alternate_form_before_final_review(tmp_path,monkeypatch):
@@ -500,3 +509,159 @@ def test_demanded_correction_is_merged_then_final_reviewed(monkeypatch):
     assert calls == ['review', 'review', 'review']
     assert merged == [{'actors': [{'name': '甲'}]}]
     assert value == {'actors': [{'name': '甲'}]}
+
+
+def test_in_frame_unmapped_animals_start_as_extras_but_mentions_stay_unknown(tmp_path,monkeypatch):
+    ledger=book(tmp_path/'book');ep=ledger.novel_dir/'book_1'
+    store.write_json(ep/'segments.json',[{'text':'耳鼠跑来。远方传来天狗叫声，狐狸只被提及。'}])
+    actors=[actor('耳鼠'),{**actor('天狗'),'source_id':2,'presence':'voice'},
+            {**actor('狐狸'),'source_id':3,'presence':'mentioned'}]
+    reviewed=[]
+    def ask(parts,schema,**kwargs):
+        if kwargs['name']=='chapter_identity_source':return {'source_readable':True,'source_problem':'','actors':actors}
+        payload=json.loads(parts[0]['text'].split('\n')[-1]);reviewed.append(payload['candidate'])
+        assert [r['decision']for r in payload['candidate']['bindings']]==['extra','extra','unknown']
+        return {'approved':True,'reason':'真实复核候选正确','correction':None}
+    monkeypatch.setattr(client,'ask_json',ask)
+    result=flow.resolve_chapter(ep)
+    assert reviewed and result['semantic_review']['approved']
+    assert set(result['semantic_extras'])=={'耳鼠','天狗'}
+
+
+def test_extra_initialization_still_requires_independent_semantic_pass(tmp_path,monkeypatch):
+    ledger=book(tmp_path/'book');ep=ledger.novel_dir/'book_1'
+    store.write_json(ep/'segments.json',[{'text':'耳鼠跑来。'}])
+    def ask(parts,schema,**kwargs):
+        if kwargs['name']=='chapter_identity_source':return {'source_readable':True,'source_problem':'','actors':[actor('耳鼠')]}
+        return {'approved':False,'reason':'实际来源仍有问题','correction':None}
+    monkeypatch.setattr(client,'ask_json',ask)
+    with pytest.raises(ValueError,match='identity semantic review unresolved'):
+        flow.resolve_chapter(ep)
+    assert not(ep/'identity_context.json').exists()
+
+
+def test_binding_review_receives_original_dialogue_and_tracks_its_changes(tmp_path,monkeypatch):
+    book(tmp_path/'book');ep=tmp_path/'book/book_1';ep.mkdir()
+    original='动作：知遥展示目的地预览卡。\n\n**知遥**（固定选项名称）：A，静音群岛。\n'
+    (ep/'authored_source.md').write_text(original)
+    store.write_json(ep/'segments.json',[{'text':'知遥展示目的地预览卡。'},{'text':'A，静音群岛。'}])
+    reviewed=[]
+    def ask(parts,schema,**kwargs):
+        if kwargs['name']=='chapter_identity_source':
+            assert original in parts[0]['text']
+            return {'source_readable':True,'source_problem':'','actors':[actor('知遥')]}
+        payload=json.loads(parts[0]['text'].split('\n')[-1]);reviewed.append(payload)
+        return {'approved':True,'reason':'选项不是主体别名','correction':None}
+    monkeypatch.setattr(client,'ask_json',ask)
+    result=flow.resolve_chapter(ep)
+    evidence=reviewed[-1]['evidence']
+    assert evidence['original_authored_document']==original
+    assert result['inputs']['authored_source']==original
+    (ep/'authored_source.md').write_text(original+'**知遥**：B，瓶中四季。\n')
+    from novel_manga.application.identity.store import load_chapter
+    assert load_chapter(ep).context=={}
+
+
+def test_binding_grounding_unifies_form_actor_and_binding_paragraphs(tmp_path,monkeypatch):
+    book(tmp_path/'book');ep=tmp_path/'book/book_1'
+    store.write_json(ep/'segments.json',[{'text':'知遥走来，知遥停下。'},{'text':'另一个人离开。'}])
+    source={**actor('知遥'),'forms':[{'form':'知遥','kind':'proper','paragraphs':[2]}]}
+    def ask(parts,schema,**kwargs):
+        if kwargs['name']=='chapter_identity_source':
+            return {'source_readable':True,'source_problem':'','actors':[source]}
+        payload=json.loads(parts[0]['text'].split('\n')[-1])
+        assert payload['candidate']['actors'][0]['paragraphs']==[1]
+        assert payload['candidate']['bindings'][0]['paragraphs']==[1]
+        assert 'cited' not in payload['candidate']['actors'][0]['forms'][0]
+        return {'approved':True,'reason':'原文引用一致','correction':None}
+    monkeypatch.setattr(client,'ask_json',ask)
+    result=flow.resolve_chapter(ep)
+    assert result['source_actors'][0]['paragraphs']==[1]
+    assert 'cited' not in result['source_actors'][0]['forms'][0]
+
+
+def test_binding_grounding_uses_validated_dialogue_speakers(tmp_path,monkeypatch):
+    book(tmp_path/'book');ep=tmp_path/'book/book_1'
+    store.write_json(ep/'segments.json',[{'segment_id':'seg_1','text':'甲行动，我说，你说。'},{'segment_id':'seg_2','text':'乙行动，我说，你说。'}])
+    store.write_json(ep/'chapter_script.json',{'shots':[
+        {'index':1,'segment_ids':['seg_1'],'turns':[{'speaker_name':'甲','text':'我说甲。'}]},
+        {'index':2,'segment_ids':['seg_2'],'turns':[{'speaker_name':'乙','text':'我说乙。'}]}]})
+    actors=[{**actor('甲'),'forms':[{'form':'甲','kind':'proper','paragraphs':[1]},
+                                      {'form':'我','kind':'contextual','paragraphs':[1,2]},
+                                      {'form':'你','kind':'contextual','paragraphs':[2]}]},
+            {**actor('乙'),'source_id':2,'forms':[{'form':'乙','kind':'proper','paragraphs':[2]},
+                                                   {'form':'我','kind':'contextual','paragraphs':[1,2]},
+                                                   {'form':'你','kind':'contextual','paragraphs':[1]}]}]
+    def ask(parts,schema,**kwargs):
+        if kwargs['name']=='chapter_identity_source':
+            return {'source_readable':True,'source_problem':'','actors':actors}
+        payload=json.loads(parts[0]['text'].split('\n')[-1])
+        assert payload['candidate']['actors'][0]['paragraphs']==[1]
+        assert payload['candidate']['actors'][0]['forms'][1]['paragraphs']==[1]
+        assert payload['candidate']['actors'][1]['paragraphs']==[2]
+        assert payload['candidate']['actors'][1]['forms'][1]['paragraphs']==[2]
+        return {'approved':True,'reason':'说话人证据一致','correction':None}
+    monkeypatch.setattr(client,'ask_json',ask)
+    result=flow.resolve_chapter(ep)
+    assert result['source_actors'][0]['paragraphs']==[1]
+    assert result['source_actors'][1]['paragraphs']==[2]
+
+
+def test_identity_grounding_includes_validated_dialogue_text(tmp_path,monkeypatch):
+    book(tmp_path/'book');ep=tmp_path/'book/book_1'
+    store.write_json(ep/'segments.json',[{'segment_id':'seg_1','text':'两人检查背包。'}])
+    store.write_json(ep/'chapter_script.json',{'shots':[{
+        'index':1,'segment_ids':['seg_1'],'turns':[{'speaker_name':'潮叔','text':'手机在包里。'}]}]})
+    actors=[actor('潮叔'),{**actor('手机'),'source_id':2,'kind':'object'}]
+    def ask(parts,schema,**kwargs):
+        if kwargs['name']=='chapter_identity_source':
+            return {'source_readable':True,'source_problem':'','actors':actors}
+        if kwargs['name']=='chapter_identity_evidence':
+            return {'source_readable':True,'source_problem':'','actors':actors}
+        return {'approved':True,'reason':'说话人与台词物件都有原文证据','correction':None}
+    monkeypatch.setattr(client,'ask_json',ask)
+    result=flow.resolve_chapter(ep)
+    assert {row['name'] for row in result['source_actors']}=={'潮叔','手机'}
+
+
+def test_identity_cache_tracks_script_dialogue_changes(tmp_path,monkeypatch):
+    book(tmp_path/'book');ep=tmp_path/'book/book_1'
+    store.write_json(ep/'segments.json',[{'segment_id':'seg_1','text':'两人检查背包。'}])
+    script={'shots':[{'index':1,'segment_ids':['seg_1'],'in_frame':['潮叔'],
+                       'turns':[{'speaker_name':'潮叔','text':'手机在包里。'}]}]}
+    store.write_json(ep/'chapter_script.json',script)
+    monkeypatch.setattr(client,'ask_json',lambda *args,**kwargs:
+        {'source_readable':True,'source_problem':'','actors':[actor('潮叔')]}
+        if kwargs['name']=='chapter_identity_source' else
+        {'approved':True,'reason':'证据一致','correction':None})
+    flow.resolve_chapter(ep)
+    script['shots'][0]['turns'][0]['text']='手机不在包里。'
+    store.write_json(ep/'chapter_script.json',script)
+    from novel_manga.application.identity.store import load_chapter
+    assert load_chapter(ep).context=={}
+    flow.resolve_chapter(ep)
+    script['shots'][0]['in_frame']=[]
+    store.write_json(ep/'chapter_script.json',script)
+    assert load_chapter(ep).context=={}
+
+
+def test_speaker_precedence_retains_non_dialogue_appearance(tmp_path,monkeypatch):
+    book(tmp_path/'book');ep=tmp_path/'book/book_1'
+    store.write_json(ep/'segments.json',[{'segment_id':'seg_1','text':'甲行动，我说。'},
+                                          {'segment_id':'seg_2','text':'乙行动，我说。'}])
+    store.write_json(ep/'chapter_script.json',{'shots':[
+        {'index':1,'segment_ids':['seg_1'],'in_frame':['甲'],
+         'turns':[{'speaker_name':'甲','text':'我说甲。'}]},
+        {'index':2,'segment_ids':['seg_2'],'in_frame':['甲'],
+         'turns':[{'speaker_name':'乙','text':'我说乙。'}]}]})
+    actors=[{**actor('甲'),'forms':[{'form':'甲','kind':'proper','paragraphs':[1]},
+                                      {'form':'我','kind':'contextual','paragraphs':[1]}]}]
+    def ask(parts,schema,**kwargs):
+        if kwargs['name']=='chapter_identity_source':
+            return {'source_readable':True,'source_problem':'','actors':actors}
+        payload=json.loads(parts[0]['text'].split('\n')[-1])
+        assert payload['candidate']['actors'][0]['paragraphs']==[1,2]
+        return {'approved':True,'reason':'动作和对白证据都保留','correction':None}
+    monkeypatch.setattr(client,'ask_json',ask)
+    result=flow.resolve_chapter(ep)
+    assert result['source_actors'][0]['paragraphs']==[1,2]

@@ -280,3 +280,42 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | ZCode #12+会话退化修复 | ①create_context目录发现:无显式output_root时探测firstframes/music/agent三约定既有run,CLI retry续真状态(冒烟已验:verify edition解析到firstframes真实目录);②默认作者配置切快速档(thinking off+effort low+16k,修复线同款),传导链有测试;2新测试,全量4053连两轮绿 | main(783b0c4) | context.py、configs/agent_sandbox.json、tests/test_agent_run_discovery.py | 2026-10-22 | 已提交;verify edition下次resume即用快速档;并行瞬态(一轮11败)已定位为与sd线资源竞争,复跑全绿 |
 
 | Codex 10小时协助ZCODE20261023 | 用户授权给原ZCODE会话指令并协助完成今早10点前知遥20集成片；协助窗口至11:56 | codex/zcode-supervision-20261023 | 仅自有协调runtime/必要独立诊断；生产单写者ZCODE，旧恋综暂不处理 | 2026-10-23 01:56 | 在途：原ZCODE已收到指令并ACK，34项相关独立回归过；定位原会话session_7acef82aafd79b10dac6e5f434e1cf08，核对真实隔离产线；不清额度/历史，不把candidate或blocked误称accepted；以20个完整导出文件验收。 |
+
+| Codex 官方KEY实测20261023 | 原official key的DS4.1/K3/GLM实测完成 | codex/official-key-probe-20261023 | 仅自有runtime，main c698b64真实run_session | 2026-10-23 | 三模型main Agent首次+同会话续跑6/6、main JSON3/3通过。协议层15例中DS两次JSON混入ds_safety导致内容失败、GLM首次95.626秒超时，K3全部通过；三者显式禁思考下首次SDK仍返回thinking块，不能声称彻底关闭。key与原运行环境内存比较相同。证据本树.runtime/official-key-probe-20261023/REPORT.md与summary.json。零媒体生成、不改默认/生产、不提交push。 |
+
+| Codex 资源与思考统一20261023 | 用户授权清点资源/共享额度、稳定免费优先、按任务思考含Luna | codex/resource-policy-20261023 | 独立资源登记/角色策略/既有入口接线/离线回归；避开其他会话music/readiness/generation等WIP | 2026-10-23 | 已完成并冷接main，未提交/push；相关218项与最后51项通过（有重叠），SD三条离线全链路过；全量4074过/2个既有失败已在无资源改动基线复现。Codex Agent续跑/medium/JSON/双图实测过；旧片/次数/历史/在跑任务不动。免费网关45测过，自有补丁留档未启用，原8789未重启。详情docs/model-resources.md及.runtime/resource-policy-integration-20261023/REPORT.md。 |
+
+| Codex 免费网关接通20261023 | 用户授权启用零费率路由补丁并实测免费Agent稳定性 | codex/free-routing-20261023 + codex/resource-policy-20261023 | 仅网关自有3文件、独立Agent夹具与资源资格；不热换生产任务 | 2026-10-23 | 已完成：网关45测过，空闲重启1次/5.334秒，无在途请求中断；原KEY与用量前缀保留。免费DS Agent内容10/11、JSON3/3，Phancy4/5；均不自动晋升Agent，默认保留Luna，免费DS启用JSON。续跑null存档修复、最终相关232项过；代码全量4081过/2既有失败。旧片/次数/历史/在跑任务不动，无媒体生成/提交/push。详.runtime/free-gateway-integration-20261023/REPORT.md。 |
+
+| Codex 免费Agent根因20261023 | 用户要求区分模型波动/网关/SDK适配，能修则修且不靠重试 | codex/resource-policy-20261023 + codex/free-routing-20261023 | 只读原失败、隔离离线协议回放、必要时有界单次对照；不热换生产 | 2026-10-23 | 已完成：DS错误在Write参数生成前，35B原回复为文本模拟工具；未发现本地网关/SDK损坏。离线修后4回放/14保真检查、固定协议4/4单次通过；两别名原始响应均自报kimi-k2.6。补请求/响应模型独立记录，相关235项通过；原小样本不作总体不稳定结论，上游内部因果边界留档。默认/在跑任务/片/次数/历史不改，无网关重启/媒体生成/提交push。详.runtime/free-agent-cause-integration-20261023/REPORT.md。 |
+
+| Codex 知遥ModelScope数据集20261023 | 用户授权公开数据集收录20集；先传既有13个完整delivery导出，后续同步 | codex/zhiyao-modelscope-20261023 | 仅scripts/ops/zhiyao_modelscope_sync.py与自有.runtime；不动生产/计数/源码WIP | 2026-10-23 | 在途：目标Flame4pd/zhiyao-episodes，复用ms_venv登录，媒体硬链接暂存，不上传私有源文/日志/环境。 |
+
+| Codex 自转主线整合与3集无人验证20261023 | 用户批准主线整合、自动恢复、3集无人干预；人工接管算失败 | codex/autonomous-production-20261023 | 独立main基线+保留现有main WIP；只整合本轮通用修复/正常入口/故障回放，不改旧20集 | 2026-10-23 18:07 | 在途：实施计划与修复来源盘点；保留资源策略/其他会话WIP，不代提交；验证将锁定版本与原始素材，新故障修通用代码后重验，不改单集文件兜底。 |
+
+| Codex GPT6与同题服务评估20261023 | 用户批准同题LLM服务评估并把5.6迁移到对应6代 | codex/llm-service-gpt6-20261023 | 独立主线WIP快照；资源默认/相关测试/冻结文字评估；保留旧路由与全部生产历史 | 2026-10-23 | 已完成并冷接：新任务/图审默认6 Luna，质量可选6 Sol，旧codex-luna固定5.6保留原角色/会话。16次同题Agent+3兼容检查+1匿名审查，无宿主重复刷题；抽取并列、修复偏6Luna/6Sol、四镜仅6Sol首稿结构/文本均过。修视觉跟随文字/Agent的接线及raw-video误发图像接口；全量4195过/main相关303过。保留85并行主线更新与H3cloud修正，zhiyao非注册入口配置不动；旧片/次数/历史不改，无媒体生成/重启/提交push。详.runtime/llm-service-gpt6-integration-20261023/REPORT.md。 |
+
+| Codex 自转验证进展 | 主线已冷整合；3集原包正式批入口实跑 | codex/autonomous-production-20261023 | 81个任务增量；保留其他作者WIP，无提交推送 | 2026-10-23T19:27:19.450724+08:00 | 全量4181过，主线关键93过，独立审查缺陷修复；服务novel-autonomous-validation-20261023，冻结执行树，真实结果待验。 |
+
+| Codex 非GPT优先20261023 | 用户要求尽量减少GPT；新任务文字Agent/结构化/图像检查优先免费通道 | codex/non-gpt-preference-20261023 → main | 仅资源资格/默认及四测试/说明；没有源码逻辑改动 | 2026-10-23 | 已完成并冷接：免费别名响应自报Kimi，工具/续接证据复用，双图检查1次通过；独立/main各200相关过、三入口新默认确认。GPT6留备用/显式选择，gpt-image-2生图仍保留；原失败、旧路由、成片、次数和历史不改，无GPT调用/媒体生成/重启/提交push。详.runtime/non-gpt-preference-integration-20261023/REPORT.md。 |
+
+| Codex 非GPT顺序接线20261023 | 用户明确授权免费→不限量KEY K3/DS/GLM→GPT，新任务按能力选择 | codex/non-gpt-order-20261023 → main | 资源排序/候选用尽退出/只读inventory及相关验证 | 2026-10-23 | 已完成并冷接：文字完整五级顺序；K3/DS双图各1次过，GLM红红误判留档，图审跳过GLM。独立/main各225相关过，15入口配置模拟过；不新增会话中途迁移，保留旧路由/预算/所有片/次数历史。未调用GPT或媒体生成，无重试刷结果/重启/提交push。详.runtime/non-gpt-order-integration-20261023/REPORT.md。 |
+
+| Codex 三集优先完整闭环20261024 | root统一冷整合与生产；canary_entry仅batch.py/CLI/batch tests；budget_actual_audit只读实际额度/引用 | codex/autonomous-production-v4-20261023 | 保留原额度、单入口按edition恢复；无手改内容 | 2026-10-24 01:30 | 在途：v7全部退出，0视频/0成片；v8/v9已主线，安全冷切换后先W10；其余集先核对实际图片预算。 |
+
+| Codex 三集恢复验证结果 | 通用修复已主线并冷上线v11；实际恢复验证失败于旧图内容与原图片额度 | codex/autonomous-production-v4-20261023 | 所有在途已收完，单入口停止派发，全部历史/余额保留 | 2026-10-24T01:46:18.511822+08:00 | W10 0/25、W12 0/18、W06 0/27视频，0成片/上传；衣装引用恢复与时序误审修复有真实证据；非从头无人成功。无新增生图/视频、无提交/push。见自有runtime recovery-results-v11.json。 |
+
+| Codex 全新无人值守v2 | 用户明确授权新开一集；原W10包从创作重新开始 | codex/autonomous-production-20261023冻结执行树 | 新edition zhiyao-auto-v2-EP04C_W10_失物海，单入口、标准额度、原旧三集不动 | 2026-10-24T02:06:45.122844+08:00 | 启动准备完成；无手改内容/热换代码，只有完整成片验收与上传才成功。runtime=/mnt/disk1/zengzhitao/interactive-video-worktrees/autonomous-production-20261023/.runtime/autonomous-clean-v2-20261024 |
+
+| Codex v2前置校验恢复 | 原26行请求真实回放后修字段级错误反馈/无进展误停；主线v13冷恢复 | codex/autonomous-production-v4-20261023 | first_frames.py、progress.py与回归；无内容/计数改写 | 2026-10-24 02:33 | 原始无人首跑已记失败；同入口恢复，原5144秒与原生成上限保留；0首帧/0视频，素材9张已完成。 |
+
+| Codex 无人v2结果 | 输入修订额度用尽，未出视频/成片；通用交接修复v16已主线待新实测 | codex/autonomous-production-v4-20261023 | 旧记录/原额度保留，服务inactive | 2026-10-24 03:49 | 15/26首帧通过、32候选、0视频/0上传。25/26源冲突仍在且输入额度0；不再盲重启。旧已受理图GET备存，未改生产判定。无提交/push。 |
+
+| Kimi W10接手 | 付费前opening预审、工具协议、范围化重试、原始说话人证据与恢复路由 | codex/autonomous-production-v4-20261023 + codex/autonomous-w10-clean-v3-20261024冻结执行树 | first_frames/opening_source/readiness/media_operations/current_task/local_preparation/identity/audit及相关Skill与测试；旧任务只读；main仅整合自有差分 | 2026-10-24 | 已合main未提交。113项最新相关回归通过；原W10独立源审issues=[]。v8恢复验证真实完成2次apply、4合格首帧、1技术视频、22候选，0成片/上传；最后16镜重复参考且缺H3描述而停止，服务inactive。最新修复有生产验证，完整无人目标未达成，不盲重启。 |
+| Kimi W10原包无人v10 | 原包重新创作、GPU16 H3、整片正式终审及私有上传；只读监控 | autonomous-w10-clean-v10-20261024冻结执行树；开发仍用v4 | 本任务runtime与新edition；旧v1-v9保留，不改内容/计数/运行代码 | 2026-10-24 21:58 | 已停止：创作27镜/素材完成，0首帧/视频/成片/上传；身份误绑定未闭环。v11从原包重开，不续旧额度/内容。 |
+| Kimi W10原包无人v11 | 身份原始证据及段落结构修复后的全新原包无人验证 | autonomous-w10-clean-v11-20261024冻结执行树；开发仍用v4 | 本任务runtime与新edition；旧v1-v10保留，不改内容/计数/运行代码 | 2026-10-24 22:33 | 已停止：0首帧/视频/成片/上传；身份多轮纠错未完成。v12补齐初次抽取原文和说话人映射，原输入完整回放两次内通过，冻结250相关回归过。 |
+| Kimi W10原包无人v12 | 说话人证据与身份协议修复后的全新原包无人验证 | autonomous-w10-clean-v12-20261024冻结执行树；开发仍用v4 | 本任务runtime与新edition；旧v1-v11保留，不改内容/计数/运行代码 | 2026-10-24 23:24 | 已停止：身份通过，opening预审拦4镜，0首帧/视频/成片/上传；watchdog误把阶段推进当无进展。v13修复单向交接，真实结果回放及63回归通过。 |
+| Kimi W10原包无人v13 | 源审阶段交接修复后的全新原包无人验证 | autonomous-w10-clean-v13-20261024冻结执行树；开发仍用v4 | 本任务runtime与新edition；旧v1-v12保留，不改内容/计数/运行代码 | 2026-10-25 00:01 | 已停止：身份通过，local_preparation交接被watchdog误停，0首帧/视频/成片/上传。v14补单向本地修复交接，76相关回归过。 |
+| Kimi W10原包无人v14 | 本地源修交接后的全新原包无人验证 | autonomous-w10-clean-v14-20261025冻结执行树；开发仍用v4 | 本任务runtime与新edition；旧v1-v13保留，不改内容/计数/运行代码 | 2026-10-25 00:42 | 已停止：身份段落冲突，0首帧/视频/成片/上传。v15说话人证据优先，真实回放通过，326冻结回归过。 |
+| Kimi W10原包无人v15 | 说话人证据优先修复后的全新原包无人验证 | autonomous-w10-clean-v15-20261025冻结执行树；开发仍用v4 | 本任务runtime与新edition；旧v1-v14保留，不改内容/计数/运行代码 | 2026-10-25 01:25 | 已停止：动作段缺台词证据，0首帧/视频/成片/上传。v16补全校验视图，真实回放通过，327冻结回归过。 |
+| Kimi W10原包无人v16 | 完整台词证据与源修交接后的全新原包无人验证 | autonomous-w10-clean-v16-20261025冻结执行树；开发仍用v4 | 本任务runtime与新edition；旧v1-v15保留，不改内容/计数/运行代码 | 2026-10-25 02:00 | 在途：单一produce-batch，MainPID2290259，标准额度；327冻结相关回归过。 |

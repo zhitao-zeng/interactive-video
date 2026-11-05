@@ -6,6 +6,33 @@ from pathlib import Path
 from novel_manga.util import atomic_write_json,read_json
 
 
+def test_current_task_and_resume_preserve_actual_input_field_capabilities(tmp_path):
+    from novel_manga.application.agents.episode.current_task import prepare
+    from novel_manga.application.agents.episode.prompts import resume_prompt
+    ctx=SimpleNamespace(work_dir=tmp_path/'sandbox',episode_dir=tmp_path/'book/book_1',run_dir=tmp_path)
+    capabilities={'adopted_input':{'shot_fields':['shot_scale','opening_frame','visual_prompt']},
+                  'source_review_required':True}
+    status={'adopted':True,'repair_capabilities':capabilities,
+            'next_action':{'action':'agent','reason':'Repair source fields with check then apply.'}}
+    task=prepare(ctx,status,{'issues':[]},[])
+    assert task['repair_capabilities']==capabilities
+    prompt=resume_prompt(task)
+    assert 'shot_scale' in prompt and 'opening_frame' in prompt and 'visual_prompt' in prompt
+
+
+def test_first_frame_argument_retry_preserves_validated_clips(tmp_path):
+    from novel_manga.application.agents.episode.current_task import prepare
+    ctx=SimpleNamespace(work_dir=tmp_path/'sandbox',episode_dir=tmp_path/'book/book_1',run_dir=tmp_path)
+    status={'adopted':True,'job':{'id':'job-2','action':'first_frames','status':'completed','result':{
+        'ok':False,'argument_errors':{'clip_08':['bad quote']},
+        'validated_clips':['clip_01','clip_02','clip_08'],
+        'validation_targets':['clip_01','clip_02','clip_08']}}}
+    task=prepare(ctx,status,{'issues':[]},[])
+    assert task['last_operation']['result']['retry_clips']==['clip_08']
+    assert any('only [' in rule and 'clip_08' in rule and 'validated_clips' in rule
+               for rule in task['execution_rules'])
+
+
 def test_completed_old_pending_receipt_is_presented_as_remaining_work(tmp_path):
     from novel_manga.application.agents.episode.current_task import prepare
     ctx=SimpleNamespace(work_dir=tmp_path/'sandbox',episode_dir=tmp_path/'book/book_1',run_dir=tmp_path)
@@ -47,6 +74,15 @@ def test_current_task_keeps_provisional_draft_and_adoption_workflow(tmp_path):
     assert any('output/episode.json' in rule and 'adopt' in rule for rule in task['execution_rules'])
     assert not any(rule.startswith('Only these current targets') for rule in task['execution_rules'])
     assert task['issues'][0]['detail']=='planner failed'
+
+
+def test_current_task_gives_complete_input_decision_protocol(tmp_path):
+    from novel_manga.application.agents.episode.current_task import prepare
+    ctx=SimpleNamespace(work_dir=tmp_path/'sandbox',episode_dir=tmp_path/'book/book_1',run_dir=tmp_path)
+    task=prepare(ctx,{'adopted':True},{'issues':[]},[])
+    assert any('reason' in rule and 'source_quote' in rule and 'shots' in rule
+               and 'old_speaker_name' in rule and 'index' in rule
+               for rule in task['execution_rules'])
 
 
 def test_related_history_keeps_effectful_repair_and_failed_choice_before_finish(tmp_path):

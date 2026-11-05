@@ -208,15 +208,24 @@ individually; it does not cancel another clip's permitted repair.
 For a confirmed source/input defect, use `input` instead of changing the final
 English to conceal a wrong reference. Include a verbatim `source_quote` from
 `input/source.txt`. Optional `shots` contains patches at this clip's existing
-shot indexes; supported fields are `location`, `light`, `visual_prompt`, `motion_prompt`,
+shot indexes; supported fields are `location`, `light`, `camera`, `shot_scale`,
+`scene_id`, `scene_time`, `scene_transition`, `visual_prompt`, `motion_prompt`,
 `start_state`, `event`, `end_state`, `sfx`, `props`, `scene_objects`, `wears`,
-`in_frame`, `extras`, `listeners`, `actions` and `speaker_map`.
+`in_frame`, `extras`, `listeners`, `actions`, `speaker_map`, `turn_texts`, `turns`,
+`opening_frame` and `audio_plan`. The current host `repair_capabilities.adopted_input.shot_fields`
+is the authoritative list if an older document differs.
 `in_frame`/`extras`/`listeners` are lists of nonempty names. `actions` contains
 objects with text `actor`, `action`, `target`; these correct source event ownership.
 `speaker_map` maps existing shot speaker names to source-correct names, for example
 `{"Wrong actor":"Actual source speaker"}`. The host changes only the names,
-retaining dialogue text and delivery mode. Source events, camera, timing and
-grouping stay intact; reattribution requires independent source support.
+retaining dialogue text and delivery mode. Patch only fields involved in the defect;
+timing and grouping stay intact, and reattribution requires independent source support.
+
+For a first-frame source conflict, repair every cited field together. Supply a complete
+`opening_frame` object when its prompt or visible people change, and also correct
+`shot_scale` or `camera` when those fields participate in the conflict. `visual_prompt`
+does not replace the first-frame `opening_frame`. Call `check`, then `apply`, and use
+`first_frames` with `reuse_candidate` to review retained pixels without new generation.
 
 After adoption, `characters` can also request a missing card for a named visible
 actor or actual speech owner in the corrected shots, using the design fields in
