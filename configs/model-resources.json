@@ -1,0 +1,298 @@
+{
+  "_": "Resource facts, not secret values. Zero token price does not imply available quota. Existing task routes remain authoritative. Evidence: docs/model-resources.md.",
+  "quota_groups": {
+    "phanthy-account": {
+      "kind": "daily_credit_pools",
+      "evidence": "OAuth usage cloud_desktop/non_cloud; all 8789 models share this account"
+    },
+    "router-video": {
+      "kind": "token",
+      "key_vars": [
+        "PHANROUTER_API_KEY",
+        "PHANROUTER_SD25_KEY"
+      ],
+      "account_balance": "unknown",
+      "token_limit": "unlimited",
+      "expires_at": 0,
+      "token_limit_checked_at": "2026-10-23"
+    },
+    "router-image": {
+      "kind": "token",
+      "key_vars": [
+        "PHANROUTER_IMAGE_API_KEY",
+        "PHANROUTER_H3CLOUD_API_KEY"
+      ],
+      "account_balance": "unknown",
+      "token_limit": "unlimited",
+      "expires_at": 0,
+      "token_limit_checked_at": "2026-10-23"
+    }
+  },
+  "resources": {
+    "phanthy-ds41": {
+      "model": "deepseek-v4.1-flash-1017",
+      "base_url": "http://127.0.0.1:8789",
+      "key_var": "PHANTHY_API_KEY",
+      "billing": "metered",
+      "quota_group": "phanthy-account",
+      "qualified": [
+        "json",
+        "agent",
+        "vision",
+        "http-chat"
+      ],
+      "available": true,
+      "thinking_switch": true,
+      "prices": {
+        "input": 300,
+        "output": 1200,
+        "cache": 6
+      }
+    },
+    "phanthy-dsv4": {
+      "model": "phanthy.com/deepseek-v4",
+      "base_url": "http://127.0.0.1:8789",
+      "key_var": "PHANTHY_API_KEY",
+      "billing": "free",
+      "quota_group": "phanthy-account",
+      "qualified": [
+        "json",
+        "agent",
+        "vision",
+        "http-chat"
+      ],
+      "available": true,
+      "thinking_switch": false,
+      "prices": {
+        "input": 0,
+        "output": 0,
+        "cache": 0
+      },
+      "note": "2026-10-23 user preference: minimize GPT for new tasks. Real native file tools/resume and subsequent source-extraction, repair and continuation passed; one two-image compatibility call passed. Earlier escaped-JSON nonce corruption and invalid creative JSON remain recorded, with ordinary content gates and existing bounded recovery unchanged. Eligibility confirms supported use, not guaranteed content quality or long-episode stability. Requested alias is not proof of DeepSeek identity; raw responses report kimi-k2.6. Evidence: docs/model-resources.md.",
+      "reported_model": "kimi-k2.6"
+    },
+    "phanthy-phancy": {
+      "model": "phanthy.com/phancy-35b",
+      "base_url": "http://127.0.0.1:8789",
+      "key_var": "PHANTHY_API_KEY",
+      "billing": "free",
+      "quota_group": "phanthy-account",
+      "qualified": [],
+      "available": false,
+      "thinking_switch": false,
+      "prices": {
+        "input": 0,
+        "output": 0,
+        "cache": 0
+      },
+      "note": "2026-10-23 native Agent4/5 phases passed; fifth returned simulated tool calls/results as plain text with invented file contents and no written output. Failure retained without retry; not qualified for automatic Agent selection. 2026-10-23 causal audit: raw Messages/Chat and saved native responses all report kimi-k2.6; alias names do not establish two distinct underlying models. Real tools/resume are supported; the retained content failures are not evidence of systematic local gateway/SDK incompatibility. Automatic eligibility is unchanged, not a permanent model-wide reliability verdict.",
+      "reported_model": "kimi-k2.6"
+    },
+    "phanthy": {
+      "model": "glm-5.3-flash",
+      "base_url": "http://127.0.0.1:8789",
+      "key_var": "PHANTHY_API_KEY",
+      "billing": "metered",
+      "quota_group": "phanthy-account",
+      "qualified": [
+        "json",
+        "agent",
+        "http-chat"
+      ],
+      "available": true,
+      "thinking_switch": false,
+      "prices": {
+        "input": 120,
+        "output": 400,
+        "cache": 40
+      }
+    },
+    "phanthy-luna": {
+      "model": "gpt-5.6-luna",
+      "base_url": "http://127.0.0.1:8789",
+      "key_var": "PHANTHY_API_KEY",
+      "billing": "unknown",
+      "quota_group": "phanthy-account",
+      "qualified": [],
+      "available": false,
+      "thinking_switch": false,
+      "note": "Absent from current authenticated catalogue; keep legacy preset, do not promote"
+    },
+    "codex-luna": {
+      "model": "gpt-5.6-luna",
+      "base_url": "codex://local",
+      "billing": "subscription",
+      "qualified": [
+        "json",
+        "agent",
+        "vision"
+      ],
+      "available": true,
+      "thinking_switch": false,
+      "note": "Pinned GPT5.6 saved-login preset retained for existing sessions and symbolic role endpoints. New tasks prefer the verified free non-GPT route; codex-luna-6 remains an available backup. Subscription limits still apply."
+    },
+    "official-ds41": {
+      "model": "deepseek-v4.1-flash-1017",
+      "base_url": "https://cloud.phanthy.com/phanrouter",
+      "key_var": "PHANROUTER_IMAGE_API_KEY",
+      "billing": "unknown",
+      "quota_group": "router-image",
+      "qualified": [
+        "json",
+        "agent",
+        "http-chat"
+      ],
+      "available": true,
+      "thinking_switch": true,
+      "note": "Live tool/resume passed; exact-echo JSON contamination observed; explicit opt-in only"
+    },
+    "official-k3": {
+      "model": "kimi-k3",
+      "base_url": "https://cloud.phanthy.com/phanrouter",
+      "key_var": "PHANROUTER_IMAGE_API_KEY",
+      "billing": "unknown",
+      "quota_group": "router-image",
+      "qualified": [
+        "json",
+        "agent",
+        "http-chat"
+      ],
+      "available": true,
+      "thinking_switch": true
+    },
+    "official-glm": {
+      "model": "glm-5.3",
+      "base_url": "https://cloud.phanthy.com/phanrouter",
+      "key_var": "PHANROUTER_IMAGE_API_KEY",
+      "billing": "unknown",
+      "quota_group": "router-image",
+      "qualified": [
+        "json",
+        "agent",
+        "http-chat"
+      ],
+      "available": true,
+      "thinking_switch": true,
+      "note": "One95.626s timeout observed; later protocol and SDK checks passed"
+    },
+    "h3": {
+      "model": "minimax-h3-ref2va-turbo",
+      "base_url": "pool",
+      "billing": "local",
+      "qualified": [
+        "video-h3"
+      ],
+      "available": true
+    },
+    "h3cloud": {
+      "model": "MiniMax-H3",
+      "key_var": "PHANROUTER_H3CLOUD_API_KEY",
+      "billing": "unknown",
+      "quota_group": "router-image",
+      "qualified": [
+        "video-h3-reference"
+      ],
+      "available": true
+    },
+    "sd25": {
+      "model": "sd2.5",
+      "key_var": "PHANROUTER_SD25_KEY",
+      "billing": "unknown",
+      "quota_group": "router-video",
+      "qualified": [
+        "video-sd25"
+      ],
+      "available": true
+    },
+    "general-video": {
+      "key_var": "PHANROUTER_API_KEY",
+      "billing": "unknown",
+      "quota_group": "router-video",
+      "qualified": [],
+      "available": true
+    },
+    "sd20-fast": {
+      "model": "sd2.0-fast",
+      "key_var": "PHANROUTER_IMAGE_API_KEY",
+      "billing": "unknown",
+      "quota_group": "router-image",
+      "qualified": [
+        "video-sd20-fast"
+      ],
+      "available": true
+    },
+    "sd20-mini": {
+      "model": "sd2.0-mini",
+      "key_var": "PHANROUTER_IMAGE_API_KEY",
+      "billing": "unknown",
+      "quota_group": "router-image",
+      "qualified": [
+        "video-sd20-mini"
+      ],
+      "available": true
+    },
+    "image": {
+      "model": "gpt-image-2",
+      "key_var": "PHANROUTER_IMAGE_API_KEY",
+      "billing": "unknown",
+      "quota_group": "router-image",
+      "qualified": [
+        "image"
+      ],
+      "available": true
+    },
+    "codex-luna-6": {
+      "model": "gpt-6-luna",
+      "base_url": "codex://local",
+      "billing": "subscription",
+      "qualified": [
+        "json",
+        "agent",
+        "vision"
+      ],
+      "available": true,
+      "thinking_switch": false,
+      "note": "Optional/backup GPT6 saved-login route; new default Agent and vision use phanthy-dsv4. Installed account advertises low/medium/high/xhigh/max; preserve effective task effort. Existing GPT6 sessions and explicit profiles are unchanged. Real activation/evaluation evidence: docs/model-resources.md."
+    },
+    "codex-sol-6": {
+      "model": "gpt-6-sol",
+      "base_url": "codex://local",
+      "billing": "subscription",
+      "qualified": [
+        "json",
+        "agent"
+      ],
+      "available": true,
+      "thinking_switch": false,
+      "note": "Opt-in GPT6 Sol saved-login profile; real file tools, saved-session continuation, direct structured JSON and text candidates tested. Vision/native-video are not qualified by this batch. Shared capacity and role effort remain unchanged."
+    }
+  },
+  "role_modes": {
+    "author": "medium",
+    "repair": "medium",
+    "agent": "low",
+    "review": "low",
+    "independent_review": "medium",
+    "translation": "off",
+    "check": "off",
+    "json": "off",
+    "music": "low"
+  },
+  "candidates": {
+    "agent": [
+      "phanthy-dsv4",
+      "codex-luna-6",
+      "phanthy-ds41"
+    ],
+    "json": [
+      "phanthy-dsv4",
+      "codex-luna-6",
+      "phanthy-ds41"
+    ],
+    "vision": [
+      "phanthy-dsv4",
+      "codex-luna-6",
+      "phanthy-ds41"
+    ]
+  }
+}

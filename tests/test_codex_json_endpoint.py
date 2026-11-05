@@ -70,3 +70,15 @@ def test_codex_clip_repair_uses_saved_login_without_phanthy_credential(tmp_path,
         return SimpleNamespace(ok=True,produced=['decision.json'])
     monkeypatch.setattr(codex_session,'run_session',execute)
     assert sandbox.run_agent('repair-case',config={'backend':'codex','model':'gpt-5.6-luna','runs_root':str(tmp_path)},timeout=300).ok
+
+
+def test_codex_image_helper_rejects_raw_video_before_model_invocation(tmp_path,monkeypatch):
+    from novel_manga.application import configuration
+    from novel_manga.application.agents import sandbox
+    from novel_manga.application.agents.episode import codex_session
+    monkeypatch.setattr(configuration,'project_root',lambda:tmp_path)
+    monkeypatch.setattr(sandbox,'load_config',lambda *a:{'image':'existing-sandbox'})
+    monkeypatch.setattr(codex_session,'run_session',lambda *a,**k:pytest.fail('Raw video must not be serialized as text for an image-only adapter'))
+    with pytest.raises(ValueError,match='video'):
+        codex.completion({'model':'gpt-6-luna','messages':[{'role':'user','content':[
+            {'type':'video_url','video_url':{'url':'data:video/mp4;base64,dGVzdA=='}}]}]},timeout=30)

@@ -17,6 +17,9 @@ VIDEO_LANES = {
     'sd20-fast': {'model': 'sd2.0-fast', 'key_var': 'PHANROUTER_IMAGE_API_KEY'},
     'sd20-mini': {'model': 'sd2.0-mini', 'key_var': 'PHANROUTER_IMAGE_API_KEY'},
 }
+from novel_manga.llm.catalog import resource as _resource
+for _lane, _values in VIDEO_LANES.items():
+    _values.update({k:v for k,v in _resource(_lane).items() if k in {'model','key_var'}})
 
 
 def project_config(root: Path, project: str) -> dict:
@@ -38,28 +41,43 @@ def configure(root: Path, lane: str = 'h3', *, project: str = 'adventure') -> No
     if lane not in VIDEO_LANES:
         raise ValueError(f'Unknown video lane: {lane}')
     selected=VIDEO_LANES[lane]
+    from novel_manga.llm.catalog import quota_group
     remote=lane!='h3'
     quota_lane='sd25' if lane=='sd25' else 'h3cloud' if lane=='h3cloud' else 'sd20'
     source = environment(root, {})
     os.environ.update(environment(root))
     config=project_config(root,project)
     services = config.get('services', {})
-    text_endpoint = os.environ.get('NOVEL_INTERACTIVE_TEXT_ENDPOINT') or services.get('text_endpoint', 'phanthy-ds41')
+    text_endpoint = os.environ.get('NOVEL_INTERACTIVE_TEXT_ENDPOINT')
+    if not text_endpoint:
+        from novel_manga.llm.catalog import catalogue, choose
+        configured = services.get('text_endpoint', 'phanthy-ds41')
+        text_endpoint = (choose(catalogue()['candidates']['json'], 'json') or configured
+                         if configured == 'phanthy-ds41' else configured)
+    from novel_manga.llm.catalog import review_defaults
+    vision_default, video_default = review_defaults(text_endpoint)
+    vision_endpoint = os.environ.get('SECOND_REVIEW_JUDGE') or vision_default
+    if not vision_endpoint:
+        raise ValueError('No qualified image-review endpoint; configure SECOND_REVIEW_JUDGE explicitly')
     channel_path = root/f'.runtime/{project}-demo/asset-channel.json'
     channel = json.loads(channel_path.read_text()) if channel_path.is_file() else {}
     os.environ.update({
         'NOVEL_PROJECT_ROOT': str(root), 'NOVEL_CLIP_SECONDS_MAX': '15',
         'NOVEL_LOCAL_QWEN_IMAGE_URL': '', 'NOVEL_REUSE_EXISTING_ASSETS': '1',
         'NOVEL_INTRO_SECONDS': '0', 'NOVEL_OUTRO_SECONDS': '0',
-        'NOVEL_PLANNER_ENDPOINT': text_endpoint, 'NOVEL_PREPARATION_ENDPOINT': text_endpoint,
-        'NOVEL_H3_TRANSLATION_ENDPOINT': text_endpoint, 'NOVEL_H3_REQUEST_CHECK_ENDPOINT': text_endpoint,
-        'SECOND_REVIEW_JUDGE': text_endpoint,
+        'NOVEL_PLANNER_ENDPOINT': os.environ.get('NOVEL_PLANNER_ENDPOINT') or text_endpoint,
+        'NOVEL_PREPARATION_ENDPOINT': os.environ.get('NOVEL_PREPARATION_ENDPOINT') or text_endpoint,
+        'NOVEL_H3_TRANSLATION_ENDPOINT': os.environ.get('NOVEL_H3_TRANSLATION_ENDPOINT') or text_endpoint,
+        'NOVEL_H3_REQUEST_CHECK_ENDPOINT': os.environ.get('NOVEL_H3_REQUEST_CHECK_ENDPOINT') or text_endpoint,
+        'SECOND_REVIEW_JUDGE': vision_endpoint,
+        'NOVEL_REVIEW_VIDEO_JUDGE': os.environ.get('NOVEL_REVIEW_VIDEO_JUDGE') or video_default,
         'NOVEL_LOCAL_H3_URL': 'pool' if lane == 'h3' else '',
         'NOVEL_H3_SHORT_EDGE': str(config.get('production', {}).get('h3_short_edge', 544)),
         'NOVEL_VIDEO_MODEL': selected['model'],
+        'NOVEL_RESOURCE_QUOTA_GROUP': quota_group(lane, source) or '',
         'NOVEL_QUOTA_STOP_FILE': str(root/f'.runtime/{project}-demo/{quota_lane}-quota.stop') if remote else '',
         'PHANROUTER_VIDEO_KEY_VAR': selected['key_var'],
-        'PHANROUTER_REFERENCE_ASSETS': '1' if remote else '0',
+        'PHANROUTER_REFERENCE_ASSETS': '1' if remote and lane != 'h3cloud' else '0',
         'PHANROUTER_INLINE_REFERENCE_IMAGES': '0' if remote else '1',
         'PHANROUTER_ASSET_PUBLIC_BASE': channel.get('public_base', source.get('PHANROUTER_ASSET_PUBLIC_BASE', '')) if remote else '',
         'NOVEL_ASSET_PUBLISH_DIR': str((root / channel.get('publish_dir', services.get('asset_publish_dir', 'outputs/.published'))).resolve()),

@@ -241,34 +241,48 @@ class FirstFrameOperations:
         if isinstance(catalog,dict):catalog=catalog.get('assets',[])
         registered={r['path'] for r in catalog if r.get('role') in {'character','location','prop'} and r.get('path')}
         segments={r['segment_id']:r['text'] for r in read_json(ctx.episode_dir/'segments.json',[])}
-        prepared=[];seen=set()
+        prepared=[];seen=set();argument_errors={}
         for row in rows:
             if not isinstance(row,dict) or row.get('clip_id') not in clips or row['clip_id'] in seen:
                 raise ValueError('frames must select distinct current clips')
             row=authored_row(ctx,clips[row['clip_id']],row)
             cid=row['clip_id'];seen.add(cid);clip=clips[cid]
+            errors=[]
             for field in ('image_prompt','source_quote'):
-                if not isinstance(row.get(field),str) or not row[field].strip():raise ValueError(f'{cid}: {field} requires text')
+                if not isinstance(row.get(field),str) or not row[field].strip():errors.append(f'{field} requires text')
             for field in ('image_references','extra_references','visible_characters'):
                 if not isinstance(row.get(field),list) or any(not isinstance(p,str) for p in row[field]) or len(set(row[field]))!=len(row[field]):
-                    raise ValueError(f'{cid}: {field} requires distinct strings')
-            if not row['image_references'] or not set(row['image_references'])<=registered:
-                raise ValueError(f'{cid}: image_references must use registered source cards, never old video/frames')
+                    errors.append(f'{field} requires distinct strings')
+            if errors:
+                argument_errors[cid]=errors;continue
             original={r['path'] for r in clip.get('references',[]) if r.get('role') in {'character','location','prop'}}
-            if not set(row['extra_references'])<=original:
-                raise ValueError(f'{cid}: extra_references must select current source image paths')
+            if not row['image_references'] or not set(row['image_references'])<=registered:
+                errors.append(f'image_references must use registered source cards; current clip paths: {sorted(original & registered)}')
+            extras_valid=set(row['extra_references'])<=original
+            if not extras_valid:
+                errors.append(f'extra_references must select current source image paths: {sorted(original)}')
             source='\n'.join(segments.get(s,'') for s in clip.get('segment_ids',[]))
-            if row['source_quote'] not in source:raise ValueError(f'{cid}: source_quote must quote this clip source verbatim')
+            if row['source_quote'] not in source:
+                errors.append('source_quote must quote this clip source verbatim, not a summary. '
+                    f'Read segments.json for segment_ids={clip.get("segment_ids",[])}. '
+                    f'Current scoped source text: {source}')
+            draft_frame={'path':'pending.png','extra_references':row['extra_references'],'visible_characters':row['visible_characters']}
+            from .requests import compose_request
+            if extras_valid:
+                try:
+                    if not isinstance(row.get('prompt_h3'),str) or not row['prompt_h3'].strip():
+                        row['prompt_h3']=compose_request({**clip,'first_frame':draft_frame},row.get('h3'))
+                    validate_existing_request({**clip,'first_frame':draft_frame},row['prompt_h3'])
+                except ValueError as error:errors.append(str(error))
+            if errors:
+                argument_errors[cid]=errors;continue
             contract=current_contract(ctx,clip,row['image_references'],include_style=True)
             bindings={r['path']:r for r in catalog if r.get('path')}
             bindings.update({r['path']:r for r in clip.get('references',[]) if r.get('path')})
             row['request_prompt']=request_prompt(ctx,row,contract,references=bindings.values())
-            draft_frame={'path':'pending.png','extra_references':row['extra_references'],'visible_characters':row['visible_characters']}
-            from .requests import compose_request
-            if not isinstance(row.get('prompt_h3'),str) or not row['prompt_h3'].strip():
-                row['prompt_h3']=compose_request({**clip,'first_frame':draft_frame},row.get('h3'))
-            validate_existing_request({**clip,'first_frame':draft_frame},row['prompt_h3'])
             prepared.append((row,contract,source_asset_state(ctx,row['image_references'])))
+        if argument_errors:
+            raise ValueError('Correct these first_frames fields before image generation: '+json.dumps(argument_errors,ensure_ascii=False))
         results={};changed=[];reviewed_candidates=[]
         self.partial_outcome={'changed':changed,'reviewed_candidates':reviewed_candidates,'clips':results}
         def reserve(row,contract,assets):

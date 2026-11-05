@@ -243,7 +243,7 @@ def resume_prompt(task, *, agent_instructions=None):
                   ('action','reason','blocked','service_interrupted','audio_review')
                   if key in next_action}
     state = {key:task[key] for key in
-             ('phase','mode','upstream_route','repair_capabilities','targets','issues',
+             ('phase','mode','workflow_scope','execution_rules','upstream_route','repair_capabilities','targets','issues',
               'last_operation','related_history','evidence_files','full_status','reference_catalog')
              if key in task}
     if task.get('postproduction'):
@@ -266,8 +266,10 @@ def resume_prompt(task, *, agent_instructions=None):
         state['audio_mix'] = task['audio_mix']
 
     prompt = (
-        'Continue this same saved episode session. The first turn already established the user task and workflow rules; '
-        'keep them in force. This message carries only the current actionable state. Use the exact actions, counters, '
+        'Continue this same saved episode session. Use the current host workflow scope and execution rules below. '
+        'They supersede restrictions from earlier production phases; user requirements and existing budgets remain binding. '
+        'For example, after first video production ends, a current review/finish action belongs to the full-production phase. '
+        'This message carries the current actionable state. Use the exact actions, counters, '
         'input permissions, and blockers below; consult /work/input/current-task.json or '
         '/work/input/current-status.json only when a needed detail is absent here. Those full files remain current and intact. '
         'Successful reads and assessments from earlier turns remain in this saved session. Check the current task and last operation first, '

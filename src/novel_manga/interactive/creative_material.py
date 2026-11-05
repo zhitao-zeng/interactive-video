@@ -129,6 +129,32 @@ def write_material(episode, manifest, destination, *, style_source=None):
     return destination
 
 
+def adaptation_designs(episode, bible):
+    """Keep supplied series identities; bind the author's new episode designs."""
+    additions={'characters':[],'props':[]};issues=[]
+    design=episode.get('production_design') or {}
+    known={row['name'] for row in bible.get('characters',[])}
+    for kind,model in [('characters',Character),('props',Prop)]:
+        existing={row['name'] for row in bible.get(kind,[])}
+        for row in design.get(kind,[]):
+            if row.get('name') in existing:continue
+            try:item=model.model_validate(row)
+            except (ValidationError,TypeError) as error:
+                issues.append(f'production_design.{kind}: {error}');continue
+            if not item.appearance.strip():
+                issues.append(f'production_design.{kind}: {item.name} needs its authored appearance');continue
+            additions[kind].append(item.model_dump(mode='json'));existing.add(item.name)
+        if kind=='characters':known.update(existing)
+    for shot in (episode.get('chapter_script') or {}).get('shots',[]):
+        names=set()
+        for key in ('characters','in_frame'):
+            if isinstance(shot.get(key),list):names.update(shot[key])
+        names.update(t.get('speaker_name') or t.get('speaker') for t in shot.get('turns',[]) if t.get('text'))
+        unknown=names-known-{None,''}
+        if unknown:issues.append(f'shot {shot["index"]}: actors {sorted(unknown)} have no supplied series identity; provide their source-supported production_design.characters designs before handoff')
+    return additions,issues
+
+
 def adaptation_issues(episode, manifest):
     """Adaptation drafts bind a supplied screenplay; design facts come from the
     approved series material, so only the script contract is checked here."""
@@ -148,6 +174,12 @@ def adaptation_issues(episode, manifest):
     covered=[i for g in episode.get('clips',[]) for i in g['shot_indexes']]
     if sorted(covered)!=indexes:
         issues.append('adaptation clips must cover every shot exactly once')
+    series=(manifest.get('task') or {}).get('series_material')
+    if series:
+        from novel_manga.application.configuration import project_root
+        path=Path(series);path=path if path.is_absolute() else project_root()/path
+        base=read_json(path/'material.json',{})
+        if base.get('bible'):issues.extend(adaptation_designs(episode,base['bible'])[1])
     return issues
 
 
@@ -180,11 +212,22 @@ def write_adaptation_material(episode, manifest, destination, *, series_material
     base=read_json(series_material/'material.json')
     scenes={s.get('scene_id'):s for s in (episode.get('spatial_plan') or {}).get('scenes',[])}
     bible=copy.deepcopy(base['bible'])
+    additions,errors=adaptation_designs(episode,bible)
+    if errors:raise ValueError('; '.join(errors))
+    for kind,rows in additions.items():bible.setdefault(kind,[]).extend(rows)
     known={loc.split('：',1)[0] for loc in bible['locations']}
+    shots_by_scene={}
+    for s in (episode.get('chapter_script') or {}).get('shots',[]):
+        sid=s.get('scene_id')
+        if sid and s.get('location'): shots_by_scene.setdefault(sid,s['location'])
     for scene in (episode.get('spatial_plan') or {}).get('scenes',[]):
-        name=scene.get('location')
+        name=scene.get('location') or shots_by_scene.get(scene.get('scene_id'),'')
         if name and name not in known:
-            bible['locations'].append(f"{name}：{'；'.join(scene.get('anchors') or []) or name}")
+            a=scene.get('anchors') or []
+            desc='；'.join(x if isinstance(x,str) else json.dumps(x,ensure_ascii=False)
+                          for x in (a if isinstance(a,list) else [a])) or name
+            bible['locations'].append(f"{name}：{desc}")
+            known.add(name)
     script=_normalize_adaptation_script(copy.deepcopy(episode['chapter_script']),scenes)
     shots={s['index']:s for s in script['shots']}
     groups=[]
@@ -198,7 +241,8 @@ def write_adaptation_material(episode, manifest, destination, *, series_material
     profile=copy.deepcopy(base['profile'])
     profile.update(manifest.get('profile') or {})
     profile.setdefault('h3_speech_policy','no_reference_performance_first')
-    profile.setdefault('h3_input_mode','first-frame'); profile.setdefault('h3_extra_reference_policy','needed')
+    # Lane mode (h3_input_mode) is chosen by the caller, not the material: baking
+    # first-frame in here made SD editions refuse to start (2026-10-23).
     interaction=copy.deepcopy(episode['interaction']);interaction.setdefault('seconds',3)
     segments=[{'segment_id':f'seg_{i}','text':'\n'.join(filter(None,[s.get('start_state'),s.get('event'),
         *[f"{t.get('speaker') or t.get('speaker_name','')}：{t['text']}" for t in s.get('turns',[])],s.get('end_state')]))}

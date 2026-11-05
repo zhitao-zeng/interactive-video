@@ -51,7 +51,9 @@ def prop_assets_on_disk(novel_dir) -> dict[str, set[str]]:
 def build_references(cast: list[str], location_short: str | None, bible: StoryBible, location_map: dict[str, str], speakers: tuple[str, ...] = (), novel_dir: Path | None = None, chapter: int | None = None, *, settings=None, identity_data=None, body_refs=None, props: list[str] | None = None, props_index: dict | None = None, props_on_disk: set[str] | None = None, worn_overrides: dict[str, str | None] | None = None, faceplate_closed: set[str] | frozenset = frozenset(), faceplate_closed_only: set[str] | frozenset = frozenset()) -> tuple[list[dict], list[str], str]:
     settings = settings or compiler_options()
     character_index = {character.name: index for index, character in enumerate(bible.characters, start=1)}
-    location_index = {full.split("：", 1)[0].strip(): index for index, full in enumerate(bible.locations, start=1)}
+    # Use the same ordered locations as the asset factory. An exact duplicate
+    # must not bind a card number the factory can never create.
+    location_index = {full.split("：", 1)[0].strip(): index for index, full in enumerate(dict.fromkeys(bible.locations), start=1)}
     # The leads carry the story and were the most often face- or costume-swapped
     # in review; they always get their expressions sheet as a second view when
     # it exists on disk, whatever the tier.

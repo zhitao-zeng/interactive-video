@@ -67,6 +67,10 @@ Write `output/episode.json` as one object with:
   consecutive `index`, `scene_id`, `location`, `duration_seconds`, `purpose`,
   `characters`, `in_frame`, `start_state`, `event`, `end_state`, `camera`, `turns`,
   `sfx`, `audio_plan.music_cue`, and the adaptation's `source_quote`.
+  `characters` and `in_frame` are JSON arrays of actor names. `in_frame` is a
+  subset of that shot's `characters`; an empty/POV frame may use `[]`. Put props,
+  scenery and descriptions in `scene_objects`/`props` or shot text, not the actor
+  roster. A phrase such as “the falling backpack” is not a character name.
 - For a task selecting `h3_input_mode: first-frame` or `sd_input_mode: first-frame`, author each shot's
   `opening_frame: {image_prompt, visible_characters, reference_subjects}` now.
   Describe one static composition at time zero: camera position, visible stable
