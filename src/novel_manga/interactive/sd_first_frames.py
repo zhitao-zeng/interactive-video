@@ -6,7 +6,8 @@ import os
 from concurrent.futures import ThreadPoolExecutor,wait,FIRST_COMPLETED
 
 from novel_manga.util import read_json, atomic_write_json
-from novel_manga.media.first_frames import current_contract, source_asset_state, require_current, review_problems, unchanged_opening_scale
+from novel_manga.media.first_frames import (CompiledOpening, compile_opening, current_contract, require_current,
+    review_problems, source_opening, source_assets_match, unchanged_opening_scale)
 
 
 def select_mode(novel, mode):
@@ -24,15 +25,16 @@ def select_mode(novel, mode):
 
 
 def prepare(root, novel, *, builder=None, checker=None):
-    from novel_manga.application.agents.episode.first_frames import (build, check, source_opening,
-        review_candidate, request_prompt, opening_state)
+    from novel_manga.application.agents.episode import opening_source
+    from novel_manga.application.agents.episode.first_frames import (build, check, review_candidate,
+        opening_state, review_opening_sources)
     from novel_manga.story.voice_delivery import native_speech_selected
     from novel_manga.story.fields import opening_frame_error
     if read_json(novel/'profile.json',{}).get('sd_input_mode')!='first-frame':
         raise ValueError('Select SD first-frame mode before preparing openings')
     episode=novel/(novel.name+'_1');plan=read_json(episode/'clip_plan.json')
     runtime=root/'.runtime/sd-first-frames'/novel.name
-    ctx=SimpleNamespace(novel_dir=novel,episode_dir=episode,run_dir=runtime)
+    ctx=SimpleNamespace(novel_dir=novel,episode_dir=episode,run_dir=runtime,work_dir=runtime)
     pending=[]
     # Check the complete source before paying for any images.
     for clip in plan['clips']:
@@ -47,27 +49,36 @@ def prepare(root, novel, *, builder=None, checker=None):
             require_current(ctx,clip)
             if (clip.get('first_frame')or{}).get('review_record'):continue
         except (ValueError,OSError):pass
-        opening=source_opening(ctx,clip)
-        if issue:=opening_frame_error(opening):
+        if issue:=opening_frame_error(source_opening(ctx,clip)):
             raise ValueError(f"{clip['clip_id']}: creator opening_frame required: {issue}")
-        refs=[r for r in clip.get('references',[]) if r.get('role') in {'character','location','prop'}]
-        subjects=opening.get('reference_subjects')
-        if subjects:
-            if set(subjects)-{r['name'] for r in refs}:
-                raise ValueError(f"{clip['clip_id']}: opening reference_subjects must name registered source cards")
-            refs=[r for r in refs if r['name'] in subjects]
-        paths=[r['path'] for r in refs]
-        if not paths:raise ValueError(f"{clip['clip_id']}: opening requires registered source cards")
-        contract=current_contract(ctx,clip,paths,include_style=True)
-        row={'image_prompt':opening['image_prompt'],'visible_characters':opening['visible_characters'],
-             'image_references':paths,'extra_references':[],
-             'request_prompt':request_prompt(ctx,{'image_prompt':opening['image_prompt']},contract,references=refs)}
-        identity={'row':row,'source_contract':contract,'source_assets':source_asset_state(ctx,paths)}
-        pending.append((clip,row,contract,identity))
+        compiled=compile_opening(ctx,clip,{'clip_id':clip['clip_id']},lane='sd20-fast',require_assets=False)
+        row,contract,assets=compiled
+        if not row['image_references']:raise ValueError(f"{clip['clip_id']}: opening requires registered source cards")
+        identity={'row':row,'source_contract':contract,'source_assets':assets,
+                  'references':[r.as_dict() for r in compiled.references]}
+        pending.append((clip,compiled,identity))
     runtime.mkdir(parents=True,exist_ok=True)
     (runtime/'owner').write_text(f'Interactive Fast API first-frame preparation / {novel}\n')
+    source_reviews=review_opening_sources(ctx,[compiled for _,compiled,_ in pending])
+    blockers=opening_source.source_blockers(ctx,plan)
+    if blockers:
+        clips={clip['clip_id']:clip for clip in plan['clips']}
+        for cid in blockers:
+            opening=current_contract(ctx,clips[cid],[])['opening']
+            review=source_reviews.get(cid) or opening_source.current_review(ctx,cid,opening)
+            atomic_write_json(runtime/'input/first_frames'/cid/'source-preflight.json',review)
+        raise ValueError(f"opening_source_conflict: {sorted(blockers)}")
+    materialized=[]
+    for clip,compiled,_ in pending:
+        current=compile_opening(ctx,clip,compiled.row,lane='sd20-fast',require_assets=True)
+        row,contract,assets=current
+        identity={'row':row,'source_contract':contract,'source_assets':assets,
+                  'references':[r.as_dict() for r in current.references]}
+        materialized.append((clip,current,identity))
+    pending=materialized
     def candidate_for(item):
-        clip,row,contract,identity=item
+        clip,compiled,identity=item
+        row,contract,assets=compiled
         folder=novel/'first_frames'/episode.name/clip['clip_id'];folder.mkdir(parents=True,exist_ok=True)
         candidates=sorted(folder.glob('candidate_*'))
         def generation_input(value):
@@ -88,7 +99,12 @@ def prepare(root, novel, *, builder=None, checker=None):
                 expected['source_contract']['opening'].pop('shot_scale',None)
             if 'character_facts'not in saved_contract and 'device_state'not in saved_contract.get('opening',{}):
                 expected['source_contract']['opening'].pop('device_state',None)
-            if generation_input(saved)==generation_input(expected):
+            if 'references' not in saved:expected.pop('references',None)
+            if not any('hash' in asset for asset in saved.get('source_assets',[])):
+                for asset in expected['source_assets']:asset.pop('hash',None)
+            left=generation_input(saved);right=generation_input(expected)
+            saved_assets=left.pop('source_assets',[]);expected_assets=right.pop('source_assets',[])
+            if left==right and source_assets_match(saved_assets,expected_assets):
                 candidate=directory
                 generation_row=saved['row'];generation_contract=saved['source_contract']
                 break
@@ -96,17 +112,20 @@ def prepare(root, novel, *, builder=None, checker=None):
             if len(candidates)>=3:raise ValueError(f"{clip['clip_id']}: first-frame image candidate budget used")
             candidate=folder/f'candidate_{len(candidates)+1:02d}';candidate.mkdir()
             atomic_write_json(candidate/'sd-input.json',identity)
+        generation_compiled=CompiledOpening(generation_row,generation_contract,assets,
+            compiled.draft_frame,compiled.references)
         path=candidate/'opening.png'
-        if not path.is_file():(builder or build)(ctx,generation_row,path)
+        if not path.is_file():(builder or build)(ctx,generation_compiled if builder is None else generation_row,path)
         if not (candidate/'image-request.json').is_file():
             from novel_manga.application.profiles import frame_spec, load_profile
             atomic_write_json(candidate/'image-request.json',{
                 'authored_prompt':generation_row['image_prompt'],'request_prompt':generation_row['request_prompt'],
                 'image_references':list(generation_row['image_references']),'extra_references':[],
                 'visible_characters':list(generation_row['visible_characters']),
+                'references':[r.as_dict() for r in compiled.references],
                 'ratio':frame_spec(load_profile(novel))['video_ratio'],
-                'opening_state':opening_state(generation_row,generation_contract)})
-        review,_,record=review_candidate(ctx,path,row,contract,identity['source_assets'],checker or check)
+                'opening_state':opening_state(generation_compiled)})
+        review,_,record=review_candidate(ctx,path,compiled,checker or check)
         if review.get('consistent') is not True or review_problems(review):
             error=ValueError(f"{clip['clip_id']}: first-frame review rejected; inspect {candidate}")
             error.frame_path=str(path.relative_to(novel))
@@ -114,9 +133,10 @@ def prepare(root, novel, *, builder=None, checker=None):
             raise error
         return {'path':str(path.relative_to(novel)),'extra_references':[],
             'visible_characters':copy.deepcopy(row['visible_characters']),'source_contract':contract,
-            'source_assets':identity['source_assets'],'prompt':row['image_prompt'],
-            'request_prompt':row['request_prompt'],'review':review,'review_record':str(record.relative_to(novel)),
-            'candidate':candidate.name}
+            'source_assets':assets,'references':[r.as_dict() for r in compiled.references],
+            'prompt':row['image_prompt'],'request_prompt':row['request_prompt'],
+            'image_sha256':read_json(record,{}).get('input',{}).get('candidate_sha256'),
+            'review':review,'review_record':str(record.relative_to(novel)),'candidate':candidate.name}
     from novel_manga.media.resources import acquire_inflight_slot,release_inflight_slot
     workers=max(1,min(8,int(read_json(novel/'profile.json',{}).get('inflight',1))))
     shared=os.environ.get('NOVEL_INFLIGHT_DIR')

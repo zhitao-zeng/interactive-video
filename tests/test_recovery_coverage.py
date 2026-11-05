@@ -316,3 +316,23 @@ def test_changed_citation_ids_are_not_reassigned_to_filmed_shots(ctx_pair):
     old=[{'segment_id':'seg_1','text':'不属于本章'}]
     atomic_write_json(ctx.source_episode_dir/'segments.json',[{'segment_id':'different_id','text':'原文'}])
     assert sync_source_segments(ctx,old,'原文')==old
+
+
+def test_acceptance_projection_requires_current_visual_and_complete_audio(tmp_path, monkeypatch):
+    from novel_manga.review.acceptance import acceptance_status
+    episode = tmp_path/'book_1'
+    movie = tmp_path/'episode.mp4'
+    movie.write_bytes(b'movie')
+    atomic_write_json(episode/'clip_plan.json', {'clips':[]})
+    atomic_write_json(episode/'thin_media_report.json', {
+        'quality_review':{'passed':True,'content_passed':True},
+        'assembly':{'final_video':str(movie),'thin_passed':True},
+        'final_cut_review':{'movie':str(movie),'complete':True,'passed':True,'issues':[]},
+        'final_audio_review_required':True})
+    atomic_write_json(episode/'final_cut_review.json', {
+        'movie':str(movie),'complete':True,'passed':True,'issues':[]})
+    monkeypatch.setattr('novel_manga.application.production.runs.episode_status',lambda *_:'done')
+    assert acceptance_status(episode)['status'] == 'candidate'
+    atomic_write_json(episode/'final_audio_review.json', {
+        'movie':str(movie),'complete':True,'passed':True,'issues':[],'errors':[]})
+    assert acceptance_status(episode)['status'] == 'accepted'

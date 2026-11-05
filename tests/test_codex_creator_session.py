@@ -72,6 +72,15 @@ def test_codex_login_dispatch_keeps_sandbox_paths_and_never_asks_api_key(tmp_pat
     assert (result.directory/'codex-events.jsonl').is_file()
 
 
+def test_daemon_without_user_path_uses_installed_user_codex(tmp_path,monkeypatch,codex_config):
+    binary=tmp_path/'.local/bin/codex';binary.parent.mkdir(parents=True);binary.write_text('binary');binary.chmod(0o755)
+    monkeypatch.setattr(codex_session.shutil,'which',lambda name:None)
+    monkeypatch.setattr(Path,'home',lambda:tmp_path)
+    work=tmp_path/'episode';_,calls=cli(monkeypatch,work)
+    codex_session.run_session(work,'Initial',config=codex_config)
+    assert f'{binary}:/usr/local/bin/codex:ro' in calls[0]
+
+
 def test_codex_resume_keeps_actual_thread_and_prior_candidates(tmp_path, monkeypatch, codex_config):
     work = tmp_path/'episode'
     identity, _ = cli(monkeypatch, work, outputs={'requests.json': 'retained'})

@@ -1,6 +1,9 @@
 """The existing scoped input-repair argument contract."""
 from __future__ import annotations
 import copy
+from dataclasses import dataclass
+import hashlib
+import json
 from .arguments import RepairArgumentError, validate_resume
 from novel_manga.story.fields import ACTION_KEYS
 from novel_manga.story.field_validation import action_strings, wears_values, patch_turn_values, delivery_issue
@@ -10,8 +13,81 @@ from novel_manga.application.identity.phases import LOOK_FIELDS
 SHOT_NAMES = {'in_frame', 'extras', 'listeners'}
 SHOT_FIELDS = {'location', 'light', 'camera', 'shot_scale', 'scene_id', 'scene_time', 'scene_transition',
                'wears', 'props', 'scene_objects', 'visual_prompt', 'motion_prompt',
-               'start_state', 'event', 'end_state', 'sfx', 'actions', 'speaker_map', 'turn_texts', 'turns','opening_frame', 'audio_plan', *SHOT_NAMES}
+               'start_state', 'event', 'end_state', 'sfx', 'actions', 'speaker_map', 'turn_texts', 'turns',
+               'opening_frame', 'device_state', 'audio_plan', *SHOT_NAMES}
 
+
+@dataclass(frozen=True)
+class RepairGrant:
+    operation: str
+    shot_indexes: tuple
+    shot_fields: frozenset
+    evidence: dict
+
+    def __post_init__(self):
+        object.__setattr__(self,'shot_indexes',tuple(self.shot_indexes))
+        object.__setattr__(self,'shot_fields',frozenset(self.shot_fields))
+
+    def as_dict(self):
+        return {'operation':self.operation,'shot_indexes':list(self.shot_indexes),
+                'shot_fields':sorted(self.shot_fields),'evidence':copy.deepcopy(self.evidence)}
+
+
+def evidence_fingerprint(value):
+    payload=json.dumps(value,ensure_ascii=False,sort_keys=True,separators=(',',':'),default=str)
+    return hashlib.sha256(payload.encode()).hexdigest()
+
+
+def operation_grant(operation,clip,evidence=None):
+    evidence=copy.deepcopy(evidence or {})
+    evidence.setdefault('fingerprint',evidence_fingerprint(evidence))
+    indexes=clip.get('shot_indexes') or []
+    return RepairGrant(operation,tuple(indexes[:1]),frozenset(),evidence)
+
+
+def opening_grant(clip,findings,evidence=None):
+    selected=[f for f in findings if f.get('origin')=='source' and f.get('relation')=='contradiction']
+    if not selected:return None
+    fields=set();basis=set()
+    for finding in selected:
+        for value in finding.get('basis') or []:
+            parts=value.split('.')
+            if parts and parts[0]=='opening':parts=parts[1:]
+            if parts and parts[0]=='opening':parts=parts[1:]
+            basis.add(value)
+            if not parts:continue
+            if parts[0]=='opening_frame' and len(parts)>1:fields.add('opening_frame')
+            elif len(parts)==1 and parts[0] in {'camera','shot_scale','device_state'}:fields.add(parts[0])
+    if not fields:
+        raise RepairArgumentError('opening findings have no minimally authorized source field mapping: '+sorted(basis).__repr__())
+    evidence=copy.deepcopy(evidence or {})
+    evidence.update(origin='source',basis=sorted(basis))
+    evidence.setdefault('fingerprint',evidence_fingerprint(evidence))
+    indexes=clip.get('shot_indexes') or []
+    return RepairGrant('input',tuple(indexes[:1]),frozenset(fields),evidence)
+
+
+def source_patch_fields(row):
+    containers={'shots','phases','locations','characters','music_plan'}
+    return set(row)&(containers|SHOT_FIELDS)
+
+
+def validate_grant(row,grant):
+    if grant is None:return
+    patches=row.get('shots') or []
+    if grant.operation!='input':
+        if source_patch_fields(row):
+            raise RepairArgumentError(f'{grant.operation} does not accept source patch fields')
+        return
+    for patch in patches:
+        index=patch.get('index')
+        if index not in grant.shot_indexes:
+            raise RepairArgumentError(f'input shot index {index} is outside the authorized grant: {list(grant.shot_indexes)}')
+        extra=set(patch)-{'index'}-set(grant.shot_fields)
+        if extra:
+            raise RepairArgumentError(f'input fields outside the authorized grant: {sorted(extra)}')
+    if set(row)&{'phases','locations','characters','music_plan'}:
+        raise RepairArgumentError('top-level source patches are outside the authorized opening grant')
 
 
 def expand_shared_scope(row, plan):
@@ -27,12 +103,17 @@ def expand_shared_scope(row, plan):
 def normalize_arguments(row):
     """Reject malformed interface values before receipts, models or asset work."""
     validate_resume(row)
-    allowed = {'clip_id','action','reason','source_quote','clip_ids','shots','phases','locations','characters','resume'}
+    allowed = {'clip_id','action','reason','source_quote','clip_ids','shots','phases','locations','characters','resume','music_plan'}
     unknown = set(row)-allowed
+    if 'input' in unknown:
+        raise RepairArgumentError("unsupported 'input' wrapper; put speaker_map and other source patch fields in "
+                                  "shots:[{index: <current shot index>, ...}] with no nested input object")
     if unknown:
         raise RepairArgumentError(f'unsupported input fields: {sorted(unknown)}; '
                                   'use shots, characters, phases.characters and locations for adopted input repairs')
     row = copy.deepcopy(row)
+    if 'music_plan' in row and not isinstance(row['music_plan'],dict):
+        raise RepairArgumentError('music_plan must be an authored postmix plan object')
     scope = row.get('clip_ids')
     if scope is not None and (not isinstance(scope, list) or not scope
             or any(not isinstance(key, str) or not key.strip() for key in scope)):

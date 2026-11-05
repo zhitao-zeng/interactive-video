@@ -123,6 +123,15 @@ def register_metadata(ctx, assets):
             if name not in names:
                 bible.setdefault('characters', []).append(Character(name=name, **asset['design']).model_dump())
                 names.append(name); changed = True
+            else:
+                index = names.index(name)
+                card = ctx.novel_dir/'series_assets/characters'/f'character_{index+1:03d}'/'turnaround.jpeg'
+                if not card.is_file():
+                    from novel_manga.application.identity.phases import LOOK_FIELDS
+                    design = {k:v for k,v in asset['design'].items() if k in LOOK_FIELDS}
+                    validated = Character.model_validate({**bible['characters'][index], **design}).model_dump(include=set(design))
+                    bible['characters'][index].update(validated)
+                    changed = True
             if not any(r.get('canonical') == name for r in entities):
                 # Unregistered Bible rows already own implicit e001, e002, etc.
                 number = max([len(names), *[int(r['id'][1:]) for r in entities

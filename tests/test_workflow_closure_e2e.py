@@ -115,11 +115,17 @@ def _make_case(tmp_path, monkeypatch):
     monkeypatch.setattr(first_frames, "build", build_frame)
     monkeypatch.setattr(first_frames, "check", lambda *_: {
         "consistent": True, "findings": [], "problems": []})
+    from novel_manga.application.agents.episode import opening_source
+    def review_openings(context, prepared):
+        reviews = {row["clip_id"]: {"findings": []} for row, _, _ in prepared}
+        opening_source.remember(context, prepared, reviews)
+        return reviews
+    monkeypatch.setattr(first_frames, "review_opening_sources", review_openings)
     def fake_asset_image(_self, _prompt, output, **_kwargs):
         from novel_manga.providers.base import ImageResult
         output = Path(output)
         output.parent.mkdir(parents=True, exist_ok=True)
-        Image.new("RGB", (48, 48), (75, 95, 115)).save(output, "JPEG")
+        Image.new("RGB", (32, 32), (80, 100, 120)).save(output, "JPEG")
         return ImageResult(path=output, request_current=True)
 
     monkeypatch.setattr("novel_manga.providers.phanrouter.PhanRouterMediaProvider.create_image",
@@ -130,7 +136,11 @@ def _make_case(tmp_path, monkeypatch):
         "source_readable": True, "issues": []})
 
     def translate_request(clip, **_kwargs):
+        from novel_manga.application.agents.episode.requests import compose_request
         from novel_manga.application.profiles import h3_stamp
+        clip["prompt_h3"] = compose_request(clip, {
+            "shots": ["The visible subject turns toward the entrance and pauses. <DIALOGUE_1>"],
+            "soundscape": "Quiet room tone."})
         clip["prompt_h3_of"] = h3_stamp(clip, "")
         return True
 
@@ -142,8 +152,15 @@ def _make_case(tmp_path, monkeypatch):
     prepare_inputs(ctx)
     plan = read_json(ctx.episode_dir / "clip_plan.json")
     clip = plan["clips"][0]
-    atomic_write_json(ctx.source_episode_dir / "chapter_script.json",
-                      read_json(ctx.episode_dir / "chapter_script.json"))
+    opening = {"image_prompt": "甲在房间门口回头，保持原文服饰与室内关系。",
+               "visible_characters": ["甲"],
+               "reference_subjects": [row["name"] for row in clip["references"]
+                                      if row.get("role") in {"character", "location", "prop"}]}
+    script = read_json(ctx.episode_dir / "chapter_script.json")
+    script["shots"][0]["opening_frame"] = opening
+    atomic_write_json(ctx.episode_dir / "chapter_script.json", script)
+    atomic_write_json(ctx.episode_dir / "clip_plan.json", plan)
+    atomic_write_json(ctx.source_episode_dir / "chapter_script.json", script)
     atomic_write_json(ctx.source_episode_dir / "clip_plan.json", plan)
     tools = EpisodeTools(ctx)
     tools.media.runner().build_assets(clips=[clip])
@@ -153,13 +170,7 @@ def _make_case(tmp_path, monkeypatch):
     # a new candidate before render.
     opening_row = {
         "clip_id": clip["clip_id"],
-        "image_prompt": "甲在房间门口回头，保持原文服饰与室内关系。",
-        "image_references": [next(row["path"] for row in read_json(ctx.run_dir / "catalog.json", [])
-                                   if row.get("role") == "character" and row.get("name") == "甲")],
         "extra_references": [],
-        "visible_characters": ["甲"], "source_quote": "甲走进房间",
-        "h3": {"shots": ["The visible subject turns toward the entrance and pauses. <DIALOGUE_1>"],
-               "soundscape": "Quiet room tone."},
     }
     atomic_write_json(ctx.work_dir / "output/first-frames.json", {"frames": [opening_row]})
     first = EpisodeTools(ctx).first_frames({"file": "output/first-frames.json"})
@@ -416,8 +427,7 @@ def test_run_episode_applies_authorized_cutaway_and_gates_interactive_audio_deli
     requests["prompts"]["clip_02"] = target_clip["prompt_h3"]
     atomic_write_json(ctx.work_dir / "output/requests.json", requests)
     first_frames = read_json(ctx.work_dir / "output/first-frames.json")
-    first_frames["frames"].append({**opening_row, "clip_id": "clip_02",
-        "source_quote": "乙看着桌边的野山羊", "image_prompt": "乙停在房间门口，保持原文服饰。"})
+    first_frames["frames"].append({**opening_row, "clip_id": "clip_02"})
     atomic_write_json(ctx.work_dir / "output/first-frames.json", first_frames)
     frames = EpisodeTools(ctx).first_frames({"file": "output/first-frames.json"})
     assert frames["ok"] and frames["clips"]["clip_02"]["ok"], frames

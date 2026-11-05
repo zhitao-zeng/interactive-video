@@ -228,13 +228,14 @@ def test_explicit_issue_retry_archives_old_session_and_preserves_media_budget(ct
     atomic_write_json(budget, {'prior_generation_counts': {'clips': {'clip_01': 3}}})
     before = budget.read_bytes()
     saved = {'status': 'finished_with_issues', 'passed': False, 'deadline': 1,
-             'fallback_invocations': 3, 'no_progress': 3,
+             'remaining_seconds': 20, 'fallback_invocations': 3, 'no_progress': 3,
              'job': {'id': 'job-7', 'action': 'finish', 'status': 'completed', 'result': {'passed': False}}}
     atomic_write_json(ctx.run_dir/'agent-run.json', saved)
     atomic_write_json(ctx.work_dir/'episode-session.json', {'session_id': 'old-session'})
     atomic_write_json(ctx.work_dir/'input/latest-finish.json', {
         'passed': False, 'author_session': {'session_id': 'old-session'}})
     assert flow.run_episode(ctx, config=config)['status'] == 'finished_with_issues'
+    before_retry = read_json(ctx.run_dir/'agent-run.json')
     calls = []
     bridges = []
     original_bridge = flow.EpisodeBridge
@@ -266,7 +267,11 @@ def test_explicit_issue_retry_archives_old_session_and_preserves_media_budget(ct
     assert budget.read_bytes() == before
     archived = list((ctx.run_dir/'retries').iterdir())
     assert len(archived) == 1
-    assert read_json(archived[0]/'agent-run.json') == saved
+    archived_run = read_json(archived[0]/'agent-run.json')
+    route_fields = {'initial_route', 'effective_route', 'route_history'}
+    assert {k: v for k, v in archived_run.items() if k not in route_fields} == before_retry
+    assert archived_run['initial_route'] == archived_run['effective_route']
+    assert archived_run['route_history'] == []
     assert read_json(archived[0]/'episode-session.json')['session_id'] == 'old-session'
 
 
@@ -274,6 +279,8 @@ def test_explicit_issue_retry_archives_old_session_and_preserves_media_budget(ct
 def test_issue_retry_never_reruns_an_accepted_episode(ctx, monkeypatch, config, preserve_session):
     install_fake_runtime(monkeypatch, ctx)
     atomic_write_json(ctx.run_dir/'agent-run.json', {'status': 'finished', 'passed': True})
+    monkeypatch.setattr('novel_manga.review.acceptance.acceptance_status',
+                        lambda *a: {'status': 'accepted', 'passed': True})
     monkeypatch.setattr(episode_turns, 'run_session', lambda *a, **k: pytest.fail('accepted episode must remain cached'))
     assert flow.run_episode(ctx, config={**config, 'resume_session_on_retry': preserve_session},
                             retry_issues=True)['passed'] is True

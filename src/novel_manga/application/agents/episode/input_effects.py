@@ -16,6 +16,8 @@ def effects(row):
               'phases': _phase_groups(row), 'locations': row.get('locations') or {}}
     if row.get('characters'):
         result['characters'] = row['characters']
+    if 'music_plan' in row:
+        result['music_plan'] = row['music_plan']
     if row.get('clip_ids'):
         result['clip_ids'] = sorted(row['clip_ids'])
     if isinstance(result['phases'], dict) and not any(result['phases'].values()):

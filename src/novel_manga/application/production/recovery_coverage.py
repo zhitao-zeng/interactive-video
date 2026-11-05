@@ -5,7 +5,6 @@ from .recovery_context import context
 
 
 def inspect_context(ctx):
-    from .runs import episode_status
     from .common import pid_alive
     from novel_manga.application.agents.episode.recovery import remaining_at_stop,upstream_route
     from novel_manga.application.agents.episode.repair_targets import eligible_targets
@@ -18,7 +17,6 @@ def inspect_context(ctx):
     saved=read_json(ctx.run_dir/'agent-run.json',{})
     plan=read_json(ctx.episode_dir/'clip_plan.json',{});clips=plan.get('clips',[])
     media=read_json(ctx.episode_dir/'thin_media_report.json',{})
-    formal=read_json(ctx.run_dir/'final-candidate/manifest.json',{})
     lock=ctx.source_episode_dir/'.render.lock';owner=lock.read_text().strip()if lock.is_file()else ''
     remaining=remaining_at_stop(saved)
     records=[{'file':str(p),'clip_id':r.get('clip_id'),'status':r.get('status'),
@@ -30,8 +28,9 @@ def inspect_context(ctx):
             'media_file':str(ctx.episode_dir/'thin_media_report.json'),'reason':saved.get('reason')}
     def route(kind,**details):return {**result,'kind':kind,**details}
     if owner.isdigit()and int(owner)>0 and pid_alive(int(owner)):return route('live_owner')
-    if (formal.get('passed')is True and media.get('quality_review',{}).get('passed')is True
-            and episode_status(ctx.episode_dir,True)=='done'):return route('accepted')
+    from novel_manga.review.acceptance import acceptance_status
+    if acceptance_status(ctx.episode_dir,ctx.run_dir)['passed']:
+        return route('accepted')
     # Prefer already generated/source-checked candidates over drawing them again.
     for clip in clips:
         cid=clip['clip_id'];proof=evidence(ctx,cid)

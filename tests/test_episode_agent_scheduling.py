@@ -878,7 +878,7 @@ def test_retry_of_started_episode_renders_current_plan_without_readopting_a_draf
     ctx = replace(ctx, input_mode='script')
     install_fake_runtime(monkeypatch, ctx)
     atomic_write_json(ctx.run_dir/'agent-run.json', {'status': prior_status, 'passed': False,
-                                                   'deadline': time.time()-1})
+                                                   'remaining_seconds': 30, 'deadline': time.time()-1})
     original = flow.EpisodeTools
     payloads = []
     video=ctx.episode_dir/'work/clips/c/attempt_01/clip.mp4'

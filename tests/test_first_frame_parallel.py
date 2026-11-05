@@ -122,7 +122,7 @@ def test_error_finishing_during_adoption_stops_next_dispatch(tmp_path, monkeypat
     class Pool(ThreadPoolExecutor):
         def submit(self,fn,*task):
             future=super().submit(fn,*task)
-            futures[task[0]['clip_id']]=future
+            futures[task[0].row['clip_id']]=future
             return future
     monkeypatch.setattr(first_frames,'ThreadPoolExecutor',Pool)
     def build(ctx,row,path):

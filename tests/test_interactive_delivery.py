@@ -62,6 +62,7 @@ def test_controlled_native_publication_keeps_reviewed_export_receipt_current(lab
     case=labelled_delivery;ctx=case.ctx;runner=SimpleNamespace(context=ctx)
     candidate=ctx.episode_dir/'repair_candidate/native.mp4';candidate.parent.mkdir();candidate.write_bytes(b'native')
     case.destination.mkdir();exported=case.destination/'episode01.mp4';exported.write_bytes(b'reviewed native with final captions and card')
+    (case.destination/'cover.jpeg').write_bytes(b'cover')
     report=copy.deepcopy(case.report);report['assembly'].update(final_video=str(candidate),pending_publish=True)
     for clip in ctx.clip_plan['clips']:clip['kind']='video'
     atomic_write_json(ctx.episode_dir/'clip_plan.json',ctx.clip_plan)

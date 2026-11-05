@@ -2,11 +2,12 @@
 from __future__ import annotations
 
 import copy
+from dataclasses import dataclass
 from pathlib import Path
 from novel_manga.util import read_json
 
 OPENING_FIELDS=('start_state','camera','light','in_frame','props','wears','location','scene_objects','opening_frame','device_state','shot_scale')
-REVIEW_POLICY='first-frame-explicit-relations-v3-appearance-scope'
+REVIEW_POLICY='first-frame-explicit-relations-v5-source-origin'
 
 
 def compose_opening_image_prompt(authored,style,image_references,references=(),*,opening=None):
@@ -18,8 +19,9 @@ def compose_opening_image_prompt(authored,style,image_references,references=(),*
         ref=by_path.get(str(path),{});role=ref.get('role','reference')
         name=ref.get('name')or Path(path).stem
         if role=='character':
-            scope=('face and hair only'if ref.get('reference_scope')=='identity_portrait'
-                   else 'character identity and design')
+            scope=('face and hair only'if ref.get('reference_scope') in ('identity_portrait','identity-baseline')
+                   else 'clothing and body proportions only; face and hair come from the identity portrait'
+                   if ref.get('reference_scope') in ('wardrobe_design','wardrobe-visual-card') else 'character identity and design')
             instruction=f'{scope}; use the authored clothing and current equipment state, not the card pose or background'
         elif role=='location':
             instruction='space, architecture and materials; current time, camera and prop state follow the authored opening'
@@ -45,18 +47,156 @@ def enabled(ctx):
     return profile.get('h3_input_mode')=='first-frame' or profile.get('sd_input_mode')=='first-frame'
 
 
+def opening_shot(clip, *, shots=None):
+    rows=shots or clip.get('first_frame_opening') or clip.get('shots') or []
+    return rows[0] if rows else {}
+
+
 def opening_contract(clip, image_references, *, shots=None):
-    rows=shots if shots is not None else clip.get('shots',clip.get('first_frame_opening',[]))
-    opening=rows[0] if rows else {}
+    opening=opening_shot(clip,shots=shots)
     return {'opening':{k:copy.deepcopy(opening.get(k)) for k in OPENING_FIELDS if k not in {'opening_frame','device_state','shot_scale'}or k in opening},
             'image_references':list(image_references),
             'source_references':[{k:r.get(k) for k in ('role','name','path','wearers')} for r in clip.get('references',[]) if r.get('role')!='voice']}
 
 
+@dataclass(frozen=True)
+class CompiledOpening:
+    row: dict
+    contract: dict
+    assets: list
+    draft_frame: dict
+    references: tuple=()
+
+    def __iter__(self):
+        yield self.row
+        yield self.contract
+        yield self.assets
+
+
+def source_opening(ctx,clip):
+    directory=getattr(ctx,'episode_dir',None)
+    script=read_json(Path(directory)/'chapter_script.json',{}) if directory else {}
+    index=(clip.get('shot_indexes')or[None])[0]
+    shot=next((s for s in script.get('shots',[]) if s.get('index')==index),None)
+    if shot is None:shot=opening_shot(clip)
+    return copy.deepcopy(shot.get('opening_frame'))
+
+
+def opening_state(row,contract):
+    opening=contract.get('opening') or {}
+    facts={}
+    for key in ('start_state','camera','light','in_frame','props','wears',
+                'location','scene_objects','device_state','shot_scale'):
+        value=opening.get(key)
+        if value not in (None,'',[],{}):facts[key]=copy.deepcopy(value)
+    if opening.get('opening_frame'):
+        frame=copy.deepcopy(opening['opening_frame'])
+        frame.pop('image_prompt',None);frame.pop('visible_characters',None)
+        if frame:facts['opening_frame']=frame
+    if contract.get('character_facts'):facts['character_facts']=copy.deepcopy(contract['character_facts'])
+    return facts
+
+
+def request_prompt(ctx,row,contract,*,references=()):
+    import json
+    prompt=compose_opening_image_prompt(row['image_prompt'],contract.get('style') or {},
+        row.get('image_references',contract.get('image_references',[])),references,
+        opening=contract.get('opening'))
+    facts=opening_state(row,contract)
+    if not facts:return prompt
+    return (prompt+'\n\nApproved opening state (source contract, not new staging direction):\n'
+            +json.dumps(facts,ensure_ascii=False,sort_keys=True))
+
+
+def compile_opening(ctx,clip,row=None,*,lane='h3',field_errors=None,require_assets=True):
+    from .reference_views import canonical_paths,compile_references,opening_references
+    row=copy.deepcopy(row or {})
+    row.pop('source_quote',None)
+    row.setdefault('clip_id',clip['clip_id'])
+    row.setdefault('extra_references',[])
+    shot_index=(clip.get('shot_indexes') or [0])[0]
+    opening=source_opening(ctx,clip)
+    if opening is not None:
+        from novel_manga.story.fields import opening_frame_error
+        if issue:=opening_frame_error(opening):
+            if field_errors is None:raise ValueError(issue)
+            field_errors['opening_frame']=issue
+            draft={'path':'pending.png','extra_references':row['extra_references'],
+                   'visible_characters':row.get('visible_characters',[])}
+            return CompiledOpening(row,{},[],draft,())
+        for field in ('image_prompt','visible_characters'):
+            if field in row and row[field]!=opening[field]:
+                error=(
+                    f'{field} differs from the approved source opening_frame. '
+                    'Edit source opening_frame through input repair before changing its production prompt or visible people. '
+                    f"For {clip['clip_id']}, write output/repair.json with decisions:[{{action:'input',clip_id:'{clip['clip_id']}',"
+                    "reason:'specific observed defect',source_quote:'verbatim source for this clip',"
+                    f"shots:[{{index:{shot_index},opening_frame:<complete corrected opening_frame object>}}]}}]. "
+                    'Call check then apply. After the source repair is adopted, omit image_prompt and visible_characters '
+                    'from the first_frames row to inherit that source. Reference selection follows '
+                    'opening_frame.reference_subjects and host expansion; extra_references is the only supplement.')
+                if field_errors is None:raise ValueError(error)
+                field_errors[field]=error
+            row[field]=copy.deepcopy(opening[field])
+    invalid_references=any(field in row and (not isinstance(row[field],list)
+        or any(not isinstance(path,str) for path in row[field])) for field in ('image_references','extra_references'))
+    if invalid_references:
+        draft={'path':'pending.png','extra_references':row.get('extra_references',[]),
+               'visible_characters':row.get('visible_characters',[])}
+        return CompiledOpening(row,{},[],draft,())
+    originals=[r for r in clip.get('references',[]) if r.get('role') in {'character','location','prop'}]
+    subjects=(opening or {}).get('reference_subjects')
+    explicit='image_references' in row and not row.get('reuse_candidate')
+    if subjects and set(subjects)-{r.get('name') for r in originals}:
+        raise ValueError(f"{clip['clip_id']}: opening reference_subjects must name registered source cards")
+    supplied=canonical_paths(ctx,row['image_references']) if explicit else []
+    paths=[r['path'] for r in originals if not subjects or r.get('name') in subjects]
+    catalog=read_json(Path(ctx.run_dir)/'catalog.json',[]) if getattr(ctx,'run_dir',None) else []
+    if isinstance(catalog,dict):catalog=catalog.get('assets',[])
+    known={r['path'] for r in [*originals,*catalog]
+           if r.get('role') in {'character','location','prop'} and r.get('path')}
+    if set(supplied)-known:
+        error=(f'image_references must use registered source cards; current clip paths: '
+               f'{sorted({r["path"] for r in originals} & known)}')
+        if field_errors is None:raise ValueError(f"{clip['clip_id']}: {error}")
+        field_errors['image_references']=error
+        draft={'path':'pending.png','extra_references':row['extra_references'],
+               'visible_characters':row.get('visible_characters',[])}
+        return CompiledOpening(row,{},[],draft,())
+    expanded=opening_references(ctx,clip,paths)
+    if subjects:expanded=[r for r in expanded if r.get('name') in subjects]
+    compiled_paths=[r['path'] for r in expanded]
+    if explicit and supplied!=compiled_paths:
+        error=(
+            'image_references differs from the host-compiled opening references. '
+            'Edit source opening_frame.reference_subjects through input repair before changing reference selection. '
+            f"For {clip['clip_id']}, write output/repair.json with decisions:[{{action:'input',clip_id:'{clip['clip_id']}',"
+            "reason:'specific observed defect',source_quote:'verbatim source for this clip',"
+            f"shots:[{{index:{shot_index},opening_frame:<complete corrected opening_frame object>}}]}}]. "
+            'Call check then apply. After the source repair is adopted, omit image_references to inherit '
+            'the host-compiled references; extra_references remains the only supplemental entry.')
+        if field_errors is None:raise ValueError(f"{clip['clip_id']}: {error}")
+        field_errors['image_references']=error
+        draft={'path':'pending.png','extra_references':row['extra_references'],
+               'visible_characters':row.get('visible_characters',[])}
+        return CompiledOpening(row,{},[],draft,())
+    references=compile_references(ctx.novel_dir,expanded,require_files=require_assets)
+    row['image_references']=[r.path for r in references]
+    if isinstance(row['extra_references'],list) and all(isinstance(p,str) for p in row['extra_references']):
+        row['extra_references']=list(dict.fromkeys(canonical_paths(ctx,row['extra_references'])))
+    contract=current_contract(ctx,clip,row['image_references'],include_style=True,references=expanded)
+    if isinstance(row.get('image_prompt'),str) and row['image_prompt'].strip():
+        row['request_prompt']=request_prompt(ctx,row,contract,references=references)
+    assets=source_asset_state(ctx,row['image_references'],references=references,allow_missing=not require_assets)
+    draft={'path':'pending.png','extra_references':row['extra_references'],
+           'visible_characters':row.get('visible_characters',[])}
+    return CompiledOpening(row,contract,assets,draft,references)
+
+
 def unchanged_opening_scale(clip,contract):
     """Older reviews omitted scale; their saved source opening still records it."""
-    rows=clip.get('first_frame_opening')or clip.get('shots')or []
-    return bool(rows) and rows[0].get('shot_scale')==contract.get('opening',{}).get('shot_scale')
+    opening=opening_shot(clip)
+    return bool(opening) and opening.get('shot_scale')==contract.get('opening',{}).get('shot_scale')
 
 
 def character_facts(ctx,clip,contract):
@@ -96,13 +236,21 @@ def character_facts(ctx,clip,contract):
     return result
 
 
-def current_contract(ctx, clip, image_references, *, include_style=False, shots=None):
+def current_contract(ctx, clip, image_references, *, include_style=False, shots=None, references=None):
     if shots is None:
         directory=getattr(ctx,'episode_dir',None)
         script=read_json(Path(directory)/'chapter_script.json',{}) if directory else {}
         indexes=clip.get('shot_indexes',[])
         shots=[s for s in script.get('shots',[]) if s.get('index') in indexes]or None
+    if references is None:
+        from .reference_views import opening_references
+        references=opening_references(ctx,clip,image_references)
+    refs=references
+    image_references=[r['path'] for r in refs]
     contract=opening_contract(clip,image_references,shots=shots)
+    scoped=[{k:r[k] for k in ('path','role','name','reference_scope') if k in r}
+            for r in refs if r.get('reference_scope') in ('identity_portrait','wardrobe_design')]
+    if scoped:contract['reference_views']=scoped
     contract['character_facts']=character_facts(ctx,clip,contract)
     if include_style:
         from novel_manga.style_packs import frame_style
@@ -133,15 +281,40 @@ def review_problems(review):
     return problems
 
 
+def source_conflicts(review):
+    return [finding for finding in review.get('findings',[])
+            if finding.get('relation')=='contradiction' and finding.get('origin')=='source']
+
+
 def interpret_review(review):
     if 'findings'not in review:return copy.deepcopy(review)
     problems=review_problems(review)
     return {**copy.deepcopy(review),'consistent':not problems,'problems':problems}
 
 
-def source_asset_state(ctx, paths):
-    return [{'path':p,'bytes':(ctx.novel_dir/p).stat().st_size,
-             'modified_ns':(ctx.novel_dir/p).stat().st_mtime_ns} for p in paths]
+def source_asset_state(ctx, paths, references=None, *, include_hash=False, allow_missing=False):
+    import hashlib
+    by_path={r.path:r for r in references} if references is not None else {}
+    result=[]
+    for path in paths:
+        disk=ctx.novel_dir/path
+        if allow_missing and not disk.is_file():
+            result.append({'path':path,'missing':True,'hash':by_path[path].hash if path in by_path else ''})
+            continue
+        row={'path':path,'bytes':disk.stat().st_size,'modified_ns':disk.stat().st_mtime_ns}
+        if include_hash or path in by_path:
+            row['hash']=by_path[path].hash if path in by_path else hashlib.sha256(disk.read_bytes()).hexdigest()
+        result.append(row)
+    return result
+
+
+def source_assets_match(saved,current):
+    if saved is None or current is None or len(saved)!=len(current):return saved==current
+    pairs=zip(saved,current)
+    if all('hash' in before and 'hash' in after for before,after in pairs):
+        return all(before.get('path')==after.get('path') and before['hash']==after['hash']
+                   for before,after in zip(saved,current))
+    return saved==current
 
 
 def require_current(ctx, clip):
@@ -155,9 +328,17 @@ def require_current(ctx, clip):
     paths=contract.get('image_references',[])
     if not matches_current_contract(ctx,clip,contract):
         raise ValueError(f"{clip['clip_id']}: first frame stale after opening/source changes; use first_frames")
-    if frame.get('source_assets') is not None and source_asset_state(ctx,paths)!=frame['source_assets']:
+    saved_assets=frame.get('source_assets')
+    hashed=bool(saved_assets) and any('hash' in row for row in saved_assets)
+    if saved_assets is not None and not source_assets_match(
+            saved_assets,source_asset_state(ctx,paths,include_hash=hashed)):
         raise ValueError(f"{clip['clip_id']}: first frame stale after source asset changes; use first_frames")
-    if not (ctx.novel_dir/frame['path']).is_file():raise ValueError(f"{clip['clip_id']}: first frame missing on disk")
+    path=ctx.novel_dir/frame['path']
+    if not path.is_file():raise ValueError(f"{clip['clip_id']}: first frame missing on disk")
+    if frame.get('image_sha256'):
+        import hashlib
+        if hashlib.sha256(path.read_bytes()).hexdigest()!=frame['image_sha256']:
+            raise ValueError(f"{clip['clip_id']}: first frame pixels are stale; review the replaced image")
 
 
 def video_metadata(clip):

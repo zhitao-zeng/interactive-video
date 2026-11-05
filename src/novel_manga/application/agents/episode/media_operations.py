@@ -32,6 +32,8 @@ class MediaOperations:
             raise ValueError('managed episode rendering requires a positive NOVEL_RENDER_INFLIGHT')
         profile = read_json(self.ctx.novel_dir / 'profile.json')
         profile['repair_backend'] = 'sandbox_agent'
+        if profile.get('native_h3_short_edge') is not None:
+            os.environ['NOVEL_H3_SHORT_EDGE'] = str(profile['native_h3_short_edge'])
         bgm = Path(profile['bgm_path']) if profile.get('bgm_path') else None
         if bgm is not None:
             bgm = bgm if bgm.is_absolute() else self.ctx.novel_dir / bgm
@@ -122,6 +124,9 @@ class MediaOperations:
         report.update(status='assembled', assembly=assembly,
                       elapsed_seconds=round(float(report.get('elapsed_seconds') or 0)+seconds, 3))
         report.setdefault('timing', {})['assembly_s'] = seconds
+        # Postmix can reject a source range. Keep the completed body/timeline so
+        # select_music can fix that range without encoding the same video again.
+        atomic_write_json(self.ctx.episode_dir/'thin_media_report.json', report)
         from novel_manga.application.repair.ambience import apply_assembly
         report=apply_assembly(self.ctx.episode_dir,report,context=runner.context)
         atomic_write_json(self.ctx.episode_dir/'thin_media_report.json', report)
@@ -190,6 +195,12 @@ class MediaOperations:
         frame_mode=first_frame_mode(self.ctx)
         if frame_mode:
             pending=read_json(self.ctx.episode_dir/'clip_plan.json',{})
+            from .opening_source import source_blockers
+            opening_conflicts=source_blockers(self.ctx,pending)
+            if opening_conflicts:
+                from novel_manga.media.first_frames import review_problems
+                return {'ok':False,'error':'opening_source_conflict','source_input_conflicts':opening_conflicts,
+                        'blocked':{cid:review_problems({'findings':findings}) for cid,findings in opening_conflicts.items()}}
             frame_blocks={}
             for clip in pending.get('clips',[]):
                 if clip.get('kind')=='video':

@@ -111,3 +111,20 @@ def test_failures_retry_with_a_bound_and_do_not_keep_stale_audits(tmp_path):
     assert not preparation_store.eligible(row,d) and 'retry_after' not in row
     row=preparation_store.record(d,'needs_source',attempts=1)
     assert not preparation_store.eligible(row,d)
+
+
+def test_preparation_repair_requires_explicit_legacy_opt_in(tmp_path, monkeypatch):
+    d = episode(tmp_path)
+    answers = iter([
+        {'source_readable':True,'issues':[{'kind':'missing_event','stage':0}]},
+        {'source_readable':True,'issues':[]},
+    ])
+    monkeypatch.setattr(preparation_actions, 'audit', lambda *a, **k: next(answers))
+    calls = []
+    monkeypatch.setattr(preparation_actions, 'replan', lambda *a: calls.append('legacy-replan'))
+    answer, blocked = preparation_actions.check_script(d, {'clips':[]})
+    assert answer is None and blocked['status'] == 'needs_replan' and calls == []
+    monkeypatch.setenv('NOVEL_LEGACY_PREPARATION_REPAIR', '1')
+    answer, blocked = preparation_actions.check_script(d, {'clips':[]})
+    assert answer == {'source_readable':True,'issues':[]} and blocked is None
+    assert calls == ['legacy-replan']

@@ -11,6 +11,46 @@ from novel_manga.util import read_json
 
 
 @dataclass(frozen=True)
+class InputScope:
+    allowed_indexes: frozenset
+    targets: frozenset
+    shared_clip_ids: frozenset
+    affected_people: frozenset
+    affected_locations: frozenset
+    source_review_indexes: frozenset
+
+
+def resolve_input_scope(ctx,row,plan,script,target):
+    addresses=set(target.get('shot_indexes') or [])
+    media=read_json(ctx.episode_dir/'thin_media_report.json',{})
+    blocked=set(media.get('blocked_clips') or {})|set(media.get('failed_clips') or [])
+    for clip in plan['clips']:
+        if clip['clip_id'] in blocked:addresses.update(clip.get('shot_indexes') or [])
+    raw_phases=row.get('phases') or {}
+    people=set(raw_phases.get('characters') or {}) if isinstance(raw_phases,dict) else set()
+    locations=set(row.get('locations') or {})
+    for clip in plan['clips']:
+        if any((ref.get('role')=='character' and ref.get('name') in people)
+               or (ref.get('role')=='location' and ref.get('name') in locations)
+               for ref in clip.get('references',[])):
+            addresses.update(clip.get('shot_indexes') or [])
+    scope=row.get('clip_ids')
+    if scope is not None:
+        addresses={i for clip in plan['clips'] if clip['clip_id'] in scope for i in clip.get('shot_indexes',[])}
+    touched={patch['index'] for patch in row.get('shots') or []}
+    shared={clip['clip_id'] for clip in plan['clips'] if touched.intersection(clip.get('shot_indexes',[]))}
+    targets={clip['clip_id'] for clip in plan['clips'] if clip['clip_id']==row['clip_id']
+             or clip['clip_id'] in shared
+             or any((ref.get('role')=='character' and ref.get('name') in people)
+                    or (ref.get('role')=='location' and ref.get('name') in locations)
+                    for ref in clip.get('references',[]))}
+    if scope is not None:targets&=set(scope)
+    review_indexes={i for clip in plan['clips'] if clip['clip_id'] in targets for i in clip.get('shot_indexes',[])}
+    return InputScope(frozenset(addresses),frozenset(targets),frozenset(shared),frozenset(people),
+                      frozenset(locations),frozenset(review_indexes))
+
+
+@dataclass(frozen=True)
 class PreparedInput:
     compilation: InputCompilation
     submitted_row: dict
@@ -21,10 +61,37 @@ class PreparedInput:
     reused_locations: dict
 
 
-def prepare_candidate(ctx, row, plan, script, target, addresses, scope, matching):
+def validate_visible_types(shots, addresses, bible, new_characters=()):
+    """Report known set/prop names before they reach the portrait compiler."""
+    people = {c['name'] for c in bible.get('characters', [])} | set(new_characters)
+    locations = {text.partition('：')[0] for text in bible.get('locations', [])}
+    props = {p['name'] for p in bible.get('props', [])}
+    problems = []
+    for index in sorted(addresses):
+        shot = shots[index]
+        for name in shot.get('in_frame', []):
+            if name in people:
+                continue
+            kind = ('scene_objects' if name in (shot.get('scene_objects') or []) else
+                    'props' if name in props or name in (shot.get('props') or []) else
+                    'location' if name in locations or name == shot.get('location') else None)
+            if kind:
+                problems.append(f'shot {index}.in_frame: {name} is a known {kind}, not a Character; '
+                                f'keep it in {kind} and describe its visibility in the scene')
+    if problems:
+        raise RepairArgumentError('; '.join(problems))
+
+
+def prepare_candidate(ctx, row, plan, script, target, addresses, scope, matching, *, scope_info=None):
     directory, cid = ctx.episode_dir, row['clip_id']
+    if scope_info is not None:addresses=set(scope_info.allowed_indexes)
     raw_phases = row.get('phases') or {}
     candidate_script = copy.deepcopy(script)
+    if 'music_plan' in row:
+        from novel_manga.story.timing import music_plan_issues
+        if issues:=music_plan_issues(row['music_plan'],candidate_script['shots']):
+            raise RepairArgumentError('; '.join(issues))
+        candidate_script['music_plan']=copy.deepcopy(row['music_plan'])
     shots = {s.get('index', i): s for i, s in enumerate(candidate_script['shots'], 1)}
     card_names = {c['name'] for c in read_json(ctx.novel_dir/'story_bible.json')['characters']}
     card_names.update(row.get('characters') or {})
@@ -64,6 +131,8 @@ def prepare_candidate(ctx, row, plan, script, target, addresses, scope, matching
         if missing := shared-set(scope):
             raise RepairArgumentError('source shot edits also affect clips '+', '.join(sorted(missing))+
                 '; include the required shared-shot clips in clip_ids and preserve their existing cuts')
+    validate_visible_types(shots, addresses, read_json(ctx.novel_dir/'story_bible.json'),
+                           row.get('characters') or {})
     phases = copy.deepcopy(raw_phases.get('characters', {}))
     locations = copy.deepcopy(row.get('locations') or {})
     registered_locations = read_json(ctx.novel_dir/'series_assets/phases.json',{}).get('locations',{})
@@ -138,6 +207,7 @@ def prepare_candidate(ctx, row, plan, script, target, addresses, scope, matching
                       for r in c.get('references', []))}
     if scope is not None:
         targets &= set(scope)
+    if scope_info is not None:targets=set(scope_info.targets)
     from .arguments import first_pass_scope
     first_pass_scope(ctx,targets)
     counts = history.generation_counts(directory)
@@ -148,5 +218,5 @@ def prepare_candidate(ctx, row, plan, script, target, addresses, scope, matching
         raise ValueError('input repair cannot render affected clips within remaining video budget: '
                          + ', '.join(exhausted) + '. If the new state starts later, provide source-supported clip_ids for that state.')
     case = InputCompilation(ctx, row, plan, script, candidate_script, shots, patches,
-        target, targets, counts, scope, phases, locations, characters, cid)
+        target, targets, counts, scope, phases, locations, characters, cid, input_scope=scope_info)
     return PreparedInput(case, submitted_row, chapter, bible, base_ids, reused, reused_locations)

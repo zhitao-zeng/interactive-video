@@ -165,7 +165,7 @@ def observe(directory, final, *, config=None, dispute=None):
     config = config or load_config()
     body = {**(config.get('extra_body') or {}), **(config.get('repair_extra_body') or {})}
     body['tool_choice'] = {'type': 'auto', 'disable_parallel_tool_use': True}
-    config = {**config, 'extra_body': body, 'effort': 'low', 'max_thinking_tokens': 0,
+    config = {**config, 'task_role': 'independent_review', 'extra_body': body, 'effort': 'low', 'max_thinking_tokens': 0,
               'extra_args': [*config.get('extra_args', []), '--tools', 'Read,Write', '--include-partial-messages']}
     run = f'independent-{directory.name}-{time.time_ns()}'
     work = Path(config['runs_root'])/run
