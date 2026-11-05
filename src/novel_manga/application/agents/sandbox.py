@@ -139,6 +139,10 @@ def run_agent(run: str, *, skills: str = "", config: dict | None = None, model: 
     Raises SandboxRefused before touching anything when the run cannot start as asked.
     """
     config = config or load_config()
+    from novel_manga.llm.policy import session_policy
+    config = session_policy(config, Path(config['runs_root']) / run,
+        resume='--continue' in config.get('extra_args', []),
+        role=config.get('task_role', 'repair' if run.startswith('repair-') else 'review'))
     base = str(config.get("base_url") or "")
     # A localhost endpoint is the HOST's loopback: without host networking the
     # container resolves its own loopback and every call dies (2026-10-22: three
@@ -182,6 +186,9 @@ def run_agent(run: str, *, skills: str = "", config: dict | None = None, model: 
     if not key:
         raise SandboxRefused(f"环境变量和 .env 里都没有 {config['key_var']}")
     model = model or config["model"]
+    from novel_manga.llm import quota
+    quota_group = quota.for_model(model, config.get('base_url'), key)
+    quota.check(quota_group, key)
     seconds = timeout or config.get("timeout_seconds", 5400)
     environment = {**os.environ, "ANTHROPIC_AUTH_TOKEN": key}
 
@@ -220,6 +227,15 @@ def run_agent(run: str, *, skills: str = "", config: dict | None = None, model: 
     with open(attempt / "session.jsonl", "w") as session, open(attempt / "stderr.log", "w") as errors:
         code = subprocess.call(command, stdout=session, stderr=errors, env=environment)
     elapsed = round(time.time() - started)
+    if code:
+        for line in (attempt/'session.jsonl').read_text().splitlines():
+            try:
+                event = json.loads(line)
+            except ValueError:
+                continue
+            if event.get('type') == 'assistant' and event.get('error'):
+                text = '\n'.join(b.get('text','') for b in (event.get('message') or {}).get('content',[]) if b.get('type') == 'text')
+                quota.note_sdk_failure(quota_group, text, key=key)
 
     # Only what this attempt wrote, decided against the snapshot taken before it ran.  Walking the whole
     # output directory reported the previous attempt's files as this one's produce, including for an
@@ -230,6 +246,7 @@ def run_agent(run: str, *, skills: str = "", config: dict | None = None, model: 
     kept = len(files) - len(produced)
     record = {"run": run, "attempt": attempt.name, "skills": skills, "skills_digest": digest,
               "model": model, "base_url": config["base_url"], "image": config["image"],
+              "reasoning_policy": config.get('reasoning_policy'),
               "timeout_seconds": seconds, "started": time.strftime("%F %T", time.localtime(started)),
               "seconds": elapsed, "exit": code, "produced": produced,
               "kept_from_earlier_attempts": kept,

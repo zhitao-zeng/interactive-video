@@ -1,0 +1,17 @@
+{
+  "_": "Explicit GPT6 saved-login profile. Existing saved sessions keep their recorded model and role endpoints.",
+  "backend": "codex",
+  "image": "agent-sandbox:0918",
+  "base_url": "codex://local",
+  "model": "gpt-6-sol",
+  "key_var": "H3_PROMPT_NO_KEY",
+  "effort": "medium",
+  "runs_root": "/mnt/disk1/zengzhitao/tmp/agent-sandbox/runs",
+  "timeout_seconds": 5400,
+  "agent_slice_seconds": 600,
+  "source_agent_slice_seconds": 1200,
+  "codex_parallel": 2,
+  "codex_slots_reserved_for_tools": 1,
+  "codex_inflight_dir": "/mnt/disk1/zengzhitao/tmp/model-inflight/codex-saved-login",
+  "refusal_fallback": null
+}

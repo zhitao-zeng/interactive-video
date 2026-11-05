@@ -14,7 +14,7 @@ from .session import SESSION_FILE
 def pending_input_continuations(ctx):
     """Continue already-approved interrupted work once, before opening another CLI."""
     from .input_repair import effects, repair_status
-    from .input_records import latest_input_records, source_review_recoverable
+    from .input_records import latest_input_records, source_review_recoverable, asset_image_recoverable
     available = repair_status(ctx)
     script = read_json(ctx.episode_dir/'chapter_script.json', {})
     shots = {s.get('index', i): s for i, s in enumerate(script.get('shots', []), 1)}
@@ -33,9 +33,9 @@ def pending_input_continuations(ctx):
         if not resume:
             continue
         reserved_source = record.get('step') == 'source' and bool(record.get('previous_source_review'))
-        if not service_resume and not (source_review_recoverable(record) or reserved_source) and (
+        if not service_resume and not (source_review_recoverable(record) or reserved_source or asset_image_recoverable(record)) and (
                 (record.get('source') or {}).get('consistent') is not True or not (
-                    record.get('step') == 'assets'
+                    record.get('step') in {'assets', 'character_assets', 'draft_assets'}
                     or str(record.get('step') or '').startswith(('translate:', 'check:')) or timing_fix)):
             continue
         decision = copy.deepcopy(record.get('decision') or {})

@@ -41,6 +41,9 @@ def normalized_events(events):
 
 def run_session(work_dir, prompt_text, *, resume=False, timeout=1200, config,
                 expected_output=None, enable_tools=False, project_root=None):
+    from novel_manga.llm.policy import session_policy, session_role
+    config = session_policy(config, work_dir, resume=resume,
+                            role=session_role(work_dir, config, expected_output))
     if not prompt_text.strip() or timeout <= 0:
         raise SandboxRefused('Codex needs a nonempty episode prompt and positive timeout.')
     expected_output = expected_output or ('repair.json' if resume and not enable_tools else 'episode.json')
