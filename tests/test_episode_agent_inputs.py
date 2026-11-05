@@ -353,6 +353,18 @@ def test_script_inputs_freeze_existing_words_groups_seconds_order_and_long_total
     assert read(episode / 'chapter_script.json') == script and read(episode / 'clip_plan.json') == plan
 
 
+def test_script_inputs_copy_the_published_creative_audit_receipt(book):
+    source, episode, _ = book
+    saved_script(source, episode)
+    receipt={'fingerprint':'author-review','content_fingerprint':'packed-content',
+        'answer':{'source_readable':True,'source_problem':'','issues':[]},'raw':{},'confirmation':None}
+    write(episode/'pre_render_story_audit.json',receipt)
+    ctx=context.create_context(source,2)
+    prepare_inputs(ctx)
+    assert read(ctx.episode_dir/'pre_render_story_audit.json')==receipt
+    assert read(episode/'pre_render_story_audit.json')==receipt
+
+
 def test_explicit_source_excludes_old_script_and_requests(book):
     source, episode, _ = book
     saved_script(source, episode)

@@ -16,7 +16,8 @@ class RepairInputs:
 
     @classmethod
     def load(cls, directory: Path):
-        return cls(directory, load_chapter(directory), read_json(directory / 'chapter_script.json', {}),
+        script = read_json(directory / 'chapter_script.json', {})
+        return cls(directory, load_chapter(directory, script=script), script,
                    read_json(directory / 'review_feedback.json', {}),
                    read_json(directory / 'source_speaker_contract.json', []))
 

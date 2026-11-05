@@ -65,7 +65,8 @@ def test_fixed_source_judge_recovery_is_automatically_dispatched_without_retry_b
     assert [s[0] for s in spawned] == ['agent_1']
     assert '--retry-issues' not in spawned[0][1]
     saved = control.read(run/'agent-run.json')
-    assert saved['remaining_seconds'] == 321 and saved['status'] == 'deferred'
+    assert saved['remaining_seconds'] == 321 and saved['status'] == 'blocked'
+    assert not (run/'source-review-recovery.json').exists()
 
 
 @pytest.mark.parametrize('terminal', ['finished', 'finished_with_issues', 'blocked'])

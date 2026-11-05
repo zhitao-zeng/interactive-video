@@ -112,19 +112,37 @@ def _blocked(ctx, problems, *, source_audit=None):
     return answer
 
 
+SOURCE_AUDIT_POLICY = 'pre-render-source-v2-authored-speaker'
+
+
 def source_gate(ctx):
     """Audit source inputs; adopting another opening image does not alter the story."""
+    from novel_manga.application.preparation.actions import reusable_creative_review
     plan=read_json(ctx.episode_dir/'clip_plan.json')
-    stamp=inputs(ctx.episode_dir)['files']
-    bible=ctx.novel_dir/'story_bible.json'
-    stamp={**stamp,str(bible):[bible.stat().st_mtime_ns,bible.stat().st_size] if bible.is_file() else None}
+    def stamp():
+        files=inputs(ctx.episode_dir)['files']
+        bible=ctx.novel_dir/'story_bible.json'
+        original=ctx.episode_dir/'authored_source.md'
+        review=read_json(ctx.episode_dir/'pre_render_story_audit.json',{})
+        result={**files,
+            str(bible):[bible.stat().st_mtime_ns,bible.stat().st_size] if bible.is_file() else None,
+            str(original):[original.stat().st_mtime_ns,original.stat().st_size] if original.is_file() else None}
+        fingerprint=review.get('content_fingerprint') or review.get('fingerprint')
+        if fingerprint:result['creative_review_fingerprint']=fingerprint
+        return result
     cache_path=ctx.run_dir/'local-source-check.json'
     cached=read_json(cache_path,{})
-    if cached.get('inputs')==stamp:
+    published=reusable_creative_review(ctx.episode_dir)
+    if published is not None:
+        answer=published['answer']
+        if (cached.get('inputs')!=stamp() or cached.get('policy')!=SOURCE_AUDIT_POLICY
+                or cached.get('answer')!=answer):
+            atomic_write_json(cache_path,{'policy':SOURCE_AUDIT_POLICY,'inputs':stamp(),'answer':answer})
+    elif cached.get('inputs')==stamp() and cached.get('policy')==SOURCE_AUDIT_POLICY:
         answer=cached['answer']
     else:
         answer=audit(ctx.episode_dir)
-        atomic_write_json(cache_path,{'inputs':stamp,'answer':answer})
+        atomic_write_json(cache_path,{'policy':SOURCE_AUDIT_POLICY,'inputs':stamp(),'answer':answer})
     issues=answer.get('issues') or []
     if answer.get('source_readable') is not True or issues:
         blocked={}
@@ -135,6 +153,16 @@ def source_gate(ctx):
         if not blocked:
             blocked={c['clip_id']:'Source audit contains an unresolved input issue' for c in plan['clips']}
         return _blocked(ctx,blocked,source_audit=answer)
+    previous=read_json(ctx.work_dir/'input/latest-preparation.json',{})
+    if previous.get('error')=='local_preparation_required':
+        prior=read_json(ctx.episode_dir/'thin_media_report.json',{})
+        remaining=dict(prior.get('blocked_clips') or {})
+        for cid in previous.get('blocked_clips') or previous.get('blocked') or {}:
+            remaining.pop(cid,None)
+        report={**prior,'blocked_clips':remaining}
+        if not remaining and prior.get('status')=='inputs_failed':report['status']='inputs_ready'
+        atomic_write_json(ctx.episode_dir/'thin_media_report.json',report)
+        atomic_write_json(ctx.work_dir/'input/latest-preparation.json',{'ok':True,'source_audit':answer})
     return None
 
 

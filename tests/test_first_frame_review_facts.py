@@ -42,8 +42,16 @@ def test_check_requests_traceable_findings_from_same_images_and_current_facts(tm
     captured = {}
     answer = {'consistent': True, 'problems': [], 'observations': ['bare feet'], 'findings': [finding()]}
     def ask(parts, schema, **kwargs):
-        captured.update(parts=parts, schema=schema, kwargs=kwargs)
-        return answer
+        captured[kwargs['name']]={'parts':parts, 'schema':schema, 'kwargs':kwargs}
+        if kwargs['name']=='episode_first_frame':return answer
+        return {'checks':[{'id':0,'result':'confirmed','evidence':'actual visible bare feet',
+            'evidence_class':'non_colour','calibration':'not_applicable',
+            'author_field_path':'character_facts[0].facts.wardrobe.value',
+            'author_quote':'grey long trousers and grey hiking shoes','author_subject':'shoes',
+            'non_colour_observation':'bare feet and shorts where shoes should be',
+            'non_colour_expected':'grey long trousers and grey hiking shoes',
+            'non_colour_basis':['character_facts[0].facts.wardrobe.value'],
+            'reference_image_number':0,'reference_use':'none'}]}
     monkeypatch.setattr('novel_manga.llm.client.ask_json', ask)
     monkeypatch.setattr('novel_manga.llm.client.image_part', lambda p, size: {'path': str(p)})
     monkeypatch.setattr('novel_manga.review.endpoints.judge_settings', lambda: None)
@@ -51,14 +59,17 @@ def test_check_requests_traceable_findings_from_same_images_and_current_facts(tm
                   current_contract(ctx, clip, row['image_references']))
     assert verdict['raw']==answer
     assert verdict['consistent']is False
-    prompt = captured['parts'][0]['text']
+    first=captured['episode_first_frame']
+    confirmation=captured['episode_first_frame_review_confirmation']
+    assert first['parts'][1:]==confirmation['parts'][1:]
+    prompt = first['parts'][0]['text']
     assert 'grey long trousers' in prompt and 'headlamp stays inside' in prompt
     assert '可见部位' in prompt and 'underspecified' in prompt
-    schema = captured['schema']['properties']['findings']['items']['properties']
+    schema = first['schema']['properties']['findings']['items']['properties']
     assert set(schema['relation']['enum']) == {'contradiction', 'underspecified', 'compatible'}
     assert {'observed', 'expected', 'basis', 'reason'} <= set(schema)
-    assert set(captured['schema']['properties'])=={'observations','findings'}
-    assert len(captured['parts']) == 4
+    assert set(first['schema']['properties'])=={'observations','findings'}
+    assert len(first['parts']) == 4
 
 
 @pytest.mark.parametrize('relation,accepted', [('contradiction', False), ('underspecified', True), ('compatible', True)])
@@ -159,6 +170,7 @@ def test_fast_uses_same_rejection_and_rechecks_retained_pixels_after_fact_change
     book,episode=fixture_book(tmp_path)
     monkeypatch.setattr('novel_manga.style_packs.frame_style',lambda novel:{})
     monkeypatch.setattr('novel_manga.style_packs.first_frame_prompt',lambda text,style:text)
+    monkeypatch.setattr('novel_manga.application.agents.episode.first_frames.review_opening_sources',lambda *a:{})
     calls=[]
     def build(ctx,row,path):
         calls.append('image')
@@ -216,6 +228,7 @@ def test_fast_pending_image_keeps_original_request_when_review_facts_are_added(t
     book, episode = fixture_book(tmp_path)
     monkeypatch.setattr('novel_manga.style_packs.frame_style', lambda novel: {})
     monkeypatch.setattr('novel_manga.style_packs.first_frame_prompt', lambda text, style: text)
+    monkeypatch.setattr('novel_manga.application.agents.episode.first_frames.review_opening_sources', lambda *a: {})
     sent = []
     submitted = []
     reviews = []

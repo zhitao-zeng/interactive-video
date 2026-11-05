@@ -83,3 +83,11 @@ def test_missing_configured_music_fails_before_constructing_media_clients(runner
     with pytest.raises(ValueError, match='background music is missing'):
         tools.media.runner()
     assert not calls
+
+
+def test_native_h3_short_edge_is_applied_before_settings(runner_arguments):
+    import os
+    tools, _ = runner_arguments
+    atomic_write_json(tools.ctx.novel_dir/'profile.json', {'native_h3_short_edge': 768})
+    tools.media.runner()
+    assert os.environ['NOVEL_H3_SHORT_EDGE'] == '768'

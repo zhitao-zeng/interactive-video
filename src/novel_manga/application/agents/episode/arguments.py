@@ -5,8 +5,7 @@ class RepairArgumentError(ValueError):
     """The proposal cannot be executed in its supplied argument shape."""
 
 
-class UnsupportedInput(ValueError):
-    """A source decision was rejected, rather than interrupted by a service."""
+from novel_manga.service_errors import UnsupportedInput, service_interruption
 
 
 class CompileConflict(ValueError):
@@ -41,3 +40,5 @@ def spent_video_budget(ctx,clip_ids):
     counts=history.generation_counts(ctx.episode_dir)
     return {cid:'effective clip retry budget used' for cid in clip_ids
             if history.remaining_takes(ctx.episode_dir,cid,preparation=True)<=0}
+
+

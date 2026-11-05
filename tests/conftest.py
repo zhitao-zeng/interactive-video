@@ -1,6 +1,45 @@
 """Regression tests must supply a simulated HTTP transport, never a production model."""
+import os
+from unittest.mock import patch
+
 import httpx
 import pytest
+import subprocess
+from pathlib import Path
+
+
+@pytest.fixture(autouse=True)
+def isolated_resource_quota_state(monkeypatch, tmp_path):
+    """Simulated quota rejections must never write a production account stop."""
+    monkeypatch.setenv('NOVEL_SHARED_QUOTA_DIR', str(tmp_path/'shared-resource-quota'))
+    monkeypatch.setenv('NOVEL_CODEX_INFLIGHT_DIR', str(tmp_path/'codex-model-slots'))
+
+
+@pytest.fixture(autouse=True)
+def forbid_unmocked_native_agents(monkeypatch):
+    """A default SDK route must not bypass the HTTP guard and call a real model."""
+    original = subprocess.call
+    def guarded(command, *args, **kwargs):
+        if isinstance(command, (list, tuple)) and command:
+            executable = Path(str(command[0])).name
+            if executable == 'codex' or (executable == 'docker' and 'run' in command
+                                         and any(name in command for name in ('codex', 'claude'))):
+                pytest.fail('Unmocked native Agent in offline test: mock its subprocess or session boundary', pytrace=False)
+        return original(command, *args, **kwargs)
+    monkeypatch.setattr(subprocess, 'call', guarded)
+
+
+@pytest.fixture(autouse=True)
+def isolated_process_environment():
+    """Direct process environment updates must not leak between tests."""
+    with patch.dict(os.environ):
+        yield
+
+
+@pytest.fixture(autouse=True)
+def isolated_resource_quota_state(monkeypatch, tmp_path):
+    """Simulated quota rejections must never write a production account stop."""
+    monkeypatch.setenv('NOVEL_SHARED_QUOTA_DIR', str(tmp_path/'shared-resource-quota'))
 
 
 @pytest.fixture(autouse=True)

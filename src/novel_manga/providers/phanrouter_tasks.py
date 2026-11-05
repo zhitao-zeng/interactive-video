@@ -19,9 +19,13 @@ def quota_exhausted() -> bool:
     return bool(path and Path(path).is_file())
 
 
-def check_generation_quota() -> None:
-    if quota_exhausted():
+def check_generation_quota(resource_id=None, resource_key=None) -> None:
+    from novel_manga.llm import quota
+    group = quota.for_resource(resource_id, resource_key) if resource_id else os.environ.get('NOVEL_RESOURCE_QUOTA_GROUP')
+    same_lane = not resource_id or not os.environ.get('NOVEL_RESOURCE_QUOTA_GROUP') or group == os.environ['NOVEL_RESOURCE_QUOTA_GROUP']
+    if same_lane and quota_exhausted():
         raise RuntimeError("quota_not_enough: generation stopped for this scheduled run")
+    quota.check(group, resource_key)
 
 
 def resubmit_before() -> float:
@@ -73,7 +77,7 @@ def http_status(error: Exception) -> int | None:
     return int(match.group(1)) if match else None
 
 
-def submit_once(submit, attempts: int = 3, base_delay: float = 1.0) -> httpx.Response:
+def submit_once(submit, attempts: int = 3, base_delay: float = 1.0, *, resource_id=None, resource_key=None) -> httpx.Response:
     """Send a task-creating request, retrying only when no task can have been created: the connection was never
     made, or the service turned it away with 429 or 503.  retry() resent on any error, so a submission the service
     had accepted but whose answer was lost was created - and paid for - twice.  A lost answer (read timeout, dropped
@@ -83,7 +87,7 @@ def submit_once(submit, attempts: int = 3, base_delay: float = 1.0) -> httpx.Res
     to get past every retry loop and take the whole render down."""
     last: Exception | None = None
     for attempt in range(attempts):
-        check_generation_quota()
+        check_generation_quota(resource_id, resource_key)
         try:
             return submit()
         except (httpx.ConnectError, httpx.ConnectTimeout, httpx.PoolTimeout) as error:
@@ -93,8 +97,18 @@ def submit_once(submit, attempts: int = 3, base_delay: float = 1.0) -> httpx.Res
         except (RuntimeError, httpx.HTTPStatusError) as error:
             status = http_status(error)
             detail = error.response.text if isinstance(error, httpx.HTTPStatusError) else str(error)
+            from novel_manga.llm import quota
+            group = quota.for_resource(resource_id, resource_key) if resource_id else os.environ.get('NOVEL_RESOURCE_QUOTA_GROUP')
+            if isinstance(error, httpx.HTTPStatusError):
+                try:
+                    quota.remember(group, status, error.response.json(), key=resource_key)
+                except ValueError:
+                    pass
+            elif status == 403 and 'quota_not_enough' in detail:
+                quota.remember(group, status, {'error': {'code': 'quota_not_enough'}}, key=resource_key)
             path = os.environ.get(QUOTA_STOP_ENV, "")
-            if path and status == 403 and "quota_not_enough" in detail:
+            same_lane = not resource_id or not os.environ.get('NOVEL_RESOURCE_QUOTA_GROUP') or group == os.environ['NOVEL_RESOURCE_QUOTA_GROUP']
+            if path and same_lane and status == 403 and "quota_not_enough" in detail:
                 marker = Path(path)
                 marker.parent.mkdir(parents=True, exist_ok=True)
                 marker.touch()
@@ -118,10 +132,10 @@ def task_data(payload: dict) -> dict:
     return result if isinstance(result, dict) else payload
 
 
-def submit_recorded(submit, task_path: Path, record: dict) -> str | None:
+def submit_recorded(submit, task_path: Path, record: dict, *, resource_id=None, resource_key=None) -> str | None:
     """submit_once; an unconfirmed submission is written beside the output, so it is not sent again unasked."""
     try:
-        return submit_once(submit).json().get("task_id")
+        return submit_once(submit, resource_id=resource_id, resource_key=resource_key).json().get("task_id")
     except SubmissionUncertain:
         atomic_write_json(task_path, {**record, "submit_uncertain_at": time.time()})
         raise

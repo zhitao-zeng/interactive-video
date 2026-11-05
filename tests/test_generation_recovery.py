@@ -364,3 +364,67 @@ def test_a_verdict_is_reused_only_for_the_very_same_take(tmp_path, monkeypatch):
     monkeypatch.setattr(review_judges, "judge_clip", lambda clip, video, *rest: judged.append(clip["clip_id"]) or {"severity": "pass"})
     review_episode.review_episode(directory)
     assert judged == ["clip_01", "clip_02"]
+
+
+def _typed_http_error(status):
+    request = httpx.Request('POST', 'https://service.test/submit')
+    response = httpx.Response(status, request=request,
+        json={'error': {'message': 'service unavailable' if status == 503 else 'unauthorized'}})
+    return httpx.HTTPStatusError(f'HTTP {status}', request=request, response=response)
+
+
+def test_typed_render_and_uncertain_failures_reach_readiness_without_content_repair(tmp_path, monkeypatch):
+    from novel_manga.application.agents.episode import readiness
+    directory = episode(tmp_path)
+    media_runner = runner(tmp_path)
+    media_runner.context.episode_dir = directory
+    clips = [{'clip_id': f'clip_{index:02d}', 'kind': 'video', 'prompt': 'p',
+              'request_seconds': 10, 'references': []} for index in (1, 2)]
+    media_runner.context.clip_plan = {'clips': clips}
+    (directory/'clip_plan.json').write_text(json.dumps(media_runner.context.clip_plan), encoding='utf-8')
+    errors = {'clip_01': _typed_http_error(503),
+              'clip_02': SubmissionUncertain('task submission unconfirmed (HTTP 502): not sent again')}
+    monkeypatch.setattr(media_runner, 'prepare_clips', lambda clips: None)
+    monkeypatch.setattr(rc.clip_attempts, 'generate_attempt',
+        lambda self, clip, attempt: rc.clip_retries.GenerationOutcome(error=errors[clip['clip_id']]))
+    monkeypatch.setattr(media_runner, 'assemble', lambda rows: pytest.fail('service failures must not assemble'))
+    report = media_runner.run()
+    assert report['status'] == 'clips_failed'
+    assert report['clips'][0]['service_interrupted']['http_status'] == 503
+    assert report['clips'][0]['retryable'] is True
+    assert report['clips'][1]['service_interrupted']['submission_uncertain'] is True
+    assert report['clips'][1]['retryable'] is False
+    work = tmp_path/'sandbox'; (work/'input').mkdir(parents=True)
+    ctx = types.SimpleNamespace(episode_dir=directory, work_dir=work, run_dir=tmp_path/'run')
+    route = readiness.next_action(ctx)
+    assert route['action'] != 'agent' and route['retryable'] is False
+    assert route['required_action'] == 'reconcile_submission'
+    status = {'adopted': True, 'job': {'action': 'review', 'status': 'completed', 'result': {'ok': True}}}
+    assert readiness.automatic_request(ctx, status) is None
+    report['clips'] = [report['clips'][0]]
+    (directory/'thin_media_report.json').write_text(json.dumps(report), encoding='utf-8')
+    recovered = readiness.automatic_request(ctx, status)
+    assert recovered is not None and recovered['action'] == 'render'
+
+
+def test_review_episode_preserves_typed_http_service_failure(tmp_path, monkeypatch):
+    directory = episode(tmp_path)
+    clip = {'clip_id': 'clip_01', 'kind': 'video', 'prompt': 'p', 'request_seconds': 10,
+            'references': [], 'lines': []}
+    (directory/'clip_plan.json').write_text(json.dumps({'clips': [clip]}), encoding='utf-8')
+    video = directory/'work/clips/clip_01/attempt_01/clip.mp4'
+    video.parent.mkdir(parents=True); video.write_bytes(b'mp4')
+    (directory/'thin_media_report.json').write_text(json.dumps({'clips': [
+        {'clip_id': 'clip_01', 'selected': {'video': str(video), 'hypothesis': ''}}]}), encoding='utf-8')
+    (tmp_path/NOVEL/'story_bible.json').write_text('{}', encoding='utf-8')
+    monkeypatch.setattr(review_evidence, 'load_review_rules', lambda novel_dir: None)
+    monkeypatch.setattr(review_episode, 'review_models_StoryBible',
+        types.SimpleNamespace(model_validate_json=lambda text: types.SimpleNamespace(characters=[])))
+    monkeypatch.setattr(review_judges, 'judge_clip',
+        lambda *args: (_ for _ in ()).throw(_typed_http_error(503)))
+    report = review_episode.review_episode(directory)
+    row = report['clips']['clip_01']
+    assert row['severity'] == 'review_error'
+    assert row['service_interrupted']['http_status'] == 503
+    assert row['retryable'] is True
+    assert report['feedback'] == {}

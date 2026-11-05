@@ -49,7 +49,7 @@ def test_rejected_card_keeps_original_and_voice(ctx_pair,approved_source,fake_im
     monkeypatch.setattr(draft_assets,'check_image',reject)
     with pytest.raises(input_repair.UnsupportedInput):upstream_assets.prepare(ctx,row())
     with pytest.raises(input_repair.UnsupportedInput):upstream_assets.prepare(ctx,row())
-    assert fake_image.calls==1
+    assert fake_image.calls==3  # Bounded same-design redraw; reentry adds no fourth picture.
     assert (ctx.novel_dir/'cards/a.jpeg').read_bytes()==before
     assert (ctx.novel_dir/'voices/a.wav').read_bytes()==voice
 

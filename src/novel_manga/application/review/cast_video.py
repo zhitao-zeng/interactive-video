@@ -199,7 +199,10 @@ def video_part(video: Path) -> dict:
 
 
 def ask(parts: list[dict], schema: dict, name: str) -> dict:
-    judge = JsonEndpoint.from_env(ENDPOINTS[os.environ.get("NOVEL_REVIEW_VIDEO_JUDGE", "flashnext")])
+    selected = os.environ.get("NOVEL_REVIEW_VIDEO_JUDGE", "flashnext")
+    if not selected:
+        raise ValueError('Native whole-video review needs an explicitly selected video-capable endpoint')
+    judge = JsonEndpoint.from_env(ENDPOINTS[selected])
     # 1500, doubled once on truncation: a comparison with long differences ran past 1800 (agent ch12 clip_02).
     return model_client.ask_json(parts, schema, name=name, max_tokens=1500, timeout=300, settings=judge)
 

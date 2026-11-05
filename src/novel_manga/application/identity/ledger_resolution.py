@@ -224,35 +224,44 @@ def close_leftovers(ledger: "Ledger") -> list[dict]:
     return closed
 
 
-def resolve_chapter(ledger, chapter: int, text: str, raw: dict | None = None, workers: int = 4, texts=None) -> dict | None:
+def resolve_chapter(ledger, chapter: int, text: str, raw: dict | None = None, workers: int = 4, texts=None,
+                    _correction=None) -> dict | None:
     # Metadata is small; historical chapter rows remain shared and are never mutated here.
     fields = ('entities', 'claims', 'merges', 'dropped', 'corrections', 'asked',
               'by_id', 'by_name', 'forms', 'recent')
     before = deepcopy({name: getattr(ledger, name) for name in fields})
     chapters = {name: dict(getattr(ledger, name)) for name in ('mentions_by_chapter', 'relations_by_chapter')}
     try:
-        raw = raw if raw is not None else ledger_store.read_json(ledger.raw_path(chapter), None)
+        raw = _correction if _correction is not None else (
+            raw if raw is not None else ledger_store.read_json(ledger.raw_path(chapter), None))
         if not raw or raw.get('error'):
             return None
-        for attempt in range(2):
-            if attempt:
-                for name, value in deepcopy(before).items(): setattr(ledger, name, value)
-                for name, value in chapters.items(): setattr(ledger, name, dict(value))
-            summary, raw = resolve_candidate(ledger, chapter, text, raw, workers, texts=texts)
-            raw, review = semantic_review.book(ledger, chapter, text, raw, texts=texts,
-                                               original_records=before['entities'])
-            if review['approved']:
-                raw['semantic_review'] = review
-                ledger_store.write_json(ledger.mentions_path(chapter), ledger.mentions_by_chapter[chapter])
-                ledger_store.write_json(ledger.relations_path(chapter), ledger.relations_by_chapter[chapter])
-                ledger.save()
-                ledger_store.write_json(ledger.raw_path(chapter), raw)
-                return summary
-        raise ValueError('identity correction did not pass final semantic review: ' + review.get('reason', ''))
+        summary, raw = resolve_candidate(ledger, chapter, text, raw, workers, texts=texts)
+        raw, review = semantic_review.book(ledger, chapter, text, raw, texts=texts,
+                                           original_records=before['entities'])
+        raw['semantic_review'] = review
+        ledger_store.write_json(ledger.mentions_path(chapter), ledger.mentions_by_chapter[chapter])
+        ledger_store.write_json(ledger.relations_path(chapter), ledger.relations_by_chapter[chapter])
+        ledger.save()
+        ledger_store.write_json(ledger.raw_path(chapter), raw)
+        return summary
     except Exception:
         for name, value in {**before, **chapters}.items():
             setattr(ledger, name, value)
         raise
+
+
+def adopt_chapter_correction(ledger, chapter: int, text: str, correction: dict, workers: int = 4, texts=None):
+    for field in ('mentions','new_entities','claims','relations'):
+        if not isinstance(correction.get(field), list):
+            raise ValueError('identity correction lacks '+field)
+    _, _, _, dropped = entity_evidence.ground(chapter, text, correction)
+    if any(row.get('why') == '证据不在本章' for row in dropped):
+        raise ValueError('identity correction fabricated a chapter quotation')
+    for row in correction['mentions']:
+        if str(row.get('form') or '') not in text or not entity_evidence.locate(row.get('evidence',''), text):
+            raise ValueError('identity correction has an ungrounded mention')
+    return resolve_chapter(ledger, chapter, text, workers=workers, texts=texts, _correction=correction)
 
 
 def resolve_candidate(ledger, chapter: int, text: str, raw: dict | None = None, workers: int = 4, texts=None) -> dict | None:

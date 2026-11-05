@@ -169,6 +169,10 @@ def test_offline_sd_lane_runs_to_real_delivery_and_resumes_without_resubmit(
     helper.write_text("""import json,sys\nfrom pathlib import Path\np=Path(sys.argv[sys.argv.index('--output')+1])\np.write_text(json.dumps({'segments':[]}))\n""")
     monkeypatch.setattr('novel_manga.application.rendering.setup.project_root', lambda: helper_root)
     monkeypatch.setenv('SECOND_REVIEW_JUDGE', 'phanthy-ds41')
+    # This provider fixture serves ordinary JSON, not SSE. The review route is
+    # explicit now, so its own transport must match the mocked service too.
+    from novel_manga.llm.config import ENDPOINTS
+    monkeypatch.setitem(ENDPOINTS, 'phanthy-ds41', {**ENDPOINTS['phanthy-ds41'], 'QWEN38_LOCAL_STREAM':'0'})
     from novel_manga.application.review import final_cut
     def accepted_final_movie(runner, report, *, receipt=None):
         movie = (receipt or {}).get('final_video') or (report.get('assembly') or {}).get('final_video')

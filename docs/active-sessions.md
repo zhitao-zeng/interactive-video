@@ -280,3 +280,7 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | ZCode #12+会话退化修复 | ①create_context目录发现:无显式output_root时探测firstframes/music/agent三约定既有run,CLI retry续真状态(冒烟已验:verify edition解析到firstframes真实目录);②默认作者配置切快速档(thinking off+effort low+16k,修复线同款),传导链有测试;2新测试,全量4053连两轮绿 | main(783b0c4) | context.py、configs/agent_sandbox.json、tests/test_agent_run_discovery.py | 2026-10-22 | 已提交;verify edition下次resume即用快速档;并行瞬态(一轮11败)已定位为与sd线资源竞争,复跑全绿 |
 
 | Codex 10小时协助ZCODE20261023 | 用户授权给原ZCODE会话指令并协助完成今早10点前知遥20集成片；协助窗口至11:56 | codex/zcode-supervision-20261023 | 仅自有协调runtime/必要独立诊断；生产单写者ZCODE，旧恋综暂不处理 | 2026-10-23 01:56 | 在途：原ZCODE已收到指令并ACK，34项相关独立回归过；定位原会话session_7acef82aafd79b10dac6e5f434e1cf08，核对真实隔离产线；不清额度/历史，不把candidate或blocked误称accepted；以20个完整导出文件验收。 |
+
+| Codex external review closure 2026-10-27 | Nine review findings, deterministic reproductions then minimal fixes; no new media | codex/autonomous-review-closure-20261027 | audit.py; episode input_repair/input_contracts/opening_source/first_frames/readiness as proved; tests | In progress | New W10 dispatch paused; preserve in-flight creator and frozen code; integrate scoped patches only after validation. No commit/push. |
+
+| Codex external review closure 收工 | 审查九项已核对；第4项先前主线已修，其余收口并集成 | codex/autonomous-review-closure-20261027 → main | 相对补丁和before见开发树 .runtime/review-closure-20261027/integration | 完成代码与小样验证 | 主线相关回归通过；真实源审12项纠错保留12、确认独立撤1；旧04正常接口仍检出双包，未生图/视频。冻结旧码W10在暂停门exit2、1次启动、0video/accepted/upload；不报从头无人成功。未commit/push/远端部署。 |

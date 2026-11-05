@@ -34,11 +34,15 @@ def compose_request(clip, directions):
         raise RepairArgumentError('H3 soundscape requires an English string')
     if re.search(r'</?d>|<DIALOGUE_|\(S\d+\)|<Audio \d+>', sound):
         raise RepairArgumentError('H3 soundscape cannot contain native speech or dialogue slots')
+    if re.search(r'[\u4e00-\u9fff]',sound):
+        raise RepairArgumentError('h3.soundscape requires English descriptions of the original sound effects; translate the source sfx rather than copying its Chinese text')
     music = directions.get('music', '')
     if not isinstance(music, str):
         raise RepairArgumentError('H3 music requires an English string')
     if re.search(r'</?d>|<DIALOGUE_|\(S\d+\)|<Audio \d+>', music):
         raise RepairArgumentError('H3 music cannot contain native speech or dialogue slots')
+    if re.search(r'[\u4e00-\u9fff]',music):
+        raise RepairArgumentError('h3.music requires English musical directions; preserve the source music/no-music decision')
     expected=dialogue_slots(clip)
     actual=[re.findall(r'<DIALOGUE_\d+>',text)for text in shots]
     global_slots=[f'<DIALOGUE_{i}>'for i in range(1,1+sum(map(len,expected)))]

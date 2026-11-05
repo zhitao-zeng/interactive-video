@@ -115,6 +115,7 @@ def test_delivery_reuses_reviewed_movie_and_refuses_changed_export(tmp_path,monk
     def export(runner,report,path):
         calls.append(path);path.mkdir(parents=True)
         final=path/'episode01.mp4';final.write_bytes(b'export')
+        (path/'cover.jpeg').write_bytes(b'cover')
         return {'final_video':str(final),'technical_passed':True}
     monkeypatch.setattr(delivery,'deliver',export)
     def review(runner,media,receipt=None):
@@ -124,9 +125,18 @@ def test_delivery_reuses_reviewed_movie_and_refuses_changed_export(tmp_path,monk
     monkeypatch.setattr(final_cut,'review_assembly',review)
     # reviewed_delivery runs the final audio review inline; a passing review bound
     # to this movie keeps the delivery gate exercised without a real audio model.
+    from novel_manga.application.review import final_audio
+    model_dir = tmp_path/'audio-model'
+    model_dir.mkdir()
+    (model_dir/'weights.bin').write_bytes(b'weights')
+    source_identity, _ = final_audio._source_facts(directory)
     def audio_review(root, episode_dir, movie, *, runtime=None):
         return {'movie': str(movie), 'complete': True, 'passed': True,
-                'issues': [], 'errors': [], 'coverage': []}
+                'issues': [], 'errors': [], 'coverage': [], 'policy':final_audio.POLICY,
+                'identity':{'movie':final_audio._file_state(movie),
+                            'model':final_audio._model_state(model_dir),
+                            'audio_source_root':str(tmp_path/'audio-source')},
+                'source_identity':source_identity}
     monkeypatch.setattr('novel_manga.application.review.final_audio.review_audio', audio_review)
     final=delivery.reviewed_delivery(runner,media,destination)
     media['final_cut_review']=final

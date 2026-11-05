@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from novel_manga.media.quality import inspect_silence  # noqa: E402
+from novel_manga.media.quality import inspect_silence, apply_check_policy  # noqa: E402
 from novel_manga.application.profiles import plan_fingerprint
 from novel_manga.application.production.runs import episode_status
 from novel_manga.application.repair.recheck_silence import recorded_outro, recheck_episode
@@ -35,8 +35,9 @@ def test_silent_outro_is_excluded_without_losing_the_story_tail(tmp_path):
     assert old["long_silence"]["passed"] is False
     assert new["long_silence"]["passed"] is True
     assert new["long_silence"]["detail"]["max_silence_seconds"] == pytest.approx(0.8, abs=.01)
-    assert new["silence_ratio"]["detail"]["duration_seconds"] == 10
-    assert new["silence_ratio"]["detail"]["ratio"] == pytest.approx(.08, abs=.001)
+    assert new["long_silence"]["detail"]["duration_seconds"] == 10
+    assert new["long_silence"]["detail"]["ratio"] == pytest.approx(.08, abs=.001)
+    assert 'silence_ratio' not in new
 
 
 def test_long_silence_in_story_still_fails_even_when_touching_outro(tmp_path):
@@ -44,15 +45,47 @@ def test_long_silence_in_story_still_fails_even_when_touching_outro(tmp_path):
     result = inspect_silence(video, 14, silent_outro_seconds=4)
     assert result["long_silence"]["passed"] is False
     assert result["long_silence"]["detail"]["max_silence_seconds"] == pytest.approx(5, abs=.01)
-    assert result["silence_ratio"]["passed"] is False
+    assert 'silence_ratio' not in result
+    assert apply_check_policy(result,[])['passed'] is False
 
 
 def test_story_silence_ratio_uses_story_duration_not_whole_video(tmp_path):
     video = audio(tmp_path / "audio.wav", [(3, False), (6, True), (5, False)])
     result = inspect_silence(video, 14, silent_outro_seconds=4)
     assert result["long_silence"]["passed"] is True  # longest story silence is just 3 seconds
-    assert result["silence_ratio"]["passed"] is False
-    assert result["silence_ratio"]["detail"]["ratio"] == pytest.approx(.4, abs=.001)
+    assert 'silence_ratio' not in result
+    assert result["long_silence"]["detail"]["ratio"] == pytest.approx(.4, abs=.001)
+    assert apply_check_policy(result,[])['passed'] is True
+
+
+def test_high_silence_ratio_in_short_intervals_is_measurement_not_a_gate(tmp_path):
+    video=audio(tmp_path/'short-gaps.wav',[(.8,True),(1.0,False)]*6)
+    original=video.read_bytes()
+    checks=inspect_silence(video,10.8)
+    assert 'silence_ratio' not in checks
+    detail=checks['long_silence']['detail']
+    assert detail['silence_seconds']==pytest.approx(6,abs=.01)
+    assert detail['ratio']==pytest.approx(6/10.8,abs=.001)
+    assert detail['max_silence_seconds']==pytest.approx(1,abs=.01)
+    assert apply_check_policy(checks,[])['passed'] is True
+    assert video.read_bytes()==original
+
+
+@pytest.mark.parametrize('failed',[None,'long_silence','audio','audio_level','subtitles'])
+def test_saved_ratio_gate_is_removed_but_measurements_and_other_gates_remain(failed):
+    import copy
+    detail={'silence_seconds':8.685158,'duration_seconds':15.744,'ratio':.551649,'threshold_db':-45}
+    checks={'silence_ratio':{'passed':False,'detail':detail},
+        'long_silence':{'passed':True,'detail':{'max_silence_seconds':1.3927}},
+        'audio':{'passed':True},'audio_level':{'passed':True},'subtitles':{'passed':True}}
+    if failed:checks[failed]['passed']=False
+    before=copy.deepcopy(checks)
+    result=apply_check_policy(checks,[])
+    assert result['passed'] is (failed is None)
+    assert 'silence_ratio' not in result['checks']
+    assert result['checks']['long_silence']['detail']=={'max_silence_seconds':1.3927,**detail}
+    assert all(result['checks'][name]==checks[name] for name in ('audio','audio_level','subtitles'))
+    assert checks==before
 
 
 def episode(tmp_path, *, black=False, speech=False):

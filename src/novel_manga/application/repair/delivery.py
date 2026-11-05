@@ -45,9 +45,9 @@ def publish_if_ready(directory: Path, review: dict, takes: dict) -> bool:
     assembly = media.get("assembly") or {}
     final_review=media.get('final_cut_review') or read(directory/'final_cut_review.json',None)
     if final_review is not None:
-        from novel_manga.application.review.final_cut import current
+        from novel_manga.application.review.final_cut import current, blocking_issues
         if (not current(directory,media,final_review) or final_review.get('complete') is not True
-                or final_review.get('passed') is not True or final_review.get('issues') or final_review.get('errors')):
+                or final_review.get('passed') is not True or blocking_issues(final_review.get('issues') or []) or final_review.get('errors')):
             return False
     if not assembly.get("pending_publish") or episode_status(directory, True) != "done":
         return False

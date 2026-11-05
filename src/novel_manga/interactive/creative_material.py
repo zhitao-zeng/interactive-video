@@ -81,7 +81,30 @@ def design_issues(episode, manifest):
     return issues
 
 
+def _normalize_original_script(script):
+    for shot in script['shots']:
+        i=shot['index'];shot.update(segment_id=f'S{i:03d}',segment_ids=[f'S{i:03d}'],
+            shot_id=f'S{i:03d}',origin_index=i,source_kind='original_agent',source_quote=shot['event'])
+        shot['visual_prompt']=copy.deepcopy(shot['start_state'])
+        shot['motion_prompt']=copy.deepcopy(shot['event'])
+    return script
+
+
+def normalized_episode(episode, manifest):
+    normalized=copy.deepcopy(episode)
+    script=normalized.get('chapter_script')
+    if not isinstance(script,dict) or not isinstance(script.get('shots'),list):
+        return normalized
+    if manifest.get('mode')=='adaptation':
+        scenes={s.get('scene_id'):s for s in (normalized.get('spatial_plan') or {}).get('scenes',[])}
+        normalized['chapter_script']=_normalize_adaptation_script(script,scenes)
+    else:
+        normalized['chapter_script']=_normalize_original_script(script)
+    return normalized
+
+
 def material(episode, manifest, *, style=None):
+    episode=normalized_episode(episode,manifest)
     if issues:=design_issues(episode,manifest):raise ValueError('; '.join(issues))
     from novel_manga.application.profiles import load_style
     profile={'frame':'9:16','tier':'quality','genre':'generic','resolution':'480p',
@@ -96,11 +119,6 @@ def material(episode, manifest, *, style=None):
     script=copy.deepcopy(episode['chapter_script'])
     script.update(authored_family=manifest['project'],video_title=title,source_title=title,
                   episode_index=1,profile=profile)
-    for shot in script['shots']:
-        i=shot['index'];shot.update(segment_id=f'S{i:03d}',segment_ids=[f'S{i:03d}'],
-            shot_id=f'S{i:03d}',origin_index=i,source_kind='original_agent',source_quote=shot['event'])
-        shot.setdefault('visual_prompt',shot['start_state'])
-        shot.setdefault('motion_prompt',shot['event'])
     interaction=copy.deepcopy(episode['interaction'])
     interaction.update(seconds=3,series_title=title)
     source=source_document(episode,manifest)
@@ -111,6 +129,19 @@ def material(episode, manifest, *, style=None):
         'delivery_policy':{'extra_visual_overlays':False}},source
 
 
+def _style_snapshot_matches(style_source,destination):
+    import hashlib
+    from novel_manga.style_packs import normalized_style
+    expected,attachments=normalized_style(style_source)
+    if read_json(destination/'style.json',{})!=expected:return False
+    root=destination/'style-examples'
+    actual={path.relative_to(destination).as_posix():path
+            for path in root.rglob('*') if path.is_file()}
+    if set(actual)!=set(attachments):return False
+    def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+    return all(digest(actual[relative])==digest(source) for relative,source in attachments.items())
+
+
 def write_material(episode, manifest, destination, *, style_source=None):
     destination=Path(destination)
     value,source=material(episode,manifest,style=read_json(Path(style_source)) if style_source else None)
@@ -118,18 +149,68 @@ def write_material(episode, manifest, destination, *, style_source=None):
     if target.exists():
         if read_json(target)!=value or (destination/'source.md').read_text()!=source:
             raise ValueError('Keep existing material; a changed authored draft needs a new edition')
+        if style_source and not _style_snapshot_matches(style_source,destination):
+            raise ValueError('Keep the existing frozen style snapshot; changed style or attachments require a new edition')
         return destination
     destination.mkdir(parents=True,exist_ok=True)
     (destination/'owner').write_text('Original creative Agent handoff / deterministic binding, no host-authored story\n')
     atomic_write_json(target,value);(destination/'source.md').write_text(source)
     atomic_write_json(destination/'layout.json',episode['spatial_plan'])
     if style_source:
-        import shutil
-        shutil.copy2(style_source,destination/'style.json')
+        from novel_manga.style_packs import export_style
+        export_style(style_source,destination)
     return destination
 
 
-def adaptation_issues(episode, manifest):
+def adaptation_designs(episode, bible):
+    """Keep supplied series identities; bind the author's new episode designs."""
+    additions={'characters':[],'props':[]};issues=[]
+    design=episode.get('production_design') or {}
+    known={row['name'] for row in bible.get('characters',[])}
+    for kind,model in [('characters',Character),('props',Prop)]:
+        existing={row['name'] for row in bible.get(kind,[])}
+        for row in design.get(kind,[]):
+            if row.get('name') in existing:continue
+            try:item=model.model_validate(row)
+            except (ValidationError,TypeError) as error:
+                issues.append(f'production_design.{kind}: {error}');continue
+            if not item.appearance.strip():
+                issues.append(f'production_design.{kind}: {item.name} needs its authored appearance');continue
+            additions[kind].append(item.model_dump(mode='json'));existing.add(item.name)
+        if kind=='characters':known.update(existing)
+    for shot in (episode.get('chapter_script') or {}).get('shots',[]):
+        names=set()
+        for key in ('characters','in_frame'):
+            if isinstance(shot.get(key),list):names.update(shot[key])
+        names.update(t.get('speaker_name') or t.get('speaker') for t in shot.get('turns',[]) if t.get('text'))
+        unknown=names-known-{None,''}
+        if unknown:issues.append(f'shot {shot["index"]}: actors {sorted(unknown)} have no supplied series identity; provide their source-supported production_design.characters designs before handoff')
+    return additions,issues
+
+
+def _adaptation_locations(episode, existing):
+    """The exact location list materialized from supplied names and authored scenes."""
+    locations=list(existing)
+    known={loc.split('：',1)[0] for loc in locations}
+    location_designs={row['name']:row.get('description','') for row in
+        (episode.get('production_design') or {}).get('locations',[]) if isinstance(row,dict) and row.get('name')}
+    shots_by_scene={}
+    for shot in (episode.get('chapter_script') or {}).get('shots',[]):
+        sid=shot.get('scene_id')
+        if sid and shot.get('location'):shots_by_scene.setdefault(sid,shot['location'])
+    for scene in (episode.get('spatial_plan') or {}).get('scenes',[]):
+        name=scene.get('location') or shots_by_scene.get(scene.get('scene_id'),'')
+        if name and name not in known:
+            anchors=scene.get('anchors') or []
+            desc='；'.join(x if isinstance(x,str) else json.dumps(x,ensure_ascii=False)
+                          for x in (anchors if isinstance(anchors,list) else [anchors])) or name
+            if authored:=location_designs.get(name):desc=authored+'；固定空间锚点：'+desc
+            locations.append(f'{name}：{desc}')
+            known.add(name)
+    return locations
+
+
+def adaptation_issues(episode, manifest, *, bible=None):
     """Adaptation drafts bind a supplied screenplay; design facts come from the
     approved series material, so only the script contract is checked here."""
     shots=(episode.get('chapter_script') or {}).get('shots',[])
@@ -148,6 +229,22 @@ def adaptation_issues(episode, manifest):
     covered=[i for g in episode.get('clips',[]) for i in g['shot_indexes']]
     if sorted(covered)!=indexes:
         issues.append('adaptation clips must cover every shot exactly once')
+    series=(manifest.get('task') or {}).get('series_material')
+    if bible is None and series:
+        from novel_manga.application.configuration import project_root
+        path=Path(series);path=path if path.is_absolute() else project_root()/path
+        bible=read_json(path/'material.json',{}).get('bible')
+    if bible:issues.extend(adaptation_designs(episode,bible)[1])
+    registered={loc.split('：',1)[0] for loc in _adaptation_locations(episode,(bible or {}).get('locations',[]))}
+    for shot in shots:
+        scene=scenes.get(shot.get('scene_id')) or {}
+        location=scene.get('location') or shot.get('location')
+        if location not in registered:
+            issues.append(f"shot {shot['index']} (scene {shot.get('scene_id')!r}): location {location!r} is not registered for material handoff. "
+                f"Registered location names: {sorted(registered)!r}. "
+                'The author must declare the source-supported place in the matching spatial_plan.scenes.location '
+                '(split/rebind the scene if its shots use different places), keep production_design.locations consistent, '
+                'or correct the shot reference to an existing name only when the source supports it. Preserve other approved fields.')
     return issues
 
 
@@ -163,8 +260,8 @@ def _normalize_adaptation_script(script, scenes):
         s.update(segment_id=f'seg_{i}',segment_ids=[f'seg_{i}'],shot_id=sid,label=sid,
                  origin_index=i,source_kind='adapted-agent',authored_duration_seconds=s['duration_seconds'])
         s.setdefault('source_quote',s.get('event') or s.get('start_state') or '')
-        s.setdefault('visual_prompt',s.get('start_state') or '')
-        s.setdefault('motion_prompt',s.get('event') or '')
+        s['visual_prompt']=copy.deepcopy(s.get('start_state') or '')
+        s['motion_prompt']=copy.deepcopy(s.get('event') or '')
     return script
 
 
@@ -174,18 +271,17 @@ def write_adaptation_material(episode, manifest, destination, *, series_material
 
     The series material supplies bible/voice/reference facts; the candidate
     supplies the bound script, groups, interaction and any new scenes."""
-    if issues:=adaptation_issues(episode,manifest):
-        raise ValueError('; '.join(issues))
+    episode=normalized_episode(episode,manifest)
     destination=Path(destination);series_material=Path(series_material)
     base=read_json(series_material/'material.json')
-    scenes={s.get('scene_id'):s for s in (episode.get('spatial_plan') or {}).get('scenes',[])}
+    if issues:=adaptation_issues(episode,manifest,bible=base['bible']):
+        raise ValueError('; '.join(issues))
     bible=copy.deepcopy(base['bible'])
-    known={loc.split('：',1)[0] for loc in bible['locations']}
-    for scene in (episode.get('spatial_plan') or {}).get('scenes',[]):
-        name=scene.get('location')
-        if name and name not in known:
-            bible['locations'].append(f"{name}：{'；'.join(scene.get('anchors') or []) or name}")
-    script=_normalize_adaptation_script(copy.deepcopy(episode['chapter_script']),scenes)
+    additions,errors=adaptation_designs(episode,bible)
+    if errors:raise ValueError('; '.join(errors))
+    for kind,rows in additions.items():bible.setdefault(kind,[]).extend(rows)
+    bible['locations']=_adaptation_locations(episode,bible['locations'])
+    script=copy.deepcopy(episode['chapter_script'])
     shots={s['index']:s for s in script['shots']}
     groups=[]
     for number,clip in enumerate(episode.get('clips',[]),1):
@@ -198,7 +294,8 @@ def write_adaptation_material(episode, manifest, destination, *, series_material
     profile=copy.deepcopy(base['profile'])
     profile.update(manifest.get('profile') or {})
     profile.setdefault('h3_speech_policy','no_reference_performance_first')
-    profile.setdefault('h3_input_mode','first-frame'); profile.setdefault('h3_extra_reference_policy','needed')
+    # Lane mode (h3_input_mode) is chosen by the caller, not the material: baking
+    # first-frame in here made SD editions refuse to start (2026-10-23).
     interaction=copy.deepcopy(episode['interaction']);interaction.setdefault('seconds',3)
     segments=[{'segment_id':f'seg_{i}','text':'\n'.join(filter(None,[s.get('start_state'),s.get('event'),
         *[f"{t.get('speaker') or t.get('speaker_name','')}：{t['text']}" for t in s.get('turns',[])],s.get('end_state')]))}
@@ -209,11 +306,22 @@ def write_adaptation_material(episode, manifest, destination, *, series_material
         'source_archive':manifest.get('source_archive'),'source_seconds':round(sum(s['duration_seconds'] for s in script['shots']),2),
         'source_seconds_kind':'authored_budget','target_seconds':round(sum(s['duration_seconds'] for s in script['shots'])+interaction['seconds'],2),
         'style_snapshot':'style.json','asset_status':copy.deepcopy(base.get('asset_status') or {})}
+    target=destination/'material.json'
+    if target.exists():
+        if read_json(target)!=value:
+            raise ValueError('Keep existing material; a changed adaptation draft needs a new edition')
+        if (destination/'source.md').read_bytes()!=Path(package_script).read_bytes():
+            raise ValueError('Keep existing source; a changed package screenplay needs a new edition')
+        if style_source and not _style_snapshot_matches(style_source,destination):
+            raise ValueError('Keep the existing frozen style snapshot; changed style or attachments require a new edition')
+        return destination
     destination.mkdir(parents=True,exist_ok=True)
     (destination/'owner').write_text('Adaptation creative Agent handoff / series-material merge, deterministic binding\n')
-    atomic_write_json(destination/'material.json',value)
+    atomic_write_json(target,value)
     import shutil
     shutil.copy2(package_script,destination/'source.md')
     atomic_write_json(destination/'layout.json',episode.get('spatial_plan') or {})
-    if style_source:shutil.copy2(style_source,destination/'style.json')
+    if style_source:
+        from novel_manga.style_packs import export_style
+        export_style(style_source,destination)
     return destination

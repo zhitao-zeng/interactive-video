@@ -392,7 +392,7 @@ def test_finish_requires_current_take_review_after_interrupted_retake_review(hos
 
 
 @pytest.mark.parametrize('advisory,other_failure,expected', [
-    (True,None,True),(True,'long_silence',False),(True,'black_frames',False),
+    (True,None,True),(True,'playable',False),(True,'black_frames',False),
     (True,'audio_level',False),(False,None,False)])
 def test_finish_rechecks_existing_movie_when_book_qc_policy_changes(host, monkeypatch, advisory, other_failure, expected):
     ctx,tools,events,state=host
@@ -402,21 +402,21 @@ def test_finish_rechecks_existing_movie_when_book_qc_policy_changes(host, monkey
     original=Path(assembly['final_video']).read_bytes()
     assembly.update(cover=str(ctx.episode_dir/'cover.jpeg'),ending=str(ctx.episode_dir/'ending.jpeg'),
                     ass=str(ctx.episode_dir/'subtitles.ass'),silent_outro_seconds=4,subtitle_events=8)
-    checks={'silence_ratio':{'passed':not advisory,'detail':{'ratio':0.6}},
-            'long_silence':{'passed':True},'black_frames':{'passed':True},'audio_level':{'passed':True},
+    checks={'long_silence':{'passed':not advisory,'detail':{'max_silence_seconds':5.0}},
+            'playable':{'passed':True},'black_frames':{'passed':True},'audio_level':{'passed':True},
             'long_freeze':{'passed':True,'detail':{'max_freeze_seconds':0}}}
-    if not advisory:checks['silence_ratio']['waived']=True
+    if not advisory:checks['long_silence']['waived']=True
     if other_failure:checks[other_failure]['passed']=False
     assembly['media_qc']={'passed':not advisory,'checks':checks}
     atomic_write_json(path,media)
-    atomic_write_json(ctx.novel_dir/'profile.json',{'frame':'16:9','qc_ignore':['silence_ratio'] if advisory else []})
+    atomic_write_json(ctx.novel_dir/'profile.json',{'frame':'16:9','qc_ignore':['long_silence'] if advisory else []})
     calls=[]
     def inspect(video, cover, ending, ass, settings, report, **kwargs):
         calls.append(kwargs)
         assert (settings.width,settings.height,settings.fps)==(1920,1080,25)
         result=copy.deepcopy(checks)
-        result['silence_ratio'].pop('waived',None)
-        result['silence_ratio']['passed']=False
+        result['long_silence'].pop('waived',None)
+        result['long_silence']['passed']=False
         for key in kwargs['ignore_checks']:
             result[key].update(passed=True,waived=True)
         if other_failure:result[other_failure]['passed']=False
@@ -430,9 +430,9 @@ def test_finish_rechecks_existing_movie_when_book_qc_policy_changes(host, monkey
     if calls:assert calls[0]['ignore_checks']==()
     assert Path(assembly['final_video']).read_bytes()==original
     assert history.generation_counts(ctx.episode_dir)==before_counts
-    assert read_json(path)['assembly']['media_qc']['checks']['silence_ratio']['detail']['ratio']==0.6
+    assert read_json(path)['assembly']['media_qc']['checks']['long_silence']['detail']['max_silence_seconds']==5.0
     if advisory and not other_failure:
-        assert read_json(path)['assembly']['media_qc']['checks']['silence_ratio']['measured_passed'] is False
+        assert read_json(path)['assembly']['media_qc']['checks']['long_silence']['measured_passed'] is False
         atomic_write_json(ctx.novel_dir/'profile.json',{'frame':'16:9','qc_ignore':[]})
         assert tools.dispatch('finish')['passed'] is False
         assert calls==[]  # the original measurement survives turning the advisory back off
@@ -518,3 +518,84 @@ def test_review_analysis_cannot_generate_voice_or_brighten_a_take(host,monkeypat
     assert 'error' not in result, result.get('error')
     assert not runner.context.options.cache_only and runner.context.state.black_checks=={'clip_01'}
     assert Path(report['clips'][0]['selected']['video']).read_bytes()==before
+
+
+def test_typed_service_failure_row_stops_before_review_or_content_findings(host, monkeypatch):
+    import httpx
+    from novel_manga.media import retries as clip_retries
+    ctx, tools, events, _ = host
+    request = httpx.Request('POST', 'https://service.test/render')
+    response = httpx.Response(503, request=request, json={'error': 'service unavailable'})
+    error = httpx.HTTPStatusError('HTTP 503', request=request, response=response)
+    class ServiceRunner:
+        def __init__(self):
+            self.context = RenderContext(episode_dir=ctx.episode_dir)
+        def run(self, *, assemble=True):
+            events.append('render')
+            row = clip_retries.failure_result('clip_01', [], error)
+            report = {'status': 'clips_failed', 'clips': [row], 'failed_clips': ['clip_01'],
+                      'gate_failed_clips': [], 'assembly': None}
+            atomic_write_json(ctx.episode_dir/'thin_media_report.json', report)
+            return report
+    monkeypatch.setattr(MediaOperations, 'runner', lambda self: ServiceRunner())
+    result = tools.dispatch('render')
+    assert result['ok'] is False and result['retryable'] is True
+    assert result['service_interrupted']['http_status'] == 503
+    assert events == ['render']
+    assert 'feedback' not in result and 'review' not in result
+
+
+def test_mixed_service_and_local_failures_are_preserved_and_stop_everywhere(host, monkeypatch):
+    import httpx
+    from novel_manga.media import retries as clip_retries
+    ctx, tools, events, _ = host
+    request = httpx.Request('POST', 'https://service.test/render')
+    response = httpx.Response(503, request=request, json={'error': 'service unavailable'})
+    outage = httpx.HTTPStatusError('server error', request=request, response=response)
+    class MixedRunner:
+        def __init__(self):
+            self.context = RenderContext(episode_dir=ctx.episode_dir)
+        def run(self, *, assemble=True):
+            events.append('render')
+            rows = [clip_retries.failure_result('clip_01', [], outage),
+                    clip_retries.failure_result('clip_02', [], ValueError('local invalid payload'))]
+            report = {'status': 'clips_failed', 'clips': rows,
+                      'failed_clips': ['clip_01', 'clip_02'], 'gate_failed_clips': [], 'assembly': None}
+            atomic_write_json(ctx.episode_dir/'thin_media_report.json', report)
+            return report
+    monkeypatch.setattr(MediaOperations, 'runner', lambda self: MixedRunner())
+    result = tools.dispatch('render')
+    assert result['ok'] is False and result['retryable'] is False
+    assert result['service_interrupted']['http_status'] == 503
+    assert set(result['clips']) == {'clip_01', 'clip_02'}
+    assert 'service_interrupted' not in result['clips']['clip_02']
+    assert result['clips']['clip_02']['retryable'] is False
+    status = tools.status({})
+    route = status['next_action']
+    assert route['action'] != 'agent' and route['retryable'] is False
+    assert route['service_interrupted']['http_status'] == 503
+    assert set(route['service_failure_clips']) == {'clip_01', 'clip_02'}
+    from novel_manga.application.agents.episode import readiness
+    route = readiness.next_action(ctx, {**status, 'job': {'action': 'finish', 'status': 'completed',
+        'result': {'ok': False, 'retryable': False, 'error': 'ValueError: local finish defect'}}})
+    assert route['retryable'] is False and route['service_interrupted']['http_status'] == 503
+    assert events == ['render']
+
+
+def test_refresh_removes_obsolete_silence_ratio_without_policy_override_or_render(host, monkeypatch):
+    ctx,tools,events,state=host
+    tools.dispatch('render')
+    path=ctx.episode_dir/'thin_media_report.json';report=read_json(path)
+    assembly=report['assembly'];movie=Path(assembly['final_video']);original=movie.read_bytes()
+    assembly.update(thin_passed=False,media_qc={'passed':False,'checks':{
+        'silence_ratio':{'passed':False,'detail':{'ratio':0.596567}},
+        'long_silence':{'passed':True,'detail':{'max_silence_seconds':1.8}},
+        'audio_level':{'passed':True}}})
+    atomic_write_json(path,report)
+    before_counts=history.generation_counts(ctx.episode_dir);before_events=list(events)
+    monkeypatch.setattr('novel_manga.media.quality.inspect_media',lambda *a,**k:pytest.fail('retained measurements suffice'))
+    refreshed=tools.media.refresh_technical_policy(report,read_json(ctx.episode_dir/'clip_plan.json'))
+    assert 'silence_ratio' not in refreshed['assembly']['media_qc']['checks']
+    assert refreshed['assembly']['thin_passed'] is True
+    assert movie.read_bytes()==original and history.generation_counts(ctx.episode_dir)==before_counts
+    assert events==before_events
