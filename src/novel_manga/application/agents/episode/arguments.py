@@ -41,3 +41,36 @@ def spent_video_budget(ctx,clip_ids):
     counts=history.generation_counts(ctx.episode_dir)
     return {cid:'effective clip retry budget used' for cid in clip_ids
             if history.remaining_takes(ctx.episode_dir,cid,preparation=True)<=0}
+
+
+import re
+
+_SERVICE_STATUS = re.compile(r'\bHTTP[:\s]+([45]\d\d)\b')
+# A payment, credential, quota or outage answer is about the shared service,
+# never about this candidate's content.  It must not spend a content revision,
+# a media take or an input attempt, and the rest of the batch must not be sent
+# to a service already known to be unusable.
+_SERVICE_STATUSES = {401, 402, 403, 407, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524}
+_SERVICE_WORDS = ('quota_not_enough', 'insufficient', 'payment required', 'credential',
+                  'unauthorized', 'api key', 'rate limit', 'service unavailable')
+
+
+def service_interruption(error):
+    """The HTTP status/text of an outage or account failure, or None.
+
+    Task submission wraps its answer in RuntimeError texts such as
+    ``task submission returned HTTP 402: ...``; direct httpx errors carry the
+    response.  Content rejections never match here.
+    """
+    if isinstance(error, UnsupportedInput):
+        return None
+    response = getattr(error, 'response', None)
+    status = getattr(response, 'status_code', None)
+    detail = getattr(response, 'text', None) or str(error)
+    if status is None:
+        match = _SERVICE_STATUS.search(str(error))
+        status = int(match.group(1)) if match else None
+    lowered = str(detail).lower()
+    if status in _SERVICE_STATUSES or any(word in lowered for word in _SERVICE_WORDS):
+        return {'http_status': status, 'detail': str(detail).strip().replace('\n', ' ')[:500]}
+    return None

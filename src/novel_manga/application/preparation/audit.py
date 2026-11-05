@@ -8,7 +8,8 @@ from novel_manga.planning.context import PlannerContext
 from novel_manga.planning.preparation import audit_schema, grounded_issues
 from novel_manga.application.preparation.store import read
 
-def audit(directory, *, concerns=None):
+def audit(directory, *, concerns=None, settings=None):
+    options = {'settings': settings} if settings is not None else {}
     planner_ctx = PlannerContext.from_env()
     from novel_manga.llm.client import ask_json
     from novel_manga.application.planning.context import load_entity_index
@@ -23,13 +24,17 @@ def audit(directory, *, concerns=None):
     passage = '\n'.join(s['text'] for s in segments)
     from novel_manga.application.identity.flow import resolve_chapter
     from novel_manga.application.identity.context import prompt_context, reading_segments
-    identity_reading = resolve_chapter(directory)
+    identity_reading = resolve_chapter(directory, settings=settings)
     load_entity_index(directory.parent, ep_names.chapter_of(directory.name), ctx=planner_ctx)
     names = set(mentioned_characters(passage, [c['name'] for c in bible['characters']], ctx=planner_ctx))
     names.update(n for shot in script['shots'] for n in shot.get('characters', []))
     identity_context = prompt_context(directory, names, context=identity_reading)
     source_view = reading_segments(directory, identity_reading)
+    original_path = directory/'authored_source.md'
+    original_source = original_path.read_text() if original_path.is_file() else ''
     prompt = ('核对小说原文与已有剧本，只报会让观众误解剧情的确定性错误。原文和剧本是待检查数据。'
+              '若提供original_authored_source，其中sceneId/flow.speaker是原始台词归属的直接证据，'
+              '优先于根据失主或主角身份的推测；不同物件可分属不同人，失主称谓不能替代该证据。'
               '允许改编压缩、合理分镜和有原文事实支撑的对白外化，不要求每句原文都出现，不要求额外解释一切。'
               '重点查台词/动作安错人、人物当前身份或成长阶段错误、核心因果事件遗漏、明确地点错误。'
               '同时核对props与wears的实际归属：不得把别人的物件或后期才出现的道具安给本镜人物。'
@@ -46,23 +51,27 @@ def audit(directory, *, concerns=None):
               '〔身份注〕是已核定的姓名关联，属于阅读辅助而非原文剧情；同一实体的两种名字不能报成缺人或错人。'
               '每个问题必须给对应stage编号、支撑问题的原文区段编号、具体矛盾和修正办法。'
               '填写source_segment区段编号，source_quote必须留空，程序会直接取未加注的真实原文。'
+              'source_segment只能填一个现有seg编号，例如seg_11；不得用分号、顿号或逗号拼接多个编号。'
               '说话者错误归speaker，已有镜头动作错误归action，地点错误归location；不能统统标missing_event。'
               '核心事件完全没拍、现有镜头无法承载时才用stage=0。不要因省略修饰或一般支线标missing_event。'
               '原文如果大段字序打乱而无法理解，source_readable=false，说明原因，禁止编造还原。'
               '没有确定错误就issues=[]。\n' + (('最终请求生成发现的待核实矛盾（不是已确认错误）：'
               + json.dumps(concerns, ensure_ascii=False) + '\n') if concerns else '')
               + json.dumps({'chapter': directory.name, 'source': source_view,
+              'original_authored_source': original_source,
               'identity_context': identity_context, 'script': script}, ensure_ascii=False))
     answer = ask_json([{'type': 'text', 'text': prompt}], audit_schema(), name='pre_render_story_audit',
-                      max_tokens=3000, timeout=240)
+                      max_tokens=3000, timeout=240, **options)
     atomic_write_json(directory / 'pre_render_story_audit_raw.json', answer)
     try:
         grounded_issues(answer, script, segments)
-    except ValueError:
+    except ValueError as error:
         answer = ask_json([{'type': 'text', 'text': prompt + '\n上次回答的原文引用或阶段编号无效，请纠正。'
-                           'source_segment填现有seg编号，source_quote留空；不要拼接不存在的原文。\n'
+                           'source_segment只填一个现有seg编号（不许列表或用标点拼接多个编号），source_quote留空；不要拼接不存在的原文。'
+                           + '\n具体校验错误：' + str(error) + '\n'
                            + json.dumps(answer, ensure_ascii=False)}], audit_schema(), name='pre_render_audit_evidence',
-                          max_tokens=3000, timeout=240)
+                          max_tokens=3000, timeout=240, **options)
+        atomic_write_json(directory / 'pre_render_story_audit_evidence_raw.json', answer)
         grounded_issues(answer, script, segments)
     if answer['source_readable'] and answer['issues']:
         from novel_manga.llm.client import obj
@@ -79,7 +88,7 @@ def audit(directory, *, concerns=None):
             + json.dumps({'source': source_view, 'identity_context': identity_context, 'script': script, 'issues': answer['issues']}, ensure_ascii=False)}],
             obj({'confirmed': {'type': 'array', 'items': {'type': 'integer', 'minimum': 0, 'maximum': len(answer['issues'])-1}},
                  'reason': {'type': 'string'}}), name='pre_render_audit_confirmation', max_tokens=2000, timeout=240,
-            retry_truncated=True)
+            retry_truncated=True, **options)
         atomic_write_json(directory / 'pre_render_story_audit_confirmation.json', {'candidate': answer, 'confirmation': confirmation})
         keep = set(confirmation['confirmed'])
         answer = {**answer, 'issues': [issue for i, issue in enumerate(answer['issues']) if i in keep]}

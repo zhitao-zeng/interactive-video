@@ -4,7 +4,7 @@ from novel_manga.application.agents.episode.arguments import UnsupportedInput
 
 
 def source_check(source, quote, shots, phases, locations=None, scoped_shots=None, *, characters=None,
-                 review_reason=None):
+                 review_reason=None, music_plans=None):
     from novel_manga.llm.client import ask_json, obj
     from novel_manga.review.endpoints import judge_settings
     prompt = ('核对原文与一份局部输入修复候选。判断修改后的入镜人物、群演、听者、地点、光线、外貌、穿戴和姿态衔接是否有原文依据，'
@@ -27,6 +27,8 @@ def source_check(source, quote, shots, phases, locations=None, scoped_shots=None
               'source_group列出同source_shot且source_kind相同的原有拆镜及前后顺序；把它们作为上下文，保留未修改拆镜中的对白和动作。'
               '不要把未改字段、拆镜保留对白或父source_shot时长预算当成本次修改；仍须拒绝真实改动人物、剧情、对白或确实反转动作先后的候选。'
               'reason是修复意图提示，不是原文证据，也不授权新增剧情。'
+              'music_plans若提供则含既有后期配乐计划before与候选after；按当前镜号和affected_shots核对进入、退出与所有明确留白。'
+              'audio_plan仅music_cue/entry/withdrawal是后期标签，不更改原生对白、现场声或表演；保留明确无音乐段。'
               '原文未逐字描述的正常衣料声、呼吸声、站位、长袍长度、发型等美术实现不是新增剧情；'
               '只拦截明确事实矛盾，不因“未明确说到”推定矛盾。称谓或同义地点标签也不等于换了地点。'
               '不支持或与原文相反的修改给出具体problems；所有修改有依据才consistent=true。'
@@ -34,6 +36,7 @@ def source_check(source, quote, shots, phases, locations=None, scoped_shots=None
               + json.dumps({'source': source, 'source_quote': quote, 'shots': shots,
                             'phases': phases, 'locations': locations or {}, 'characters': characters or {},
                             'affected_shots': scoped_shots or [],
+                            **({'music_plans':music_plans} if music_plans is not None else {}),
                             'reason': review_reason or next((s.get('reason') for s in (scoped_shots or [])
                                                              if s.get('reason')), '')}, ensure_ascii=False))
     result = ask_json([{'type': 'text', 'text': prompt}],
@@ -47,6 +50,8 @@ def source_check(source, quote, shots, phases, locations=None, scoped_shots=None
             '现在独立核实这份初审结论，初审文字不是事实。只返回实际成立的原文与候选冲突。'
             '剔除肯定说明、合法缩写、旧稿未改字段和无证据推断；不能因初审不通过而维持拒绝。'
             '每项conflicts必须给逐字source_quote和具体problem，说明候选哪个字段与原文哪项事实相反。'
+            'source_quote只能逐字复制source字段中的原文，不能复制候选的fields、after、characters或设计文字；'
+            '找不到对应原文原句时，不得把候选自己的描述伪造为源引文或输出该conflict。'
             '如果全部有据或只有肯定说明，conflicts=[]；无确定矛盾不补造问题。\n'
             + json.dumps({'initial': result}, ensure_ascii=False)}],
             obj({'conflicts': {'type': 'array', 'items': obj({
