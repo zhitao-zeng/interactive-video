@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-from novel_manga.application.planning import cli, requests
+from novel_manga.application.planning import cli, requests, cast_inputs, flow as planning_flow
 from novel_manga.application.review import bible
 from novel_manga.llm import client
 from novel_manga.planning.context import PlannerContext
@@ -33,6 +33,7 @@ def test_catalogue_is_reloaded_even_when_growth_added_nothing_locally(tmp_path, 
         path.write_text(json.dumps(current))
         return []
     monkeypatch.setattr(cast_bible_growth, 'grow_unbound_roster', sibling_added_the_person)
+    monkeypatch.setattr(planning_flow, 'prepare_cast', cast_inputs.repair_cast)
     offered = []
     class BoundEnough(RuntimeError):
         pass

@@ -1,6 +1,8 @@
 """A current repair view; complete state and history remain available on disk."""
 from __future__ import annotations
 
+import os
+
 from novel_manga.util import atomic_write_json,read_json
 from .memory_summary import summarize_case
 
@@ -34,6 +36,8 @@ def prepare(ctx,status,diagnosis,memories):
                 'can_revise_saved':bool(saved.get('revision_available')),
                 'failed_step':saved.get('step'),'error':saved.get('error'),
                 'error_details':saved.get('error_details'),'next':saved.get('next_action')}}
+        grant=((status.get('first_frames') or {}).get('clips') or {}).get(cid,{}).get('repair_grant')
+        if grant:target['input']['grant']=grant
         from novel_manga.application.review.confirmed import clip_review_criteria
         criteria=clip_review_criteria(ctx.episode_dir,cid)
         if criteria:
@@ -63,22 +67,27 @@ def prepare(ctx,status,diagnosis,memories):
     job=status.get('job') or {}
     outcome=job.get('result') or {}
     last={k:job.get(k) for k in ('id','action','status','error')}
-    last['result']={k:outcome[k] for k in ('ok','passed','error','changed','input_repaired','input_reused','unresolved_clips') if k in outcome}
+    last['result']={k:outcome[k] for k in ('ok','passed','error','changed','input_repaired','input_reused','unresolved_clips','validated_clips','validation_targets','validation_scope') if k in outcome}
     if 'pending'in outcome and job.get('action')=='apply' and job.get('status')=='completed':
         last['result']['unresolved_clips']=outcome['pending']
     for field in ('blocked','argument_errors'):
         if isinstance(outcome.get(field),dict):last['result'][field]={k:v for k,v in outcome[field].items() if k in selected}
     if job.get('action')=='first_frames':
+        if outcome.get('argument_errors'):
+            last['result']['retry_clips']=sorted(outcome['argument_errors'])
         last['result']['first_frame_failures']={cid:{'error':row.get('error'),
             'problems':(row.get('review')or{}).get('problems',[]),'evidence':row.get('evidence')}
             for cid,row in (outcome.get('clips')or{}).items()if cid in selected and row.get('ok')is False}
         last['result']['video_input_failures']={cid:row['error']
             for cid,row in (outcome.get('video_stream')or{}).items()if cid in selected and row.get('error')}
+    first_pass = os.environ.get('NOVEL_FIRST_PASS_ONLY') == '1'
     brief={'phase':read_json(ctx.work_dir/'input/manifest.json',{}).get('agent_phase'),
+        'workflow_scope':'first_pass' if first_pass else 'full_production',
         'mode':'adopted_repair' if adopted else 'provisional_draft',
         'next_action':status.get('next_action'),
         'author_session':read_json(ctx.work_dir/'episode-session.json',{}).get('session_id'),
         'upstream_route':status.get('upstream_route'),
+        **({'repair_capabilities':status['repair_capabilities']} if status.get('repair_capabilities') else {}),
         **({'first_frames':status['first_frames']} if status.get('first_frames') else {}),
         **({'music_selection':status['music_selection']} if status.get('music_selection') else {}),
         **({'audio_mix':status['audio_mix']} if status.get('audio_mix') else {}),
@@ -86,9 +95,14 @@ def prepare(ctx,status,diagnosis,memories):
         'targets':targets,'issues':issues,'last_operation':last,'evidence_files':files,
         'full_status':'input/current-status.json','reference_catalog':'input/catalog.json','related_history':recent,
         'tool_source':'/opt/novel-code/novel_manga/application/agents/episode',
-        'execution_rules':([
-            'Only these current targets need work. Old errors on other clips are history, not new tasks.',
-            'Write output/repair.json and call check, then apply. Replying with JSON alone executes nothing.'] if adopted else [
+        'execution_rules':[
+            ('This phase only prepares and generates missing first videos; film review and finish wait for the next phase.'
+             if first_pass else
+             'Full scope: obey host review/music/mix/finish.')
+        ]+([
+            'Only current targets; old errors are history.',
+            'check then apply output/repair.json. input: clip_id/reason/source_quote/shots:[{index}]; '
+            'speaker_map=old_speaker_name→new_speaker_name, not dialogue.'] if adopted else [
             'No adopted plan exists. Repair the saved provisional output/episode.json using the planner failure and source; call check, then adopt.',
             'For missing draft assets only, use output/repair.json with source-backed asset requests and apply; bind returned IDs in the draft.',
             'Empty adopted targets do not mean the draft is complete. Read the saved draft/check evidence.'])+[
@@ -110,6 +124,11 @@ def prepare(ctx,status,diagnosis,memories):
               if postproduction else []),
             'Only a target with host-provided review_criteria may use review_file on keep. The current production session authors one output/scoped-review-<clip_id>.json per clip with schema scoped-agent-review-v1, exact author_session from episode-session.json, clip_id, current selected video path/take, selected raw task_id, exact source_segment_ids and source_evidence [{segment_id,text}] copied from current segments.json, exact review_criteria, assessment pass/minor/fail, judgment, observations [{kind:video_frame|reference,file,times or time_seconds,observation}], and reviewed_findings [{finding,disposition:resolved|not_demonstrated|upheld}] addressing every current automated blocker. Optionally include independent_review_file pointing to the supplied independent reviewer JSON in this work directory. Set review_file to this path on that clip keep decision, then call check and apply. This does not skip speech or media gates and is unavailable for clips without host criteria.',
             'For deterministic tool bugs, inspect the read-only source and report the concrete failing field; do not repeat the same rejected operation.']}
+    if job.get('action')=='first_frames' and outcome.get('argument_errors'):
+        retry=last['result']['retry_clips']
+        brief['execution_rules'].append(
+            f'For this first_frames argument retry, submit only {retry!r}. Preserve validated_clips and their valid fields; '
+            'do not rewrite or resubmit validated rows. Correct the returned invalid_fields, then run first_frames again.')
     playbook=read_json(ctx.work_dir/'input/manifest.json',{}).get('skill_references',{}).get('repair_playbook')
     if playbook:
         brief['repair_playbook']=playbook

@@ -107,6 +107,12 @@ class DraftOperations:
                     action = row.get('action')
                     if row.get('review_file') is not None and action != 'keep':
                         raise RepairArgumentError('review_file is supported only for a current-take keep decision')
+                    if row.get('input_clip_id') is not None:
+                        if len(draft['decisions']) != 1:
+                            raise RepairArgumentError('submit one same-source request correction separately')
+                        from .input_request_recovery import edit
+                        edit(self.ctx, row, check_only=True)
+                        continue
                     if action in {'repair_assets','repack'}:
                         if len(draft['decisions'])!=1:raise RepairArgumentError('submit one upstream operation separately')
                         if action=='repair_assets':
@@ -143,8 +149,10 @@ class DraftOperations:
                     elif action == 'input':
                         from .repair_targets import validate_target
                         validate_target(self.ctx,normalize_arguments(row))
-                        from .input_repair import repair
-                        repair(self.ctx,row,check_only=True)
+                        from .input_repair import repair, current_repair_grant
+                        plan=read_json(self.ctx.episode_dir/'clip_plan.json',{})
+                        repair(self.ctx,row,check_only=True,
+                               grant=current_repair_grant(self.ctx,row,plan))
                     elif action == 'accept_risk':
                         from .repair_targets import validate_target
                         validate_target(self.ctx,row)

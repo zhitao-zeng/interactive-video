@@ -2,6 +2,8 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
+import hashlib
+import json
 from novel_manga.util import read_json
 from novel_manga.story.catalog import IdentityCatalog
 from novel_manga.story.source_identity import POLICY, usable_reading
@@ -29,9 +31,23 @@ def data_signature(novel):
     return {str(p): [p.stat().st_mtime_ns, p.stat().st_size] if p.is_file() else None for p in data_files(novel)}
 
 
-def chapter_inputs(directory):
+def chapter_inputs(directory, *, script=None):
     directory = Path(directory).resolve()
-    return {'data': data_signature(directory.parent), 'segments': read(directory / 'segments.json', [])}
+    result = {'data': data_signature(directory.parent), 'segments': read(directory / 'segments.json', [])}
+    authored = directory / 'authored_source.md'
+    if authored.is_file():
+        result['authored_source'] = authored.read_text(encoding='utf-8')
+    script_path = directory / 'chapter_script.json'
+    if script_path.is_file():
+        script = read(script_path, {}) if script is None else script
+        evidence = [{'index': shot.get('index'), 'segment_ids': shot.get('segment_ids'),
+                     'characters': shot.get('characters'), 'in_frame': shot.get('in_frame'),
+                     'turns': [{key: turn.get(key) for key in ('speaker_name', 'text')}
+                               for turn in shot.get('turns', [])]}
+                    for shot in script.get('shots', [])]
+        result['dialogue_grounding'] = hashlib.sha256(
+            json.dumps(evidence, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+    return result
 
 
 
@@ -77,9 +93,9 @@ class ChapterIdentityData:
                          and saved.get('inputs') == self.expected) else {}
 
 
-def load_chapter(directory: Path) -> ChapterIdentityData:
+def load_chapter(directory: Path, *, script=None) -> ChapterIdentityData:
     directory = Path(directory).resolve()
-    return ChapterIdentityData(directory, load_book(directory.parent), chapter_inputs(directory),
+    return ChapterIdentityData(directory, load_book(directory.parent), chapter_inputs(directory, script=script),
                                read(directory / 'identity_context.json', {}))
 
 

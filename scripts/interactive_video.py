@@ -23,7 +23,13 @@ def main():
     film.add_argument('--output-dir',type=Path,required=True)
     film.add_argument('--edition',required=True)
     film.add_argument('--config',type=Path)
+    film.add_argument('--lane',choices=list(VIDEO_LANES),help='Media lane for this frozen full-production task')
     film.add_argument('--resume',action='store_true')
+    batch=commands.add_parser('produce-batch',help='Supervise independent frozen produce tasks with bounded automatic recovery')
+    batch.add_argument('--batch',type=Path,required=True)
+    batch.add_argument('--output-dir',type=Path,required=True)
+    batch.add_argument('--resume',action='store_true',help='Resume blocked entries after a general repair, preserving all launches and original budgets')
+    batch.add_argument('--edition',dest='editions',action='append',help='Only dispatch this edition from the frozen batch; repeat to select more, omit for all')
     music=commands.add_parser('music',help='Search SoulTuner candidates without adopting music or generating video')
     music.add_argument('--request',type=Path,required=True,help='JSON with query and optional limit')
     music.add_argument('--output-dir',type=Path,required=True)
@@ -61,11 +67,16 @@ def main():
     status.add_argument('--project-root',type=Path,default=ROOT,
                         help='Existing project data root; source code stays in this checkout')
     args=parser.parse_args()
-    if args.command=='produce':
+    if args.command=='produce-batch':
+        from novel_manga.interactive.batch import run
+        result=run(ROOT,args.batch,args.output_dir,resume=args.resume,editions=args.editions)
+        print(json.dumps(result,ensure_ascii=False,indent=2))
+        return 0 if result['status']=='accepted' else 2
+    elif args.command=='produce':
         from novel_manga.interactive.film import run
         from novel_manga.application.agents.sandbox import load_config
         result=run(ROOT,args.task,args.output_dir,args.edition,resume=args.resume,
-                   config=load_config(args.config) if args.config else None)
+                   config=load_config(args.config) if args.config else None,lane=args.lane)
         print(json.dumps(result,ensure_ascii=False,indent=2))
         return 0 if result.get('status')=='accepted' else 2
     elif args.command=='music':

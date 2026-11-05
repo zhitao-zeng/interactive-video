@@ -11,6 +11,11 @@ from novel_manga.util import atomic_write_json, read_json
 from support.first_frame_cases import case
 
 
+def pixel_hash(path):
+    import hashlib
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 @pytest.fixture
 def spent_frames(tmp_path, monkeypatch):
     ctx, clips = case(tmp_path, monkeypatch)
@@ -34,9 +39,10 @@ def spent_frames(tmp_path, monkeypatch):
             atomic_write_json(candidate/'opening.png.task.json', {'task_id': f'retained-{cid}-{index}'})
             atomic_write_json(candidate/'rejected.json', {'error': 'earlier opening was rejected',
                 'review': {'consistent': False, 'problems': ['visible pixel defect']}})
-            atomic_write_json(candidate/'reviews/review_001.json',{'input':review_inputs[cid],
-                'review':{'consistent':False,'problems':['visible pixel defect']}})
             Image.new('RGB', (8, 16)).save(candidate/'opening.png')
+            atomic_write_json(candidate/'reviews/review_001.json',{
+                'input':{**review_inputs[cid],'candidate_sha256':pixel_hash(candidate/'opening.png')},
+                'review':{'consistent':False,'problems':['visible pixel defect']}})
     retained = {p: p.read_bytes() for root in roots.values() for p in root.rglob('*') if p.is_file()}
     calls = []
 
@@ -60,7 +66,8 @@ def save_current_review(ctx, rows, candidate, review):
     contract=current_contract(ctx,clip,row['image_references'],include_style=True)
     review_input={'policy':REVIEW_POLICY,'source_contract':contract,
         'source_assets':source_asset_state(ctx,row['image_references']),
-        'image_prompt':row['image_prompt'],'visible_characters':row['visible_characters']}
+        'image_prompt':row['image_prompt'],'visible_characters':row['visible_characters'],
+        'candidate_sha256':pixel_hash(candidate/'opening.png')}
     atomic_write_json(candidate/'reviews/review_002.json',{'input':review_input,'review':review})
 
 
@@ -93,7 +100,11 @@ def test_explicit_clip_grant_allows_only_fourth_and_resume_never_refills(spent_f
     assert resumed['clips']['clip_01']['ok'] is True
     assert calls == [('clip_01', 'candidate_04')] and receipt.read_bytes() == before
 
-    rows[0]['image_prompt'] = 'A different source-supported opening request.'
+    changed_prompt = 'A different source-supported opening request.'
+    plan = read_json(ctx.episode_dir/'clip_plan.json')
+    plan['clips'][0]['shots'][0]['opening_frame']['image_prompt'] = changed_prompt
+    atomic_write_json(ctx.episode_dir/'clip_plan.json', plan)
+    rows[0]['image_prompt'] = changed_prompt
     atomic_write_json(ctx.work_dir/'output/first-frames.json', {'frames': rows})
     changed = FirstFrameOperations(ctx, builder=build, checker=checker).prepare({})
     assert changed['clips']['clip_01']['error'] == 'first-frame image candidate budget used'
@@ -176,6 +187,8 @@ def test_explicit_retake_spends_one_image_and_both_resume_paths_reuse_it(spent_f
     assert decision['reason'] == rows[0]['retake_candidate']['reason']
     replacement = roots['clip_01']/'candidate_04'
     assert read_json(replacement/'input.json')['image_prompt'] == rows[0]['image_prompt']
+    request = read_json(replacement/'image-request.json')
+    assert request['request_prompt'].count(rows[0]['retake_candidate']['reason']) == 1
     assert result['first_frames']['clips']['clip_01']['image_candidates'] == 4
 
     # Same explicit request, then an ordinary resume with the retake field omitted.
@@ -285,3 +298,31 @@ def test_supplier_exception_resume_stays_on_reserved_replacement(spent_frames):
     assert calls == [('clip_01', 'candidate_04'), ('clip_01', 'candidate_04')]
     assert read_json(roots['clip_01']/'candidate_03/retake-decision.json')['replacement_candidate'] == 'candidate_04'
     assert len(list(roots['clip_01'].glob('candidate_*'))) == 4
+
+
+def test_service_interruption_only_resumes_original_candidate(tmp_path,monkeypatch):
+    ctx,clips=case(tmp_path,monkeypatch)
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':[clips[0]]})
+    row=read_json(ctx.work_dir/'output/first-frames.json')['frames'][0]
+    atomic_write_json(ctx.work_dir/'output/first-frames.json',{'frames':[row]})
+    def interrupted(c,r,path):
+        atomic_write_json(path.with_suffix('.png.task.json'),{'task_id':'retained-service-task'})
+        raise RuntimeError('task submission returned HTTP 503: service unavailable')
+    operation=FirstFrameOperations(ctx,builder=interrupted)
+    with pytest.raises(RuntimeError,match='503'):operation.prepare({})
+    grant=operation.partial_outcome['clips']['clip_01']['repair_grant']
+    assert grant['operation']=='resume'
+    atomic_write_json(ctx.work_dir/'input/latest-first-frames.json',operation.partial_outcome)
+    changed={**row,'image_prompt':'a different request cannot ride service resume'}
+    plan=read_json(ctx.episode_dir/'clip_plan.json')
+    plan['clips'][0]['shots'][0]['opening_frame']['image_prompt']=changed['image_prompt']
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',plan)
+    atomic_write_json(ctx.work_dir/'output/first-frames.json',{'frames':[changed]})
+    with pytest.raises(ValueError,match='resume.*original candidate'):
+        FirstFrameOperations(ctx,builder=lambda *a:pytest.fail('changed request must not allocate')).prepare({})
+    plan['clips'][0]['shots'][0]['opening_frame']['image_prompt']=row['image_prompt']
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',plan)
+    atomic_write_json(ctx.work_dir/'output/first-frames.json',{'frames':[row]})
+    def resume(c,r,path):Image.new('RGB',(8,16)).save(path)
+    result=FirstFrameOperations(ctx,builder=resume,checker=lambda *a:{'consistent':True,'problems':[]}).prepare({})
+    assert result['ok'] and len(list((ctx.novel_dir/'first_frames/book_1/clip_01').glob('candidate_*')))==1

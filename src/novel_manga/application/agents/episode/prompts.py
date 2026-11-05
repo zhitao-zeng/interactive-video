@@ -105,7 +105,9 @@ def initial_prompt(ctx):
             'For a confirmed source/input conflict, use apply with action=input, a verbatim source_quote '
             'and supported cast/speaker/scene/appearance/wearing/sound corrections. '
             'shots can correct in_frame/extras/listeners/actions, event/start_state/end_state, '
-            'speaker_map and sfx. characters requests a missing source actor card after adoption too. '
+            'speaker_map and sfx. The complete allowed fields come from current '
+            'repair_capabilities.adopted_input.shot_fields, including opening_frame/shot_scale/camera/visual_prompt. '
+            'characters requests a missing source actor card after adoption too. '
             'The host checks source support, builds scoped cards and recompiles dependent clips retaining cuts and words. '
             'output/requests.json is already seeded with the existing final requests. '
             'Read manifest.request_draft: reusable lists structurally valid requests and needs_work '
@@ -128,6 +130,8 @@ def initial_prompt(ctx):
             'Use source evidence for cast/speaker/appearance/wardrobe/scene/sound corrections. '
             'Input can correct references and request missing source actor cards with characters. '
             'Use shots.in_frame/extras/listeners/actions, speaker_map and sfx as needed; '
+            'use current repair_capabilities.adopted_input.shot_fields for the complete allowed list, '
+            'including opening_frame/shot_scale/camera/visual_prompt for opening consistency repairs. '
             'unnamed crowds remain extras unless an actual speech owner requires a card. '
             'accept_risk can explicitly acknowledge a '
             'current wearer-card or scene-people uncertainty for one clip before rendering; '
@@ -215,6 +219,8 @@ def continuation_prompt():
         'Do not rewrite appearance or wardrobe merely to apply the same state to another clip. '
         'After adoption, action=input supports scoped shots.in_frame/extras/listeners/actions and '
         'event/start_state/end_state/sfx corrections, plus speaker_map from old to source-correct speech owners. '
+        'The complete field list is current repair_capabilities.adopted_input.shot_fields; '
+        'opening_frame, shot_scale, camera and visual_prompt are distinct supported fields, not substitutes. '
         'characters can request a missing named visible actor or actual speech owner with appearance/wardrobe. '
         'For source-authored speech_overflow, input shots[].turn_texts may shorten each existing turn in order; '
         'the host preserves the speaker/mode and independently checks essential meaning against the source. '
@@ -239,23 +245,26 @@ def resume_prompt(task, *, agent_instructions=None):
     target_ids = {row.get('clip_id') for row in targets if row.get('clip_id')}
     next_action = task.get('next_action') or {}
     action = next_action.get('action')
+    source_conflicts=next_action.get('source_input_conflicts') or {}
     next_state = {key:next_action[key] for key in
-                  ('action','reason','blocked','service_interrupted','audio_review')
+                  ('action','reason','blocked','service_interrupted','audio_review','source_input_conflicts')
                   if key in next_action}
     state = {key:task[key] for key in
-             ('phase','mode','upstream_route','repair_capabilities','targets','issues',
+             ('phase','mode','workflow_scope','execution_rules','upstream_route','repair_capabilities','targets','issues',
               'last_operation','related_history','evidence_files','full_status','reference_catalog')
              if key in task}
     if task.get('postproduction'):
         state['postproduction'] = task['postproduction']
     if next_state:
         state['next_action'] = next_state
-    if action == 'first_frames':
+    if source_conflicts:
+        state['targets']=[row for row in targets if row.get('clip_id') in source_conflicts]
+    if action == 'first_frames' or source_conflicts:
         frames = task.get('first_frames') or {}
         blocked = next_action.get('blocked') or {}
         blocked_ids = (set(blocked) if isinstance(blocked,dict) else
                        set(blocked) if isinstance(blocked,(list,tuple,set)) else set())
-        relevant = target_ids | blocked_ids
+        relevant = set(source_conflicts) if source_conflicts else target_ids | blocked_ids
         state['first_frames'] = {
             **{key:frames[key] for key in ('mode','extra_reference_policy','command','schema') if key in frames},
             'clips':{cid:row for cid,row in (frames.get('clips') or {}).items() if cid in relevant},
@@ -266,8 +275,10 @@ def resume_prompt(task, *, agent_instructions=None):
         state['audio_mix'] = task['audio_mix']
 
     prompt = (
-        'Continue this same saved episode session. The first turn already established the user task and workflow rules; '
-        'keep them in force. This message carries only the current actionable state. Use the exact actions, counters, '
+        'Continue this same saved episode session. Use the current host workflow scope and execution rules below. '
+        'They supersede restrictions from earlier production phases; user requirements and existing budgets remain binding. '
+        'For example, after first video production ends, a current review/finish action belongs to the full-production phase. '
+        'This message carries the current actionable state. Use the exact actions, counters, '
         'input permissions, and blockers below; consult /work/input/current-task.json or '
         '/work/input/current-status.json only when a needed detail is absent here. Those full files remain current and intact. '
         'Successful reads and assessments from earlier turns remain in this saved session. Check the current task and last operation first, '
@@ -296,41 +307,35 @@ def first_frame_instructions(ctx):
     return (
         'This edition uses OPTIONAL FIRST-FRAME MODE. Every authored shot needs a newly API-generated opening image. '
         'Use the existing first_frames host command BEFORE render. Do not use old video frames or derived pictures. '
-        'For creator-authored opening_frame, use its image_prompt and visible_characters directly; omit those fields in the tool row to inherit them. '
-        'Your production job is binding actual registered cards, executing the image API, reviewing and repairing. '
+        'The host inherits creator opening_frame, binds actual registered cards, compiles H3 and executes the image API; '
+        'your normal production job is to execute that host command and handle only reported exceptions. '
         'The host appends the selected style rules to the image request and supplies them to image review; '
         'keep the creator opening_frame.image_prompt unchanged and correct source conflicts through input repair. '
         'If the opening needs a creative change, update source opening_frame through input repair first; do not silently replace the creator prompt. '
         'Read first_frames in input/current-status.json for the exact schema, per-clip remaining image candidates and current/stale state. '
-        'Write output/first-frames.json with frames:[{clip_id,image_prompt,image_references,visible_characters,extra_references,h3,source_quote}]. '
-        'PREFER h3={shots:[English body with <DIALOGUE_1>, <DIALOGUE_2> in original order],soundscape:English environment sound}; '
-        +('the existing host compiler fills protected dialogue, Subject definitions, actual Picture mapping and timing. 'if speech else
-          'the existing host compiler fills protected dialogue, Subject/Audio definitions, actual Picture mapping and timing. ') +
-        'Each clip has exactly one shot here, so h3.shots is a one-item array. Do not spend turns reconstructing fixed six-section syntax or auditing source code. '
+        'Write output/first-frames.json with frames:[{clip_id,extra_references:[]}] for every requested clip. '
+        'Do not duplicate opening prompts, image references or H3 in a normal row. '
+        'The host reviews the opening source before translation and validates any reused or newly compiled request against the accepted first frame. '
+        +('Its compiler fills protected dialogue, Subject definitions, actual Picture mapping and timing. 'if speech else
+          'Its compiler fills protected dialogue, Subject/Audio definitions, actual Picture mapping and timing. ') +
         'Call python3 /work/tools/episode.py first_frames output/first-frames.json; end the turn on yield=true. '
         'For the user-selected per-shot image-to-video stream, set top-level render_ready:true in that file. '
         'Then each accepted opening immediately queues its first H3 take while later images continue; '
         'rejected openings block only their own clips. Existing videos, including failed takes, are never automatically reshot by this stream. '
         'When the streamed batch returns, use review on existing videos and apply confirmed repairs within retained budgets; '
         'do not run render merely to collect the same first takes again. Normal render remains available after an approved repair. '
-        'image_references are registered ORIGINAL source image paths from input/catalog.json, ordered to match your image prompt; '
-        'Use creator opening_frame.reference_subjects to decide which cards are needed to paint frame zero; '
-        'do not mechanically copy every clip reference. An offscreen voice does not require a portrait in an empty POV image. '
-        'For visible hands, feet or clothing, choose the relevant appearance view. Future entrants belong in extra video references. '
-        'inspect the actor/scene cards and source/layout before authoring. Keep the face, stable clothing, readable geometry and opening camera/held props correct. '
-        'Make one single cinematic frame, never a collage or storyboard. New image for each shot, not a crop/reuse of another generated shot. '
-        'visible_characters lists people actually visible at time zero, not merely present or speaking offscreen. '
+        'The host uses creator opening_frame.reference_subjects and registered original cards to bind frame zero; '
+        'an offscreen voice does not require a portrait in an empty POV image. '
+        'Future entrants belong in extra video references. Inspect current review evidence when repairing an exception. '
+        'The generated opening must be one single cinematic frame, never a collage or storyboard, and never a crop of another generated shot. '
         'extra_references selects only original clip image paths for new people/content NOT covered by the opening; empty is normal when all needed content is visible. '
         'The actual H3 Picture 1 is ALWAYS the complete generated opening, also native keyframe at frame_index=0. '
         +('Extra video pictures follow in listed order as Picture 2 onward. Preserve logical Subject and speaker IDs; no Audio IDs are supplied. 'if speech else
           'Extra video pictures follow in listed order as Picture 2 onward. Preserve the ORIGINAL logical Subject IDs and Audio IDs. ') +
         'All subjects covered by the opening bind to Picture 1; a new actor absent at time zero binds to its supplied extra picture. '
         'An offscreen source speaker absent from the frame and not supplied an extra card must have a Subject definition without a Picture tag; do not invent their face in the frame. '
-        'Alternatively a complete six-section prompt_h3 is supported with that ACTUAL image numbering, exact original Chinese <d> speech/speaker IDs and existing shot timing; '
-        'all direction outside <d> is English — refer to people by their bound Subject/reference labels (e.g. <Subject 1>), never by their Chinese names inside English descriptions. '
-        'Preserve source events and do not copy obsolete card Picture numbers. '
         'The opening image need not contain future actions; video moves from its stated opening. Reference retention must respect the opening composition. '
-        'Batch all independent shot candidates in one first_frames call. Rejected images and supplier receipts remain; revise only the failed opening image_prompt/source inputs. '
+        'Batch all independent shot candidates in one first_frames call. Rejected images and supplier receipts remain; repair only confirmed source or image defects. '
         'Identical image inputs reuse/resume the original candidate, never spend another paid attempt; the default is three image candidates per clip. '
         'Use the image_candidate_limit and remaining_image_candidates in current status for explicit clip-specific image grants; these never grant extra video takes. '
         'The host independently checks actual pixels and refuses video until the accepted opening is current. '

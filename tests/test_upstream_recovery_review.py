@@ -165,9 +165,13 @@ def test_batch_persists_successful_change_for_native_render_handoff(ctx_pair,mon
     atomic_write_json(ctx.run_dir/'agent-run.json',{'status':'blocked','remaining_seconds':300})
     calls=[]
     def native(ctx,**kw):
-        saved=read_json(ctx.run_dir/'agent-run.json');job=saved['job']
+        saved=read_json(ctx.run_dir/'agent-run.json')
+        handoff=read_json(ctx.run_dir/'upstream-handoff.json');job=handoff['job']
         assert job['action']=='apply' and job['status']=='completed'
         assert job['result']['changed']==['clip_01'] and job['result']['repacked']
+        if saved.get('upstream_handoff')!=handoff['id']:
+            assert 'job' not in saved
+            saved.update(job=job,upstream_handoff=handoff['id'])
         calls.append(kw)
         if len(calls)==1:
             saved.update(status='deferred',phase='deferred',remaining_seconds=250,

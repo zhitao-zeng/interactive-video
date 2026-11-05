@@ -3,7 +3,7 @@ import json
 from types import SimpleNamespace
 import pytest
 
-from novel_manga.application.agents.episode import recovery
+from novel_manga.application.agents.episode import recovery, lifecycle
 from novel_manga.util import atomic_write_json, read_json
 
 
@@ -37,7 +37,8 @@ def test_source_judge_fix_reopens_only_old_rejection_once_with_remaining_time(tm
            'reason': 'episode agent ended twice without operation or output progress',
            'job': {'id': 'job-10', 'action': 'finish', 'status': 'completed', 'result': {'passed': False}}}
     atomic_write_json(ctx.run_dir/'agent-run.json', old)
-    resumed = recovery.resume_source_review(ctx.run_dir, ctx.episode_dir, old)
+    planned = recovery.plan_resume(ctx, old, {}, False)
+    resumed = lifecycle.apply_resume_plan(ctx, planned)
     assert resumed['status'] == 'deferred' and resumed['remaining_seconds'] == 333
     assert resumed['attempts'] == ['old'] and resumed['agent_seconds'] == 125
     assert resumed['no_progress'] == 0 and resumed.get('job') is None
@@ -283,7 +284,9 @@ def test_blocked_summary_resume_preserves_only_the_original_remaining_time(tmp_p
     monkeypatch.setattr(recovery.time,'time',lambda:1000)
     config={'model':'DS','refusal_fallback':{'model':'Qwen','base_url':'http://qwen','key_var':'KEY'}}
     assert recovery.blocked_summary_loop(ctx.run_dir)
-    replacement,resumed=recovery.resume_summary_loop(ctx,config,saved)
+    planned = recovery.plan_resume(ctx,saved,config,True)
+    replacement = planned['config']
+    resumed = lifecycle.apply_resume_plan(ctx,planned)
     assert replacement['model']=='Qwen' and resumed['deadline']==1123
     assert resumed['status']=='deferred' and resumed['agent_seconds']==88
     assert resumed['attempts']==saved['attempts'] and resumed['remaining_seconds']==123
@@ -399,3 +402,17 @@ def test_diagnosis_uses_current_success_after_keep_not_old_export(tmp_path):
     atomic_write_json(ctx.episode_dir/'thin_media_report.json',{'clips':[
         {'clip_id':'clip_01','selected':{'passed':True,'issues':[]}}]})
     assert recovery.diagnose(ctx,{'adopted':True,'repair_actions':{'clip_01':[]}})['issues']==[]
+
+
+def test_plan_resume_never_calls_input_repair_for_candidate_validation(tmp_path, monkeypatch):
+    ctx = context(tmp_path)
+    saved = {'status':'blocked','remaining_seconds':100}
+    def protocol(_run,_episode,current,*,validate_input):
+        assert validate_input(ctx,{'clip_id':'clip_01'}) == {'clip_ids':['clip_01']}
+        return {**current,'status':'deferred','protocol_recovery':{'kind':'compile_diagnostics'}}
+    monkeypatch.setattr(recovery,'resume_protocol',protocol)
+    monkeypatch.setattr('novel_manga.application.agents.episode.input_repair.repair',
+                        lambda *a,**k:pytest.fail('pure planning invoked real input repair'))
+    planned = recovery.plan_resume(ctx,saved,{},False)
+    assert planned['actions'][0]['validate'] is True
+    assert not (ctx.run_dir/'agent-run.json').exists()

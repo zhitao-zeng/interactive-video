@@ -159,6 +159,7 @@ def test_fast_uses_same_rejection_and_rechecks_retained_pixels_after_fact_change
     book,episode=fixture_book(tmp_path)
     monkeypatch.setattr('novel_manga.style_packs.frame_style',lambda novel:{})
     monkeypatch.setattr('novel_manga.style_packs.first_frame_prompt',lambda text,style:text)
+    monkeypatch.setattr('novel_manga.application.agents.episode.first_frames.review_opening_sources',lambda *a:{})
     calls=[]
     def build(ctx,row,path):
         calls.append('image')
@@ -216,6 +217,7 @@ def test_fast_pending_image_keeps_original_request_when_review_facts_are_added(t
     book, episode = fixture_book(tmp_path)
     monkeypatch.setattr('novel_manga.style_packs.frame_style', lambda novel: {})
     monkeypatch.setattr('novel_manga.style_packs.first_frame_prompt', lambda text, style: text)
+    monkeypatch.setattr('novel_manga.application.agents.episode.first_frames.review_opening_sources', lambda *a: {})
     sent = []
     submitted = []
     reviews = []

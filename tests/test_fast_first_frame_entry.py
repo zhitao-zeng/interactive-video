@@ -12,6 +12,15 @@ from novel_manga.providers.phanrouter_video import video_payload
 from novel_manga.interactive.sd_first_frames import prepare,select_mode
 
 
+@pytest.fixture(autouse=True)
+def compatible_opening_sources(monkeypatch):
+    import json
+    def ask(parts,schema,**kwargs):
+        payload=json.loads(parts[0]['text'].rsplit('\n',1)[1])
+        return {'reviews':[{'clip_id':row['clip_id'],'findings':[]} for row in payload['clips']]}
+    monkeypatch.setattr('novel_manga.llm.client.ask_json',ask)
+
+
 def test_task_asset_channel_can_use_supplier_urls_instead_of_an_old_tunnel(tmp_path,monkeypatch):
     from novel_manga.interactive import runtime
     import os
@@ -133,6 +142,32 @@ def test_all_source_openings_are_checked_before_any_image_charge(tmp_path,monkey
     monkeypatch.setattr('novel_manga.style_packs.first_frame_prompt',lambda text,style:text)
     with pytest.raises(ValueError,match='creator opening_frame required'):
         prepare(tmp_path,book,builder=lambda *args:pytest.fail('No partial image spend'))
+
+
+def test_source_preflight_blocks_all_fast_images_and_reuses_cache(tmp_path,monkeypatch):
+    book,episode=parallel_book(tmp_path,monkeypatch,2);calls=[]
+    finding={'origin':'source','relation':'contradiction',
+        'observed':'The source opening requests a wide shot.',
+        'expected':'The source camera requires a close shot.',
+        'basis':['opening.shot_scale','opening.camera'],
+        'reason':'The two opening requirements cannot hold simultaneously.'}
+    def ask(parts,schema,**kwargs):
+        import json
+        calls.append(parts)
+        payload=json.loads(parts[0]['text'].rsplit('\n',1)[1])
+        assert {row['clip_id'] for row in payload['clips']}=={'clip_01','clip_02'}
+        return {'reviews':[{'clip_id':'clip_01','findings':[finding]},
+                           {'clip_id':'clip_02','findings':[]}]}
+    monkeypatch.setattr('novel_manga.llm.client.ask_json',ask)
+    for _ in range(2):
+        with pytest.raises(ValueError,match='opening_source_conflict'):
+            prepare(tmp_path,book,builder=lambda *args:pytest.fail('No image before source acceptance'),
+                    checker=lambda *args:pytest.fail('No image review before source acceptance'))
+    assert len(calls)==1
+    runtime=tmp_path/'.runtime/sd-first-frames'/book.name
+    evidence=runtime/'input/first_frames/clip_01/source-preflight.json'
+    assert read_json(evidence)['findings']==[finding]
+    assert not (book/'first_frames').exists()
 
 
 def test_fast_prompt_does_not_point_at_removed_portrait_numbers():

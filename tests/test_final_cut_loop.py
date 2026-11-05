@@ -32,6 +32,18 @@ def verdict(movie,passed):
                  'source_basis':'only this phone records','evidence':'movie frame','frame_paths':[]}]}
 
 
+def test_minor_visual_finding_survives_real_save_result_as_accepted(tmp_path,monkeypatch):
+    from novel_manga.application.review import final_cut
+    from novel_manga.application.review.execution import save_result
+    runner,report,movie=fixture(tmp_path,monkeypatch)
+    report['final_cut_review']={**verdict(movie,True),'issues':[
+        {'severity':'minor','clip_ids':['a'],'problem':'momentary harmless jitter'}]}
+    monkeypatch.setattr(final_cut,'current',lambda *a:True)
+    native=json.loads((tmp_path/'episode_review.json').read_text())
+    out=save_result(tmp_path,report,native,plan=runner.context.clip_plan)
+    assert out['quality_review']['content_passed'] is True
+
+
 def test_final_failure_after_native_pass_enters_existing_repair(tmp_path,monkeypatch):
     runner,report,movie=fixture(tmp_path,monkeypatch);events=[]
     def final(media):

@@ -115,6 +115,7 @@ def test_delivery_reuses_reviewed_movie_and_refuses_changed_export(tmp_path,monk
     def export(runner,report,path):
         calls.append(path);path.mkdir(parents=True)
         final=path/'episode01.mp4';final.write_bytes(b'export')
+        (path/'cover.jpeg').write_bytes(b'cover')
         return {'final_video':str(final),'technical_passed':True}
     monkeypatch.setattr(delivery,'deliver',export)
     def review(runner,media,receipt=None):

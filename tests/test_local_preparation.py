@@ -85,6 +85,21 @@ def test_source_conflict_cannot_submit_video_or_trigger_asset_work(tmp_path, mon
     assert read_json(ctx.episode_dir/'clip_plan.json')==before
 
 
+def test_source_gate_clears_only_resolved_preparation_blocks(tmp_path, monkeypatch):
+    ctx,_=local_case(tmp_path,monkeypatch)
+    atomic_write_json(ctx.episode_dir/'thin_media_report.json', {
+        'status': 'inputs_failed', 'clips': [],
+        'blocked_clips': {'clip_01': 'old speaker error', 'clip_99': 'unrelated media error'}})
+    atomic_write_json(ctx.work_dir/'input/latest-preparation.json', {
+        'error': 'local_preparation_required', 'blocked': {'clip_01': 'old speaker error'}})
+    monkeypatch.setattr(local_preparation,'inputs',lambda directory:{'files':{'revision':1}})
+    monkeypatch.setattr(local_preparation,'audit',lambda directory:{'source_readable':True,'issues':[]})
+    assert local_preparation.source_gate(ctx) is None
+    assert read_json(ctx.episode_dir/'thin_media_report.json')['blocked_clips']=={'clip_99':'unrelated media error'}
+    latest=read_json(ctx.work_dir/'input/latest-preparation.json')
+    assert latest['ok'] and latest['source_audit']['source_readable']
+
+
 def test_source_check_reuses_same_candidate_but_rechecks_changed_inputs(tmp_path, monkeypatch):
     ctx,_=local_case(tmp_path,monkeypatch);local_preparation.stage(ctx)
     calls=[];revision=[1]
@@ -98,6 +113,60 @@ def test_source_check_reuses_same_candidate_but_rechecks_changed_inputs(tmp_path
     revision[0]=2
     assert local_preparation.before_render(ctx) is None
     assert calls==[1,2]
+
+
+def test_source_cache_uses_post_audit_fingerprint(tmp_path, monkeypatch):
+    ctx,_=local_case(tmp_path,monkeypatch)
+    def mutate(directory):
+        entities=directory.parent/'entity/entities.json'
+        entities.parent.mkdir(parents=True,exist_ok=True)
+        entities.write_text('[]')
+        return {'source_readable':True,'issues':[]}
+    monkeypatch.setattr(local_preparation,'audit',mutate)
+    assert local_preparation.source_gate(ctx) is None
+    saved=read_json(ctx.run_dir/'local-source-check.json')
+    bible=ctx.novel_dir/'story_bible.json'
+    original=ctx.episode_dir/'authored_source.md'
+    expected=local_preparation.inputs(ctx.episode_dir)['files'] | {
+        str(bible):[bible.stat().st_mtime_ns,bible.stat().st_size] if bible.is_file() else None,
+        str(original):[original.stat().st_mtime_ns,original.stat().st_size] if original.is_file() else None}
+    assert saved['inputs']==expected
+
+
+def test_source_policy_change_does_not_reuse_old_verdict(tmp_path, monkeypatch):
+    ctx,_=local_case(tmp_path,monkeypatch)
+    calls=[]
+    monkeypatch.setattr(local_preparation,'inputs',lambda directory:{'files':{'revision':1}})
+    monkeypatch.setattr(local_preparation,'audit',lambda directory:calls.append(1) or {'source_readable':True,'issues':[]})
+    bible=ctx.novel_dir/'story_bible.json'
+    atomic_write_json(ctx.run_dir/'local-source-check.json', {
+        'inputs': {'revision': 1, str(bible): None,
+                   str(ctx.episode_dir/'authored_source.md'): None},
+        'answer': {'source_readable': False, 'issues': ['old false verdict']}})
+    assert local_preparation.source_gate(ctx) is None
+    assert calls == [1]
+
+
+def test_source_audit_receives_original_speaker_structure(tmp_path, monkeypatch):
+    from novel_manga.application.preparation import audit as source_audit
+    directory=tmp_path/'book'/'book_1';directory.mkdir(parents=True)
+    atomic_write_json(directory/'chapter_script.json', {'shots':[{'index':1,'turns':[]}]})
+    atomic_write_json(directory/'segments.json', [{'segment_id':'seg_1','text':'C01：我能直接拿吗？'}])
+    atomic_write_json(directory.parent/'story_bible.json', {'characters':[]})
+    original={'scenes':[{'sceneId':'S1001','flow':[{'speaker':'C01','line':'我能直接拿吗？'}]}]}
+    (directory/'authored_source.md').write_text(__import__('json').dumps(original,ensure_ascii=False))
+    monkeypatch.setattr(source_audit.PlannerContext,'from_env',lambda:None)
+    monkeypatch.setattr('novel_manga.application.planning.context.load_entity_index',lambda *a,**kw:None)
+    monkeypatch.setattr('novel_manga.planning.cast.mentioned_characters',lambda *a,**kw:set())
+    monkeypatch.setattr('novel_manga.application.identity.flow.resolve_chapter',lambda d,settings=None:{})
+    monkeypatch.setattr('novel_manga.application.identity.context.prompt_context',lambda *a,**kw:{})
+    monkeypatch.setattr('novel_manga.application.identity.context.reading_segments',lambda *a,**kw:[])
+    prompts=[]
+    monkeypatch.setattr('novel_manga.llm.client.ask_json',lambda parts,*args,**kwargs:prompts.append((parts[0]['text'],kwargs)) or {'source_readable':True,'issues':[]})
+    source_audit.audit(directory, settings='official-k3-settings')
+    assert 'flow.speaker' in prompts[0][0] and 'C01' in prompts[0][0]
+    assert '失主' in prompts[0][0] and '不能替代' in prompts[0][0]
+    assert prompts[0][1]['settings'] == 'official-k3-settings'
 
 
 def test_only_missing_requests_are_translated_and_valid_requests_survive(tmp_path, monkeypatch):

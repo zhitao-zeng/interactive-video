@@ -8,6 +8,7 @@ from PIL import Image
 import pytest
 
 from novel_manga.providers.local_h3 import LocalH3MediaProvider
+from novel_manga.util import read_json
 from novel_manga.media import generation
 from novel_manga.media.first_frames import opening_contract, require_current, video_metadata
 
@@ -25,6 +26,15 @@ def test_first_frame_is_raw_keyframe_zero_and_first_reference(tmp_path):
 
 
 from support.first_frame_cases import clip_case
+
+
+def approve_opening_sources(monkeypatch):
+    from novel_manga.application.agents.episode import first_frames, opening_source
+    def review(ctx, prepared):
+        reviews={row['clip_id']:{'findings':[]} for row,_,_ in prepared}
+        opening_source.remember(ctx,prepared,reviews)
+        return reviews
+    monkeypatch.setattr(first_frames,'review_opening_sources',review)
 
 
 def test_actual_images_select_frame_and_only_supplement_without_changing_sources(tmp_path):
@@ -95,14 +105,16 @@ def test_missing_and_rejected_first_frames_block_billing(tmp_path):
 def test_first_frame_tool_rejects_old_take_and_keeps_rejected_candidates(tmp_path,monkeypatch):
     from novel_manga.application.agents.episode.first_frames import FirstFrameOperations
     from novel_manga.util import atomic_write_json, read_json
+    approve_opening_sources(monkeypatch)
     ctx,clip=clip_case(tmp_path);clip.pop('first_frame')
+    clip['shots'][0]['opening_frame']={'image_prompt':'A at the pool','visible_characters':['A'],
+        'reference_subjects':['pool','A']}
     ctx.episode_dir=tmp_path/'book_1';ctx.episode_dir.mkdir();ctx.run_dir=tmp_path/'run';ctx.work_dir=ctx.run_dir/'sandbox';(ctx.work_dir/'output').mkdir(parents=True)
     atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':[clip]})
     atomic_write_json(ctx.run_dir/'catalog.json',clip['references'])
     atomic_write_json(ctx.episode_dir/'segments.json',[{'segment_id':'s','text':'A alone then B enters'}])
     clip['segment_ids']=['s'];atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':[clip]})
-    row={'clip_id':'clip_01','image_prompt':'A at the pool','image_references':['scene.png','actor.png'],
-         'visible_characters':['A'],'extra_references':['new.png'],'prompt_h3':'mapped words','source_quote':'A alone then B enters'}
+    row={'clip_id':'clip_01','extra_references':['new.png']}
     calls=[]
     def build(ctx,row,path):calls.append(path);Image.new('RGB',(10,20)).save(path)
     def reject(*a):return {'consistent':False,'problems':['wrong starting view']}
@@ -207,22 +219,31 @@ def test_source_recompile_retains_opening_for_freshness_check(tmp_path):
     with pytest.raises(ValueError,match='stale'):require_current(ctx,after)
 
 
-def test_frame_tool_accepts_structured_h3_using_existing_source_compiler(tmp_path,monkeypatch):
+def test_frame_tool_uses_existing_h3_converter_with_accepted_frame(tmp_path,monkeypatch):
     from novel_manga.application.agents.episode.first_frames import FirstFrameOperations
     from novel_manga.util import atomic_write_json,read_json
+    approve_opening_sources(monkeypatch)
     ctx,clip=clip_case(tmp_path);clip.pop('first_frame');clip['segment_ids']=['s']
+    clip['shots'][0]['opening_frame']={'image_prompt':'A opening','visible_characters':['A'],
+        'reference_subjects':['pool','A']}
     ctx.episode_dir=tmp_path/'book_1';ctx.episode_dir.mkdir();ctx.run_dir=tmp_path/'run';ctx.work_dir=ctx.run_dir/'sandbox';(ctx.work_dir/'output').mkdir(parents=True)
     atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':[clip]});atomic_write_json(ctx.run_dir/'catalog.json',clip['references'])
     atomic_write_json(ctx.episode_dir/'segments.json',[{'segment_id':'s','text':'A alone then B enters'}])
-    row={'clip_id':'clip_01','image_prompt':'A opening','image_references':['scene.png','actor.png'],'visible_characters':['A'],'extra_references':['new.png'],'h3':{'shots':['A waits. B enters. <DIALOGUE_1>'],'soundscape':'Water.'},'source_quote':'A alone then B enters'}
+    row={'clip_id':'clip_01','extra_references':['new.png']}
     atomic_write_json(ctx.work_dir/'output/first-frames.json',{'frames':[row]});seen=[]
-    def compose(clip,h3):seen.append((clip,h3));return 'source-preserving mapped H3'
-    monkeypatch.setattr('novel_manga.application.agents.episode.requests.compose_request',compose)
+    def convert(candidate,**kwargs):
+        from novel_manga.application.profiles import h3_stamp
+        seen.append(copy.deepcopy(candidate))
+        candidate['prompt_h3']='source-preserving mapped H3'
+        candidate['prompt_h3_of']=h3_stamp(candidate,kwargs.get('note',''))
+        return True
+    monkeypatch.setattr('novel_manga.application.rendering.h3.convert',convert)
     monkeypatch.setattr('novel_manga.application.agents.episode.first_frames.validate_existing_request',lambda *a:None)
     def build(ctx,row,path):Image.new('RGB',(10,20)).save(path)
     result=FirstFrameOperations(ctx,builder=build,checker=lambda *a:{'consistent':True,'problems':[]}).prepare({})
     assert result['ok']
-    assert seen[0][0]['first_frame']['extra_references']==['new.png']
+    assert seen[0]['first_frame']['extra_references']==['new.png']
+    assert seen[0]['first_frame']['path']=='first_frames/book_1/clip_01/candidate_01/opening.png'
     assert read_json(ctx.episode_dir/'clip_plan.json')['clips'][0]['prompt_h3']=='source-preserving mapped H3'
 
 
@@ -324,23 +345,24 @@ def test_new_frame_style_snapshot_invalidates_after_change_but_legacy_contract_i
 @pytest.mark.parametrize('image_already_exists',[True,False])
 def test_legacy_first_frame_candidate_resumes_without_rebilling_or_budget_reset(tmp_path, monkeypatch, image_already_exists):
     from novel_manga.application.agents.episode.first_frames import FirstFrameOperations
-    from novel_manga.media.first_frames import current_contract, source_asset_state
+    from novel_manga.media.first_frames import compile_opening, current_contract, source_asset_state
     from novel_manga.util import read_json
+    approve_opening_sources(monkeypatch)
     ctx,clip=clip_case(tmp_path)
+    clip['shots'][0]['opening_frame']={'image_prompt':'A stands beside the closed door.',
+        'visible_characters':['A'],'reference_subjects':['pool','A']}
     ctx.episode_dir=tmp_path/'episode';ctx.episode_dir.mkdir()
     ctx.run_dir=tmp_path/'run';ctx.work_dir=ctx.run_dir/'sandbox'
-    row={'clip_id':'clip_01','image_prompt':'A stands beside the closed door.',
-         'image_references':['scene.png','actor.png'],'extra_references':[],
-         'visible_characters':['A'],'prompt_h3':'new video direction, same opening',
-         'source_quote':'A waits by the door.'}
+    row={'clip_id':'clip_01','extra_references':[]}
     clip['segment_ids']=['s']
-    atomic_write_json(ctx.episode_dir/'segments.json',[{'segment_id':'s','text':row['source_quote']}])
+    atomic_write_json(ctx.episode_dir/'segments.json',[{'segment_id':'s','text':'A waits by the door.'}])
     atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':[clip]})
     atomic_write_json(ctx.run_dir/'catalog.json',clip['references'])
     atomic_write_json(ctx.work_dir/'output/first-frames.json',{'frames':[row]})
-    legacy={k:row[k]for k in ('image_prompt','image_references','visible_characters')}
-    legacy.update(source_contract=current_contract(ctx,clip,row['image_references']),
-                  source_assets=source_asset_state(ctx,row['image_references']))
+    compiled=compile_opening(ctx,clip,row)
+    legacy={k:compiled.row[k]for k in ('image_prompt','image_references','visible_characters')}
+    legacy.update(source_contract=current_contract(ctx,clip,compiled.row['image_references']),
+                  source_assets=source_asset_state(ctx,compiled.row['image_references']))
     root=tmp_path/'first_frames/episode/clip_01';old=root/'candidate_001'
     atomic_write_json(old/'input.json',legacy)
     pending=old/'opening.png.task.json'
@@ -361,11 +383,77 @@ def test_legacy_first_frame_candidate_resumes_without_rebilling_or_budget_reset(
         assert 'style'not in contract  # It is the old request, not a new style-certified image.
         return {'consistent':True,'observations':['retained opening'],'problems':[]}
     monkeypatch.setattr('novel_manga.application.agents.episode.first_frames.validate_existing_request',lambda *a:None)
+    from support.first_frame_cases import stub_host_h3
+    stub_host_h3(monkeypatch)
     result=FirstFrameOperations(ctx,builder=build,checker=check).prepare({})
     assert result['ok'] is True
     assert len(calls)==(0 if image_already_exists else 1)
-    if calls:assert calls[0][1]==row['image_prompt']
+    if calls:assert calls[0][1]==compiled.row['image_prompt']
     assert len(list(root.glob('candidate_*')))==3
     assert read_json(old/'input.json')==legacy and pending.read_bytes()==receipt_before
     selected=read_json(ctx.episode_dir/'clip_plan.json')['clips'][0]['first_frame']
     assert selected['candidate']=='candidate_001' and 'style'not in selected['source_contract']
+
+
+def test_minimal_row_compiles_without_duplicate_authoring_or_source_quote(tmp_path):
+    from novel_manga.media.first_frames import compile_opening
+    ctx,clip=clip_case(tmp_path)
+    ctx.episode_dir=tmp_path/'book_1';ctx.episode_dir.mkdir()
+    ctx.run_dir=tmp_path/'run'
+    opening={'image_prompt':'Only A is visible at t=0.','visible_characters':[],
+             'reference_subjects':['A','pool']}
+    clip['shots'][0].update(characters=['A','B'],in_frame=['A','B'],opening_frame=opening)
+    atomic_write_json(ctx.episode_dir/'chapter_script.json',{'shots':[{'index':1,**clip['shots'][0]}]})
+    clip['shot_indexes']=[1]
+    atomic_write_json(ctx.run_dir/'catalog.json',clip['references'])
+    compiled=compile_opening(ctx,clip,{'clip_id':'clip_01','source_quote':'not a source quotation'})
+    assert compiled.row['clip_id']=='clip_01'
+    assert compiled.row['image_prompt']==opening['image_prompt']
+    assert compiled.row['image_references']==['scene.png','actor.png']
+    assert compiled.row['extra_references']==[]
+    assert 'source_quote' not in compiled.row
+    assert 'prompt_h3' not in compiled.row
+    assert compiled.draft_frame['visible_characters']==[]
+    assert compiled.contract['opening']['in_frame']==['A','B']
+    assert clip['shots'][0]['characters']==['A','B']
+
+
+def test_same_path_pixel_change_invalidates_review_cache_and_current_frame(tmp_path,monkeypatch):
+    import hashlib
+    from support.first_frame_cases import case
+    from novel_manga.application.agents.episode import first_frames
+    ctx,clips=case(tmp_path,monkeypatch)
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':[clips[0]]})
+    row=read_json(ctx.work_dir/'output/first-frames.json')['frames'][0]
+    atomic_write_json(ctx.work_dir/'output/first-frames.json',{'frames':[row]})
+    calls=[]
+    def review(*args):
+        calls.append(args[1])
+        return {'consistent':True,'problems':[]}
+    operation=lambda:first_frames.FirstFrameOperations(ctx,
+        builder=lambda c,r,path:Image.new('RGB',(8,16)).save(path),checker=review).prepare({})
+    assert operation()['ok']
+    candidate=ctx.novel_dir/'first_frames/book_1/clip_01/candidate_01'
+    path=candidate/'opening.png'
+    original_hash=hashlib.sha256(path.read_bytes()).hexdigest()
+    receipt=read_json(candidate/'reviews/review_001.json')
+    assert receipt['input']['candidate_sha256']==original_hash
+    selected=read_json(ctx.episode_dir/'clip_plan.json')['clips'][0]['first_frame']
+    assert selected['image_sha256']==original_hash
+
+    Image.new('RGB',(8,16),'red').save(path)
+    changed_hash=hashlib.sha256(path.read_bytes()).hexdigest()
+    assert changed_hash!=original_hash
+    with pytest.raises(ValueError,match='stale.*pixels|pixels.*stale'):
+        first_frames.require_current(ctx,read_json(ctx.episode_dir/'clip_plan.json')['clips'][0])
+    monkeypatch.setattr(first_frames.FirstFrameOperations,'__init__',
+        lambda self,ctx,builder=None,checker=None,on_accepted=None:
+            setattr(self,'ctx',ctx) or setattr(self,'builder',builder) or
+            setattr(self,'checker',lambda *a:{'consistent':False,'problems':['replacement pixels were not reviewed']}) or
+            setattr(self,'on_accepted',on_accepted))
+    result=first_frames.FirstFrameOperations(ctx,builder=lambda *a:None).prepare({})
+    assert not result['ok']
+    assert result['clips']['clip_01']['problems']==['replacement pixels were not reviewed']
+    records=sorted((candidate/'reviews').glob('review_*.json'))
+    assert len(records)==2
+    assert read_json(records[-1])['input']['candidate_sha256']==changed_hash

@@ -168,6 +168,13 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                 if remaining <= 0:
                     result['reason'] = 'episode operation timeout exhausted'
                     break
+                if not production_only and config.get('production_mode')=='agent':
+                    from .readiness import automatic_action
+                    action = automatic_action(ctx, status, first_pass_only=first_pass_only)
+                    if action is not None:
+                        bridge.handle(action, {})
+                        bridge.update_state(phase='tool_running', next_action={'action': action})
+                        continue
                 if slice_limit is not None and state.slice_invocations >= int(slice_limit):
                     state.defer('Agent slice completed; resume this session after other production work')
                     break

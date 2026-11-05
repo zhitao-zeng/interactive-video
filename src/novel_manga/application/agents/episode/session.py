@@ -46,6 +46,9 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
     The host still owns media services, budgets, caching and independent acceptance.
     """
     config = load_config() if config is None else config
+    from novel_manga.llm.policy import session_policy, session_role
+    config = session_policy(config, work_dir, resume=resume,
+                            role=session_role(work_dir, config, expected_output))
     if config.get('backend') == 'codex':
         from .codex_session import run_session as run_codex_session
         return run_codex_session(work_dir, prompt_text, resume=resume, timeout=timeout,
@@ -65,6 +68,9 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
     key = key_for(config["key_var"])
     if not key:
         raise SandboxRefused(f"No credential in {config['key_var']} or the project .env.")
+    from novel_manga.llm import quota
+    quota_group = quota.for_model(config.get('model'), config.get('base_url'), key)
+    quota.check(quota_group, key)
 
     state_path = work_dir / SESSION_FILE
     if resume:
@@ -192,6 +198,7 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
     _snapshot(output, attempt / "output-after")
     completion = {}
     last_text = ''
+    response_models = set()
     with (attempt / 'session.jsonl').open() as stream:
         for line in stream:
             try:
@@ -201,12 +208,17 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
             if event.get('type') == 'result':
                 completion = event
             elif event.get('type') == 'assistant':
-                content = (event.get('message') or {}).get('content') or []
+                message = event.get('message') or {}
+                if isinstance(message.get('model'), str) and message['model']:
+                    response_models.add(message['model'])
+                content = message.get('content') or []
                 if isinstance(content, list):
                     text = '\n'.join(str(p.get('text') or '') for p in content if p.get('type') == 'text')
                     if text:
                         last_text = text
     from .recovery import refusal_reason, summary_ending
+    if completion.get('is_error'):
+        quota.note_sdk_failure(quota_group, completion.get('result') or last_text, key=key)
     record = {
         "run": work_dir.name, "attempt": attempt.name, "session_id": session_id, "resume": resume,
         "enable_tools": enable_tools,
@@ -216,11 +228,13 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
         "expected_output": expected_output, "expected_output_produced": expected_output in produced,
         'turn_limit_reached': completion.get('subtype') == 'error_max_turns',
         'num_turns': completion.get('num_turns'),
+        'reasoning_policy': config.get('reasoning_policy'),
         'refusal': refusal_reason(completion.get('result') or last_text) or (
             # GLM cuts violent chapters off with a sensitive stop and no text; that is a
             # refusal by another name, and the model fallback exists for it (358, 2026-10-10).
             'content moderation: sensitive stop' if completion.get('stop_reason') == 'sensitive' else ''),
         'summary_only': summary_ending(completion.get('result') or last_text),
+        **({'response_models': sorted(response_models)} if response_models else {}),
         **({'context_rotation':context_rotation} if context_rotation else {}),
     }
     _write_json(attempt / "attempt.json", record)

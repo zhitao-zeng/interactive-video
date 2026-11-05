@@ -5,7 +5,7 @@ import novel_manga.episodes as ep_names
 from pathlib import Path
 import json
 import time
-from novel_manga.util import atomic_write_json
+from novel_manga.util import atomic_write_json, read_json
 from novel_manga.story.identity import canonical_entity
 from novel_manga.story.source_identity import (POLICY, usable_reading, source_schema, UnreadableSource, clean_reading, map_source_reading)
 from novel_manga.application.identity.store import ChapterIdentityData, load_chapter
@@ -30,6 +30,36 @@ def reading_aliases(novel_dir, chapter=None) -> dict:
         return aliases
     except (OSError, ValueError, TypeError):
         return {}
+
+
+def structured_cast(directory):
+    script_path = directory / 'chapter_script.json'
+    if not script_path.is_file() or not (directory / 'authored_source.md').is_file():
+        return None
+    script = json.loads(script_path.read_text())
+    actors = {}
+    for shot in script.get('shots', []):
+        index = shot.get('index')
+        if type(index) is not int:
+            continue
+        for name in shot.get('characters', []):
+            actor = actors.setdefault(name, {'paragraphs': set(), 'presence': 'on_stage'})
+            actor['paragraphs'].add(index)
+        for name in shot.get('in_frame', []):
+            actor = actors.setdefault(name, {'paragraphs': set(), 'presence': 'on_stage'})
+            actor['paragraphs'].add(index)
+        for turn in shot.get('turns', []):
+            name = turn.get('speaker_name')
+            if name and turn.get('text'):
+                actor = actors.setdefault(name, {'paragraphs': set(), 'presence': 'on_stage'})
+                actor['paragraphs'].add(index)
+    return {'actors': [
+        {'source_id': number, 'name': name,
+         'forms': [{'form': name, 'kind': 'proper', 'paragraphs': sorted(actor['paragraphs'])}],
+         'kind': 'individual', 'count': 1, 'presence': actor['presence'],
+         'appearance': '', 'paragraphs': sorted(actor['paragraphs'])}
+        for number, (name, actor) in enumerate(actors.items(), 1)],
+        'actorless_confirmed': not actors}
 
 
 def reconcile_repeated_actors(directory, answer, segments, *, force=False):
@@ -89,17 +119,22 @@ def reconcile_repeated_actors(directory, answer, segments, *, force=False):
     return {**answer, 'actors': result}
 
 
-def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData | None = None):
+def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData | None = None, settings=None,
+                    _correction=None):
+    options = {'settings': settings} if settings is not None else {}
     # Read source first; legacy dictionaries never enter this semantic call.
     from novel_manga.llm.client import ask_json
     directory = Path(directory).resolve()
     data = data if data is not None else load_chapter(directory)
     expected, saved = data.expected, data.saved
-    if not force and saved.get('policy') == POLICY and saved.get('inputs') == expected and usable_reading(saved) and saved.get('semantic_review', {}).get('approved'):
+    review = saved.get('semantic_review', {})
+    if (_correction is None and not force and saved.get('policy') == POLICY and saved.get('inputs') == expected
+            and usable_reading(saved) and review.get('policy') == semantic_review.REVIEW_POLICY and review.get('approved')):
         return saved
     segments = expected['segments']
     if not segments:
         raise ValueError('identity resolution needs source segments')
+    segments = semantic_review.grounding_segments(directory, segments)
     chapter = ep_names.chapter_of(directory.name)
     catalog = data.catalog
     prompt = (
@@ -118,15 +153,31 @@ def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData |
         'appearance只写原文明示的当时身体/物种/外貌，没写就留空；不得自行补成人形或兽形。'
         '所有paragraphs均引用下列原文编号，由程序摘取证据；不要输出推理过程。\n'
         + json.dumps([{'paragraph': i, **r} for i, r in enumerate(segments, 1)], ensure_ascii=False))
+    if data.expected.get('authored_source'):
+        prompt += ('\n以下是同一来源的原始剧本文档，补齐动作段未保留的说话人、台词用途和固定选项。'
+                   '用它核对“我”等代词属于哪个说话人；选项字母和选项名称是台词内容，不自动成为主体称谓。'
+                   'actors的paragraphs仍只引用上面的编号段。\n' + data.expected['authored_source'])
     # Binding reviews changed; unchanged source extraction remains reusable.
-    if (not force and saved.get('policy') in {POLICY, 'story-identity-v6-catalogue-bindings', 'story-identity-v5-grounded-types'} and saved.get('inputs', {}).get('segments') == segments
+    raw_path = directory / 'identity_source_reading.json'
+    source_saved = read_json(raw_path, {})
+    source_answer = source_saved.get('answer') or {}
+    structured = structured_cast(directory)
+    if structured is not None:
+        answer = structured
+    elif (not force and saved.get('policy') in {POLICY, 'story-identity-v6-catalogue-bindings', 'story-identity-v5-grounded-types'} and saved.get('inputs', {}).get('segments') == segments
+            and saved.get('inputs', {}).get('authored_source') == data.expected.get('authored_source')
             and 'source_actors' in saved and usable_reading(saved)
             and not clean_reading({'actors':saved['source_actors']},segments)[2]):
         answer = {'actors': saved['source_actors'], 'actorless_confirmed': saved.get('actorless_confirmed', False)}
+    elif (not force and source_saved.get('policy') == POLICY
+            and source_saved.get('inputs', {}).get('segments') == expected.get('segments')
+            and source_saved.get('inputs', {}).get('authored_source') == expected.get('authored_source')
+            and (source_answer.get('actors') or source_answer.get('actorless_confirmed'))
+            and not clean_reading(source_answer, segments)[2]):
+        answer = source_answer
     else:
         answer = ask_json([{'type': 'text', 'text': prompt}], source_schema(len(segments)),
-                          name='chapter_identity_source', max_tokens=4096, timeout=240)
-    raw_path = directory / 'identity_source_reading.json'
+                          name='chapter_identity_source', max_tokens=4096, timeout=240, **options)
     atomic_write_json(raw_path, {'policy': POLICY, 'inputs': expected, 'answer': answer})
     if answer.get('source_readable') is False:
         from novel_manga.llm.client import obj
@@ -136,12 +187,12 @@ def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData |
             '只有字符顺序严重打乱、无法理解连续事件才填false。\n'
             + json.dumps(segments, ensure_ascii=False)}],
             obj({'source_readable': {'type':'boolean'}, 'source_problem': {'type':'string','maxLength':200}}),
-            name='source_readability_confirmation', max_tokens=500, timeout=120)
+            name='source_readability_confirmation', max_tokens=500, timeout=120, **options)
         atomic_write_json(directory / 'source_readability_confirmation.json', confirmation)
         if not confirmation['source_readable']:
             raise UnreadableSource(confirmation.get('source_problem') or 'source text is unreadable')
         answer = ask_json([{'type':'text','text':prompt + '\n原文可读性已独立复核通过；按连续事件识别主体，不要把断行或旧名残留报成字序损坏。'}],
-                          source_schema(len(segments)), name='chapter_identity_readable_source', max_tokens=4096, timeout=240)
+                          source_schema(len(segments)), name='chapter_identity_readable_source', max_tokens=4096, timeout=240, **options)
         atomic_write_json(raw_path, {'policy': POLICY, 'inputs': expected, 'answer': answer})
         if answer.get('source_readable') is False:
             raise ValueError('identity extraction failed after source readability was confirmed')
@@ -153,7 +204,7 @@ def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData |
             '逐段检查动作发起者、对话双方和提及对象；只要有人物或动物参与，就重新完整抽取actors。'
             '只有全文确实没有任何主体（例如纯景物描写），才允许actors为空并填actorless_confirmed=true。'
             '断行、人名残留或无法完成抽取不能作为无人章节；此时填false。'}], schema,
-            name='chapter_identity_empty_confirmation', max_tokens=4096, timeout=240)
+            name='chapter_identity_empty_confirmation', max_tokens=4096, timeout=240, **options)
         atomic_write_json(directory / 'identity_empty_confirmation.json', {'policy': POLICY, 'inputs': expected, 'answer': answer})
         if answer.get('source_readable') is False or (not answer.get('actors') and not answer.get('actorless_confirmed')):
             raise ValueError('identity extraction returned no actors without confirming an actorless chapter')
@@ -161,7 +212,7 @@ def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData |
     if unresolved:
         correction = ask_json([{'type': 'text', 'text': prompt + '\n只修正下列主体的forms与原文编号；保留source_id，不输出其他主体。'
             '每个主体必须至少有一个原文实际存在的指称，不能补出原文没有的代词。\n' + json.dumps(unresolved, ensure_ascii=False)}],
-            source_schema(len(segments)), name='chapter_identity_evidence', max_tokens=2500, timeout=180)
+            source_schema(len(segments)), name='chapter_identity_evidence', max_tokens=2500, timeout=180, **options)
         fixed, dropped, pending = clean_reading(correction, segments)
         wanted = {r['source_id'] for r in unresolved}
         restored = [r for r in fixed['actors'] if r['source_id'] in wanted]
@@ -182,8 +233,12 @@ def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData |
     cleaned = reconcile_repeated_actors(directory, cleaned, segments, force=force)
     aliases = reading_aliases(directory.parent, chapter)
     mapped = map_source_reading(cleaned, catalog, segments, aliases)
+    cached_review = saved.get('semantic_review') or read_json(directory/'identity_binding_review.json', {})
     corrected, review = semantic_review.bindings(directory, cleaned, catalog, segments, mapped,
-                                                cached=None if force else saved.get('semantic_review'), aliases=aliases)
+                                                cached=None if force or _correction is not None else cached_review,
+                                                aliases=aliases, settings=settings,
+                                                authored_source=data.expected.get('authored_source'), correction=_correction,
+                                                resolution_inputs=expected)
     cleaned = {**cleaned, 'actors': corrected['actors']}
     decisions = corrected['bindings']
     mapped = map_source_reading(cleaned, catalog, segments, aliases,
@@ -192,14 +247,28 @@ def resolve_chapter(directory: Path, *, force=False, data: ChapterIdentityData |
               'primary_entities': [r['id'] for r in catalog.entities.values() if r['design'].get('role') in {'主角','男主角','女主角'}],
               'entities': {r['id']: r['name'] for r in catalog.entities.values()},
               'actorless_confirmed': not cleaned['actors'] and bool(answer.get('actorless_confirmed')),
-              'discarded_mentions': rejected, 'semantic_review': review,
+              'discarded_mentions': rejected, 'semantic_review': review, 'binding_decisions': decisions,
               'semantic_extras': [a['name'] for a in cleaned['actors'] if any(r['source_id']==a['source_id'] and r['decision']=='extra' for r in decisions)],
               'semantic_new_names': [a['name'] for a in cleaned['actors'] if any(r['source_id']==a['source_id'] and r['decision']=='named_missing' for r in decisions)], **mapped}
     result['relations'] = [r for r in catalog.claims if r.get('status') == 'accepted' and r.get('chapter', 0) <= chapter]
     for key in ['mentions','appearances']:
         for row in result[key]:
             row['entity_id'] = canonical_entity(result, row['entity_id'])
-    semantic_review.register_names(directory.parent, result, decisions)
     atomic_write_json(directory / 'identity_context.json', result)
     data.saved = result
     return result
+
+
+def adopt_chapter_correction(directory: Path, correction, *, settings=None):
+    return resolve_chapter(directory, settings=settings, _correction=correction)
+
+
+def adopt_named_missing(directory: Path, *, settings=None):
+    from novel_manga.application.identity.store import current_context
+    directory = Path(directory).resolve()
+    context = current_context(directory)
+    names = context.get('semantic_new_names') or []
+    if not names:
+        return context
+    semantic_review.register_names(directory.parent, context, context.get('binding_decisions') or [])
+    return resolve_chapter(directory, settings=settings)
