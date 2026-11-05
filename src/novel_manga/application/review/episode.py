@@ -152,8 +152,10 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
             if invalid_verdict_ids({clip_id: verdict}):
                 raise ValueError('review model returned no valid severity verdict')
         except Exception as error:  # noqa: BLE001 - a judge failure is reported, never fatal
+            from novel_manga.service_errors import service_failure
             model_client.log(f"episode {episode_dir.name} {clip_id}: review error {type(error).__name__}: {str(error)[:120]}")
-            report["clips"][clip_id] = {"video": str(video), "take": take, "severity": "review_error", "error": f"{type(error).__name__}: {str(error)[:300]}"}
+            report["clips"][clip_id] = {"video": str(video), "take": take, "severity": "review_error",
+                "error": f"{type(error).__name__}: {str(error)[:300]}", **service_failure(error)}
             checkpoint()
             continue
         report["clips"][clip_id] = {"video": str(video), "take": take, **verdict,
@@ -188,7 +190,7 @@ def _review_episode(episode_dir: Path, video_name: str = "clip.mp4", *, fresh: b
     for clip in plan['clips']:
         cid = clip.get('clip_id')
         note = correction(clip, selected.get(cid) or {}, include_missing=use_agent)
-        if note and cid in report['clips']:
+        if note and cid in report['clips'] and not report['clips'][cid].get('service_interrupted'):
             report['clips'][cid]['speech_gate'] = {'passed': False, 'issues': list((selected.get(cid) or {}).get('issues') or [])}
             report['clips'][cid]['tier'] = 'must_fix'
             report['feedback'][cid] = merge_note(report['feedback'].get(cid, ''), note)

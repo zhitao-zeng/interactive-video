@@ -7,6 +7,16 @@ from novel_manga.models.bible import StoryBible, Character
 from novel_manga.review.endpoints import judge_settings
 from novel_manga.application.agents.episode.arguments import UnsupportedInput
 IMAGE_REVIEW_POLICY = 2
+IMAGE_ATTEMPTS = 3  # Newly authorized bounded automatic repair, 2026-10-23.
+
+
+class AssetImageRejected(UnsupportedInput):
+    """A picture verdict, distinct from a rejection of its source design."""
+    def __init__(self, message, *, image_review=None, exhausted=False, asset_id=None):
+        super().__init__(message)
+        self.image_review = image_review or {}
+        self.exhausted = exhausted
+        self.asset_id = asset_id
 
 
 def style_key(ctx):
@@ -31,9 +41,31 @@ def build(ctx, directory, role, name, design):
     bible = bible.model_copy(update={'characters': [Character(name=name, **design)] if role == 'character' else [],
         'locations': [name+'：'+design] if role == 'location' else [], 'props': []})
     bible = styled_bible(bible, profile, ctx.novel_dir)
+    style_data = load_style(profile, ctx.novel_dir)
+    # The author declares this type in an existing Character field; never infer
+    # it from a name or transplant the traveller's identity into another actor.
+    if role == 'character' and str(design.get('visual_archetype') or '').startswith('非人动物'):
+        import copy
+        style_data = copy.deepcopy(style_data)
+        style_data.update({'render_direction': '保持本书已选媒介、光色和材质表现；当前动物的身体结构、体表与表情按本资产已审外貌呈现，不强制人类皮肤、发型、双手、站姿或现代衣服，也不抹去本资产已明确的相关特征。已审固定服装、饰物和持物照原字段保留，不自动增加或清空。', 'card_brief': '只呈现当前一个非人动物主体且只出现一次，完整本体及其已审固定构成清楚可辨；取景和朝向以能核对本资产已有解剖、体表、轮廓和固定特征为准，不预设肢体数量、眼睛数量、尾巴数量或体表种类。保留本资产字段明确的固定服装、饰物与持物。除已审设计明确属于该资产的固定构成外，不额外画人类主角、另一动物或剧情陪体；临时与谁同框、站在哪个包上等分镜状态不进入独立卡。纯色简洁背景，不画多视角、镜像、局部小头像或拼图。'})
+        style_data['visual_style'] = (str(style_data.get('render_family') or profile.get('render_family') or '')
+            + '：沿用本书已选媒介与材质；当前非人动物的独立身份仅按本资产已审外貌。')
+        style_data.setdefault('art_direction', {}).setdefault('asset_guidance', {})['character'] = ['当前素材的独立身份仅依据本资产已审外貌和类型；不将主角或其他角色的人脸、身体、衣服或参考图复制给它。', '尊重每个动物自己已审的解剖与体表，包括特殊肢体；不把某个动物的足、翼、眼或尾巴设计推广给其他动物。', '固定服装、饰物、持物依当前Character既有字段保留；没有相关设计时不凭空增加，也不在共用模板中一律禁止。', '定妆卡表达独立素材；剧情临时搭乘、站位或其他陪体留在分镜，不把主角与动物合成一张身份卡。']
+        if design.get('signature_prop'):
+            style_data['card_brief'] += '本资产已审固定持物：' + str(design['signature_prop']) + '。'
+        bible = bible.model_copy(update={'visual_style': style_data['visual_style'],
+                                        'palette': '以各世界原设定和本资产已审专属配色为准；本动物身份依据自己的已审设计，不使用其他角色作为它的人脸或身体来源。'})
     style = AssetStyle.for_genre(load_genre(profile), frame_text=frame['text'],
-                                style=load_style(profile, ctx.novel_dir), backend=image_backend(settings))
-    factory = FramedAssetFactory(settings, FramedPhanRouter(settings, frame), style=style)
+                                style=style_data, backend=image_backend(settings))
+    feedback = read_json(directory/'image-review-feedback.json', {}).get('problems') or []
+    if feedback:
+        correction = '\n纠正上一张实际图片审核指出的可见矛盾，已审source/design其余部分保持不变：' + '；'.join(map(str, feedback))
+        style = replace(style, render_direction=style.render_direction+correction,
+                        scene_direction=(style.scene_direction or style.render_direction)+correction)
+    # Keep the real people check and its picture-bound record. This outer loop
+    # owns redraws, so one candidate must not create another three pictures.
+    factory = FramedAssetFactory(settings, FramedPhanRouter(settings, frame), style=style,
+                                 empty_retry_seeds=())
     factory.build_selected(directory, bible, {'character_001'} if role == 'character' else set(),
         {'location_001'} if role == 'location' else set(), expressions=False, prop_ids=set())
     return directory/('characters/character_001/turnaround.jpeg' if role == 'character'
@@ -42,6 +74,12 @@ def build(ctx, directory, role, name, design):
 
 def check_image(path, role, name, design):
     import json
+    from novel_manga.media.card_check import people_found
+    if role == 'location' and people_found(path) > 0:
+        counted = read_json(path.with_suffix(path.suffix+'.request.json'), {})['people_check']
+        review = {'consistent':False, 'problems':[
+            f"location card people check found {counted['people_in_scene']} people: {counted.get('where', '')}"]}
+        raise AssetImageRejected('generated asset failed image review: '+str(review['problems']), image_review=review)
     answer = ask_json([{'type': 'text', 'text':
         '检查这张实际参考图是否符合申请的素材与本书动画画风。'
         'character可指人类或动物；检查可见的物种、稳定外貌和服装，允许同一角色的多个视图。'
@@ -57,13 +95,14 @@ def check_image(path, role, name, design):
         obj({'consistent': {'type': 'boolean'}, 'problems': {'type': 'array', 'items': {'type': 'string'}}}),
         name='draft_asset_image', max_tokens=1000, timeout=180, settings=judge_settings())
     if answer.get('consistent') is not True or answer.get('problems'):
-        raise UnsupportedInput('generated asset failed image review: '+str(answer.get('problems')))
+        raise AssetImageRejected('generated asset failed image review: '+str(answer.get('problems')),
+                                 image_review=answer)
     return answer
 
 
 def _asset(ctx, role, name, design, *, base_asset=None, asset_root=None, builder=None, checker=None,
            image_review_policy=IMAGE_REVIEW_POLICY):
-    """One shared image per accepted design, retaining unfinished supplier receipts."""
+    """Up to three pictures for one design, retaining each supplier job and verdict."""
     builder = builder or build
     checker = checker or check_image
     asset_root = ctx.asset_snapshot_dir if asset_root is None else Path(asset_root)
@@ -90,22 +129,65 @@ def _asset(ctx, role, name, design, *, base_asset=None, asset_root=None, builder
         accepted = read_json(receipt, {})
         if accepted:
             return accepted
-        rejected = read_json(directory/'rejected.json', {})
-        if rejected.get('image_review_policy') == image_review_policy:
-            raise UnsupportedInput(rejected['error'])
-        built = read_json(directory/'built.json', {})
-        image = asset_root/built['path'] if built else None
-        if image is None or not image.is_file():
-            image = builder(ctx, directory, role, name, design)
-            atomic_write_json(directory/'built.json', {'path': str(image.relative_to(asset_root))})
-        try:
-            review = checker(image, role, name, {'source_design': design, 'production_style': style})
-        except UnsupportedInput as error:
-            atomic_write_json(directory/'rejected.json', {'error': str(error),
-                'image_review_policy': image_review_policy,
-                **({'previous_error': rejected['error']} if rejected else {})})
-            raise
-        accepted = {**row, 'asset_id': row['id'], 'path': str(image.relative_to(asset_root)),
-                    'image_review': review, 'image_review_policy': image_review_policy}
-        atomic_write_json(receipt, accepted)
-        return accepted
+        exhausted = read_json(directory/'exhausted.json', {})
+        if exhausted.get('image_review_policy') == image_review_policy:
+            raise AssetImageRejected(exhausted['error'], image_review=exhausted.get('image_review'),
+                                     exhausted=True, asset_id=row['id'])
+        previous = None
+        for number in range(1, IMAGE_ATTEMPTS+1):
+            attempt = directory/'attempts'/f'attempt_{number:02d}'
+            attempt.mkdir(parents=True, exist_ok=True)
+            # A previously generated image is picture one, not a free extra.
+            # Its original pixels/spec/request/rejection remain at their paths.
+            if number == 1 and not (attempt/'built.json').exists():
+                legacy = read_json(directory/'built.json', {})
+                if legacy and (asset_root/legacy['path']).is_file():
+                    atomic_write_json(attempt/'built.json', legacy)
+                    old_rejection = read_json(directory/'rejected.json', {})
+                    if old_rejection:
+                        atomic_write_json(attempt/'rejected.json', old_rejection)
+            rejected = read_json(attempt/'rejected.json', {})
+            if rejected.get('image_review_policy') == image_review_policy:
+                previous = rejected
+                continue
+            built = read_json(attempt/'built.json', {})
+            image = asset_root/built['path'] if built else None
+            if image is None or not image.is_file():
+                feedback = attempt/'image-review-feedback.json'
+                if previous and not feedback.exists():
+                    atomic_write_json(feedback, {'previous_attempt': number-1,
+                        'problems': (previous.get('image_review') or {}).get('problems') or [previous['error']]})
+                # An outage leaves this same attempt's task/request files in place.
+                # Do not advance until a complete picture receives a real verdict.
+                image = builder(ctx, attempt, role, name, design)
+                built = {'path': str(image.relative_to(asset_root))}
+                atomic_write_json(attempt/'built.json', built)
+                if number == 1 and not (directory/'built.json').exists():
+                    atomic_write_json(directory/'built.json', built)
+            try:
+                review = checker(image, role, name, {'source_design': design, 'production_style': style})
+                if review.get('consistent') is not True or review.get('problems'):
+                    raise AssetImageRejected('generated asset failed image review: '+str(review.get('problems')),
+                                             image_review=review)
+            except UnsupportedInput as error:
+                review = getattr(error, 'image_review', None) or {'consistent': False, 'problems': [str(error)]}
+                previous = {'error': str(error), 'image_review': review,
+                            'image_review_policy': image_review_policy}
+                atomic_write_json(attempt/'review.json', review)
+                if rejected:
+                    atomic_write_json(attempt/f'rejected-policy-{rejected.get("image_review_policy", "unspecified")}.json', rejected)
+                atomic_write_json(attempt/'rejected.json', previous)
+                if not (directory/'rejected.json').exists():
+                    atomic_write_json(directory/'rejected.json', previous)
+                continue
+            atomic_write_json(attempt/'review.json', review)
+            accepted = {**row, 'asset_id': row['id'], 'path': str(image.relative_to(asset_root)),
+                        'image_review': review, 'image_review_policy': image_review_policy}
+            atomic_write_json(receipt, accepted)
+            return accepted
+        message = 'generated asset failed image review: asset image attempts exhausted (3/3): '+previous['error']
+        atomic_write_json(directory/'exhausted.json', {'error': message, 'exhausted': True,
+            'attempts': IMAGE_ATTEMPTS, 'image_review': previous.get('image_review'),
+            'image_review_policy': image_review_policy})
+        raise AssetImageRejected(message, image_review=previous.get('image_review'),
+                                 exhausted=True, asset_id=row['id'])

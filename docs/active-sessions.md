@@ -280,3 +280,7 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | ZCode #12+会话退化修复 | ①create_context目录发现:无显式output_root时探测firstframes/music/agent三约定既有run,CLI retry续真状态(冒烟已验:verify edition解析到firstframes真实目录);②默认作者配置切快速档(thinking off+effort low+16k,修复线同款),传导链有测试;2新测试,全量4053连两轮绿 | main(783b0c4) | context.py、configs/agent_sandbox.json、tests/test_agent_run_discovery.py | 2026-10-22 | 已提交;verify edition下次resume即用快速档;并行瞬态(一轮11败)已定位为与sd线资源竞争,复跑全绿 |
 
 | Codex 10小时协助ZCODE20261023 | 用户授权给原ZCODE会话指令并协助完成今早10点前知遥20集成片；协助窗口至11:56 | codex/zcode-supervision-20261023 | 仅自有协调runtime/必要独立诊断；生产单写者ZCODE，旧恋综暂不处理 | 2026-10-23 01:56 | 在途：原ZCODE已收到指令并ACK，34项相关独立回归过；定位原会话session_7acef82aafd79b10dac6e5f434e1cf08，核对真实隔离产线；不清额度/历史，不把candidate或blocked误称accepted；以20个完整导出文件验收。 |
+
+| Codex Pi单Agent短片试验 2026-10-27 | 用户授权试极简单Agent，选择Pi core负责循环，只接媒体工具；先30–45秒原场01 | codex/minimal-pi-video-probe-20261027 | 隔离.runtime/pi-single-agent-probe；不改生产主干 | 在途 | 原包/原双参考，DS4.1显式通道，3镜原候选上限；先验证工具和看图，未启动媒体；不报严格A/B或主线accepted。 |
+
+| Codex Pi单Agent短片试验收工 2026-10-27 | Pi core+DS4.1原场01样片41.422秒；原型恢复验证 | codex/minimal-pi-video-probe-20261027 | 实验树.runtime/pi-single-agent-probe/REPORT.md及experiment-result.json | 完成 | 4图/3视频，Agent自行发现剪辑截断并修v2；首次24响应exit2，工具修复及额外4轮既有素材交接后exit0。原失败保留，不报从头无人或质量A/B胜出；主线生产代码/旧任务不改，未commit/push/upload。 |

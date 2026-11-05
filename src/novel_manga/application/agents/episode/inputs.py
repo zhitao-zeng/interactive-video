@@ -20,7 +20,7 @@ BOOK_FILES = ('novel.json', 'story_bible.json', 'bible_aliases.json', 'bible_gro
               'entity/claims.json', 'entity/types.json', *IMPORTED_BOOK_FILES)
 READING_FILES = ('identity_source_reading.json', 'identity_context.json', 'source_reading.json',
                  'source_speaker_contract.json', 'identity_binding_review.json')
-SCRIPT_FILES = ('chapter_script.json', 'clip_plan.json', 'episode_plan.json', 'scene_outline.json',
+SCRIPT_FILES = ('chapter_script.json', 'clip_plan.json', 'pre_render_story_audit.json', 'episode_plan.json', 'scene_outline.json',
                 'scene_script.json', 'clip_overrides.json', 'visor_states.json', 'posture_states.json', *EPISODE_FILES)
 SKILL_REFERENCES = {
     'output_contract': 'references/output-contract.md',
@@ -208,6 +208,13 @@ def _candidate_references(ctx, text, plan, script, *, bound_plan=False, fresh=Fa
         if name in names or name in text:
             references.append({'asset_id': f'voice_{name}', 'role': 'voice', 'name': name,
                                'path': f'series_assets/voices/{name}.wav'})
+    from novel_manga.media.reference_views import scope_of,supplied_wardrobe_views
+    supplied=[]
+    for ref in references:
+        if ref.get('role')!='character':continue
+        if scope:=scope_of(ctx.source_novel_dir,ref):ref['reference_scope']=scope
+        supplied.extend(supplied_wardrobe_views(ctx.source_novel_dir,ref))
+    references.extend(supplied)
     return references
 
 
@@ -227,7 +234,9 @@ def _catalog(ctx, references, *, fresh=False):
         else:
             relative = Path('series_assets/episode_refs') / f'{ctx.source_episode_dir.name}-{ctx.input_mode}' / f'asset_{len(assets)+1:03d}{source.suffix}'
         local_target = ctx.novel_dir / relative
-        target = local_target if local_target.is_file() else ctx.asset_snapshot_dir / relative
+        local_assets=ctx.novel_dir/'series_assets'
+        localized=local_assets.is_dir() and not local_assets.is_symlink()
+        target = local_target if local_target.is_file() or localized else ctx.asset_snapshot_dir / relative
         if not source.is_file() and not original.is_absolute():
             local = ctx.novel_dir/original
             if local.is_file():
@@ -401,6 +410,12 @@ def prepare_inputs(ctx: EpisodeContext):
         asset_link.symlink_to(ctx.asset_snapshot_dir / 'series_assets', target_is_directory=True)
     for name in BOOK_FILES:
         _copy(ctx.source_novel_dir / name, ctx.novel_dir / name)
+    examples=ctx.source_novel_dir/'style-examples'
+    if examples.is_dir():
+        for source in sorted(path for path in examples.rglob('*') if path.is_file()):
+            relative=Path('style-examples')/source.relative_to(examples)
+            if fresh:_snapshot_file(ctx,source,relative)
+            else:_copy(source,ctx.novel_dir/relative)
     sync_source_index(ctx)
     if not (ctx.novel_dir / 'profile.json').is_file():
         atomic_write_json(ctx.novel_dir / 'profile.json', read_json(ctx.novel_dir / 'novel.json', {}).get('profile', {}))

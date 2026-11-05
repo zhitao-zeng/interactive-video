@@ -8,6 +8,28 @@ from pathlib import Path
 import re
 
 
+def _supplied_prop_names(manifest):
+    """Use supplied material's existing prop order and declared image destinations."""
+    series=(manifest.get('task') or {}).get('series_material')
+    if manifest.get('mode')!='adaptation' or not series:return set()
+    from novel_manga.application.configuration import project_root
+    from novel_manga.util import read_json
+    directory=Path(series)
+    if not directory.is_absolute():directory=project_root()/directory
+    material=read_json(directory/'material.json',{})
+    paths=set()
+    for ref in material.get('reference_images',[]):
+        source=Path(ref['source'])
+        if not source.is_absolute():source=directory/source
+        if source.is_file():paths.add(ref['path'])
+    names=set()
+    for index,prop in enumerate((material.get('bible') or {}).get('props',[]),1):
+        folder=f'series_assets/props/prop_{index:03d}'
+        image='detail.jpeg' if prop.get('closeup') and f'{folder}/detail.jpeg' in paths else 'turnaround.jpeg'
+        if f'{folder}/{image}' in paths:names.add(prop['name'])
+    return names
+
+
 def validate(episode, manifest, work_dir):
     if not isinstance(episode, dict):
         return ['episode.json must be one object']
@@ -37,18 +59,70 @@ def validate(episode, manifest, work_dir):
     if source := manifest.get('dialogue_source'):
         from .source_dialogue import extract_markdown_dialogue, dialogue_issues
         issues.extend(dialogue_issues(shots, extract_markdown_dialogue((work_dir/source).read_text())))
+    if structured := task.get('structured_script'):
+        from .structured_dialogue import dialogue_issues
+        try:
+            issues.extend(dialogue_issues(shots, work_dir/structured, task['series_material'], task))
+        except (OSError, ValueError) as error:
+            issues.append(f'structured dialogue evidence cannot be validated: {error}')
     text = re.sub(r'\s+', '', '\n'.join((work_dir / p).read_text()
         for p in manifest['source_documents']))
     durations = {}
     from novel_manga.story.fields import opening_frame_error
     first_frame=any(task.get(key)=='first-frame'or task.get('profile',{}).get(key)=='first-frame'
                     for key in ('h3_input_mode','sd_input_mode'))
+    supplied_props=_supplied_prop_names(manifest)
+    scenes=(episode.get('spatial_plan') or {}).get('scenes') or []
+    scene_locations={scene.get('scene_id'):scene.get('location') for scene in
+                     (scenes if isinstance(scenes,list) else []) if isinstance(scene,dict)}
     for number, shot in enumerate(shots, 1):
+        rosters={key:shot.get(key,[]) for key in ('characters','in_frame')}
+        valid_rosters=True
+        for key,names in rosters.items():
+            if not isinstance(names,list) or any(not isinstance(name,str) or not name.strip() for name in names):
+                issues.append(f'shot {number}: {key} must be a JSON list of actor names; put objects and scenery in scene_objects/props or the shot description, not actor rosters')
+                valid_rosters=False
+        if valid_rosters:
+            declared_props={p.get('name') for p in (episode.get('production_design') or {}).get('props',[]) if isinstance(p,dict)}
+            nonactors=(set(rosters['characters'])|set(rosters['in_frame'])) & declared_props
+            if nonactors:
+                issues.append(f'shot {number}: actor roster contains declared production_design.props {sorted(nonactors)}; put these in props/scene_objects and keep only actors in characters/in_frame')
+            unknown=set(rosters['in_frame'])-set(rosters['characters'])
+            if unknown:
+                issues.append(f'shot {number}: in_frame entries {sorted(unknown)} are not declared actor names in characters={rosters["characters"]}; keep props/scenery/descriptive phrases out of the actor roster, or declare an actual source-supported actor in characters')
         if shot.get('index') != number:
             issues.append(f'shot {number}: consecutive index required; actual index={shot.get("index")!r}, expected {number}. After splitting, update clips and music anchors too')
+        def type_issue(field, form, value):
+            issues.append(f'shot {number} (index={shot.get("index")!r}): {field} must be {form}; '
+                          f'got {type(value).__name__}. Preserve the authored facts when correcting this field shape.')
         for name in ('scene_id', 'location', 'purpose', 'camera', 'start_state', 'event', 'end_state'):
-            if not str(shot.get(name) or '').strip():
-                issues.append(f'shot {number}: missing {name}')
+            value=shot.get(name)
+            valid_text=isinstance(value,str) and bool(value.strip())
+            purpose_lines=(name=='purpose' and isinstance(value,list) and bool(value)
+                           and all(isinstance(line,str) and line.strip() for line in value))
+            if not valid_text and not purpose_lines:
+                type_issue(name,'a nonempty string'+(' or a nonempty list of strings' if name=='purpose' else ''),value)
+        for name in ('light','scene_time','shot_scale'):
+            if name not in shot:continue
+            value=shot[name]
+            if value is None and name in {'light','scene_time'}:continue
+            if not isinstance(value,str):type_issue(name,'a string when supplied',value)
+        for name in ('props','scene_objects'):
+            value=shot.get(name)
+            if value is not None and (not isinstance(value,list) or any(not isinstance(item,str) for item in value)):
+                type_issue(name,'a JSON list of string names ([] or null clears it)',value)
+        for name in ('sfx','extras'):
+            value=shot.get(name)
+            if value is not None and not isinstance(value,str) and not (
+                    isinstance(value,list) and all(isinstance(item,str) for item in value)):
+                type_issue(name,'a string or a JSON list of strings (or null)',value)
+        audio_plan=shot.get('audio_plan')
+        if audio_plan is not None and not isinstance(audio_plan,dict):
+            type_issue('audio_plan','a JSON object (or null)',audio_plan)
+        elif isinstance(audio_plan,dict):
+            cue=audio_plan.get('music_cue')
+            if cue is not None and not isinstance(cue,str):
+                type_issue('audio_plan.music_cue','a string (or null)',cue)
         seconds = shot.get('duration_seconds')
         if not isinstance(seconds, (float, int)) or not math.isfinite(seconds) or seconds <= 0:
             issues.append(f'shot {number}: positive duration_seconds required')
@@ -56,6 +130,21 @@ def validate(episode, manifest, work_dir):
         durations[number] = seconds
         if first_frame or 'opening_frame'in shot:
             if problem:=opening_frame_error(shot.get('opening_frame')):issues.append(f'shot {number}: {problem}')
+            elif valid_rosters:
+                subjects=shot['opening_frame'].get('reference_subjects') or []
+                location=(scene_locations.get(shot.get('scene_id')) if manifest.get('mode')=='adaptation'
+                          and isinstance(shot.get('scene_id'),str) else None) or shot.get('location')
+                legal=set(shot.get('characters') or [])
+                if isinstance(location,str) and location:legal.add(location)
+                if isinstance(shot.get('props'),list):
+                    legal.update(name for name in shot['props'] if isinstance(name,str) and name in supplied_props)
+                unknown=sorted(set(subjects)-legal)
+                if unknown:
+                    issues.append(f'shot {number}: opening_frame.reference_subjects has unregistered names {unknown}. '
+                        f'Legal logical subject names for this shot: {sorted(legal)}. '
+                        'Use exact names, not Image numbers, file paths or purpose labels. '
+                        'The host adds each selected character\'s supplied portrait/wardrobe views and frozen style references; '
+                        'do not list style as a subject. Preserve the shot facts and dialogue; omitted or empty reference_subjects is allowed.')
         for turn in shot.get('turns', []):
             if not all(turn.get(k) for k in ('speaker_name', 'text', 'delivery_mode', 'emotion')):
                 issues.append(f'shot {number}: complete speaker/text/delivery/performance required')
@@ -68,6 +157,8 @@ def validate(episode, manifest, work_dir):
             if not quote or quote not in text:
                 issues.append(f'shot {number}: source_quote must be exact original-package text')
     indexes = []
+    if 'clips' not in episode and isinstance(script.get('clips'),list):
+        issues.append('Found chapter_script.clips, but top-level clips is required. Move the existing array unchanged to episode.clips (a sibling of chapter_script), then remove chapter_script.clips; do not regroup or rewrite valid shots to repair this JSON path.')
     for number, clip in enumerate(episode.get('clips') or [], 1):
         ids = clip.get('shot_indexes') or []
         indexes.extend(ids)
@@ -78,7 +169,7 @@ def validate(episode, manifest, work_dir):
         if (not ids or len(ids) > 6 or not isinstance(seconds, (int, float))
                 or not 4 <= seconds <= 15 or (abs(total - seconds) > .01 and not silent_floor)):
             issues.append(f'clip {number}: group 1–6 shots, 4–15 seconds, matching shot total')
-    if indexes != list(range(1, len(shots) + 1)):
+    if indexes != list(range(1, len(shots) + 1)) and not ('clips' not in episode and isinstance(script.get('clips'),list)):
         issues.append('clips must cover every shot exactly once in screen order')
     if task.get('world_card_seconds'):
         after = task.get('world_card_after_shot', 1)
@@ -108,9 +199,15 @@ def validate(episode, manifest, work_dir):
             if row['label'] not in str(actual.get(row['id'], {}).get('label', '')):
                 issues.append(f'interaction {row["id"]}: retain destination {row["label"]}')
     scenes = (episode.get('spatial_plan') or {}).get('scenes') or []
+    if not isinstance(scenes, list):
+        issues.append('spatial_plan.scenes must be a list of scene objects; keep each scene_id and its complete blockout')
+        scenes = []
     if not scenes:
         issues.append('spatial_plan.scenes needs a source-backed blockout design')
     for number, scene in enumerate(scenes, 1):
+        if not isinstance(scene, dict):
+            issues.append(f'spatial scene {number}: must be a scene object, got {type(scene).__name__}')
+            continue
         label = f'spatial scene {scene.get("scene_id", number)!r} (shots {scene.get("shot_indexes", [])})'
         if not scene.get('anchors'):
             issues.append(f'{label}: missing anchors')
@@ -118,10 +215,10 @@ def validate(episode, manifest, work_dir):
             issues.append(f'{label}: missing explicit assumptions')
         scene_shots = [shot for shot in shots if shot.get('index') in scene.get('shot_indexes', [])]
         visible = list(dict.fromkeys(name for shot in scene_shots
-            for name in [*shot.get('in_frame', []),
+            for name in [*(shot.get('in_frame') if isinstance(shot.get('in_frame'),list) else []),
                          *(turn.get('speaker_name') for turn in shot.get('turns', [])
                            if turn.get('delivery_mode') == 'visible_dialogue')]
-            if name))
+            if isinstance(name,str) and name))
         if 'placed' not in scene:
             issues.append(f'{label}: missing placed list; [] is valid when no bodies are present')
         elif not scene['placed'] and visible:
@@ -131,10 +228,24 @@ def validate(episode, manifest, work_dir):
     if not episode.get('self_review'):
         issues.append('self_review of the complete creative draft is required')
     music_plan=(episode.get('chapter_script')or{}).get('music_plan')
-    if task.get('music_mode')=='timeline'or music_plan is not None:
+    # Music timing indexes duration_seconds directly; a draft whose shots have not
+    # yet cleared the basic duration check must keep the per-shot feedback instead
+    # of crashing the validator (EP03B 2026-10-23: one missing duration killed the
+    # whole validation, the author never saw which shot was broken).
+    durations_ok=(all(s.get('index')==number for number,s in enumerate(shots,1))
+                  and all(isinstance(s.get('duration_seconds'),(int,float))
+                          and s['duration_seconds']>0 for s in shots))
+    if (task.get('music_mode')=='timeline'or music_plan is not None) and durations_ok:
         from novel_manga.story.timing import music_plan_issues
         issues.extend(music_plan_issues(music_plan,shots))
-    if task.get('production_handoff') and not issues:
+    if manifest.get('mode')=='adaptation' and not issues:
+        # Adaptation authors get the shot↔scene coverage feedback in-session, but
+        # only once the basic per-shot checks are clean: adaptation_issues indexes
+        # shot fields directly and must not crash on drafts that already carry
+        # explicit basic errors (EP03C 2026-10-23: missing index).
+        from .creative_material import adaptation_issues
+        issues.extend(adaptation_issues(episode,manifest))
+    elif task.get('production_handoff') and not issues:
         from .creative_material import design_issues
         issues.extend(design_issues(episode,manifest))
     return issues
@@ -193,6 +304,9 @@ def read_evidence(work_dir):
     return reads
 
 
+from novel_manga.style_packs import normalized_style, export_style
+
+
 def export(episode, manifest, destination, *, notes=None, style_source=None):
     destination.mkdir(parents=True, exist_ok=True)
     (destination / 'owner').write_text('Unified creator / text-only creative candidate; no media generated.\n')
@@ -204,25 +318,7 @@ def export(episode, manifest, destination, *, notes=None, style_source=None):
     if manifest.get('selected_style'):
         if style_source is None:
             raise ValueError('export requires the selected frozen style_source')
-        import shutil
-        style_source = Path(style_source)
-        work = style_source.parent.parent
-        style = json.loads(style_source.read_text())
-        for example in style.get('examples', []):
-            if example.get('kind') in {'original_style_board', 'historical_style_frame'} and example.get('path'):
-                source = work / example['path']
-                relative = Path('style-examples') / source.name
-                (destination / relative).parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(source, destination / relative)
-                example['path'] = relative.as_posix()
-            for field in ('review', 'evidence'):
-                if example.get(field):
-                    evidence = work / example[field]
-                    evidence_target = Path('style-examples') / evidence.name
-                    (destination / evidence_target).parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(evidence, destination / evidence_target)
-                    example[field] = evidence_target.as_posix()
-        (destination / 'style.json').write_text(json.dumps(style, ensure_ascii=False, indent=2) + '\n')
+        export_style(style_source,destination)
     shots = episode['chapter_script']['shots']
     for name, data in [('episode', episode), ('chapter_script', episode['chapter_script']),
                        ('interaction', episode['interaction']), ('spatial_plan', episode['spatial_plan']),

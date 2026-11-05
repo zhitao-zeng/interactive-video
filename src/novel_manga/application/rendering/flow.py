@@ -137,7 +137,9 @@ class ThinMediaRunner:
             return {"clip_id": clip["clip_id"], "attempts": [], "selected": None,
                     "error": "request blocked before generation", "blocked": reasons}
         attempts: list[dict] = []
-        state = clip_retries.RetryState(attempt=1, limit=self.context.options.max_attempts)
+        first_attempt = clip_retries.starting_attempt(self.context.work, clip)
+        state = clip_retries.RetryState(attempt=first_attempt,
+                                       limit=first_attempt + self.context.options.max_attempts - 1)
         try:
             from novel_manga.story.voice_delivery import postmixed
             if postmixed(clip):
@@ -159,6 +161,8 @@ class ThinMediaRunner:
                 cached = {**cached, "generated_this_run": False}
                 log(f"{clip['clip_id']}: reusing a matching passed take; no new request despite the old duration estimate")
                 return {"clip_id": clip["clip_id"], "attempts": [cached], "selected": cached}
+            if state.attempt > state.limit:
+                raise ValueError('attempt limit used; preserve the prior unconfirmed submissions')
             while state.attempt <= state.limit:
                 outcome = clip_attempts.generate_attempt(self, clip, state.attempt)
                 if outcome.error is not None:
@@ -289,8 +293,10 @@ class ThinMediaRunner:
         self.prepare_clips(clips)
         with ThreadPoolExecutor(max_workers=self.context.options.workers) as pool:
             results = list(pool.map(self.process_clip, clips))
-        errored = [r["clip_id"] for r in results if r.get("error") or not r.get("selected")]
-        failed = [r["clip_id"] for r in results if r.get("selected") and not r["selected"]["passed"]]
+        errored = [r["clip_id"] for r in results
+                   if r.get("error") or r.get("service_interrupted") or not r.get("selected")]
+        failed = [r["clip_id"] for r in results
+                  if not r.get("service_interrupted") and r.get("selected") and not r["selected"]["passed"]]
         if self.context.options.cache_only and errored:
             # Nothing is written: the episode keeps the report and final it had.
             log(f"cache-only: {len(errored)} clip(s) not in the cache ({', '.join(errored)}); episode left as it was")

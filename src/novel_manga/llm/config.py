@@ -4,6 +4,7 @@ from pathlib import Path
 import contextlib
 import os
 import hashlib
+import json
 
 # The model endpoints this project runs on, by name.  QWEN38_LOCAL_* is read by three different
 # jobs - the planner, the H3 prompt translation and the judge - so moving one of them used to move all
@@ -45,7 +46,7 @@ ENDPOINTS = {
     "phanthy-dsv4": {"QWEN38_LOCAL_BASE_URL": "http://127.0.0.1:8789/v1",
                      "QWEN38_LOCAL_MODEL": "phanthy.com/deepseek-v4",
                      "QWEN38_LOCAL_API_KEY_VAR": "PHANTHY_API_KEY", "QWEN38_LOCAL_STREAM": "1",
-                     "QWEN38_LOCAL_MIN_MAX_TOKENS": "0"},
+                     "QWEN38_LOCAL_MIN_MAX_TOKENS": "16000"},
     "phanthy-phancy": {"QWEN38_LOCAL_BASE_URL": "http://127.0.0.1:8789/v1",
                        "QWEN38_LOCAL_MODEL": "phanthy.com/phancy-35b",
                        "QWEN38_LOCAL_API_KEY_VAR": "PHANTHY_API_KEY", "QWEN38_LOCAL_STREAM": "1",
@@ -71,7 +72,40 @@ ENDPOINTS = {
                      "QWEN38_LOCAL_MIN_MAX_TOKENS": "0"},
 }
 
+from .catalog import catalogue as _catalogue
+for _name, _resource in _catalogue()['resources'].items():
+    _base = _resource.get('base_url', '')
+    if not _resource.get('model') or not _base.startswith(('http://', 'https://', 'codex://')):
+        continue
+    _existing = ENDPOINTS.get(_name, {})
+    ENDPOINTS[_name] = {**_existing,
+        'QWEN38_LOCAL_BASE_URL': _base if _base.startswith('codex://') else _base.rstrip('/')+'/v1',
+        'QWEN38_LOCAL_MODEL': _resource['model'],
+        'QWEN38_LOCAL_API_KEY_VAR': _resource.get('key_var', 'H3_PROMPT_NO_KEY'),
+        'QWEN38_LOCAL_STREAM': '0' if _base.startswith('codex://') else '1',
+        'QWEN38_LOCAL_MIN_MAX_TOKENS': _existing.get('QWEN38_LOCAL_MIN_MAX_TOKENS', '0')}
+
 TRANSPORT_ENV = ('QWEN38_LOCAL_STREAM', 'QWEN38_LOCAL_REASONING', 'QWEN38_LOCAL_MIN_MAX_TOKENS')
+
+
+def _endpoint_values(name):
+    values = ENDPOINTS[name]
+    raw = os.environ.get('NOVEL_RESOLVED_ROUTE')
+    if not raw:
+        return values
+    try:
+        route = json.loads(raw)
+    except ValueError:
+        return values
+    for role in (route.get('roles') or {}).values():
+        if role.get('endpoint') != name:
+            continue
+        snapshot = {'QWEN38_LOCAL_MODEL':role.get('model'),
+                    'QWEN38_LOCAL_BASE_URL':role.get('base_url'),
+                    'QWEN38_LOCAL_API_KEY_VAR':role.get('key_var'),
+                    **(role.get('transport') or {})}
+        return {**values, **{key:value for key,value in snapshot.items() if value is not None}}
+    return values
 
 
 def planner_endpoint_name(environ=None) -> str:
@@ -86,7 +120,7 @@ def planner_endpoint_name(environ=None) -> str:
     environ = os.environ if environ is None else environ
     # 2026-10-10 用户决定：主力模型切 Phanthy API（本地大模型服务保留配置不再使用）。
     # API deepseek-v4.1-flash 实测 6 并发全绿、长输出无 8000 天花板（6979 自然停止）。
-    name = str(environ.get("NOVEL_PLANNER_ENDPOINT", "") or "").strip() or "phanthy-ds41"
+    name = str(environ.get("NOVEL_PLANNER_ENDPOINT", "") or "").strip() or 'phanthy-ds41'
     if name not in ENDPOINTS:
         raise ValueError(f"NOVEL_PLANNER_ENDPOINT={name!r} names no endpoint; pick one of {sorted(ENDPOINTS)}")
     return name
@@ -96,7 +130,7 @@ def endpoint_settings(name: str) -> JsonEndpoint:
     """A named endpoint as the settings for one call, with the process environment left alone."""
     if name not in ENDPOINTS:
         raise ValueError(f"unknown endpoint {name}; pick one of {sorted(ENDPOINTS)}")
-    return JsonEndpoint.from_env(ENDPOINTS[name])
+    return JsonEndpoint.from_env(_endpoint_values(name))
 
 
 @contextlib.contextmanager
@@ -110,8 +144,9 @@ def using_endpoint(name: str, environ=None):
     if name not in ENDPOINTS:
         raise ValueError(f"unknown endpoint {name}; pick one of {sorted(ENDPOINTS)}")
     environ = os.environ if environ is None else environ
-    before = {key: environ.get(key) for key in ENDPOINTS[name]}
-    environ.update(ENDPOINTS[name])
+    values = _endpoint_values(name)
+    before = {key: environ.get(key) for key in values}
+    environ.update(values)
     try:
         yield name
     finally:

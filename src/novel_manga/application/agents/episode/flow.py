@@ -24,7 +24,7 @@ from .turns import invoke
 
 
 def run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
-    """One agent owns creative decisions; this controller only waits and resumes operations."""
+    """The host runs normal stages and resumes an Agent only for authored decisions."""
     from novel_manga.llm import usage as llm_usage
     with lifecycle.episode_lock(ctx), llm_usage.scope(novel=ctx.episode_dir.parent.name, episode=ctx.episode_dir.name, stage='episode_agent'):
         return _run_episode(ctx, config=config, timeout=timeout, retry_issues=retry_issues)
@@ -76,6 +76,28 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                 if not thread.is_alive() or time.monotonic() >= startup_deadline:
                     raise RuntimeError('episode tool bridge did not start')
             native_block, native_wait = prepare_operations(ctx, bridge, state)
+
+            def dispatch_automatic(status):
+                if production_only or config.get('production_mode') != 'agent':
+                    return None
+                from .readiness import automatic_request
+                request = automatic_request(ctx, status, first_pass_only=first_pass_only)
+                if request is None:
+                    return None
+                if request.get('document') is not None:
+                    atomic_write_json(ctx.work_dir / request['payload']['file'], request['document'])
+                route = {**request['route'], 'automatic_fingerprint': request['fingerprint']}
+                result['next_action'] = route
+                bridge.update_state(phase='tool_running', next_action=route)
+                bridge.handle(request['action'], request['payload'])
+                return request
+
+            def finished_manifest(status, *, allow_host=False):
+                return lifecycle.finished_manifest(
+                    ctx, finish_stamp, status,
+                    allow_host=allow_host or config.get('production_mode') == 'agent',
+                    route_guard=config.get('production_mode') == 'agent')
+
             no_progress = result['no_progress']
             fallbacks = result['fallback_invocations']
             while True:
@@ -105,7 +127,7 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                 if native_block is not None:
                     result.update(reason='native pipeline preparation blocked',pipeline_failure=native_block)
                     break
-                manifest = lifecycle.current_finish(ctx, finish_stamp, status.get('job'))
+                manifest = finished_manifest(status)
                 if manifest is not None:
                     lifecycle.record_finish(result, manifest)
                     break
@@ -119,11 +141,8 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                     # Reserve an Agent conversation for an actual unresolved decision.
                     bridge.handle('finish', {})
                     status = lifecycle.wait_for_idle(bridge)
-                    completed = status.get('job') or {}
-                    manifest = read_json(ctx.work_dir / 'input/latest-finish.json', {})
-                    if (completed.get('action') == 'finish' and completed.get('status') == 'completed'
-                            and (completed.get('result') or {}).get('passed') is True
-                            and manifest.get('passed') is True):
+                    manifest = finished_manifest(status, allow_host=True)
+                    if manifest is not None and manifest.get('passed') is True:
                         lifecycle.record_finish(result, manifest)
                         result['method'] = 'existing requests executed and accepted by host'
                         break
@@ -144,21 +163,29 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                 if (progress_rules.applied_repair(job)
                         and (time.monotonic() < state.deadline or config.get('complete_started_repairs', True))):
                     # An accepted source/input change can invalidate the approved
-                    # opening. Render only when the host reports it as legal.
+                    # opening. Continue only through the latest legal route.
+                    latest = bridge.handle('status', {})
+                    if dispatch_automatic(latest) is not None:
+                        continue
                     from .readiness import next_action
-                    ready = next_action(ctx, bridge.handle('status', {}))
+                    ready = next_action(ctx, latest)
                     result['next_action'] = ready
                     bridge.update_state(next_action=ready)
-                    if ready['action'] == 'render':
+                    if config.get('production_mode') != 'agent' and ready['action'] == 'render':
                         bridge.handle('render', {})
                         bridge.update_state(phase='tool_running')
                         continue
-                    # first_frames/agent: the saved session must author the missing
-                    # work; fall through to the normal invocation below.
                 if (result.get('upstream_recovery')or{}).get('proposals',0)>=2:
+                    number = int(((status.get('job') or {}).get('id') or 'job-0').rsplit('-', 1)[-1])+1
                     finished=bridge.tools.dispatch('finish',{})
-                    if finished.get('passed'):
-                        lifecycle.record_finish(result,read_json(ctx.work_dir/'input/latest-finish.json',{}))
+                    job = {'id': f'job-{number}', 'action': 'finish',
+                           'status': 'completed', 'result': finished}
+                    current = bridge.handle('status', {})
+                    current['job'] = job
+                    result['job'] = job
+                    manifest = finished_manifest(current, allow_host=True)
+                    if manifest is not None and manifest.get('passed') is True:
+                        lifecycle.record_finish(result, manifest)
                     else:
                         result.update(reason='bounded recovery completed two proposal turns',bounded_finish=finished)
                     break
@@ -168,6 +195,60 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                 if remaining <= 0:
                     result['reason'] = 'episode operation timeout exhausted'
                     break
+                if dispatch_automatic(status) is not None:
+                    continue
+                if config.get('production_mode') == 'agent':
+                    from .readiness import next_action
+                    ready = next_action(ctx, status)
+                    result['next_action'] = ready
+                    bridge.update_state(next_action=ready)
+                    outcome = (status.get('job') or {}).get('result') or {}
+                    review_outcome = outcome.get('review') or {}
+                    content_pending = bool(
+                        outcome.get('feedback') or review_outcome.get('feedback')
+                        or outcome.get('failed_clips') or outcome.get('gate_failed_clips')
+                        or outcome.get('final_cut_feedback') or review_outcome.get('final_cut_feedback'))
+                    frame_rows=(status.get('first_frames') or {}).get('clips') or {}
+                    remaining_retakes=(ready['action']=='first_frames'
+                        and (status.get('job') or {}).get('action')=='first_frames'
+                        and outcome.get('ok') is True and bool(outcome.get('changed'))
+                        and any(grant.get('operation')=='retake_candidate'
+                            and (frame_rows.get(cid) or {}).get('remaining_image_candidates',0)>0
+                            for cid,grant in (ready.get('repair_grant') or {}).items()))
+                    routed_repairs=(not status.get('job') and ready['action']=='first_frames' and any(
+                        grant.get('operation')=='input' or (
+                            grant.get('operation')=='retake_candidate'
+                            and (frame_rows.get(cid) or {}).get('remaining_image_candidates',0)>0)
+                        for cid,grant in (ready.get('repair_grant') or {}).items()))
+                    protocol_pending = bool(
+                        outcome.get('argument_errors') or outcome.get('invalid_fields')
+                        or outcome.get('source_input_conflicts') or outcome.get('repair_grant')
+                        or (isinstance(outcome.get('clips'),dict)
+                            and any(row.get('repair_grant') for row in outcome['clips'].values()))
+                        or remaining_retakes or routed_repairs)
+                    registration_blocked = ready.get('error') == 'first_frame_registration'
+                    execution_blocked = ready.get('error') == 'media_execution_failed'
+                    if (ready.get('service_interrupted') or registration_blocked or execution_blocked or
+                            (ready['action'] not in {'agent', 'adopt'} and not content_pending and not protocol_pending)):
+                        retryable = ready.get('retryable', outcome.get('retryable', False))
+                        result.update(status='blocked', phase='blocked', passed=False, exit_code=2,
+                                      retryable=retryable is True,
+                                      reason=ready.get('reason') or outcome.get('error'))
+                        error = ready.get('error') or outcome.get('error')
+                        if error:
+                            result['error'] = error
+                        interrupted = ready.get('service_interrupted') or outcome.get('service_interrupted')
+                        if interrupted:
+                            result['service_interrupted'] = interrupted
+                        required = ready.get('required_action') or outcome.get('required_action')
+                        if required:
+                            result['required_action'] = required
+                        for key in ('invalid_fields','argument_errors','repair_origin','repair_grant',
+                                    'source_input_conflicts','blocked'):
+                            value = ready.get(key, outcome.get(key))
+                            if value is not None:
+                                result[key] = value
+                        break
                 if slice_limit is not None and state.slice_invocations >= int(slice_limit):
                     state.defer('Agent slice completed; resume this session after other production work')
                     break
@@ -274,7 +355,7 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                         break
                     result.update(reason='episode agent invocation failed', session_exit=attempt.exit_code)
                     break
-                manifest = lifecycle.current_finish(ctx, finish_stamp, status.get('job'))
+                manifest = finished_manifest(status)
                 if manifest is not None:
                     lifecycle.record_finish(result, manifest)
                     break

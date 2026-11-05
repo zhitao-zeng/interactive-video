@@ -118,7 +118,15 @@ exactly inside its language-tagged `<d>` marker and preserve the supplied refere
 and speaker bindings. Use `None.` for an empty audio section. The supplied pictures
 are references; concrete first-frame/keyframe use requires explicit host support.
 
-In optional H3 `first_frames`, an unchanged request reuses its saved candidate.
+## First-frame host compilation
+
+For normal optional H3 `first_frames`, submit
+`{"frames": [{"clip_id": "clip_01", "extra_references": []}]}`. The host derives
+the opening and ordered references, reviews the opening source before translation,
+and uses the accepted image's actual path when checking or compiling H3. An
+unchanged valid request and image reuse their saved candidate; stale or invalid H3
+is compiled again through the existing translator and then validated.
+
 After image review rejects visible pixels while the source opening and selected
 references remain correct, a row may request one bounded replacement with
 `retake_candidate: {candidate: "candidate_NN", reason: "specific visible pixel defect"}`.

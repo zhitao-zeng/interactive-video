@@ -30,6 +30,17 @@ class RepairOperations:
             raise ValueError('each repair decision requires an object and clip_id')
         if len({row['clip_id'] for row in answer['decisions']}) != len(answer['decisions']):
             raise ValueError('repair decision must name each eligible clip at most once')
+        if any(row.get('input_clip_id') is not None for row in answer['decisions']):
+            if len(answer['decisions']) != 1:
+                raise ValueError('submit one same-source request correction separately')
+            from .input_request_recovery import edit
+            result = edit(self.ctx, answer['decisions'][0])
+            result.update(submission_id=payload.get('submission_id'), submitted_decisions=answer['decisions'],
+                          generation_counts=history.generation_counts(self.ctx.episode_dir))
+            path = self.ctx.run_dir/'tool-repair-decisions.json'
+            rounds = read_json(path, []); rounds.append(result); atomic_write_json(path, rounds)
+            record_state(self.ctx, 'input_request_corrected', changed=result.get('changed', []))
+            return result
         if any(row.get('action') == 'cutaway' for row in answer['decisions']):
             if len(answer['decisions']) != 1:
                 raise ValueError('submit one post-production cutaway separately from clip repairs')
@@ -149,11 +160,17 @@ class RepairOperations:
                         continue
                     if not row.get('reason'):
                         raise ValueError('input repair needs a reason')
-                    result = repair(self.ctx, row)
+                    from .input_repair import current_repair_grant
+                    plan=read_json(self.ctx.episode_dir/'clip_plan.json',{})
+                    grant=current_repair_grant(self.ctx,row,plan)
+                    result = repair(self.ctx, row, grant=grant) if grant else repair(self.ctx, row)
                     input_changed.extend(result['changed'])
                     repaired.extend(result['input_repaired'])
+                    input_blocked.update(result.get('blocked') or {})
+                    if result.get('ok') is False and not (result.get('blocked') or {}).get(cid):
+                        input_blocked[cid]=result.get('error') or 'current source review rejected the candidate'
                     if result.get('reused'):
-                        input_reused.extend(result['input_repaired'])
+                        input_reused.extend(result.get('input_reused',result['input_repaired']))
                         reused_effects.append(effects(row))
                     handled_effects.append(effects(row))
                 except Exception as error:
@@ -190,6 +207,10 @@ class RepairOperations:
         if deferred:
             outcome['deferred'] = deferred
             outcome['deferred_reason'] = 'Input repair changed these requests; inspect the updated evidence before editing their old prompts.'
+        if input_reused and not outcome['blocked']:
+            from .local_preparation import active, source_gate
+            if active(self.ctx) and (blocked := source_gate(self.ctx)):
+                outcome.update(blocked)
         path = self.ctx.run_dir / 'tool-repair-decisions.json'
         rounds = read_json(path, [])
         rounds.append(outcome)

@@ -7,6 +7,7 @@ import json
 import os
 import re
 import time
+from dataclasses import replace
 from pathlib import Path
 import httpx
 from PIL import Image
@@ -14,6 +15,26 @@ from .config import JsonEndpoint, endpoint_order, endpoint_key
 from .transport import post_any
 
 _CALL_COUNTER = itertools.count(os.getpid())
+
+
+class ModelOutputTruncated(ValueError):
+    """The model returned no complete verdict; this is not a content rejection."""
+
+    def __init__(self, name, max_tokens):
+        self.name = name
+        self.max_tokens = max_tokens
+        super().__init__(f'{name}: JSON truncated at {max_tokens} output tokens')
+
+
+class ModelOutputMalformed(ValueError):
+    """The model did not return a JSON object; no content verdict was obtained."""
+
+    def __init__(self, name, response_path=None):
+        self.name = name
+        self.response_path = response_path
+        evidence = f'; preserved response: {response_path}' if response_path else ''
+        super().__init__(f'{name}: model returned malformed JSON object{evidence}')
+
 
 def log(message: str) -> None:
     print(f"[{time.strftime('%H:%M:%S')}] {message}", flush=True)
@@ -40,8 +61,26 @@ def scaled_timeout(timeout: float, parts: list[dict]) -> float:
     return max(timeout, min(1800.0, chars * 0.02))
 
 
+def _wire_budget(payload: dict, settings: JsonEndpoint | None) -> int:
+    transport = settings or JsonEndpoint.from_env()
+    return max(payload['max_tokens'], transport.min_max_tokens) if transport.stream else payload['max_tokens']
+
+
+def _json_object(content: str, *, extract: bool) -> dict:
+    try:
+        answer = json.loads(content)
+    except json.JSONDecodeError:
+        match = re.search(r"\{.*\}", content, re.S) if extract else None
+        if match is None:
+            raise
+        answer = json.loads(match.group(0))
+    if not isinstance(answer, dict):
+        raise json.JSONDecodeError('expected a JSON object', content, 0)
+    return answer
+
+
 def ask_json(parts: list[dict], schema: dict, *, name: str, max_tokens: int = 700, timeout: float = 600.0, retry_truncated: bool = True, settings: JsonEndpoint | None = None, json_object: bool = False) -> dict:
-    """Ask a JSON question, sharing the timeout across endpoints and at most one length retry."""
+    """Ask a JSON question with one shared deadline and at most three attempts."""
     timeout = scaled_timeout(timeout, parts)
     headers = {}
     key = settings.key if settings else endpoint_key()
@@ -53,22 +92,29 @@ def ask_json(parts: list[dict], schema: dict, *, name: str, max_tokens: int = 70
         "response_format": {"type": "json_schema", "json_schema": {"name": name, "strict": True, "schema": schema}},
         "messages": [{"role": "user", "content": parts}],
     }
-    if json_object:
+    from .policy import json_policy, role_for
+    payload.update(json_policy(payload['model'], role_for(name)))
+    native_codex = (settings or JsonEndpoint.from_env()).endpoints == ('codex://local',)
+    if json_object and not native_codex:
         # Some deployed services accept json_schema but corrupt free-form string arrays.
         # These callers validate their own result; make the shape visible to the model.
         payload['response_format'] = {'type': 'json_object'}
         payload['messages'][0]['content'] = [*parts, {'type': 'text', 'text':
             'Return a JSON object matching this schema: ' + json.dumps(schema, ensure_ascii=False)}]
     from novel_manga.resource_waits import RequestDeadline
+    from .usage import scope
     deadline = RequestDeadline(timeout)
+    attempts = 3 if retry_truncated else 1
     with httpx.Client(timeout=timeout, trust_env=False) as client:
-        for retry in range(3 if retry_truncated else 1):
+        for retry in range(attempts):
             request_key = f"{name}-{next(_CALL_COUNTER)}"
             bases = endpoint_order(request_key, list(settings.endpoints)) if settings else endpoint_order(request_key)
-            body = post_any(client, bases, headers, payload, settings=settings, deadline=deadline,
-                            timeout_message=f"{name}: {timeout:g}s request budget exhausted")
+            wire_budget = _wire_budget(payload, settings)
+            with scope(max_tokens=wire_budget):
+                body = post_any(client, bases, headers, payload, settings=settings, deadline=deadline,
+                                timeout_message=f"{name}: {timeout:g}s request budget exhausted")
             choice = body["choices"][0]
-            content = choice["message"].get("content") or "{}"
+            content = choice["message"].get("content") or ""
             from .refusal import refusal_reason
             fallback = os.environ.get('NOVEL_REFUSAL_FALLBACK')
             refused = choice['message'].get('refusal') or (
@@ -78,17 +124,21 @@ def ask_json(parts: list[dict], schema: dict, *, name: str, max_tokens: int = 70
                 settings = endpoint_settings(fallback)
                 headers = {'Authorization': 'Bearer '+settings.key} if settings.key else {}
                 payload = {**payload, 'model': settings.model}
+                payload.pop('thinking', None)
+                payload.update(json_policy(settings.model, role_for(name)))
                 log(f'{name}: explicit model refusal; switching once to {settings.model} within the same request budget')
-                body = post_any(client, list(settings.endpoints), headers, payload, settings=settings,
-                                deadline=deadline, timeout_message=f'{name}: fallback request budget exhausted')
+                wire_budget = _wire_budget(payload, settings)
+                with scope(max_tokens=wire_budget):
+                    body = post_any(client, list(settings.endpoints), headers, payload, settings=settings,
+                                    deadline=deadline, timeout_message=f'{name}: fallback request budget exhausted')
                 choice = body['choices'][0]
-                content = choice['message'].get('content') or '{}'
+                content = choice['message'].get('content') or ''
             try:
                 if choice.get('finish_reason') == 'length' and not choice['message'].get('content'):
                     # Thinking models may exhaust the budget before producing
-                    # any JSON. The fallback "{}" is not a successful answer.
+                    # any JSON. An empty object must not stand in for an answer.
                     raise json.JSONDecodeError('empty truncated JSON response', '', 0)
-                return json.loads(content)
+                return _json_object(content, extract=choice.get('finish_reason') != 'length')
             except json.JSONDecodeError as error:
                 if choice.get("finish_reason") == "length":
                     # 2026-10-10: 主力切 Phanthy API 后网关实测可自然输出 9890 tokens，
@@ -98,15 +148,21 @@ def ask_json(parts: list[dict], schema: dict, *, name: str, max_tokens: int = 70
                     empty = not choice['message'].get('content')
                     if retry == 0 and retry_truncated and payload["max_tokens"] < 16000:
                         payload["max_tokens"] = min(16000, payload["max_tokens"] * 2)
-                        log(f"{name}: JSON truncated; one retry with {payload['max_tokens']} tokens inside the remaining time budget")
+                        log(f"{name}: JSON truncated; one retry with {_wire_budget(payload, settings)} tokens inside the remaining time budget")
                         continue
                     if empty and retry == 1 and retry_truncated:
                         payload['max_tokens'] = max(700, payload['max_tokens'] // 2)
+                        # This existing final retry intentionally lowers the cap;
+                        # do not let the streaming floor undo the reset.
+                        settings = replace(settings or JsonEndpoint.from_env(), min_max_tokens=0)
                         log(f"{name}: empty truncated reasoning again; one reset-budget retry with {payload['max_tokens']} tokens")
                         continue
-                    raise ValueError(f"{name}: JSON truncated at {payload['max_tokens']} output tokens") from error
-                match = re.search(r"\{.*\}", content, re.S)
-                return json.loads(match.group(0)) if match else {}
+                    raise ModelOutputTruncated(name, wire_budget) from error
+                if retry + 1 < attempts:
+                    log(f'{name}: malformed JSON object; retry inside the remaining time budget')
+                    continue
+                response_path = (body.get('codex_execution') or {}).get('response_path')
+                raise ModelOutputMalformed(name, response_path) from error
 
 
 def obj(properties: dict, required: list[str] | None = None) -> dict:
