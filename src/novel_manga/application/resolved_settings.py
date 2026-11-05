@@ -150,7 +150,12 @@ def resolve_agent_environment(ctx, config):
                 metadata = read_json(ctx.source_novel_dir/'novel.json', {})
             profile = metadata.get('profile', {})
         review_mode = str(profile.get('review_mode') or repair_settings(ctx.project_root)['review_mode'])
-    if not env.get('NOVEL_LOCAL_H3_URL', '').strip():
+    remote_selected = (not env.get('NOVEL_LOCAL_H3_URL', '').strip()
+        and os.environ.get('NOVEL_VIDEO_MODEL') in {'MiniMax-H3', 'sd2.0-fast', 'sd2.0-mini', 'sd2.5'}
+        and bool(os.environ.get('PHANROUTER_VIDEO_KEY_VAR')))
+    if remote_selected:
+        env.setdefault('NOVEL_RENDER_INFLIGHT', '4')
+    elif not env.get('NOVEL_LOCAL_H3_URL', '').strip():
         env, settings = repair_environment(ctx.project_root, ctx.run_dir)
         # The pool belongs to the service, not this episode's sandbox directory.
         key = next((row for row in pipeline.get('resources', {}).get('video_keys', {}).values()
