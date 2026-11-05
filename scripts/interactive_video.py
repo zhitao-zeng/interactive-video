@@ -17,6 +17,9 @@ def main():
     creative.add_argument('--config',type=Path)
     creative.add_argument('--resume',action='store_true')
     creative.add_argument('--feedback',type=Path)
+    music=commands.add_parser('music',help='Search SoulTuner candidates without adopting music or generating video')
+    music.add_argument('--request',type=Path,required=True,help='JSON with query and optional limit')
+    music.add_argument('--output-dir',type=Path,required=True)
     incoming=commands.add_parser('import')
     incoming.add_argument('package',choices=['adventure','suspense','romance'])
     incoming.add_argument('archive',type=Path)
@@ -33,12 +36,18 @@ def main():
     production.add_argument('--lane',choices=['h3','sd25'],required=True)
     production.add_argument('--project',choices=['adventure','romance','suspense'],default='adventure')
     production.add_argument('--edition',help='Render a separately prepared output edition, retaining other versions')
+    production.add_argument('--h3-input-mode',choices=['first-frame'],help='New edition only: fresh opening for every shot, selective extra cards, persistent Agent and review')
     production.add_argument('--resume-unsubmitted',action='store_true',help='Retry infrastructure failure only when no video task or take exists')
     production.add_argument('--resume',action='store_true',help='Resume original task receipts, takes and bounded review history; never clear them')
     status=commands.add_parser('status');status.add_argument('--project',choices=['adventure','romance','suspense'],default='adventure')
     status.add_argument('--edition',help='Read one retained edition and its real generation history')
     args=parser.parse_args()
-    if args.command=='create':
+    if args.command=='music':
+        from novel_manga.application.music_selection import search
+        from novel_manga.util import read_json
+        result=search(ROOT,read_json(args.request,{}),args.output_dir)
+        print(json.dumps(result,ensure_ascii=False,indent=2));return 0
+    elif args.command=='create':
         from novel_manga.interactive.creation import run
         from novel_manga.application.agents.sandbox import load_config
         result=run(args.task,args.output_dir,resume=args.resume,feedback=args.feedback,
@@ -101,7 +110,7 @@ def main():
             if args.kind in ('all',kind):fn(ROOT,ROOT/'outputs/adventure-master')
     elif args.command=='run':
         from novel_manga.interactive.production import run_episode
-        result=run_episode(ROOT,args.lane,project=args.project,resume_unsubmitted=args.resume_unsubmitted,resume=args.resume,edition=args.edition)
+        result=run_episode(ROOT,args.lane,project=args.project,resume_unsubmitted=args.resume_unsubmitted,resume=args.resume,edition=args.edition,h3_input_mode=args.h3_input_mode)
         return 0 if result['status']=='accepted' else 2
     else:
         if args.edition:

@@ -110,6 +110,8 @@ class MediaOperations:
         report.update(status='assembled', assembly=assembly,
                       elapsed_seconds=round(float(report.get('elapsed_seconds') or 0)+seconds, 3))
         report.setdefault('timing', {})['assembly_s'] = seconds
+        from novel_manga.application.repair.ambience import apply_assembly
+        report=apply_assembly(self.ctx.episode_dir,report,context=runner.context)
         atomic_write_json(self.ctx.episode_dir/'thin_media_report.json', report)
         history.record_render(self.ctx.episode_dir, report)
         return report
@@ -172,12 +174,22 @@ class MediaOperations:
         from novel_manga.application.repair import history
         from novel_manga.application.rendering.reviewed import _load_current
         from .local_preparation import active, stage, before_render
-        local_inputs = active(self.ctx) and not media_started(self.ctx.episode_dir)
+        from novel_manga.media.first_frames import enabled as first_frame_mode, require_current
+        frame_mode=first_frame_mode(self.ctx)
+        if frame_mode:
+            pending=read_json(self.ctx.episode_dir/'clip_plan.json',{})
+            frame_blocks={}
+            for clip in pending.get('clips',[]):
+                if clip.get('kind')=='video':
+                    try:require_current(self.ctx,clip)
+                    except (ValueError,OSError) as error:frame_blocks[clip['clip_id']]=str(error)
+            if frame_blocks:return {'ok':False,'error':'first_frames_required','blocked':frame_blocks}
+        local_inputs = (active(self.ctx) or frame_mode) and not media_started(self.ctx.episode_dir)
         if local_inputs:
             stage(self.ctx)
         path = self.ctx.episode_dir/'clip_plan.json'
         pending_script = (self.ctx.input_mode == 'script'
-            and not (self.ctx.run_dir/'prepared.json').is_file()
+            and not frame_mode and not (self.ctx.run_dir/'prepared.json').is_file()
             and not media_started(self.ctx.episode_dir))
         if not path.is_file() or payload.get('file') or pending_script:
             adopted = self.drafts.adopt(payload)

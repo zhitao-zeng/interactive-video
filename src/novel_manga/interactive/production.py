@@ -112,16 +112,27 @@ def can_resume_unsubmitted(episode: Path, report: dict) -> bool:
 
 
 def run_episode(root: Path, lane: str, *, project: str = 'adventure', resume_unsubmitted: bool = False, resume: bool = False,
-                edition: str | None = None) -> dict:
+                edition: str | None = None, h3_input_mode: str | None = None) -> dict:
     if edition:
         novel=edition_directory(root,project,edition)
     else:
         novel=lane_workspace(root,lane,project)
+    if h3_input_mode is not None and lane!='h3':raise ValueError('first-frame mode requires H3')
+    from .first_frame_entry import select_mode
+    select_mode(novel,h3_input_mode)
     episode=novel/(novel.name+'_1')
     runner=runner_for(root,novel,lane,project=project)
     report_path=episode/'thin_media_report.json'
     label=edition.removeprefix(project+'-') if edition else lane
     destination=(root/f'delivery/{project}/{label}').resolve()
+    music_plan=read_json(episode/'chapter_script.json',{}).get('music_plan')
+    if read_json(novel/'profile.json',{}).get('h3_input_mode')=='first-frame'or(lane=='h3'and music_plan):
+        if music_plan and read_json(novel/'profile.json',{}).get('h3_input_mode')!='first-frame':
+            from novel_manga.application.repair.history import generation_counts
+            if any(generation_counts(episode).values()):
+                raise ValueError('Keep this existing production and its take budgets; story-music Agent entry requires a new prepared edition')
+        from .first_frame_entry import run as run_first_frames
+        return run_first_frames(root,novel,project=project,destination=destination,resume=resume)
     saved_final=read_json(episode/'final_cut_review.json',{})
     saved_movie=Path(saved_final.get('movie') or '')
     if saved_movie.is_file() and saved_movie.parent.parent.name=='versions':

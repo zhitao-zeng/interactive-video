@@ -1,0 +1,133 @@
+{
+  "name": "明亮池室真人摄影",
+  "video_kind": "明亮超现实池室真人片段",
+  "render_family": "photo",
+  "visual_style": "真人电影摄影，真实皮肤和衣料，巨大白砖池室、蓝绿色清水、温润天光",
+  "render_direction": "真实皮肤与发丝，自然人物比例和真实衣料，空间美丽干净但陌生；服装与机位按作品已定方案",
+  "scene_style": "明亮超现实白砖池室，实际材质与可信空间相对位置",
+  "scene_direction": "巨大的白色方柱、白砖墙与池底，蓝绿清水，柔和高处天光；浅深水和干平台边界清晰，空间布局按当前作品设定",
+  "h3_style_line": "Photorealistic contemporary cinematic footage. Natural skin, realistic fabric, immense white ceramic poolrooms, clear turquoise water and soft warm skylight. Physically legible scale, depth and geometry; preserve the authored cast, wardrobe, time of day and camera perspective.",
+  "card_suffix": "",
+  "prompt_fingerprint": false,
+  "tidy_prompts": true,
+  "location_empty_suffix": "空场参考，无人、不含人影，不生成文字，精确层级与选项文字由后期添加",
+  "pack_version": "2026-10-19.2",
+  "art_direction": {
+    "intent": "以白砖、蓝绿清水、柔和天光和真实尺度形成美丽干净但陌生的池室。包只定义美学，不携带旧剧集人物、固定服装、单手机限制、特定台阶布局或必然恐怖；作品已定身份、事实、时刻、光源和机位优先。",
+    "suitable_for": [
+      "明亮超现实建筑探索",
+      "以水深、平台和入口构成判断的池室故事",
+      "保留真人材质与可信尺度的陌生空间片段"
+    ],
+    "palette": {
+      "base": [
+        "暖白或中性白瓷砖",
+        "蓝绿色清水",
+        "天光下的浅石灰与自然肤色"
+      ],
+      "accent": [
+        "水深产生的深青",
+        "门洞与遮挡处的自然阴影",
+        "人物与关键物件的既定固有色"
+      ],
+      "use": "白砖与水色作为稳定基准，用深浅、倒影、遮挡和入口对比引导观察；关键道具可有局部颜色，但不把池水统一染黑来制造危险。"
+    },
+    "lighting": [
+      "以可辨认的高处天光建立明亮基调，照见瓷砖网格、平台边缘与水下深度；明确的其他光源按作品执行。",
+      "水纹焦散、反射和阴影服从同一空间，亮处仍有细节，水与干地的材质差别清楚。",
+      "不安可来自光照不到的深处、远端尺度或不可见区域，不强制脏污、夜景、怪物或频闪。"
+    ],
+    "composition": [
+      "以柱列、门框、水线和干平台建立尺度参照，再让观众看清本场真正改变的关系。",
+      "空空间可以主导画面，人物也可作为尺度或回应锚点；具体比例由事件决定。",
+      "关键台阶、入口或递交动作保留完整可辨认区域，不用漂亮水面覆盖判断对象。",
+      "按作品确定的第一人称、第三人称或其他机位组织画面，风格不额外锁定手机拍摄。"
+    ],
+    "motifs": [
+      "重复的柱、白砖网格与水线构成同一世界语言，变体仍保留可比较的锚点。",
+      "干与湿、浅与深、亮处与遮挡可以提供行动信息，不必每处都藏异常。",
+      "选用本作已有物件或空间关系作回收，未知机制与后果由作者明确设定。"
+    ],
+    "asset_guidance": {
+      "character": [
+        "真实皮肤、发丝、自然身体比例和布料；演员、年龄与衣物来自当前作品。",
+        "角色服装可以与白砖和水色拉开层级，但不复制来源剧集的脸、姓名或穿戴。",
+        "持握、站立和接触水面的方式遵循当前场景，不预设自拍、携带探杆或使用某种装备。"
+      ],
+      "location": [
+        "白砖、柱、池底与干地有可信连接，人物可用的边缘和通路符合已定布局。",
+        "清水保留深度、折射与焦散的层次，不能只是一整块发光蓝色表面。",
+        "为本场必要的方向与高度提供视图，不把旧单集的两组台阶或平台当全局空间模板。"
+      ],
+      "prop": [
+        "实物在明亮环境中仍有清楚轮廓与手持尺度，关键物件从装饰和水纹里分离。",
+        "湿面、干面和水下状态依实际需求准备，保留位置与持有人变化。",
+        "门牌、测量值与选项等精确文字沿用项目可靠文字流程，样板保持无字。"
+      ]
+    },
+    "pitfalls": [
+      "不要把干净、明亮或没有怪物当作失败，也不把池室自动拍成度假广告。",
+      "不要用无依据的黑水、血迹、废墟和追逐替代本场已经存在的空间问题。",
+      "不要让重复建筑失去可比较的方向，也不要用水纹和高光掩盖关键台阶或手部。",
+      "不要继承旧剧集的演员、服装、单手机和剧情；当前作品的明确约束仍须遵守。"
+    ],
+    "references": [
+      {
+        "title": "The Backrooms (Found Footage)",
+        "url": "https://www.bilibili.com/video/BV1LL4y1s7eE/",
+        "observed_method": "授权中文字幕版全时间轴3秒抽帧及关键帧；01:39重复开口、08:03—08:09门缝变化可见。",
+        "lesson": "稳定建筑参照、遮挡和局部变化足以组织注意力；在本包白砖清水中使用这一原理。",
+        "limits": "非AI参考；不复制黄色墙、VHS、怪物或匿名摄影机，也不要求整体变暗。"
+      },
+      {
+        "title": "零号档案第3集",
+        "url": "https://www.douyin.com/video/7645916838001511743",
+        "observed_method": "全时间轴3秒抽帧及07:39单帧，可见房间与外部巨大建筑的尺度联系。",
+        "lesson": "让熟悉的人物或小空间保留尺度锚点，再揭示外部空间。",
+        "limits": "只借尺度关系，不新增异类、传送门或该片世界观；没有连续听审。"
+      }
+    ],
+    "sample_prompt": "One complete cinematic frame, 16:9 landscape. Two original adult strangers stand on opposite sides of a small counter. One offers a plain folded note across the counter; the other has not yet accepted it, with the receiving hand still clearly separated from the note. A window and a door remain visible in the background. One eye-level oblique medium two-shot shows both faces, both hands and the note. Photorealistic bright surreal poolroom aesthetics: the counter is a small dry tiled ledge on a generous dry platform, with clear turquoise water, immense white ceramic columns and physically credible architectural depth beyond it. Both adults stand safely on the dry platform in distinct ordinary modern clothing, with natural skin and fabric textures. Soft high skylight and daylight from the visible window reveal tile grids, water caustics and a gradual shift into deeper teal water. Keep the folded note and separated hands clear against a quieter background. The space is clean, beautiful and unfamiliar, without mandatory dirt, monsters or artificial darkness. No panels, text, logos or borrowed character identities."
+  },
+  "examples": [
+    {
+      "kind": "original_style_board",
+      "path": "assets/style-library/2026-10-19/poolrooms-live/board.png",
+      "scope": "style_only_not_character_identity",
+      "status": "reviewed",
+      "review": "assets/style-library/2026-10-19/poolrooms-live/image-review-remaining-20261019.json"
+    },
+    {
+      "kind": "historical_style_frame",
+      "path": "assets/style-library/2026-10-19/poolrooms-live/historical-frame.jpg",
+      "scope": "style_only_not_character_identity",
+      "status": "reviewed",
+      "source_label": "后室池室根因修复export010；历史版本，不是新版通用包成片",
+      "timecode": "01:03",
+      "note": "旧片静帧仅展示历史色光、材质；不是本版规则或视频验收。",
+      "evidence": "assets/style-library/2026-10-19/poolrooms-live/historical-example.json"
+    }
+  ],
+  "validation": {
+    "image": "reviewed",
+    "video": "short_sample_reviewed",
+    "notes": [
+      "规则与样图只指导色光、材质、构图；源素材的人物身份、事实、衣装、空间与已定机位优先。",
+      "附已实际查看的旧片静帧；不复制原片演员、衣装、机位、布局或剧情。",
+      "本版补齐三张新样图，并登记七种画风的8步H3短小样；美术规则未变，旧任务保持原快照。",
+      "小样取样审阅不等于完整动作、整集、声音或长时连续性通过；具体偏差见附带审阅。",
+      "仍标needs_revision的唯美/纸艺静帧继续保留问题状态，不因视频风格保持而自动成为可用作者参考。"
+    ],
+    "video_sample": {
+      "path": "delivery/style-h3-remaining-20261019/poolrooms-live/sample.mp4",
+      "review": "delivery/style-h3-remaining-20261019/video-review-poolrooms-live.json",
+      "mode": "H100 H3 Ref2VA / 8step acceleration LoRA / strength1",
+      "seconds": 5.207,
+      "short_edge": 768,
+      "seed": 2101,
+      "num_inference_steps": 9,
+      "scope": "单种子5秒小样，21张4fps样本及关键原帧审阅；非整集、连续播放或声音验收。",
+      "source_config_version": "2026-10-19.1"
+    }
+  }
+}

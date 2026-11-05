@@ -153,6 +153,8 @@ def rebuild_clips(episode_dir: Path, bible_path: Path, script: dict, plan: dict,
                 from novel_manga.story.dialogue import clip_bindings
                 repack_report.setdefault('_source_lines',{})[before['clip_id']]=clip_bindings(pieces)
             after = packing_service.clip_entry(clip, before["clip_id"], ctx, override)
+            from novel_manga.media.first_frames import retain_opening
+            retain_opening(before,after)
             def seat(ref):
                 return tuple(ref.get(k) for k in ('role', 'name', 'asset_id', 'view'))
             old_refs = {seat(r): r for r in before.get('references', [])}

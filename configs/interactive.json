@@ -37,6 +37,7 @@
     }
   },
   "services": {
+    "music_selection_config": ".runtime/music-selection/runtime.json",
     "text_endpoint": "phanthy-ds41",
     "asset_publish_dir": "outputs/.published"
   },
