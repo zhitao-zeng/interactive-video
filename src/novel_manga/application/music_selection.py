@@ -62,7 +62,17 @@ def recommend(root,config,query,directory):
     """Run upstream with its existing environment; secrets only cross via environment."""
     from novel_manga.application.configuration import environment
     from novel_manga.llm.config import JsonEndpoint,ENDPOINTS
-    endpoint=JsonEndpoint.from_env({**environment(Path(root)),**ENDPOINTS[config.get('text_endpoint','phanthy-ds41')]})
+    from novel_manga.llm.catalog import catalogue, choose
+    selected=config.get('text_endpoint','phanthy-ds41')
+    if selected == 'phanthy-ds41':
+        selected=choose(catalogue()['candidates']['json'],'http-chat')
+        if not selected:
+            raise ValueError('No qualified HTTP chat resource available for SoulTuner in the configured candidate order')
+    endpoint=JsonEndpoint.from_env({**environment(Path(root)),**ENDPOINTS[selected]})
+    if not endpoint.endpoints[0].startswith(('http://','https://')):
+        raise ValueError('SoulTuner requires an HTTP chat resource; saved-login Codex uses another protocol')
+    from novel_manga.llm import quota
+    quota.check(quota.for_model(endpoint.model, endpoint.endpoints[0], endpoint.key), endpoint.key)
     env={**os.environ,'ST_LLM_BASE_URL':endpoint.endpoints[0],'ST_LLM_MODEL':endpoint.model,'ST_LLM_KEY':endpoint.key}
     for name in ('NO_PROXY','no_proxy'):
         env[name]=','.join(filter(None,[env.get(name,''),'127.0.0.1','localhost']))

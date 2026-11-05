@@ -20,6 +20,8 @@ def completion(request,*,timeout):
         content=message.get('content',[])
         if not isinstance(content,list):continue
         for part in content:
+            if part.get('type')=='video_url':
+                raise ValueError('Codex JSON/image adapter cannot inspect raw video_url; use a verified native-video endpoint or the existing frame-review path')
             if part.get('type')!='image_url':continue
             url=part.get('image_url',{}).get('url','')
             if not url.startswith('data:image/')or';base64,'not in url:
@@ -30,7 +32,9 @@ def completion(request,*,timeout):
     atomic_write_json(work/'input/manifest.json',{'phase':'model_json'})
     atomic_write_json(work/'input/request.json',payload)
     config={**load_config(root/'configs/agent_sandbox.json'),'backend':'codex','model':request['model'],
-            'effort':'low','codex_attached_images':images}
+            'effort':request.get('reasoning_effort', 'low'),'codex_attached_images':images,
+            'task_reasoning':{'json':request.get('reasoning_effort', 'low')},
+            'codex_parallel':2,'codex_inflight_dir':'/mnt/disk1/zengzhitao/tmp/model-inflight/codex-saved-login'}
     schema=(request.get('response_format',{}).get('json_schema')or{}).get('schema')
     if schema:
         atomic_write_json(work/'input/schema.json',schema);config['codex_output_schema']='input/schema.json'

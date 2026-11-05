@@ -280,3 +280,21 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | ZCode #12+会话退化修复 | ①create_context目录发现:无显式output_root时探测firstframes/music/agent三约定既有run,CLI retry续真状态(冒烟已验:verify edition解析到firstframes真实目录);②默认作者配置切快速档(thinking off+effort low+16k,修复线同款),传导链有测试;2新测试,全量4053连两轮绿 | main(783b0c4) | context.py、configs/agent_sandbox.json、tests/test_agent_run_discovery.py | 2026-10-22 | 已提交;verify edition下次resume即用快速档;并行瞬态(一轮11败)已定位为与sd线资源竞争,复跑全绿 |
 
 | Codex 10小时协助ZCODE20261023 | 用户授权给原ZCODE会话指令并协助完成今早10点前知遥20集成片；协助窗口至11:56 | codex/zcode-supervision-20261023 | 仅自有协调runtime/必要独立诊断；生产单写者ZCODE，旧恋综暂不处理 | 2026-10-23 01:56 | 在途：原ZCODE已收到指令并ACK，34项相关独立回归过；定位原会话session_7acef82aafd79b10dac6e5f434e1cf08，核对真实隔离产线；不清额度/历史，不把candidate或blocked误称accepted；以20个完整导出文件验收。 |
+
+| Codex 官方KEY实测20261023 | 原official key的DS4.1/K3/GLM实测完成 | codex/official-key-probe-20261023 | 仅自有runtime，main c698b64真实run_session | 2026-10-23 | 三模型main Agent首次+同会话续跑6/6、main JSON3/3通过。协议层15例中DS两次JSON混入ds_safety导致内容失败、GLM首次95.626秒超时，K3全部通过；三者显式禁思考下首次SDK仍返回thinking块，不能声称彻底关闭。key与原运行环境内存比较相同。证据本树.runtime/official-key-probe-20261023/REPORT.md与summary.json。零媒体生成、不改默认/生产、不提交push。 |
+
+| Codex 资源与思考统一20261023 | 用户授权清点资源/共享额度、稳定免费优先、按任务思考含Luna | codex/resource-policy-20261023 | 独立资源登记/角色策略/既有入口接线/离线回归；避开其他会话music/readiness/generation等WIP | 2026-10-23 | 已完成并冷接main，未提交/push；相关218项与最后51项通过（有重叠），SD三条离线全链路过；全量4074过/2个既有失败已在无资源改动基线复现。Codex Agent续跑/medium/JSON/双图实测过；旧片/次数/历史/在跑任务不动。免费网关45测过，自有补丁留档未启用，原8789未重启。详情docs/model-resources.md及.runtime/resource-policy-integration-20261023/REPORT.md。 |
+
+| Codex 免费网关接通20261023 | 用户授权启用零费率路由补丁并实测免费Agent稳定性 | codex/free-routing-20261023 + codex/resource-policy-20261023 | 仅网关自有3文件、独立Agent夹具与资源资格；不热换生产任务 | 2026-10-23 | 已完成：网关45测过，空闲重启1次/5.334秒，无在途请求中断；原KEY与用量前缀保留。免费DS Agent内容10/11、JSON3/3，Phancy4/5；均不自动晋升Agent，默认保留Luna，免费DS启用JSON。续跑null存档修复、最终相关232项过；代码全量4081过/2既有失败。旧片/次数/历史/在跑任务不动，无媒体生成/提交/push。详.runtime/free-gateway-integration-20261023/REPORT.md。 |
+
+| Codex 免费Agent根因20261023 | 用户要求区分模型波动/网关/SDK适配，能修则修且不靠重试 | codex/resource-policy-20261023 + codex/free-routing-20261023 | 只读原失败、隔离离线协议回放、必要时有界单次对照；不热换生产 | 2026-10-23 | 已完成：DS错误在Write参数生成前，35B原回复为文本模拟工具；未发现本地网关/SDK损坏。离线修后4回放/14保真检查、固定协议4/4单次通过；两别名原始响应均自报kimi-k2.6。补请求/响应模型独立记录，相关235项通过；原小样本不作总体不稳定结论，上游内部因果边界留档。默认/在跑任务/片/次数/历史不改，无网关重启/媒体生成/提交push。详.runtime/free-agent-cause-integration-20261023/REPORT.md。 |
+
+| Codex 知遥ModelScope数据集20261023 | 用户授权公开数据集收录20集；先传既有13个完整delivery导出，后续同步 | codex/zhiyao-modelscope-20261023 | 仅scripts/ops/zhiyao_modelscope_sync.py与自有.runtime；不动生产/计数/源码WIP | 2026-10-23 | 在途：目标Flame4pd/zhiyao-episodes，复用ms_venv登录，媒体硬链接暂存，不上传私有源文/日志/环境。 |
+
+| Codex 自转主线整合与3集无人验证20261023 | 用户批准主线整合、自动恢复、3集无人干预；人工接管算失败 | codex/autonomous-production-20261023 | 独立main基线+保留现有main WIP；只整合本轮通用修复/正常入口/故障回放，不改旧20集 | 2026-10-23 18:07 | 在途：实施计划与修复来源盘点；保留资源策略/其他会话WIP，不代提交；验证将锁定版本与原始素材，新故障修通用代码后重验，不改单集文件兜底。 |
+
+| Codex GPT6与同题服务评估20261023 | 用户批准同题LLM服务评估并把5.6迁移到对应6代 | codex/llm-service-gpt6-20261023 | 独立主线WIP快照；资源默认/相关测试/冻结文字评估；保留旧路由与全部生产历史 | 2026-10-23 | 已完成并冷接：新任务/图审默认6 Luna，质量可选6 Sol，旧codex-luna固定5.6保留原角色/会话。16次同题Agent+3兼容检查+1匿名审查，无宿主重复刷题；抽取并列、修复偏6Luna/6Sol、四镜仅6Sol首稿结构/文本均过。修视觉跟随文字/Agent的接线及raw-video误发图像接口；全量4195过/main相关303过。保留85并行主线更新与H3cloud修正，zhiyao非注册入口配置不动；旧片/次数/历史不改，无媒体生成/重启/提交push。详.runtime/llm-service-gpt6-integration-20261023/REPORT.md。 |
+
+| Codex 自转验证进展 | 主线已冷整合；3集原包正式批入口实跑 | codex/autonomous-production-20261023 | 81个任务增量；保留其他作者WIP，无提交推送 | 2026-10-23T19:27:19.450724+08:00 | 全量4181过，主线关键93过，独立审查缺陷修复；服务novel-autonomous-validation-20261023，冻结执行树，真实结果待验。 |
+
+| Codex 非GPT优先20261023 | 用户要求尽量减少GPT；新任务文字Agent/结构化/图像检查优先免费通道 | codex/non-gpt-preference-20261023 → main | 仅资源资格/默认及四测试/说明；没有源码逻辑改动 | 2026-10-23 | 已完成并冷接：免费别名响应自报Kimi，工具/续接证据复用，双图检查1次通过；独立/main各200相关过、三入口新默认确认。GPT6留备用/显式选择，gpt-image-2生图仍保留；原失败、旧路由、成片、次数和历史不改，无GPT调用/媒体生成/重启/提交push。详.runtime/non-gpt-preference-integration-20261023/REPORT.md。 |

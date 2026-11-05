@@ -208,6 +208,13 @@ def _candidate_references(ctx, text, plan, script, *, bound_plan=False, fresh=Fa
         if name in names or name in text:
             references.append({'asset_id': f'voice_{name}', 'role': 'voice', 'name': name,
                                'path': f'series_assets/voices/{name}.wav'})
+    from novel_manga.media.reference_views import scope_of,supplied_wardrobe_views
+    supplied=[]
+    for ref in references:
+        if ref.get('role')!='character':continue
+        if scope:=scope_of(ctx.source_novel_dir,ref):ref['reference_scope']=scope
+        supplied.extend(supplied_wardrobe_views(ctx.source_novel_dir,ref))
+    references.extend(supplied)
     return references
 
 

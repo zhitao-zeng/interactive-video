@@ -122,6 +122,9 @@ class MediaOperations:
         report.update(status='assembled', assembly=assembly,
                       elapsed_seconds=round(float(report.get('elapsed_seconds') or 0)+seconds, 3))
         report.setdefault('timing', {})['assembly_s'] = seconds
+        # Postmix can reject a source range. Keep the completed body/timeline so
+        # select_music can fix that range without encoding the same video again.
+        atomic_write_json(self.ctx.episode_dir/'thin_media_report.json', report)
         from novel_manga.application.repair.ambience import apply_assembly
         report=apply_assembly(self.ctx.episode_dir,report,context=runner.context)
         atomic_write_json(self.ctx.episode_dir/'thin_media_report.json', report)

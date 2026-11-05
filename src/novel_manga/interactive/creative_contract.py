@@ -44,6 +44,20 @@ def validate(episode, manifest, work_dir):
     first_frame=any(task.get(key)=='first-frame'or task.get('profile',{}).get(key)=='first-frame'
                     for key in ('h3_input_mode','sd_input_mode'))
     for number, shot in enumerate(shots, 1):
+        rosters={key:shot.get(key,[]) for key in ('characters','in_frame')}
+        valid_rosters=True
+        for key,names in rosters.items():
+            if not isinstance(names,list) or any(not isinstance(name,str) or not name.strip() for name in names):
+                issues.append(f'shot {number}: {key} must be a JSON list of actor names; put objects and scenery in scene_objects/props or the shot description, not actor rosters')
+                valid_rosters=False
+        if valid_rosters:
+            declared_props={p.get('name') for p in (episode.get('production_design') or {}).get('props',[]) if isinstance(p,dict)}
+            nonactors=(set(rosters['characters'])|set(rosters['in_frame'])) & declared_props
+            if nonactors:
+                issues.append(f'shot {number}: actor roster contains declared production_design.props {sorted(nonactors)}; put these in props/scene_objects and keep only actors in characters/in_frame')
+            unknown=set(rosters['in_frame'])-set(rosters['characters'])
+            if unknown:
+                issues.append(f'shot {number}: in_frame entries {sorted(unknown)} are not declared actor names in characters={rosters["characters"]}; keep props/scenery/descriptive phrases out of the actor roster, or declare an actual source-supported actor in characters')
         if shot.get('index') != number:
             issues.append(f'shot {number}: consecutive index required; actual index={shot.get("index")!r}, expected {number}. After splitting, update clips and music anchors too')
         for name in ('scene_id', 'location', 'purpose', 'camera', 'start_state', 'event', 'end_state'):
@@ -68,6 +82,8 @@ def validate(episode, manifest, work_dir):
             if not quote or quote not in text:
                 issues.append(f'shot {number}: source_quote must be exact original-package text')
     indexes = []
+    if 'clips' not in episode and isinstance(script.get('clips'),list):
+        issues.append('Found chapter_script.clips, but top-level clips is required. Move the existing array unchanged to episode.clips (a sibling of chapter_script), then remove chapter_script.clips; do not regroup or rewrite valid shots to repair this JSON path.')
     for number, clip in enumerate(episode.get('clips') or [], 1):
         ids = clip.get('shot_indexes') or []
         indexes.extend(ids)
@@ -78,7 +94,7 @@ def validate(episode, manifest, work_dir):
         if (not ids or len(ids) > 6 or not isinstance(seconds, (int, float))
                 or not 4 <= seconds <= 15 or (abs(total - seconds) > .01 and not silent_floor)):
             issues.append(f'clip {number}: group 1–6 shots, 4–15 seconds, matching shot total')
-    if indexes != list(range(1, len(shots) + 1)):
+    if indexes != list(range(1, len(shots) + 1)) and not ('clips' not in episode and isinstance(script.get('clips'),list)):
         issues.append('clips must cover every shot exactly once in screen order')
     if task.get('world_card_seconds'):
         after = task.get('world_card_after_shot', 1)
@@ -108,9 +124,15 @@ def validate(episode, manifest, work_dir):
             if row['label'] not in str(actual.get(row['id'], {}).get('label', '')):
                 issues.append(f'interaction {row["id"]}: retain destination {row["label"]}')
     scenes = (episode.get('spatial_plan') or {}).get('scenes') or []
+    if not isinstance(scenes, list):
+        issues.append('spatial_plan.scenes must be a list of scene objects; keep each scene_id and its complete blockout')
+        scenes = []
     if not scenes:
         issues.append('spatial_plan.scenes needs a source-backed blockout design')
     for number, scene in enumerate(scenes, 1):
+        if not isinstance(scene, dict):
+            issues.append(f'spatial scene {number}: must be a scene object, got {type(scene).__name__}')
+            continue
         label = f'spatial scene {scene.get("scene_id", number)!r} (shots {scene.get("shot_indexes", [])})'
         if not scene.get('anchors'):
             issues.append(f'{label}: missing anchors')
@@ -118,10 +140,10 @@ def validate(episode, manifest, work_dir):
             issues.append(f'{label}: missing explicit assumptions')
         scene_shots = [shot for shot in shots if shot.get('index') in scene.get('shot_indexes', [])]
         visible = list(dict.fromkeys(name for shot in scene_shots
-            for name in [*shot.get('in_frame', []),
+            for name in [*(shot.get('in_frame') if isinstance(shot.get('in_frame'),list) else []),
                          *(turn.get('speaker_name') for turn in shot.get('turns', [])
                            if turn.get('delivery_mode') == 'visible_dialogue')]
-            if name))
+            if isinstance(name,str) and name))
         if 'placed' not in scene:
             issues.append(f'{label}: missing placed list; [] is valid when no bodies are present')
         elif not scene['placed'] and visible:
@@ -131,10 +153,24 @@ def validate(episode, manifest, work_dir):
     if not episode.get('self_review'):
         issues.append('self_review of the complete creative draft is required')
     music_plan=(episode.get('chapter_script')or{}).get('music_plan')
-    if task.get('music_mode')=='timeline'or music_plan is not None:
+    # Music timing indexes duration_seconds directly; a draft whose shots have not
+    # yet cleared the basic duration check must keep the per-shot feedback instead
+    # of crashing the validator (EP03B 2026-10-23: one missing duration killed the
+    # whole validation, the author never saw which shot was broken).
+    durations_ok=(all(s.get('index')==number for number,s in enumerate(shots,1))
+                  and all(isinstance(s.get('duration_seconds'),(int,float))
+                          and s['duration_seconds']>0 for s in shots))
+    if (task.get('music_mode')=='timeline'or music_plan is not None) and durations_ok:
         from novel_manga.story.timing import music_plan_issues
         issues.extend(music_plan_issues(music_plan,shots))
-    if task.get('production_handoff') and not issues:
+    if manifest.get('mode')=='adaptation' and not issues:
+        # Adaptation authors get the shot↔scene coverage feedback in-session, but
+        # only once the basic per-shot checks are clean: adaptation_issues indexes
+        # shot fields directly and must not crash on drafts that already carry
+        # explicit basic errors (EP03C 2026-10-23: missing index).
+        from .creative_material import adaptation_issues
+        issues.extend(adaptation_issues(episode,manifest))
+    elif task.get('production_handoff') and not issues:
         from .creative_material import design_issues
         issues.extend(design_issues(episode,manifest))
     return issues

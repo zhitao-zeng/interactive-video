@@ -43,6 +43,17 @@ def raw_result():
         'recommendations':{'success':True,'data':[{'song':{'music_id':str(i%4)},'reason':'candidate'}for i in range(11)]}}
 
 
+def test_music_exhausted_http_candidates_do_not_reenter_metered_template(tmp_path,monkeypatch):
+    import novel_manga.llm.catalog as catalog
+    rows=copy.deepcopy(catalog.catalogue())
+    for name in rows['candidates']['json']:
+        if 'http-chat' in rows['resources'][name]['qualified']:rows['resources'][name]['available']=False
+    monkeypatch.setattr(catalog,'catalogue',lambda:rows)
+    monkeypatch.setattr(music.subprocess,'run',lambda *a,**kw:pytest.fail('no music model call is allowed'))
+    with pytest.raises(ValueError,match='No qualified HTTP chat'):
+        music.recommend(tmp_path,{},'quiet music',tmp_path)
+
+
 def test_real_count_and_unreviewed_status_reach_search_and_cache(studio,tmp_path):
     root,_=studio;seen=[]
     def backend(*args):seen.append(True);return raw_result()

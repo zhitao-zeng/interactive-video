@@ -38,6 +38,9 @@ def source_opening(ctx,clip):
 def authored_row(ctx,clip,row):
     """The creator owns the opening prompt; production binds cards and executes it."""
     row=copy.deepcopy(row);opening=source_opening(ctx,clip)
+    if isinstance(row.get('image_references'),list) and all(isinstance(p,str)for p in row['image_references']):
+        from novel_manga.media.reference_views import opening_references
+        row['image_references']=[ref['path'] for ref in opening_references(ctx,clip,row['image_references'])]
     if opening is None:return row # retained historical input has no authored prompt
     from novel_manga.story.fields import opening_frame_error
     if issue:=opening_frame_error(opening):raise ValueError(issue)
@@ -117,6 +120,9 @@ def check(ctx,path,row,contract):
     review_contract=copy.deepcopy(contract)
     if 'style'in review_contract:review_contract['style']=opening_appearance(review_contract['style'])
     instructions=('检查新生成的单一镜头首帧与原始素材及本镜开场状态。第一张是首帧，后面是原素材卡。'
+        'reference_images逐项标明本次实际附件图号；identity_portrait只约束脸和头发，'
+        'wardrobe_design只约束可见服装、体态和配饰，不用衣装卡中的脸覆盖身份肖像。'
+        '衣装卡的姿势、持物和背包佩戴状态仍以本镜opening当前状态为准。'
         '逐张描述实际可见内容后判断；报告明确可见的身份/服饰/空间或开场机位、持物、可见人物矛盾。'
         '若opening.style给出所选画风，核对其明确的媒介、材质、色光与构图规则；'
         '原素材卡的拍摄媒介不覆盖所选画风。没有画风约定时不增加审美要求，轻微色差不自动失败。'
@@ -128,7 +134,21 @@ def check(ctx,path,row,contract):
         '每条findings返回实际可见事实observed、对照要求expected及basis（本次contract字段路径或原素材图号），给出reason和relation。'
         'contradiction表示实际可见属性与明确当前依据不能同时成立；未展示、看不清或依据未指定是underspecified；可同时成立是compatible。'
         '只返回observations及findings，不另给自由通过结论或问题清单；程序只从明确contradiction生成通过结论和问题。无冲突可返回空findings。'
-        '不替首帧脑补正确事实，不把审美偏好当成失败。\n'+json.dumps({'opening':review_contract,'visible_characters':row['visible_characters'],'image_prompt':row['image_prompt']},ensure_ascii=False))
+        '不替首帧脑补正确事实，不把审美偏好当成失败。\n')
+    if 'image_references' in contract and list(contract['image_references'])!=row['image_references']:
+        raise ValueError('image review must receive the exact current ordered reference images')
+    from novel_manga.media.reference_views import scope_of
+    bindings={r['path']:dict(r) for r in contract.get('source_references',[]) if r.get('path')}
+    for ref in contract.get('reference_views',[]):bindings[ref['path']]={**bindings.get(ref['path'],{}),**ref}
+    supplied=[]
+    for reference_path in row['image_references']:
+        ref={**bindings.get(reference_path,{}),'path':reference_path}
+        if scope:=scope_of(ctx.novel_dir,ref):ref['reference_scope']=scope
+        supplied.append(ref)
+    instructions+=json.dumps({'opening':review_contract,'visible_characters':row['visible_characters'],
+        'image_prompt':row['image_prompt'],'reference_images':[
+            {'image_number':index+2,**{k:ref[k] for k in ('path','name','role','reference_scope') if k in ref}}
+            for index,ref in enumerate(supplied)]},ensure_ascii=False)
     raw=ask_json([{'type':'text','text':instructions},image_part(path,1280),
         *(image_part(ctx.novel_dir/p,1024) for p in row['image_references'])],
         obj({'observations':{'type':'array','items':{'type':'string'}},
@@ -203,8 +223,22 @@ def status(ctx,plan):
                     row['next_action']=(
                         'Inspect the rejected image and review evidence. Correct the relevant source opening_frame through input repair '
                         'or correct the registered reference selection, then call first_frames. '
+                        'After restoring missing original reference evidence, reuse_candidate can review an existing image against it without another generation. '
                         'If the source inputs are already correct and a visible pixel defect remains, request one bounded retake with '
                         "retake_candidate:{candidate:'candidate_NN',reason:'specific visible pixel defect'}; this uses one remaining image candidate.")
+            from novel_manga.media.reference_views import opening_references
+            saved_input=read_json(latest/'input.json',{})
+            original_paths=saved_input.get('image_references') or []
+            restored=[r['path'] for r in opening_references(ctx,clip,original_paths)
+                      if r.get('reference_scope')=='wardrobe_design' and r['path'] not in original_paths]
+            last_input=read_json(reviews[-1],{}).get('input',{}) if reviews else {}
+            reviewed_paths=(last_input.get('source_contract') or {}).get('image_references',[])
+            if restored and not set(restored)<=set(reviewed_paths):
+                rows[clip['clip_id']]['restored_original_reference_views']=restored
+                rows[clip['clip_id']]['next_action']=(
+                    f"Original supplied wardrobe evidence is now available. Use reuse_candidate:{latest.name!r} "
+                    'without retake_candidate to review the retained image with these references first. '
+                    'The host binds the required views; original requests and image counts are retained. This grants no new generation.')
     return {'mode':'first-frame','extra_reference_policy':'needed','clips':rows,
             'command':'python3 /work/tools/episode.py first_frames output/first-frames.json',
             'schema':{'render_ready':False,'frames':[{'clip_id':'current clip id','image_prompt':'single opening image prompt',
@@ -241,34 +275,50 @@ class FirstFrameOperations:
         if isinstance(catalog,dict):catalog=catalog.get('assets',[])
         registered={r['path'] for r in catalog if r.get('role') in {'character','location','prop'} and r.get('path')}
         segments={r['segment_id']:r['text'] for r in read_json(ctx.episode_dir/'segments.json',[])}
-        prepared=[];seen=set()
+        prepared=[];seen=set();argument_errors={}
         for row in rows:
             if not isinstance(row,dict) or row.get('clip_id') not in clips or row['clip_id'] in seen:
                 raise ValueError('frames must select distinct current clips')
             row=authored_row(ctx,clips[row['clip_id']],row)
             cid=row['clip_id'];seen.add(cid);clip=clips[cid]
+            errors=[]
             for field in ('image_prompt','source_quote'):
-                if not isinstance(row.get(field),str) or not row[field].strip():raise ValueError(f'{cid}: {field} requires text')
+                if not isinstance(row.get(field),str) or not row[field].strip():errors.append(f'{field} requires text')
             for field in ('image_references','extra_references','visible_characters'):
                 if not isinstance(row.get(field),list) or any(not isinstance(p,str) for p in row[field]) or len(set(row[field]))!=len(row[field]):
-                    raise ValueError(f'{cid}: {field} requires distinct strings')
-            if not row['image_references'] or not set(row['image_references'])<=registered:
-                raise ValueError(f'{cid}: image_references must use registered source cards, never old video/frames')
+                    errors.append(f'{field} requires distinct strings')
+            if errors:
+                argument_errors[cid]=errors;continue
             original={r['path'] for r in clip.get('references',[]) if r.get('role') in {'character','location','prop'}}
-            if not set(row['extra_references'])<=original:
-                raise ValueError(f'{cid}: extra_references must select current source image paths')
+            if not row['image_references'] or not set(row['image_references'])<=registered:
+                errors.append(f'image_references must use registered source cards; current clip paths: {sorted(original & registered)}')
+            extras_valid=set(row['extra_references'])<=original
+            if not extras_valid:
+                errors.append(f'extra_references must select current source image paths: {sorted(original)}')
             source='\n'.join(segments.get(s,'') for s in clip.get('segment_ids',[]))
-            if row['source_quote'] not in source:raise ValueError(f'{cid}: source_quote must quote this clip source verbatim')
-            contract=current_contract(ctx,clip,row['image_references'],include_style=True)
-            bindings={r['path']:r for r in catalog if r.get('path')}
-            bindings.update({r['path']:r for r in clip.get('references',[]) if r.get('path')})
-            row['request_prompt']=request_prompt(ctx,row,contract,references=bindings.values())
+            if row['source_quote'] not in source:
+                errors.append('source_quote must quote this clip source verbatim, not a summary. '
+                    f'Read segments.json for segment_ids={clip.get("segment_ids",[])}. '
+                    f'Current scoped source text: {source}')
             draft_frame={'path':'pending.png','extra_references':row['extra_references'],'visible_characters':row['visible_characters']}
             from .requests import compose_request
-            if not isinstance(row.get('prompt_h3'),str) or not row['prompt_h3'].strip():
-                row['prompt_h3']=compose_request({**clip,'first_frame':draft_frame},row.get('h3'))
-            validate_existing_request({**clip,'first_frame':draft_frame},row['prompt_h3'])
+            if extras_valid:
+                try:
+                    if not isinstance(row.get('prompt_h3'),str) or not row['prompt_h3'].strip():
+                        row['prompt_h3']=compose_request({**clip,'first_frame':draft_frame},row.get('h3'))
+                    validate_existing_request({**clip,'first_frame':draft_frame},row['prompt_h3'])
+                except ValueError as error:errors.append(str(error))
+            if errors:
+                argument_errors[cid]=errors;continue
+            contract=current_contract(ctx,clip,row['image_references'],include_style=True)
+            bindings={r['path']:r for r in catalog if r.get('path')}
+            bindings.update({r['path']:{**bindings.get(r['path'],{}),**r} for r in clip.get('references',[]) if r.get('path')})
+            from novel_manga.media.reference_views import opening_references
+            bindings.update({r['path']:r for r in opening_references(ctx,clip,row['image_references'])})
+            row['request_prompt']=request_prompt(ctx,row,contract,references=bindings.values())
             prepared.append((row,contract,source_asset_state(ctx,row['image_references'])))
+        if argument_errors:
+            raise ValueError('Correct these first_frames fields before image generation: '+json.dumps(argument_errors,ensure_ascii=False))
         results={};changed=[];reviewed_candidates=[]
         self.partial_outcome={'changed':changed,'reviewed_candidates':reviewed_candidates,'clips':results}
         def reserve(row,contract,assets):
@@ -292,7 +342,10 @@ class FirstFrameOperations:
                         or not (parent/'rejected.json').is_file()):
                     raise ValueError(f'{cid}: retake_candidate must name this clip\'s rejected candidate with an image')
                 reviewed=current_review(parent,row,contract,assets)
-                if reviewed is None or (reviewed.get('consistent') is True and not review_problems(reviewed)):
+                if reviewed is None:
+                    raise ValueError(f'{cid}: current source/reference evidence differs from the saved review; '
+                        f'use reuse_candidate:{parent.name!r} without retake_candidate to review the existing image first, with no new image generation')
+                if reviewed.get('consistent') is True and not review_problems(reviewed):
                     raise ValueError(f'{cid}: retake_candidate must name a candidate rejected by image review')
                 decision_path=parent/'retake-decision.json'
                 decision=read_json(decision_path,{})

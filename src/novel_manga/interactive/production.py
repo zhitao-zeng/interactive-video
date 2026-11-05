@@ -177,7 +177,8 @@ def run_episode(root: Path, lane: str, *, project: str = 'adventure', resume_uns
     if sd_input_mode is not None:
         from .sd_first_frames import select_mode as select_sd_mode
         select_sd_mode(novel,sd_input_mode)
-    if read_json(novel/'profile.json',{}).get('sd_input_mode')=='first-frame':
+    music_plan=read_json(episode/'chapter_script.json',{}).get('music_plan')
+    if read_json(novel/'profile.json',{}).get('sd_input_mode')=='first-frame' and not music_plan:
         configure(root,lane,project=project)
         from .sd_first_frames import prepare as prepare_sd_frames
         prepare_sd_frames(root,novel)
@@ -185,14 +186,13 @@ def run_episode(root: Path, lane: str, *, project: str = 'adventure', resume_uns
     report_path=episode/'thin_media_report.json'
     label=edition.removeprefix(project+'-') if edition else lane
     destination=(root/f'delivery/{project}/{label}').resolve()
-    music_plan=read_json(episode/'chapter_script.json',{}).get('music_plan')
-    if read_json(novel/'profile.json',{}).get('h3_input_mode')=='first-frame'or(lane=='h3'and music_plan):
+    if read_json(novel/'profile.json',{}).get('h3_input_mode')=='first-frame' or music_plan:
         if music_plan and read_json(novel/'profile.json',{}).get('h3_input_mode')!='first-frame':
             from novel_manga.application.repair.history import generation_counts
             if any(generation_counts(episode).values()):
                 raise ValueError('Keep this existing production and its take budgets; story-music Agent entry requires a new prepared edition')
         from .first_frame_entry import run as run_first_frames
-        return run_first_frames(root,novel,project=project,destination=destination,resume=resume,config=agent_config)
+        return run_first_frames(root,novel,project=project,destination=destination,resume=resume,config=agent_config,lane=lane)
     saved_final=read_json(episode/'final_cut_review.json',{})
     saved_movie=Path(saved_final.get('movie') or '')
     if saved_movie.is_file() and saved_movie.parent.parent.name=='versions':
