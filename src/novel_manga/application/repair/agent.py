@@ -39,7 +39,7 @@ class CandidateRejected(ValueError):
 
 
 def enabled(directory: Path) -> bool:
-    return (os.environ.get('NOVEL_INTERACTIVE_REPAIR_LANE') in {'h3','sd25'}
+    return (os.environ.get('NOVEL_INTERACTIVE_REPAIR_LANE') in {'h3','sd25','sd20-fast','sd20-mini'}
             or read_json(directory.parent/'profile.json', {}).get('repair_backend') == 'sandbox_agent')
 
 
@@ -50,13 +50,13 @@ def request_lane(clip):
 
 def check_request(clip, novel_dir):
     from novel_manga.application.preparation.request_check import request_consistency
-    if request_lane(clip) == 'sd25':
+    if request_lane(clip) != 'h3':
         clip = {**clip, 'prompt_h3': ''}
     return request_consistency(clip, novel_dir)
 
 
 def validate_request(clip, prompt):
-    if request_lane(clip) == 'sd25':
+    if request_lane(clip) != 'h3':
         from novel_manga.application.repair.sd_request import validate
         validate(clip, prompt)
     else:

@@ -104,13 +104,23 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
         return {"short_edge": getattr(self, 'short_edge', SHORT_EDGE), "aspect_ratio": self.ratio,
                 "num_inference_steps": 9, "flow_shift": 12.0, "audio_flow_shift": 3.0}
 
-    def _payload(self, prompt: str, images: list[Path], audios: tuple[Path, ...], duration: float) -> dict:
+    def _payload(self, prompt: str, images: list[Path], audios: tuple[Path, ...], duration: float, *, first_frame: Path | None = None) -> dict:
         sampling = self.sampling_parameters()
         seconds = max(MIN_SECONDS, min(MAX_SECONDS, math.ceil(duration)))
-        conditions = [{"type": "image", "role": "reference", "uri": self._image_data_url(path)}
+        def image_uri(path):
+            if first_frame is not None and Path(path) == Path(first_frame):
+                with Image.open(path) as source:
+                    mime = Image.MIME.get(source.format, 'image/png')
+                return 'data:'+mime+';base64,'+base64.b64encode(Path(path).read_bytes()).decode('ascii')
+            return self._image_data_url(path)
+        conditions = [{"type": "image", "role": "reference", "uri": image_uri(path)}
                       for path in images]
         conditions += [{"type": "audio", "role": "reference", "uri": audio_data_url(path)}
                        for path in audios]
+        if first_frame is not None:
+            if not images or Path(images[0]) != Path(first_frame):
+                raise ValueError('first frame must also be the first ordinary reference')
+            conditions.append({'type': 'image', 'role': 'keyframe', 'frame_index': 0, 'uri': image_uri(first_frame)})
         return {
             "model": self.settings.video_model,
             "task": "ref2va",
@@ -177,6 +187,7 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
         reference_audios: tuple[Path, ...] = (),
         seed_variant: int = 0,
         seed: int | None = None,
+        first_frame: Path | None = None,
     ) -> Path:
         call_started = time.monotonic()
         timing = {'call_started_at': time.time(), 'pool_wait_s': 0.0, 'submission_s': 0.0}
@@ -184,7 +195,7 @@ class LocalH3MediaProvider(PhanRouterMediaProvider):
         for path in (*images, *reference_audios):
             if not Path(path).is_file():
                 raise FileNotFoundError(path)
-        payload = self._payload(prompt, images, tuple(reference_audios), duration)
+        payload = self._payload(prompt, images, tuple(reference_audios), duration, **({"first_frame": first_frame} if first_frame is not None else {}))
         if seed is not None:
             if not isinstance(seed, int) or not 0 <= seed < 2 ** 31:
                 raise ValueError('H3 seed must be an integer in [0, 2**31)')
