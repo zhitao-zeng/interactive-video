@@ -50,6 +50,29 @@ def episode():
             'self_review': {'source': '已核对', 'open_issues': []}}
 
 
+def test_first_frame_creation_requires_authored_static_opening_before_production(tmp_path):
+    path=task(tmp_path);value=json.loads(path.read_text());value['h3_input_mode']='first-frame';write(path,value)
+    manifest=creation.prepare(path,tmp_path/'run');draft=episode();work=tmp_path/'run/sandbox'
+    assert any('opening_frame'in e for e in creation.validate(draft,manifest,work))
+    for shot in draft['chapter_script']['shots']:
+        shot['opening_frame']={'image_prompt':'One traveller stands beside the sign at the entrance before moving.',
+            'visible_characters':['旅客'],'reference_subjects':['旅客','入口']}
+    assert creation.validate(draft,manifest,work)==[]
+
+
+def test_timeline_music_is_authored_with_story_and_source_shot_anchors(tmp_path):
+    path=task(tmp_path);value=json.loads(path.read_text());value['music_mode']='timeline';write(path,value)
+    manifest=creation.prepare(path,tmp_path/'run');draft=episode();work=tmp_path/'run/sandbox'
+    assert any('music_plan'in e for e in creation.validate(draft,manifest,work))
+    draft['chapter_script']['music_plan']={'cues':[{'id':'cue1','query':'restrained investigation',
+        'source_quote':'入口有一块牌，旅客看完后停步。','reason':'slow observation',
+        'start':{'shot':1,'edge':'start'},'end':{'shot':2,'edge':'end'}}],
+        'silences':[]}
+    assert creation.validate(draft,manifest,work)==[]
+    draft['chapter_script']['music_plan']['cues'][0]['end']['shot']=999
+    assert any('music_plan'in e for e in creation.validate(draft,manifest,work))
+
+
 def test_package_intake_keeps_complete_sources_and_installs_one_integrated_skill(tmp_path):
     manifest = creation.prepare(task(tmp_path), tmp_path / 'run')
     work = tmp_path / 'run/sandbox'
@@ -87,6 +110,28 @@ def test_shared_dialogue_craft_is_installed_and_required_for_every_creator_genre
     assert manifest['skill_references'][manifest['selected_genre']] in manifest['required_reads']
 
 
+def test_creation_requires_short_camera_and_method_index_while_retaining_full_sources(tmp_path):
+    source = task(tmp_path)
+    archive = tmp_path/'original.zip'
+    full_text = '旅客沿入口的水痕慢慢观察。' * 1500
+    with zipfile.ZipFile(archive, 'a') as package:
+        package.writestr('长原文.md', full_text)
+    manifest = creation.prepare(source, tmp_path/'run')
+    work = tmp_path/'run/sandbox'
+    refs = manifest['skill_references']
+    assert refs['camera_selection'] in manifest['required_reads']
+    assert 'input/creation-method-index.json' in manifest['required_reads']
+    assert manifest['method_library'] == 'input/creation-methods.json'
+    for key in ('camera_language', 'output_contract', 'production_workflow', 'authoring', 'repair_playbook'):
+        assert refs[key] not in manifest['required_reads']
+        assert (work/refs[key]).is_file()
+    assert 'input/package/长原文.md' in manifest['required_reads']
+    assert (work/'input/package/长原文.md').read_text() == full_text
+    index = json.loads((work/'input/creation-method-index.json').read_text())
+    library = json.loads((work/'input/creation-methods.json').read_text())
+    assert [m['key'] for m in index] == [m['key'] for m in library]
+
+
 def test_original_brief_is_a_distinct_authority_without_a_fake_archive(tmp_path):
     manifest = creation.prepare(task(tmp_path, original=True), tmp_path / 'run')
     assert manifest['mode'] == 'original' and manifest['source_documents'] == []
@@ -119,7 +164,22 @@ def test_read_evidence_keeps_successful_cat_before_an_unrelated_command_failure(
     assert source not in {r['path'] for r in read_evidence(work)}
 
 
-@pytest.mark.parametrize('first_issue', ['selected_route', 'truncated_json'])
+def test_native_read_evidence_records_declared_optional_skill_reference(tmp_path):
+    manifest = creation.prepare(task(tmp_path), tmp_path/'run')
+    work = tmp_path/'run/sandbox'
+    guide = manifest['skill_references']['director_camera_styles']
+    required = list(manifest['required_reads'])
+    assert guide not in required
+    attempt = work/'attempts/native'; attempt.mkdir(parents=True)
+    event = {'type':'item.completed','item':{'type':'command_execution','exit_code':0,
+        'command':f"sed -n '43,58p' /work/{guide}",
+        'aggregated_output':'## 2. 库布里克式低位稳定跟拍'}}
+    (attempt/'codex-events.jsonl').write_text(json.dumps(event))
+    assert guide in {r['path'] for r in read_evidence(work)}
+    assert json.loads((work/'input/manifest.json').read_text())['required_reads'] == required
+
+
+@pytest.mark.parametrize('first_issue', ['selected_route', 'truncated_json', 'missing_notes'])
 def test_run_uses_file_tools_and_one_existing_session_for_correction(tmp_path, monkeypatch, first_issue):
     source = task(tmp_path); run = tmp_path / 'run'; calls = []
     manifest = creation.prepare(source, run)
@@ -130,9 +190,11 @@ def test_run_uses_file_tools_and_one_existing_session_for_correction(tmp_path, m
         assert actual_manifest['skill_references']['dialogue_craft'] in actual_manifest['required_reads']
         attempt = work / 'attempts' / str(len(calls)); attempt.mkdir(parents=True)
         draft = episode()
-        if len(calls) == 1:
+        if len(calls) == 1 and first_issue != 'missing_notes':
             draft['interaction']['selected'] = 'A'
         write(work / 'output/episode.json', draft)
+        if len(calls) > 1 or first_issue != 'missing_notes':
+            (work/'output/creative-notes.md').write_text('镜1–12保持旅客与规则牌同框，让核对动作可见。')
         if len(calls) == 1 and first_issue == 'truncated_json':
             (work / 'output/episode.json').write_text('{"title": "partial"')
         write(work / 'episode-session.json', {'session_id': 'same-creator'})
@@ -155,6 +217,11 @@ def test_run_uses_file_tools_and_one_existing_session_for_correction(tmp_path, m
     assert creation.run(source, run, config={'source_agent_slice_seconds': 1200}) == result
     assert len(calls) == 2
     legacy = json.loads((run/'sandbox/input/manifest.json').read_text())
+    camera = run/'sandbox'/legacy['skill_references']['camera_language']
+    camera.write_text('Earlier camera guidance')
+    # A completed no-op must leave even an older mounted guide untouched.
+    assert creation.run(source, run, config={'source_agent_slice_seconds': 1200}) == result
+    assert camera.read_text() == 'Earlier camera guidance' and len(calls) == 2
     guide = legacy['skill_references'].pop('dialogue_craft')
     legacy['required_reads'].remove(guide)
     write(run/'sandbox/input/manifest.json', legacy)
@@ -162,8 +229,71 @@ def test_run_uses_file_tools_and_one_existing_session_for_correction(tmp_path, m
     revised = creation.run(source, run, config={'source_agent_slice_seconds': 1200},
                            resume=True, feedback=feedback)
     assert revised['session_id'] == 'same-creator' and len(calls) == 3
+    from novel_manga.application.agents.episode.session import SKILL_SOURCE
+    assert camera.read_bytes() == (SKILL_SOURCE/'references/camera-language.md').read_bytes()
     assert calls[-1]['resume'] is True
     archived = json.loads((run/'manifest-before-dialogue-craft.json').read_text())
     assert archived == legacy and guide not in archived['required_reads']
     assert json.loads((run/'sandbox/input/manifest.json').read_text())['task'] == legacy['task']
     assert (run/'sandbox/input/feedback/revision-01.md').read_text() == feedback.read_text()
+
+
+from novel_manga.interactive.creative_contract import export
+from novel_manga.story.voice_delivery import NATIVE_SPEECH_POLICY
+from novel_manga.util import atomic_write_json, read_json
+import copy
+
+
+def test_new_creator_defaults_speech_and_exports_it_without_changing_original_task(tmp_path):
+    source = task(tmp_path, original=True)
+    original = source.read_bytes()
+    manifest = creation.prepare(source, tmp_path/'run')
+    assert manifest['profile']['h3_speech_policy'] == NATIVE_SPEECH_POLICY
+    assert manifest['skill_references']['sound_direction'] in manifest['required_reads']
+    export(episode(), manifest, tmp_path/'delivery')
+    assert read_json(tmp_path/'delivery/profile.json')['h3_speech_policy'] == NATIVE_SPEECH_POLICY
+    assert read_json(tmp_path/'delivery/chapter_script.json')['profile']['h3_speech_policy'] == NATIVE_SPEECH_POLICY
+    assert source.read_bytes() == original
+
+
+def test_creator_rejects_unusable_performance_before_production(tmp_path):
+    manifest = creation.prepare(task(tmp_path, original=True), tmp_path/'run')
+    draft = episode()
+    turn = {'speaker_name':'旅客', 'text':'先等等。', 'delivery_mode':'visible_dialogue',
+            'emotion':'紧张，小声'}
+    draft['chapter_script']['shots'][0]['turns'] = [turn]
+    assert any('English' in e for e in creation.validate(draft, manifest, tmp_path/'run/sandbox'))
+    turn['emotion'] = 'Her voice drops as she notices the missing tile.'
+    assert creation.validate(draft, manifest, tmp_path/'run/sandbox') == []
+
+
+def test_explicit_reference_mode_and_frozen_legacy_manifest_keep_their_contract(tmp_path):
+    source = task(tmp_path, original=True)
+    data = read_json(source); data.pop('voice_reference_policy')
+    data['profile'] = {'h3_speech_policy':'reference'}
+    atomic_write_json(source, data)
+    manifest = creation.prepare(source, tmp_path/'run')
+    assert manifest['profile']['h3_speech_policy'] == 'reference'
+    frozen = copy.deepcopy(manifest); frozen.pop('profile')
+    atomic_write_json(tmp_path/'run/sandbox/input/manifest.json', frozen)
+    assert creation.prepare(source, tmp_path/'run') == frozen
+
+
+def test_conflicting_none_and_reference_policies_fail_at_intake(tmp_path):
+    source = task(tmp_path, original=True)
+    data = read_json(source); data['profile'] = {'h3_speech_policy':'reference'}
+    atomic_write_json(source, data)
+    with pytest.raises(ValueError, match='conflict'):
+        creation.prepare(source, tmp_path/'run')
+
+
+def test_creator_cannot_override_effective_policy_in_its_script(tmp_path):
+    manifest = creation.prepare(task(tmp_path, original=True), tmp_path/'run')
+    draft = episode(); draft['chapter_script']['profile'] = {'h3_speech_policy':'reference'}
+    assert any('policy' in e for e in creation.validate(draft, manifest, tmp_path/'run/sandbox'))
+
+
+def test_null_creative_screenplay_returns_correction_instead_of_crashing(tmp_path):
+    manifest = creation.prepare(task(tmp_path, original=True), tmp_path/'run')
+    assert creation.validate({'chapter_script':None},manifest,tmp_path/'run/sandbox') == [
+        'chapter_script.shots must contain the complete episode']

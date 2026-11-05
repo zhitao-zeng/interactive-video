@@ -1,16 +1,46 @@
 """Budget constraints for adopted recuts, without changing physical take counts."""
 from pathlib import Path
+from contextlib import contextmanager
+from contextvars import ContextVar
 from novel_manga.util import read_json
 
 FIELD='_repack_budget'
 
 
+def _groups(record):
+    return tuple(group for trial in reversed(record.get('trials',[]))
+                 for group in (trial.get('changes')or{}).get('groups',[]))
+
+
+_READ_SCOPE = ContextVar('repack_group_reads', default=None)
+
+
+@contextmanager
+def scope_reads(directory):
+    """One read-only status uses one group snapshot; generation stays live."""
+    token = _READ_SCOPE.set((Path(directory), {}))
+    try:
+        yield
+    finally:
+        _READ_SCOPE.reset(token)
+
+
 def group_for(directory, cid, record=None):
-    record=read_json(Path(directory)/'repair_history/history.json',{}) if record is None else record
-    for trial in reversed(record.get('trials',[])):
-        for group in (trial.get('changes')or{}).get('groups',[]):
-            budget=group.get('source_budget') or {}
-            if cid in budget.get('children',{}) or cid in budget.get('roots',{}):return group
+    if record is not None:
+        groups = _groups(record)
+    else:
+        directory = Path(directory)
+        scope = _READ_SCOPE.get()
+        if scope is not None and scope[0] == directory:
+            snapshot = scope[1]
+            if 'groups' not in snapshot:
+                snapshot['groups'] = _groups(read_json(directory/'repair_history/history.json', {}))
+            groups = snapshot['groups']
+        else:
+            groups = _groups(read_json(directory/'repair_history/history.json', {}))
+    for group in groups:
+        budget=group.get('source_budget') or {}
+        if cid in budget.get('children',{}) or cid in budget.get('roots',{}):return group
     return None
 
 

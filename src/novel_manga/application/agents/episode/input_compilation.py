@@ -1,5 +1,6 @@
 """Compile and validate one scoped input candidate; publication belongs to the caller."""
 from __future__ import annotations
+import copy
 from dataclasses import dataclass
 from pathlib import Path
 from .context import EpisodeContext
@@ -64,6 +65,22 @@ def compile_input(case: InputCompilation, receipt, record, progress) -> Compiled
     candidate, changed = rebuild_clips(directory, ctx.novel_dir/'story_bible.json', candidate_script, plan, targets,
                                       repack_report=structural, preserve_timing=True,
                                       **({'source_checked_turns':source_checked_turns} if source_checked_turns else {}))
+    from novel_manga.media.first_frames import enabled, opening_contract
+    frame_mode=enabled(ctx)
+    if frame_mode:
+        old_shots={s.get('index',i):s for i,s in enumerate(script['shots'],1)}
+        new_shots={s.get('index',i):s for i,s in enumerate(candidate_script['shots'],1)}
+        opening_changed={c['clip_id'] for c in plan['clips'] if c['clip_id'] in targets
+            and c.get('shot_indexes') and
+            old_shots[c['shot_indexes'][0]].get('opening_frame')!=new_shots[c['shot_indexes'][0]].get('opening_frame')}
+        if opening_changed:
+            # Opening-only edits have no new H3 request until an image exists.
+            # Preserve the unmodified plan while publishing their source effect.
+            candidate={**candidate,'clips':[copy.deepcopy(c) if c['clip_id']in opening_changed else c for c in candidate['clips']]}
+            for clip in candidate['clips']:
+                if clip['clip_id']in opening_changed:
+                    clip['first_frame_opening']=[copy.deepcopy(new_shots[clip['shot_indexes'][0]])]
+            changed=[c['clip_id']for c in candidate['clips']if c['clip_id']in set(changed)|opening_changed]
     if not changed:
         if phases or locations or candidate_script != script:
             raise ValueError('input correction did not reach the compiled request')
@@ -141,6 +158,20 @@ def compile_input(case: InputCompilation, receipt, record, progress) -> Compiled
         if 'generation_seed' in before:
             clip['generation_seed'] = before['generation_seed']
         clip['repair_take'] = int(before.get('repair_take', 0)) + 1
+        frame=clip.get('first_frame')
+        opening=[s for s in candidate_script['shots'] if s.get('index') in clip['shot_indexes']]
+        expected=(frame or{}).get('source_contract',{})
+        contract=opening_contract(clip,expected.get('image_references',[]),shots=opening)
+        if 'style'in expected:
+            from novel_manga.style_packs import frame_style
+            contract['style']=frame_style(ctx.novel_dir)
+        if frame_mode and (not frame or contract!=expected):
+            # Source is checked, but the old pixels cannot certify the new opening.
+            # first_frames will supply the Agent's complete new image/request pair.
+            clip.pop('prompt_h3',None)
+            clip.pop('prompt_h3_of',None)
+            clip['prompt_h3_skip']='Opening changed; generate and review its fresh first frame before rendering.'
+            continue
         progress('translate:'+key)
         from novel_manga.application.profiles import h3_stamp
         cached = translations.get(key) or {}

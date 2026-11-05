@@ -65,7 +65,8 @@ def test_silence_report_only_does_not_disable_extra_or_missing_speech(tmp_path):
         assert not row['passed'] and row['issues'] == [issue]
 
 
-def test_agent_backend_defers_first_failed_take_without_inner_retries(tmp_path, monkeypatch):
+@pytest.mark.parametrize('generated', [True, False])
+def test_agent_backend_defers_first_failed_take_without_inner_retries(tmp_path, monkeypatch, generated):
     runner = uninitialized_runner(); ctx = runner.context
     ctx.episode_dir = tmp_path/'book'/'book_1'; ctx.episode_dir.mkdir(parents=True)
     ctx.novel_dir = ctx.episode_dir.parent; ctx.work = ctx.episode_dir/'work'
@@ -73,7 +74,7 @@ def test_agent_backend_defers_first_failed_take_without_inner_retries(tmp_path, 
     ctx.options.free_retries = True; ctx.profile = {'repair_backend':'sandbox_agent'}
     calls=[]
     def generate(clip,attempt):
-        calls.append(attempt);runner.context.state.clip(clip['clip_id']).generated=True;return tmp_path/f'{attempt}.mp4'
+        calls.append(attempt);runner.context.state.clip(clip['clip_id']).generated=generated;return tmp_path/f'{attempt}.mp4'
     monkeypatch.setattr(runner,'generate_clip',generate)
     monkeypatch.setattr(runner,'analyse_clip',lambda *a:{'video':'v','passed':False,'cer':1.2,
                          'max_volume_db':-2,'issues':['excess_unplanned_speech']})
