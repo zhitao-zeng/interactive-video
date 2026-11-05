@@ -4,6 +4,12 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
+def isolated_resource_quota_state(monkeypatch, tmp_path):
+    """Simulated quota rejections must never write a production account stop."""
+    monkeypatch.setenv('NOVEL_SHARED_QUOTA_DIR', str(tmp_path/'shared-resource-quota'))
+
+
+@pytest.fixture(autouse=True)
 def forbid_unmocked_http(monkeypatch):
     def blocked(*args, **kwargs):
         pytest.fail('Unmocked HTTP connection in test: supply MockTransport or mock the model call', pytrace=False)

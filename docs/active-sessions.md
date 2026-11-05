@@ -280,3 +280,27 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | ZCode #12+会话退化修复 | ①create_context目录发现:无显式output_root时探测firstframes/music/agent三约定既有run,CLI retry续真状态(冒烟已验:verify edition解析到firstframes真实目录);②默认作者配置切快速档(thinking off+effort low+16k,修复线同款),传导链有测试;2新测试,全量4053连两轮绿 | main(783b0c4) | context.py、configs/agent_sandbox.json、tests/test_agent_run_discovery.py | 2026-10-22 | 已提交;verify edition下次resume即用快速档;并行瞬态(一轮11败)已定位为与sd线资源竞争,复跑全绿 |
 
 | Codex 10小时协助ZCODE20261023 | 用户授权给原ZCODE会话指令并协助完成今早10点前知遥20集成片；协助窗口至11:56 | codex/zcode-supervision-20261023 | 仅自有协调runtime/必要独立诊断；生产单写者ZCODE，旧恋综暂不处理 | 2026-10-23 01:56 | 在途：原ZCODE已收到指令并ACK，34项相关独立回归过；定位原会话session_7acef82aafd79b10dac6e5f434e1cf08，核对真实隔离产线；不清额度/历史，不把candidate或blocked误称accepted；以20个完整导出文件验收。 |
+
+| Codex 官方KEY实测20261023 | 原official key的DS4.1/K3/GLM实测完成 | codex/official-key-probe-20261023 | 仅自有runtime，main c698b64真实run_session | 2026-10-23 | 三模型main Agent首次+同会话续跑6/6、main JSON3/3通过。协议层15例中DS两次JSON混入ds_safety导致内容失败、GLM首次95.626秒超时，K3全部通过；三者显式禁思考下首次SDK仍返回thinking块，不能声称彻底关闭。key与原运行环境内存比较相同。证据本树.runtime/official-key-probe-20261023/REPORT.md与summary.json。零媒体生成、不改默认/生产、不提交push。 |
+
+| Codex 资源与思考统一20261023 | 用户授权清点资源/共享额度、稳定免费优先、按任务思考含Luna | codex/resource-policy-20261023 | 独立资源登记/角色策略/既有入口接线/离线回归；避开其他会话music/readiness/generation等WIP | 2026-10-23 | 已完成并冷接main，未提交/push；相关218项与最后51项通过（有重叠），SD三条离线全链路过；全量4074过/2个既有失败已在无资源改动基线复现。Codex Agent续跑/medium/JSON/双图实测过；旧片/次数/历史/在跑任务不动。免费网关45测过，自有补丁留档未启用，原8789未重启。详情docs/model-resources.md及.runtime/resource-policy-integration-20261023/REPORT.md。 |
+
+| Codex 免费网关接通20261023 | 用户授权启用零费率路由补丁并实测免费Agent稳定性 | codex/free-routing-20261023 + codex/resource-policy-20261023 | 仅网关自有3文件、独立Agent夹具与资源资格；不热换生产任务 | 2026-10-23 | 已完成：网关45测过，空闲重启1次/5.334秒，无在途请求中断；原KEY与用量前缀保留。免费DS Agent内容10/11、JSON3/3，Phancy4/5；均不自动晋升Agent，默认保留Luna，免费DS启用JSON。续跑null存档修复、最终相关232项过；代码全量4081过/2既有失败。旧片/次数/历史/在跑任务不动，无媒体生成/提交/push。详.runtime/free-gateway-integration-20261023/REPORT.md。 |
+
+| Codex 免费Agent根因20261023 | 用户要求区分模型波动/网关/SDK适配，能修则修且不靠重试 | codex/resource-policy-20261023 + codex/free-routing-20261023 | 只读原失败、隔离离线协议回放、必要时有界单次对照；不热换生产 | 2026-10-23 | 已完成：DS错误在Write参数生成前，35B原回复为文本模拟工具；未发现本地网关/SDK损坏。离线修后4回放/14保真检查、固定协议4/4单次通过；两别名原始响应均自报kimi-k2.6。补请求/响应模型独立记录，相关235项通过；原小样本不作总体不稳定结论，上游内部因果边界留档。默认/在跑任务/片/次数/历史不改，无网关重启/媒体生成/提交push。详.runtime/free-agent-cause-integration-20261023/REPORT.md。 |
+
+| Codex 知遥ModelScope数据集20261023 | 用户授权公开数据集收录20集；先传既有13个完整delivery导出，后续同步 | codex/zhiyao-modelscope-20261023 | 仅scripts/ops/zhiyao_modelscope_sync.py与自有.runtime；不动生产/计数/源码WIP | 2026-10-23 | 在途：目标Flame4pd/zhiyao-episodes，复用ms_venv登录，媒体硬链接暂存，不上传私有源文/日志/环境。 |
+
+| Codex 自转主线整合与3集无人验证20261023 | 用户批准主线整合、自动恢复、3集无人干预；人工接管算失败 | codex/autonomous-production-20261023 | 独立main基线+保留现有main WIP；只整合本轮通用修复/正常入口/故障回放，不改旧20集 | 2026-10-23 18:07 | 在途：实施计划与修复来源盘点；保留资源策略/其他会话WIP，不代提交；验证将锁定版本与原始素材，新故障修通用代码后重验，不改单集文件兜底。 |
+
+| Codex 自转验证进展 | 主线已冷整合；3集原包正式批入口实跑 | codex/autonomous-production-20261023 | 81个任务增量；保留其他作者WIP，无提交推送 | 2026-10-23T19:27:19.450651+08:00 | 全量4181过，主线关键93过，独立审查缺陷修复；服务novel-autonomous-validation-20261023，冻结执行树，真实结果待验。 |
+
+| Codex 三集优先完整闭环20261024 | root统一冷整合与生产；canary_entry仅batch.py/CLI/batch tests；budget_actual_audit只读实际额度/引用 | codex/autonomous-production-v4-20261023 | 保留原额度、单入口按edition恢复；无手改内容 | 2026-10-24 01:30 | 在途：v7全部退出，0视频/0成片；v8/v9已主线，安全冷切换后先W10；其余集先核对实际图片预算。 |
+
+| Codex 三集恢复验证结果 | 通用修复已主线并冷上线v11；实际恢复验证失败于旧图内容与原图片额度 | codex/autonomous-production-v4-20261023 | 所有在途已收完，单入口停止派发，全部历史/余额保留 | 2026-10-24T01:46:18.511822+08:00 | W10 0/25、W12 0/18、W06 0/27视频，0成片/上传；衣装引用恢复与时序误审修复有真实证据；非从头无人成功。无新增生图/视频、无提交/push。见自有runtime recovery-results-v11.json。 |
+
+| Codex 全新无人值守v2 | 用户明确授权新开一集；原W10包从创作重新开始 | codex/autonomous-production-20261023冻结执行树 | 新edition zhiyao-auto-v2-EP04C_W10_失物海，单入口、标准额度、原旧三集不动 | 2026-10-24T02:06:45.122844+08:00 | 启动准备完成；无手改内容/热换代码，只有完整成片验收与上传才成功。runtime=/mnt/disk1/zengzhitao/interactive-video-worktrees/autonomous-production-20261023/.runtime/autonomous-clean-v2-20261024 |
+
+| Codex v2前置校验恢复 | 原26行请求真实回放后修字段级错误反馈/无进展误停；主线v13冷恢复 | codex/autonomous-production-v4-20261023 | first_frames.py、progress.py与回归；无内容/计数改写 | 2026-10-24 02:33 | 原始无人首跑已记失败；同入口恢复，原5144秒与原生成上限保留；0首帧/0视频，素材9张已完成。 |
+
+| Codex 无人v2结果 | 输入修订额度用尽，未出视频/成片；通用交接修复v16已主线待新实测 | codex/autonomous-production-v4-20261023 | 旧记录/原额度保留，服务inactive | 2026-10-24 03:49 | 15/26首帧通过、32候选、0视频/0上传。25/26源冲突仍在且输入额度0；不再盲重启。旧已受理图GET备存，未改生产判定。无提交/push。 |

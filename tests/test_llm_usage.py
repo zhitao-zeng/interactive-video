@@ -45,6 +45,17 @@ def test_meter_extracts_schema_name_and_records(tmp_path, monkeypatch):
     assert row['model'] == 'Qwen3.8-Flash-Next'
     assert row['endpoint'] == 'http://x:1/v1'
     assert row['total_tokens'] == 12
+    assert 'response_model' not in row
+
+
+def test_meter_distinguishes_requested_alias_from_reported_model_and_keeps_route_billing(tmp_path,monkeypatch):
+    monkeypatch.setenv('NOVEL_PROJECT_ROOT',str(tmp_path))
+    _meter('http://127.0.0.1:8789/v1/chat/completions',{'model':'phanthy.com/deepseek-v4'},
+        {'model':'kimi-k2.6','usage':{'prompt_tokens':10,'completion_tokens':2}})
+    row=json.loads((tmp_path/'.runtime'/llm_usage.FILE).read_text().splitlines()[0])
+    assert row['model']=='phanthy.com/deepseek-v4'
+    assert row['response_model']=='kimi-k2.6'
+    assert row['resource_id']=='phanthy-dsv4' and row['billing']=='free'
 
 
 def test_meter_survives_malformed_bodies(tmp_path, monkeypatch):
@@ -64,3 +75,16 @@ def test_scaled_timeout_grows_with_input_and_respects_floor_and_cap():
     assert 600 <= scaled_timeout(240, big) <= 900     # 大料放大
     assert scaled_timeout(240, huge) == 1800          # 封顶
     assert scaled_timeout(900, small) == 900          # 调用方更松时不缩
+
+
+def test_saved_login_json_is_metered_once_with_resource_and_reasoning(tmp_path,monkeypatch):
+    from novel_manga.llm import codex,transport
+    monkeypatch.setenv('NOVEL_PROJECT_ROOT',str(tmp_path))
+    monkeypatch.setattr(codex,'completion',lambda *a,**k:{'choices':[{'message':{'content':'{}'}}],
+        'usage':{'input_tokens':20,'cached_input_tokens':10,'output_tokens':3}})
+    transport.post_any(None,['codex://local'],{}, {'model':'gpt-5.6-luna','reasoning_effort':'medium','messages':[]})
+    rows=[json.loads(l) for l in (tmp_path/'.runtime'/llm_usage.FILE).read_text().splitlines()]
+    assert len(rows)==1
+    assert rows[0]['resource_id']=='codex-luna'
+    assert rows[0]['billing']=='subscription' and rows[0]['reasoning_effort']=='medium'
+    assert rows[0]['cached_input_tokens']==10

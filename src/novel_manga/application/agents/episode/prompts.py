@@ -239,23 +239,26 @@ def resume_prompt(task, *, agent_instructions=None):
     target_ids = {row.get('clip_id') for row in targets if row.get('clip_id')}
     next_action = task.get('next_action') or {}
     action = next_action.get('action')
+    source_conflicts=next_action.get('source_input_conflicts') or {}
     next_state = {key:next_action[key] for key in
-                  ('action','reason','blocked','service_interrupted','audio_review')
+                  ('action','reason','blocked','service_interrupted','audio_review','source_input_conflicts')
                   if key in next_action}
     state = {key:task[key] for key in
-             ('phase','mode','upstream_route','repair_capabilities','targets','issues',
+             ('phase','mode','workflow_scope','execution_rules','upstream_route','repair_capabilities','targets','issues',
               'last_operation','related_history','evidence_files','full_status','reference_catalog')
              if key in task}
     if task.get('postproduction'):
         state['postproduction'] = task['postproduction']
     if next_state:
         state['next_action'] = next_state
-    if action == 'first_frames':
+    if source_conflicts:
+        state['targets']=[row for row in targets if row.get('clip_id') in source_conflicts]
+    if action == 'first_frames' or source_conflicts:
         frames = task.get('first_frames') or {}
         blocked = next_action.get('blocked') or {}
         blocked_ids = (set(blocked) if isinstance(blocked,dict) else
                        set(blocked) if isinstance(blocked,(list,tuple,set)) else set())
-        relevant = target_ids | blocked_ids
+        relevant = set(source_conflicts) if source_conflicts else target_ids | blocked_ids
         state['first_frames'] = {
             **{key:frames[key] for key in ('mode','extra_reference_policy','command','schema') if key in frames},
             'clips':{cid:row for cid,row in (frames.get('clips') or {}).items() if cid in relevant},
@@ -266,8 +269,10 @@ def resume_prompt(task, *, agent_instructions=None):
         state['audio_mix'] = task['audio_mix']
 
     prompt = (
-        'Continue this same saved episode session. The first turn already established the user task and workflow rules; '
-        'keep them in force. This message carries only the current actionable state. Use the exact actions, counters, '
+        'Continue this same saved episode session. Use the current host workflow scope and execution rules below. '
+        'They supersede restrictions from earlier production phases; user requirements and existing budgets remain binding. '
+        'For example, after first video production ends, a current review/finish action belongs to the full-production phase. '
+        'This message carries the current actionable state. Use the exact actions, counters, '
         'input permissions, and blockers below; consult /work/input/current-task.json or '
         '/work/input/current-status.json only when a needed detail is absent here. Those full files remain current and intact. '
         'Successful reads and assessments from earlier turns remain in this saved session. Check the current task and last operation first, '

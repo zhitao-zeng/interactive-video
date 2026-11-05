@@ -6,6 +6,20 @@ from pathlib import Path
 from novel_manga.util import atomic_write_json,read_json
 
 
+def test_current_task_and_resume_preserve_actual_input_field_capabilities(tmp_path):
+    from novel_manga.application.agents.episode.current_task import prepare
+    from novel_manga.application.agents.episode.prompts import resume_prompt
+    ctx=SimpleNamespace(work_dir=tmp_path/'sandbox',episode_dir=tmp_path/'book/book_1',run_dir=tmp_path)
+    capabilities={'adopted_input':{'shot_fields':['shot_scale','opening_frame','visual_prompt']},
+                  'source_review_required':True}
+    status={'adopted':True,'repair_capabilities':capabilities,
+            'next_action':{'action':'agent','reason':'Repair source fields with check then apply.'}}
+    task=prepare(ctx,status,{'issues':[]},[])
+    assert task['repair_capabilities']==capabilities
+    prompt=resume_prompt(task)
+    assert 'shot_scale' in prompt and 'opening_frame' in prompt
+
+
 def test_completed_old_pending_receipt_is_presented_as_remaining_work(tmp_path):
     from novel_manga.application.agents.episode.current_task import prepare
     ctx=SimpleNamespace(work_dir=tmp_path/'sandbox',episode_dir=tmp_path/'book/book_1',run_dir=tmp_path)

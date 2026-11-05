@@ -87,7 +87,8 @@ def test_interrupted_picture_check_resumes_same_image_inside_input_budget(setup,
     monkeypatch.setattr(draft_assets, 'check_image', lambda *a: {'consistent': True, 'problems': []})
     result = draft_assets.repair(ctx, state['resume_action'])
     assert result['ok'] and draws == ['默先生']
-    assert read_json(receipt)['resume_count'] == int(interruption is ConnectionError)
+    # An image-service outage resumes its job, not a text-input continuation.
+    assert read_json(receipt)['resume_count'] == 0
 
 
 def test_false_source_and_unknown_clip_never_draw(setup, monkeypatch):
@@ -164,7 +165,7 @@ def test_changed_book_style_does_not_reuse_an_accepted_image(setup):
     assert first['id'] != second['id'] and len(draws) == 2
 
 
-def test_corrected_review_reuses_old_rejected_image_but_does_not_repeat_current_rejection(setup, monkeypatch):
+def test_new_three_picture_bound_retains_current_rejections_and_stops(setup, monkeypatch):
     ctx, row, draws, _ = setup
     design = row['characters']['默先生']
     checks = []
@@ -178,26 +179,27 @@ def test_corrected_review_reuses_old_rejected_image_but_does_not_repeat_current_
         draft_assets._asset(ctx, 'character', '默先生', design)
     with pytest.raises(draft_assets.UnsupportedInput):
         draft_assets._asset(ctx, 'character', '默先生', design)
-    assert len(checks) == len(draws) == 1
-    saved = next((ctx.asset_snapshot_dir/'series_assets/draft-assets').glob('*/rejected.json'))
-    atomic_write_json(saved, {'error': 'old review applied human skin requirements to an animal'})
-    monkeypatch.setattr(draft_assets, 'check_image', lambda *a: checks.append(1) or
-                        {'consistent': True, 'problems': []})
-    accepted = draft_assets._asset(ctx, 'character', '默先生', design)
-    assert accepted['image_review']['consistent'] and len(checks) == 2 and len(draws) == 1
-    assert draft_assets._asset(ctx, 'character', '默先生', design) == accepted
-    assert len(checks) == 2
+    assert len(checks) == len(draws) == 3
+    folder = next((ctx.asset_snapshot_dir/'series_assets/draft-assets').glob('draft_*'))
+    assert len(list((folder/'attempts').glob('attempt_*/rejected.json'))) == 3
+    assert read_json(folder/'exhausted.json')['exhausted']
 
 
 def test_public_repair_rechecks_stale_image_failure_inside_the_original_input_allowance(setup, monkeypatch):
     ctx, row, draws, _ = setup
     row.pop('locations')
-    monkeypatch.setattr(draft_assets, 'IMAGE_REVIEW_POLICY', 1)
-    monkeypatch.setattr(draft_assets, 'check_image', lambda *a: (_ for _ in ()).throw(
-        draft_assets.UnsupportedInput('old scope rejected a valid card')))
-    with pytest.raises(draft_assets.UnsupportedInput):
-        draft_assets.repair(ctx, row)
-    receipt = next((ctx.episode_dir/'work/input_repairs').glob('*.json'))
+    # Seed an actual one-picture legacy failure, not a newly exhausted run.
+    from novel_manga.application.assets.candidates import style_key
+    root=ctx.asset_snapshot_dir/'series_assets/draft-assets';folder=root/'draft_character_0001'
+    folder.mkdir(parents=True);design=row['characters']['默先生']
+    atomic_write_json(root/'index.json',[{'id':folder.name,'role':'character','name':'默先生','design':design,'style_key':style_key(ctx)}])
+    image=draft_assets.build(ctx,folder,'character','默先生',design)
+    atomic_write_json(folder/'built.json',{'path':str(image.relative_to(ctx.asset_snapshot_dir))})
+    error='generated asset failed image review: old scope rejected a valid card'
+    atomic_write_json(folder/'rejected.json',{'error':error,'image_review_policy':1})
+    receipt=ctx.episode_dir/'work/input_repairs/clip_01-1.json'
+    atomic_write_json(receipt,{'clip_id':'clip_01','decision':row,'source':{'consistent':True,'problems':[]},
+        'status':'rejected','step':'draft_assets','error':error,'image_review_policy':1,'resume_count':1,'revision_count':1})
     before = read_json(receipt)
     monkeypatch.setattr(draft_assets, 'IMAGE_REVIEW_POLICY', 2)
     monkeypatch.setattr(draft_assets, 'check_image', lambda *a: {'consistent': True, 'problems': []})

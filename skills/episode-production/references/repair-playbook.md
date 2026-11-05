@@ -14,6 +14,18 @@ English request, selected take and final acceptance. A verdict is a claim to
 check against evidence. Repair the earliest confirmed conflict; later retakes
 cannot repair wrong dialogue ownership or a wrong reference card.
 
+For repeated first-frame failures, inspect the actual supplied references and
+their declared scopes before choosing another retake. A portrait does not
+establish the whole outfit; a generated location card is not proof that its
+layout agrees with the source. Check whether the opening prompt copied a whole
+camera move or whether start_state already describes the completed action. Fix
+an evidenced source/reference defect through the normal input/asset tools.
+After restoring missing original evidence, use `reuse_candidate` to review an
+existing image under the complete current evidence before spending another
+image. Keep its original generation request and all candidate counts. A real
+pixel defect still needs a remaining authorized candidate; a reference fix does
+not grant another generation.
+
 | Current evidence | Useful action and boundary |
 | --- | --- |
 | An old speech flag conflicts with the selected take's current analysis. | Compare the planned words, raw chunks and audible audio. Exact Mandarin homophones, names, punctuation and expected silence are not missing lines. Use the supported current-take recheck before a new generation; real missing meaning, added lexical speech and inaudible planned lines still need repair. |

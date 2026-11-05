@@ -30,7 +30,9 @@ def completion(request,*,timeout):
     atomic_write_json(work/'input/manifest.json',{'phase':'model_json'})
     atomic_write_json(work/'input/request.json',payload)
     config={**load_config(root/'configs/agent_sandbox.json'),'backend':'codex','model':request['model'],
-            'effort':'low','codex_attached_images':images}
+            'effort':request.get('reasoning_effort', 'low'),'codex_attached_images':images,
+            'task_reasoning':{'json':request.get('reasoning_effort', 'low')},
+            'codex_parallel':2,'codex_inflight_dir':'/mnt/disk1/zengzhitao/tmp/model-inflight/codex-saved-login'}
     schema=(request.get('response_format',{}).get('json_schema')or{}).get('schema')
     if schema:
         atomic_write_json(work/'input/schema.json',schema);config['codex_output_schema']='input/schema.json'

@@ -223,6 +223,15 @@ def test_selected_but_unmixed_music_cannot_be_accepted(episode):
     assert music.episode_music_errors(ctx.episode_dir,{'assembly':{'final_video':'old.mp4'}})
 
 
+def test_story_plan_rejects_blanket_music_with_actionable_timeline_route(episode):
+    ctx,_,result,source=episode
+    atomic_write_json(ctx.episode_dir/'chapter_script.json',{'shots':[],
+        'music_plan':{'cues':[{'id':'m1'},{'id':'m2'}],'silences':[]}})
+    tool=MusicOperations(ctx,NS(),source_checker=lambda *a:pytest.fail('wrong adoption mode must not call a model'))
+    atomic_write_json(ctx.work_dir/'output/music-selection.json',selection(result,source))
+    with pytest.raises(ValueError,match='apply_timeline.*m1.*m2'):tool.prepare({})
+
+
 def test_agent_can_adopt_story_cues_and_preserves_source_gaps_and_usage_history(episode):
     ctx,call,result,source=episode
     atomic_write_json(ctx.episode_dir/'chapter_script.json',{'shots':[{'index':1,'duration_seconds':2},{'index':2,'duration_seconds':2}]})
@@ -239,6 +248,27 @@ def test_agent_can_adopt_story_cues_and_preserves_source_gaps_and_usage_history(
     assert policy['silences']==plan['silences']and policy['cues'][0]['start']==cue['start']
     assert len(read_json(ctx.project_root/'.runtime/music-selection/usages.json'))==1
     assert call(plan)['ok']is True and len(read_json(ctx.project_root/'.runtime/music-selection/usages.json'))==1
+
+
+def test_music_source_reviewer_receives_the_effective_inherited_silences(episode,monkeypatch):
+    ctx,call,result,source=episode
+    gap={'start':{'shot':2,'edge':'start'},'end':{'shot':2,'edge':'end'},'source_quote':source,'reason':'listen'}
+    atomic_write_json(ctx.episode_dir/'chapter_script.json',{'shots':[{'index':1,'duration_seconds':2},{'index':2,'duration_seconds':2}],
+        'music_plan':{'cues':[{'id':'cue1'}],'silences':[gap]}})
+    atomic_write_json(ctx.episode_dir/'clip_plan.json',{'clips':[
+        {'clip_id':'a','shot_indexes':[1],'request_seconds':2,'music_delivery':'postmix'},
+        {'clip_id':'b','shot_indexes':[2],'request_seconds':2,'music_delivery':'postmix'}]})
+    selected=selection(result,source)
+    cue={**selected,'id':'cue1','source_start_seconds':0,'source_seconds':4,'loop':False,
+        'start':{'shot':1,'edge':'start'},'end':{'shot':2,'edge':'end'},'fade_in_seconds':.2,'fade_out_seconds':.2}
+    plan={'action':'apply_timeline','source_quote':source,'reason':'approved cue','cues':[cue]}
+    seen=[]
+    tool=MusicOperations(ctx,NS(),source_checker=lambda c,a,p:seen.append(p) or {'consistent':True,'problems':[]})
+    atomic_write_json(ctx.work_dir/'output/music-selection.json',plan)
+    assert tool.prepare({})['ok']
+    assert seen[0]['silences']==[gap]
+    assert music.source_inputs(ctx.episode_dir,ctx.run_dir/'source.txt')['planned_music_delivery']==['postmix']
+    assert 'silences' not in plan
 
 
 def test_music_and_room_tone_are_idempotent_and_keep_video_and_native_voice(episode,monkeypatch):

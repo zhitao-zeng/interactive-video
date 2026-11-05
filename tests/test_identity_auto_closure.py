@@ -500,3 +500,32 @@ def test_demanded_correction_is_merged_then_final_reviewed(monkeypatch):
     assert calls == ['review', 'review', 'review']
     assert merged == [{'actors': [{'name': '甲'}]}]
     assert value == {'actors': [{'name': '甲'}]}
+
+
+def test_in_frame_unmapped_animals_start_as_extras_but_mentions_stay_unknown(tmp_path,monkeypatch):
+    ledger=book(tmp_path/'book');ep=ledger.novel_dir/'book_1'
+    store.write_json(ep/'segments.json',[{'text':'耳鼠跑来。远方传来天狗叫声，狐狸只被提及。'}])
+    actors=[actor('耳鼠'),{**actor('天狗'),'source_id':2,'presence':'voice'},
+            {**actor('狐狸'),'source_id':3,'presence':'mentioned'}]
+    reviewed=[]
+    def ask(parts,schema,**kwargs):
+        if kwargs['name']=='chapter_identity_source':return {'source_readable':True,'source_problem':'','actors':actors}
+        payload=json.loads(parts[0]['text'].split('\n')[-1]);reviewed.append(payload['candidate'])
+        assert [r['decision']for r in payload['candidate']['bindings']]==['extra','extra','unknown']
+        return {'approved':True,'reason':'真实复核候选正确','correction':None}
+    monkeypatch.setattr(client,'ask_json',ask)
+    result=flow.resolve_chapter(ep)
+    assert reviewed and result['semantic_review']['approved']
+    assert set(result['semantic_extras'])=={'耳鼠','天狗'}
+
+
+def test_extra_initialization_still_requires_independent_semantic_pass(tmp_path,monkeypatch):
+    ledger=book(tmp_path/'book');ep=ledger.novel_dir/'book_1'
+    store.write_json(ep/'segments.json',[{'text':'耳鼠跑来。'}])
+    def ask(parts,schema,**kwargs):
+        if kwargs['name']=='chapter_identity_source':return {'source_readable':True,'source_problem':'','actors':[actor('耳鼠')]}
+        return {'approved':False,'reason':'实际来源仍有问题','correction':None}
+    monkeypatch.setattr(client,'ask_json',ask)
+    with pytest.raises(ValueError,match='identity semantic review unresolved'):
+        flow.resolve_chapter(ep)
+    assert not(ep/'identity_context.json').exists()

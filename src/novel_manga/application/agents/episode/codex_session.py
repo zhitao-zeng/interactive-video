@@ -41,9 +41,13 @@ def normalized_events(events):
 
 def run_session(work_dir, prompt_text, *, resume=False, timeout=1200, config,
                 expected_output=None, enable_tools=False, project_root=None):
+    from novel_manga.llm.policy import session_policy, session_role
+    config = session_policy(config, work_dir, resume=resume,
+                            role=session_role(work_dir, config, expected_output))
     from novel_manga.media.resources import acquire_inflight_slot,release_inflight_slot
-    pool=os.environ.get('NOVEL_CODEX_INFLIGHT_DIR')
-    handle=acquire_inflight_slot(Path(work_dir),int(config.get('codex_parallel',4)),pool_directory=Path(pool))if pool else None
+    pool=os.environ.get('NOVEL_CODEX_INFLIGHT_DIR') or config.get('codex_inflight_dir')
+    slots=max(1,int(config.get('codex_parallel',4))-int(config.get('codex_slots_reserved_for_tools',0)))
+    handle=acquire_inflight_slot(Path(work_dir),slots,pool_directory=Path(pool))if pool else None
     try:
         return _run_session(work_dir,prompt_text,resume=resume,timeout=timeout,config=config,
             expected_output=expected_output,enable_tools=enable_tools,project_root=project_root)
@@ -58,6 +62,9 @@ def _run_session(work_dir, prompt_text, *, resume=False, timeout=1200, config,
     if expected_output not in {'episode.json', 'requests.json', 'repair.json','decision.json','review.json','response.json'}:
         raise SandboxRefused('Expected output must be episode.json, requests.json or repair.json.')
     binary = shutil.which('codex')
+    if not binary:
+        installed=Path.home()/'.local/bin/codex'
+        if installed.is_file() and os.access(installed,os.X_OK):binary=str(installed)
     if not binary:
         raise SandboxRefused('Codex CLI is not installed.')
     binary = Path(binary).resolve()
@@ -233,6 +240,7 @@ def _run_session(work_dir, prompt_text, *, resume=False, timeout=1200, config,
         'creation_only': creation_only, 'host_media_tools_installed': bool(enable_tools),
         'phase': manifest.get('phase', 'production'),
         'usage': native_completion.get('usage', {}),
+        'reasoning_policy': config.get('reasoning_policy'),
         'timeout_seconds': timeout, 'seconds': round(time.monotonic()-started), 'exit': code,
         'produced': produced, 'kept_from_earlier_attempts': len(files)-len(produced),
         'expected_output': expected_output, 'expected_output_produced': expected_output in produced,
