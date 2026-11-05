@@ -333,3 +333,21 @@ def test_sensitive_stop_is_recorded_as_refusal_so_fallback_fires(tmp_path, monke
         'type': 'result', 'subtype': 'success', 'stop_reason': 'sensitive', 'result': ''})
     result = session.run_session(work, 'Draft', config=config)
     assert result.record['refusal'] == 'content moderation: sensitive stop'
+
+
+from novel_manga.util import atomic_write_json
+
+
+def test_default_agent_creation_role_uses_creative_contract_only(tmp_path, monkeypatch):
+    from novel_manga.application.agents.episode import session
+    work = tmp_path/'work'
+    atomic_write_json(work/'input/manifest.json', {'phase':'creation_only'})
+    monkeypatch.setattr(session, 'key_for', lambda _: 'test-only')
+    calls = fake_cli(monkeypatch, work)
+    session.run_session(work, 'Create', config={'image':'test', 'model':'test',
+        'key_var':'TEST', 'base_url':'http://unused'})
+    command = calls[0][0]
+    role = command[command.index('--append-system-prompt')+1]
+    assert 'creative-authoring.md' in role
+    assert 'output contract before authoring' not in role
+    assert command[command.index('--tools')+1] == 'Read,Write,Edit,Glob,Grep'

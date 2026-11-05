@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import copy
 import math
 from pathlib import Path
 import re
@@ -11,13 +12,21 @@ def validate(episode, manifest, work_dir):
     if not isinstance(episode, dict):
         return ['episode.json must be one object']
     task = manifest['task']
+    from novel_manga.story.voice_delivery import native_speech_selected, performance_error
+    profile=manifest.get('profile') or task.get('profile') or {}
+    native=native_speech_selected(profile)
+    authored_policy=((episode.get('chapter_script') or {}).get('profile') or {}).get('h3_speech_policy')
     shots = (episode.get('chapter_script') or {}).get('shots') or []
     issues = []
+    if authored_policy and profile.get('h3_speech_policy') and authored_policy!=profile['h3_speech_policy']:
+        issues.append('chapter_script speech policy conflicts with the selected task policy')
     if not shots:
         return ['chapter_script.shots must contain the complete episode']
     text = re.sub(r'\s+', '', '\n'.join((work_dir / p).read_text()
         for p in manifest['source_documents']))
     durations = {}
+    from novel_manga.story.fields import opening_frame_error
+    first_frame=task.get('h3_input_mode')=='first-frame'or task.get('profile',{}).get('h3_input_mode')=='first-frame'
     for number, shot in enumerate(shots, 1):
         if shot.get('index') != number:
             issues.append(f'shot {number}: consecutive index required')
@@ -29,11 +38,15 @@ def validate(episode, manifest, work_dir):
             issues.append(f'shot {number}: positive duration_seconds required')
             seconds = 0
         durations[number] = seconds
+        if first_frame or 'opening_frame'in shot:
+            if problem:=opening_frame_error(shot.get('opening_frame')):issues.append(f'shot {number}: {problem}')
         for turn in shot.get('turns', []):
             if not all(turn.get(k) for k in ('speaker_name', 'text', 'delivery_mode', 'emotion')):
                 issues.append(f'shot {number}: complete speaker/text/delivery/performance required')
             if turn.get('delivery_mode') not in {'visible_dialogue', 'offscreen_dialogue'}:
                 issues.append(f'shot {number}: invalid delivery_mode')
+            if native and (error:=performance_error(turn.get('emotion'))):
+                issues.append(f'shot {number}: {error}')
         if manifest['mode'] == 'adaptation':
             quote = re.sub(r'\s+', '', str(shot.get('source_quote') or ''))
             if not quote or quote not in text:
@@ -86,6 +99,10 @@ def validate(episode, manifest, work_dir):
             issues.append('spatial scene must refer to current shot indexes')
     if not episode.get('self_review'):
         issues.append('self_review of the complete creative draft is required')
+    music_plan=(episode.get('chapter_script')or{}).get('music_plan')
+    if task.get('music_mode')=='timeline'or music_plan is not None:
+        from novel_manga.story.timing import music_plan_issues
+        issues.extend(music_plan_issues(music_plan,shots))
     return issues
 
 
@@ -113,10 +130,12 @@ def read_evidence(work_dir):
             item = event.get('item') or {}
             command = str(item.get('command') or '')
             if (event.get('type') != 'item.completed' or item.get('type') != 'command_execution'
-                    or not re.search(r'\b(cat|sed|head|tail)\b|read_text\(', command)):
+                    or not re.search(r'\b(cat|sed|head|tail)\b|read_text\(|read-text\.py\b', command)):
                 continue
             manifest = json.loads((work_dir/'input/manifest.json').read_text())
-            for path in manifest['required_reads']:
+            declared = dict.fromkeys([*manifest['required_reads'],
+                                      *manifest.get('skill_references', {}).values()])
+            for path in declared:
                 candidate = work_dir/path
                 mention = path in command
                 prefix = '.claude/skills/episode-production/'
@@ -140,9 +159,36 @@ def read_evidence(work_dir):
     return reads
 
 
-def export(episode, manifest, destination, *, notes=None):
+def export(episode, manifest, destination, *, notes=None, style_source=None):
     destination.mkdir(parents=True, exist_ok=True)
     (destination / 'owner').write_text('Unified creator / text-only creative candidate; no media generated.\n')
+    if manifest.get('profile'):
+        episode=copy.deepcopy(episode)
+        profile=copy.deepcopy(manifest['profile'])
+        episode['chapter_script'].setdefault('profile',{}).update(profile)
+        (destination/'profile.json').write_text(json.dumps(profile,ensure_ascii=False,indent=2)+'\n')
+    if manifest.get('selected_style'):
+        if style_source is None:
+            raise ValueError('export requires the selected frozen style_source')
+        import shutil
+        style_source = Path(style_source)
+        work = style_source.parent.parent
+        style = json.loads(style_source.read_text())
+        for example in style.get('examples', []):
+            if example.get('kind') in {'original_style_board', 'historical_style_frame'} and example.get('path'):
+                source = work / example['path']
+                relative = Path('style-examples') / source.name
+                (destination / relative).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, destination / relative)
+                example['path'] = relative.as_posix()
+            for field in ('review', 'evidence'):
+                if example.get(field):
+                    evidence = work / example[field]
+                    evidence_target = Path('style-examples') / evidence.name
+                    (destination / evidence_target).parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(evidence, destination / evidence_target)
+                    example[field] = evidence_target.as_posix()
+        (destination / 'style.json').write_text(json.dumps(style, ensure_ascii=False, indent=2) + '\n')
     shots = episode['chapter_script']['shots']
     for name, data in [('episode', episode), ('chapter_script', episode['chapter_script']),
                        ('interaction', episode['interaction']), ('spatial_plan', episode['spatial_plan']),
@@ -160,6 +206,13 @@ def export(episode, manifest, destination, *, notes=None):
         board.extend([f'## {heading}\n', f'目的：{shot["purpose"]}',
             f'起始：{shot["start_state"]}', f'画面与行动：{shot["event"]}',
             f'机位与运动：{shot["camera"]}', f'结果：{shot["end_state"]}'])
+        if shot.get('visual_prompt'):
+            board.append('视觉重点：' + str(shot['visual_prompt']))
+        if shot.get('opening_frame'):
+            board.append('首帧 prompt：'+shot['opening_frame']['image_prompt'])
+            board.append('首帧可见人物：'+('、'.join(shot['opening_frame']['visible_characters'])or'无人或主角在镜头后'))
+        if shot.get('light'):
+            board.append('场景光线：' + str(shot['light']))
         for turn in shot.get('turns', []):
             mode = {'visible_dialogue': '现场对白', 'offscreen_dialogue': '画外声'}[turn['delivery_mode']]
             speech = f'{turn["speaker_name"]}（{mode}）：{turn["text"]}'

@@ -52,7 +52,9 @@ Action `actor`/`target` may refer to a character, animal, prop, self or empty ta
 use the original ownership. Each action is `{"actor":"name", "action":"authored action text", "target":"name or empty string"}`.
 The host also accepts `description` for a missing `action` key, retaining its exact text.
 Each turn requires `speaker_name`, `text`, `delivery_mode`;
-`emotion` and `chat_target` are optional. For audience-only inner voice, set
+`chat_target` is optional. In `no_reference_performance_first`, `emotion` is the
+required final English performance; other modes retain their existing contract.
+See [sound direction](sound-direction.md). For audience-only inner voice, set
 `delivery_mode: "offscreen_dialogue"` and `inner_monologue: true`.
 Use `visible_dialogue` for speech whose owner is visible in this shot, and
 `offscreen_dialogue` for speech from a character outside the shot.
@@ -79,14 +81,19 @@ For source input, replace `prompt_h3` with `h3` (supply exactly one):
 
 For prepared script input, a `prompts` value may be the same shots/soundscape
 object. Existing complete strings remain valid and should be reused.
-The structured object also accepts `music`, an English string for the final
-`non_diegetic_music` section. Use the approved shot music cues and their timing;
-keep speech and dialogue markers out of music, as for soundscape.
+The structured object also accepts `music`, an English string for explicitly
+native music. With postmix story music, leave it empty or `None.` and use the
+separate `music_plan`/`select_music` timeline. Keep speech and dialogue markers out
+of music and soundscape; see [sound direction](sound-direction.md).
 Provide one English body per covered shot. Use `<DIALOGUE_1>`, `<DIALOGUE_2>`, etc.
 exactly once in playback order within each shot, restarting numbering at one for
 the next shot. Place each marker where that utterance belongs relative to actions.
-Put relevant English vocal delivery and its triggering action immediately before
-the dialogue marker; place the resulting reaction after it. When the authored
+Put the triggering physical action before the dialogue marker and its resulting
+reaction after it. In no-reference performance mode, the host inserts `emotion`
+before the utterance; do not also write that vocal direction in this body.
+For reference/legacy modes without host insertion, write delivery before the
+marker. Complete prompt strings include the bound direction once themselves.
+When the authored
 pause or end needs it, describe closed lips and a concrete observation or action.
 Keep physical sound with its authored source. Preserve the approved words and
 timing; the performance convention does not authorize changing either.

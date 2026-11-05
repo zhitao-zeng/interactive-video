@@ -138,7 +138,17 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
             'the host already supplies fixed H3 syntax, bindings and timing.' if direct_draft else
             'Read /work/.claude/skills/episode-production/SKILL.md '
             'and its output contract before authoring this episode.')
-    if read_json(work_dir/'input/manifest.json',{}).get('production_mode') in {'pipeline_review','batch_review'}:
+    manifest=read_json(work_dir/'input/manifest.json',{})
+    if manifest.get('phase')=='creation_only':
+        role=('You are the single creative author. Read input/manifest.json, the episode-production Skill '
+              'and references/creative-authoring.md inside that Skill. Follow its required sources and '
+              'sound/style/camera guidance. Write the complete creative episode.json; production requests '
+              'and media execution belong to later phases. Use supplied file tools only.')
+    elif manifest.get('phase')=='script_preparation':
+        role=('Compile the approved screenplay using the episode-production output contract. '
+              'Write output/requests.json with its protected words, timing, references and camera. '
+              'This phase has file tools only; do not generate media or rewrite the screenplay.')
+    elif manifest.get('production_mode') in {'pipeline_review','batch_review'}:
         role = ('Repair the confirmed input defect or review the existing film, as specified by the current phase. '
                 'Reuse completed production stages. '
                 'Consult only relevant episode-production skill sections and shared repair cases; '

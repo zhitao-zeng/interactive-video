@@ -11,13 +11,27 @@ render contract.
 Read the manifest, `input/brief.md`, every original text document, and the supplied
 character/design images in `asset_catalog`. The manifest's `required_reads` also
 identifies the current authoring/voice guidance, camera library, spatial blockout,
-selected genre, repair playbook and six-method library. Read those resources, then
-choose useful methods for this story. They are one author's tools, not six rewrites.
+selected genre and six-method index. Read those required resources and all original
+sources. The index offers the method choices; `manifest.method_library` points to
+the complete library when a selected method needs its detailed procedure. These
+are one author's tools, not six rewrites. Production/H3 and repair references are
+available for their later phases or a concrete current ambiguity, not mandatory
+creation reading.
 Record chosen methods and their concrete purpose in `output/creative-notes.md`.
+Before drafting each scene, decide what the audience learns, who knows it, and
+which information remains hidden. In those same notes, explain the key viewing
+choices using current shot numbers: why this position, move or cut serves that
+change. Implement the choices in each shot's `purpose` and `camera`; notes alone
+are not the design. During self-review, compare the actual camera text with the
+intended reveal, reaction and spatial continuity, correct mismatches, and identify
+the shots changed. Camera variety and director-name counts are not acceptance.
 Read [shared dialogue craft](dialogue-craft.md) for every genre. Shape what the
 character says in context before designing how the voice delivers it; do not use
 performance adjectives to cover a lecture-like line.
-For shot design, use [camera language](camera-language.md) and
+Read [sound direction](sound-direction.md) and follow `manifest.profile`. New
+interactive tasks default to no audio reference with English per-turn performance.
+Write that performance in `emotion` now; the production compiler binds it once.
+For shot design, start with [scene camera selection](camera-selection.md) and
 [spatial blockout](spatial-blockout.md). Select the current genre's guidance:
 [travel](genres/travel.md), [romance](genres/romance.md), or
 [suspense](genres/suspense.md); their linked resources are for relevant cases,
@@ -37,6 +51,13 @@ Use the supplied medium, length and interaction policy. A package's old timing o
 burn-in instructions do not override the current task. Preserve original assets.
 Where dimensions or off-camera geometry are unknown, mark a staging assumption.
 
+Use the known manifest paths instead of repeated directory inventories. Read a
+single short resource or a named section in each tool result. For a long document,
+use small windows (about 2,000 characters or 40 lines); after truncation, continue
+from the missing range instead of restarting. Reuse unchanged same-session reads.
+Read original source documents completely, with continuation windows as needed;
+shorter instructions never authorize dropping source events or evidence.
+
 ## Write the complete episode
 
 Write `output/episode.json` as one object with:
@@ -46,8 +67,20 @@ Write `output/episode.json` as one object with:
   consecutive `index`, `scene_id`, `location`, `duration_seconds`, `purpose`,
   `characters`, `in_frame`, `start_state`, `event`, `end_state`, `camera`, `turns`,
   `sfx`, `audio_plan.music_cue`, and the adaptation's `source_quote`.
+- For a task selecting `h3_input_mode: first-frame`, author each shot's
+  `opening_frame: {image_prompt, visible_characters, reference_subjects}` now.
+  Describe one static composition at time zero: camera position, visible stable
+  identity/clothing, spatial anchors, light and the exact opening prop state.
+  Keep subsequent movement and arrivals in the shot's event/video direction.
+  POV can have `visible_characters: []`. Name the logical scene/character sources;
+  apply the selected style to the composition, materials and light. Production
+  binds actual card paths and appends the same frozen style rules to the image API
+  request and image review, without rewriting your opening prompt. Do not
+  defer this creative prompt to production. Opening repairs update this source
+  field through the existing repair tool; their previous images/history remain.
 - Each turn has `speaker_name`, exact `text`, `delivery_mode` (`visible_dialogue`
-  or `offscreen_dialogue`) and a specific `emotion`/delivery description. Use
+  or `offscreen_dialogue`) and a specific `emotion`/delivery description, in
+  English for `no_reference_performance_first`. Use
   `turns: []` for a genuinely silent shot. Design speech and its observable reaction
   together; the later H3 compiler places the English performance before `<d>`.
 - `clips`: contiguous generation groups, each with `shot_indexes` and
@@ -56,6 +89,16 @@ Write `output/episode.json` as one object with:
   inputs. An individual shot can be shorter than four seconds; the group minimum
   does not turn every insert or reaction into a long take. Group suitable short
   cuts together and use long takes when their ongoing action earns the time.
+- For `music_mode: timeline`, also author `chapter_script.music_plan` with
+  `cues` and `silences`. A cue contains `id`, a musical `query`, `reason`, exact
+  `source_quote`, and `start`/`end` anchors such as
+  `{"shot":3,"edge":"start","offset_seconds":0}`. Plan entries, withdrawals,
+  fades and listening gaps with the drama now; production chooses actual tracks
+  from the library and binds anchors to measured cuts. Record silence windows
+  with the same anchors/reason/source evidence. They mute only added music.
+  This is postmix music: video prompts keep non_diegetic_music=None and preserve
+  native dialogue/environment sound. Existing source-required listening gaps
+  remain protected; revising those gaps requires revising the source music plan.
   These are future groups,
   not generated videos; final H3 prompts and asset binding are not required here.
 - `interaction`: `question`, `options` and `selected: null`. Each option has `id`,

@@ -199,6 +199,7 @@ def _run_episode(ctx, *, config=None, timeout=None, retry_issues=False):
                     resume = (ctx.work_dir / SESSION_FILE).is_file()
                     prompt = prompts.continuation_prompt() if resume or (ctx.run_dir/'prepared.json').is_file() else prompts.initial_prompt(ctx)
                 resume = (ctx.work_dir / SESSION_FILE).is_file()
+                prompt += '\n'+prompts.task_instructions(ctx)
                 if config.get('agent_instructions'):
                     prompt += '\nTask-specific instructions:\n' + str(config['agent_instructions'])
                 diagnosis = recovery.diagnose(ctx, status)
