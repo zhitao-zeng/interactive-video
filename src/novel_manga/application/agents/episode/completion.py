@@ -36,7 +36,12 @@ class EpisodeCompletion:
             return {'ok': False, 'error': 'stale_review', 'required_action': 'review',
                     'message': 'Run review with the current policy and configured mode before finishing existing video.',
                     'review_policy': review.get('policy'), 'expected_review_policy': REVIEW_POLICY}
-        if report.get('status') == 'clips_ready' or (report.get('assembly')or{}).get('needs_subtitle_refresh'):
+        batch_review = read_json(self.ctx.work_dir/'input/manifest.json', {}).get('production_mode') == 'batch_review'
+        content_pending = bool(review.get('feedback') or report.get('failed_clips')
+            or report.get('gate_failed_clips') or any(row.get('severity') in {'fail','review_error'}
+                for row in (review.get('clips') or {}).values()))
+        if ((report.get('status') == 'clips_ready' or (report.get('assembly')or{}).get('needs_subtitle_refresh'))
+                and not (batch_review and content_pending)):
             if not media_matches(plan, report, notes=read_json(self.ctx.episode_dir/'review_feedback.json', {})):
                 return {'ok': False, 'error': 'stale_media', 'required_action': 'render',
                         'message': 'Current requests need render before existing takes can be assembled.'}

@@ -42,8 +42,11 @@ def runner_for(root: Path, novel: Path, lane: str, *, project: str | None = None
     from novel_manga.models.bible import StoryBible
     from novel_manga.application.rendering.flow import ThinMediaRunner
     from novel_manga.application.profiles import load_profile
+    profile=load_profile(novel)
+    if lane=='h3' and profile.get('native_h3_short_edge') is not None:
+        os.environ['NOVEL_H3_SHORT_EDGE']=str(profile['native_h3_short_edge'])
     settings = Settings.from_env(provider='phanrouter', output_root=novel.parent, admission_mode='preview')
     workers=json.loads((root/'configs/interactive.json').read_text())['production'].get('workers_by_lane', {}).get(lane, 1)
     return ThinMediaRunner(novel_dir=novel, episode_dir=novel/(novel.name+'_1'), settings=settings,
                            bible=StoryBible.model_validate_json((novel/'story_bible.json').read_text()),
-                           profile=load_profile(novel), workers=workers, max_attempts=2)
+                           profile=profile, workers=workers, max_attempts=2)

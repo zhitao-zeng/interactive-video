@@ -1,0 +1,29 @@
+{
+  "id": "flowers-ep01-END",
+  "series_title": "未署名的花",
+  "question": "今晚，她的花送给谁？",
+  "seconds": 3,
+  "options": [
+    {
+      "id": "A",
+      "label": "栀子给闻屿",
+      "next": "第二集A：窗边续聊"
+    },
+    {
+      "id": "B",
+      "label": "玫瑰给程越",
+      "next": "第二集B：一起做咖啡"
+    },
+    {
+      "id": "C",
+      "label": "今晚留花",
+      "next": "第二集C：和许棠聊聊"
+    }
+  ],
+  "selected": null,
+  "theme": {
+    "background": "#F4EEE4",
+    "foreground": "#344A5C",
+    "secondary": "#AB8869"
+  }
+}

@@ -46,6 +46,11 @@ def run_session(work_dir: Path | str, prompt_text: str, *, resume: bool = False,
     The host still owns media services, budgets, caching and independent acceptance.
     """
     config = load_config() if config is None else config
+    if config.get('backend') == 'codex':
+        from .codex_session import run_session as run_codex_session
+        return run_codex_session(work_dir, prompt_text, resume=resume, timeout=timeout,
+            config=config, expected_output=expected_output, enable_tools=enable_tools,
+            project_root=project_root)
     work_dir = Path(work_dir).resolve()
     if not prompt_text.strip():
         raise SandboxRefused("The episode session needs a prompt.")

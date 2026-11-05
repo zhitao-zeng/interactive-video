@@ -1,0 +1,30 @@
+[
+  {
+    "index": 4,
+    "text": "阮夏｜展陈设计师",
+    "offset_seconds": 0,
+    "duration_seconds": 3,
+    "kind": "cast_flower_profile"
+  },
+  {
+    "index": 4,
+    "text": "闻屿｜建筑声学工程师",
+    "offset_seconds": 3,
+    "duration_seconds": 3,
+    "kind": "cast_flower_profile"
+  },
+  {
+    "index": 6,
+    "text": "程越｜咖啡店主",
+    "offset_seconds": 0,
+    "duration_seconds": 3,
+    "kind": "cast_flower_profile"
+  },
+  {
+    "index": 6,
+    "text": "许棠｜活动策划",
+    "offset_seconds": 3,
+    "duration_seconds": 3,
+    "kind": "cast_flower_profile"
+  }
+]

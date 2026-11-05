@@ -18,7 +18,7 @@ def prepare(ctx,status,diagnosis,memories):
     for cid in sorted(selected):
         clip=by_id.get(cid,{})
         saved=(status.get('input_repairs') or {}).get(cid) or {}
-        targets.append({'clip_id':cid,'shot_indexes':clip.get('shot_indexes',[]),
+        target={'clip_id':cid,'shot_indexes':clip.get('shot_indexes',[]),
             'dialogue_slots':dialogue_slots(clip),
             'request_seconds':clip.get('request_seconds'),
             'references':[{k:r[k] for k in ('name','role','asset_id','image') if k in r}
@@ -32,7 +32,12 @@ def prepare(ctx,status,diagnosis,memories):
                 'resume_saved':saved.get('resume_action'),
                 'can_revise_saved':bool(saved.get('revision_available')),
                 'failed_step':saved.get('step'),'error':saved.get('error'),
-                'error_details':saved.get('error_details'),'next':saved.get('next_action')}})
+                'error_details':saved.get('error_details'),'next':saved.get('next_action')}}
+        from novel_manga.application.review.confirmed import clip_review_criteria
+        criteria=clip_review_criteria(ctx.episode_dir,cid)
+        if criteria:
+            target['review_criteria']=criteria
+        targets.append(target)
     issues=[r for r in diagnosis.get('issues',[]) if not status.get('adopted')
             or not r.get('clips') or selected.intersection(r['clips'])]
     files=[f'input/{name}' for name in ('source.txt','segments.json','chapter_script.json',
@@ -52,6 +57,7 @@ def prepare(ctx,status,diagnosis,memories):
         if isinstance(outcome.get(field),dict):last['result'][field]={k:v for k,v in outcome[field].items() if k in selected}
     brief={'phase':read_json(ctx.work_dir/'input/manifest.json',{}).get('agent_phase'),
         'mode':'adopted_repair' if adopted else 'provisional_draft',
+        'author_session':read_json(ctx.work_dir/'episode-session.json',{}).get('session_id'),
         'upstream_route':status.get('upstream_route'),
         'targets':targets,'issues':issues,'last_operation':last,'evidence_files':files,
         'full_status':'input/current-status.json','reference_catalog':'input/catalog.json','related_history':recent,
@@ -71,6 +77,7 @@ def prepare(ctx,status,diagnosis,memories):
             'An accepted episode does not prove every attempted remedy worked. Match the concrete issue to current evidence; '
             'not_recorded means no repair recipe was retained, and unresolved cases are not verified recipes.',
             'repair_assets/repack are separate upstream operations; source/image candidates do not grant video or certify acceptance.',
+            'Only a target with host-provided review_criteria may use review_file on keep. The current production session authors one output/scoped-review-<clip_id>.json per clip with schema scoped-agent-review-v1, exact author_session from episode-session.json, clip_id, current selected video path/take, selected raw task_id, exact source_segment_ids and source_evidence [{segment_id,text}] copied from current segments.json, exact review_criteria, assessment pass/minor/fail, judgment, observations [{kind:video_frame|reference,file,times or time_seconds,observation}], and reviewed_findings [{finding,disposition:resolved|not_demonstrated|upheld}] addressing every current automated blocker. Optionally include independent_review_file pointing to the supplied independent reviewer JSON in this work directory. Set review_file to this path on that clip keep decision, then call check and apply. This does not skip speech or media gates and is unavailable for clips without host criteria.',
             'For deterministic tool bugs, inspect the read-only source and report the concrete failing field; do not repeat the same rejected operation.']}
     playbook=read_json(ctx.work_dir/'input/manifest.json',{}).get('skill_references',{}).get('repair_playbook')
     if playbook:

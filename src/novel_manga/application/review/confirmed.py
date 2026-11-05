@@ -32,10 +32,30 @@ def finding_result(answer):
                         or '；'.join(c.get('evidence', '') for c in checks)}
 
 
+def resolved_on_take(claim, video, take):
+    check = claim.get('check') or {}
+    return check.get('video') == str(video) and check.get('take') == take and check.get('result') == 'resolved'
+
+
+def clip_review_criteria(directory, cid):
+    """Return host-authored criteria for one clip; absent files preserve legacy review behavior."""
+    path = Path(directory) / 'review_criteria.json'
+    if not path.is_file():
+        return []
+    data = read_json(path, {})
+    clips = data.get('clips', {}) if isinstance(data, dict) else {}
+    if not isinstance(clips, dict):
+        raise ValueError('review_criteria.json must contain a clips object')
+    criteria = clips.get(cid, [])
+    if (not isinstance(criteria, list) or any(not isinstance(item, str) or not item.strip() for item in criteria)):
+        raise ValueError(f'review criteria for {cid} must be a list of non-empty strings')
+    return [item.strip() for item in criteria]
+
+
 def apply_claim(verdict, claim, video, take):
     verdict = copy.deepcopy(verdict)
     check = claim.get('check') or {}
-    resolved = check.get('video') == str(video) and check.get('take') == take and check.get('result') == 'resolved'
+    resolved = resolved_on_take(claim, video, take)
     verdict['confirmed'] = claim
     if check.get('error_kind') == 'review_premise_conflict':
         verdict['defect_kind'] = 'review_premise_conflict'
@@ -50,7 +70,7 @@ def apply_claim(verdict, claim, video, take):
 
 
 
-def judge_finding(clip, video, claim, work, novel_dir=None):
+def judge_finding(clip, video, claim, work, novel_dir=None, review_criteria=()):
     """Inspect current ordered frames for the concrete acceptance condition; never auto-clear on a broad pass."""
     frames = clip_frames(Path(video), Path(work), 6)
     from .evidence import segment_texts
@@ -85,7 +105,8 @@ def judge_finding(clip, video, claim, work, novel_dir=None):
         '旧评审指控不是事实，目标中的性别、外貌、身份和在场前提也需核对。'
         '先独立读取实际角色卡、当前帧和下方原文，premise_valid表示目标前提是否成立；'
         '前提与原文或参考图冲突时填false并写具体premise_evidence，缺少证据填null；'
-        '这类冲突需先修输入/资产，不能靠重拍正确画面来迎合错误指控。'
+        '这类冲突需先修输入/资产，不能靠重拍正确画面来迎合错误指控。' +
+        ('\n本次由宿主提供的逐镜验收标准（仅这些明确容差覆盖较严格的旧判词；不覆盖原文明确事实，也不豁免身份、座位或道具空间关系的实际错误）：\n- ' + '\n- '.join(review_criteria) if review_criteria else '') +
         '\n对应原文：' + (passage or '本次未提供，不能推断原文事实。') +
         '\n待核对的验收目标：' + claim['instruction'] + '\n只输出JSON。')})
     answer = ask_json(parts, SCHEMA, name='confirmed_picture_check', max_tokens=1800,
@@ -93,7 +114,7 @@ def judge_finding(clip, video, claim, work, novel_dir=None):
     return finding_result(answer)
 
 
-def enforce(directory, report, previous, *, verify=False):
+def enforce(directory, report, previous, *, verify=False, review_criteria=None):
     """Read-only unless the caller publishes the returned report. Resolved checks are bound to a take."""
     result = copy.deepcopy(report)
     plan = {c['clip_id']: c for c in read_json(directory / 'clip_plan.json', {}).get('clips', [])}
@@ -102,23 +123,47 @@ def enforce(directory, report, previous, *, verify=False):
         row = result.get('clips', {}).get(cid)
         if not claim or not row or not row.get('video') or not row.get('take'):
             continue
+        # A take may carry positive review evidence without ever having had a
+        # failure. It has no repair instruction and must not become a finding.
+        if not claim.get('issue') and not claim.get('instruction'):
+            continue
         video, take = row['video'], row['take']; check = claim.get('check') or {}
-        if claim.get('video') == video and claim.get('take') == take:
-            # Confirmed on this very take: not re-judged on it, and no check written on it clears it.  A model
-            # reading the same frames cleared two human-confirmed findings (ch12-1 clip_19/20, 2026-09-26).
-            claim.pop('check', None)
-            checked = True
+        criteria = (review_criteria or {}).get(cid)
+        if criteria is None:
+            criteria = clip_review_criteria(directory, cid)
+        criteria = list(criteria)
+        criteria_changed = bool(criteria) and check.get('review_criteria') != criteria
+        if claim.get('video') == video and claim.get('take') == take and not criteria_changed:
+            if (criteria and check.get('video') == video and check.get('take') == take
+                    and check.get('review_criteria') == criteria):
+                checked = True
+            else:
+                # Confirmed on this very take: not re-judged on it, and no check written on it clears it.  A model
+                # reading the same frames cleared two human-confirmed findings (ch12-1 clip_19/20, 2026-09-26).
+                claim.pop('check', None)
+                checked = True
         else:
-            checked = check.get('video') == video and check.get('take') == take
+            checked = (check.get('video') == video and check.get('take') == take
+                       and (not criteria or check.get('review_criteria') == criteria))
         if verify and not checked:
             try:
-                answer = judge_finding(plan[cid], video, claim, directory / 'work/confirmed_review' / cid, directory.parent)
-                claim['check'] = {**answer, 'video': video, 'take': take}
+                if criteria:
+                    answer = judge_finding(plan[cid], video, claim,
+                                           directory / 'work/confirmed_review' / cid, directory.parent,
+                                           review_criteria=criteria)
+                else:
+                    answer = judge_finding(plan[cid], video, claim,
+                                           directory / 'work/confirmed_review' / cid, directory.parent)
+                claim['check'] = {**answer, 'video': video, 'take': take,
+                                  **({'review_criteria': criteria} if criteria else {})}
             except Exception as error:
                 claim['check'] = {'result': 'uncertain', 'video': video, 'take': take,
-                                  'evidence': f'检查未完成：{type(error).__name__}'}
+                                  'evidence': f'检查未完成：{type(error).__name__}',
+                                  **({'review_criteria': criteria} if criteria else {})}
         row = apply_claim(row, claim, video, take)
         result['clips'][cid] = row
-        if row.get('severity') == 'fail':
-            result.setdefault('feedback', {})[cid] = claim['instruction']
+        if row.get('severity') == 'fail' and not resolved_on_take(claim, video, take):
+            from novel_manga.media.speech_repair import merge_note
+            feedback = result.setdefault('feedback', {})
+            feedback[cid] = merge_note(feedback.get(cid, ''), claim['instruction'])
     return result

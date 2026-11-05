@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import time
+from contextlib import nullcontext
 
 from novel_manga.util import read_json
 
@@ -37,8 +38,12 @@ def invoke(ctx, bridge, state, config, prompt, resume, remaining):
                             model_wait_seconds=result['model_wait_seconds'])
     bridge.update_state(phase='ready_agent', waiting_for=None)
     try:
-        with model_slot(config['base_url'], on_wait=waiting, cancelled=lifecycle.paused,
-                        reserve=int(config.get('model_slots_reserved_for_tools', 0)),record_queue=False):
+        # Saved Codex login has its own capacity; it does not occupy the API
+        # provider's slot while the ordinary host checks retain their settings.
+        admission = (nullcontext() if config.get('backend') == 'codex' else
+                     model_slot(config['base_url'], on_wait=waiting, cancelled=lifecycle.paused,
+                        reserve=int(config.get('model_slots_reserved_for_tools', 0)),record_queue=False))
+        with admission:
             account_wait()
             if lifecycle.paused():
                 raise InterruptedError('production dispatch paused')

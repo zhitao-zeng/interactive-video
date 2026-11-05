@@ -105,6 +105,8 @@ class DraftOperations:
                     if not row.get('reason'):
                         raise RepairArgumentError('repair decision needs a reason')
                     action = row.get('action')
+                    if row.get('review_file') is not None and action != 'keep':
+                        raise RepairArgumentError('review_file is supported only for a current-take keep decision')
                     if action in {'repair_assets','repack'}:
                         if len(draft['decisions'])!=1:raise RepairArgumentError('submit one upstream operation separately')
                         if action=='repair_assets':
@@ -150,6 +152,12 @@ class DraftOperations:
                         raise RepairArgumentError('clip has no English request; use edit to supply it before retake')
                     elif action not in {'keep','stop','retake','accept_risk'}:
                         raise RepairArgumentError('choose input, edit, retake, keep, accept_risk or stop')
+                    elif action == 'keep' and row.get('review_file') is not None:
+                        artifact = input_file(self.ctx, {'file': row['review_file']}, row['review_file'])
+                        from novel_manga.application.review.execution import validate_scoped_agent_review
+                        session = read_json(self.ctx.work_dir / 'episode-session.json', {}).get('session_id')
+                        validate_scoped_agent_review(self.ctx.episode_dir, cid, artifact,
+                                                      work_dir=self.ctx.work_dir, author_session=session)
                     elif action in {'keep','stop','retake'}:
                         from .repair_targets import validate_target
                         validate_target(self.ctx,row)
