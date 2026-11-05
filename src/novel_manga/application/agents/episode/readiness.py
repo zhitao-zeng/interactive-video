@@ -41,6 +41,22 @@ def review_is_current(ctx, review):
     return not EpisodeEvidence.unreviewed_clips(media, review)
 
 
+def automatic_action(ctx, status, *, first_pass_only=False):
+    """Dispatch deterministic stages once; failed unchanged work returns to the Agent."""
+    if status.get('adopted') is not True:
+        return None
+    job = status.get('job') or {}
+    if job.get('status') in {'accepted', 'running'}:
+        return None
+    action = next_action(ctx, status)['action']
+    allowed = {'render'} if first_pass_only else {'render', 'review', 'finish'}
+    if action not in allowed:
+        return None
+    if job.get('action') == action and job.get('status') in {'completed','failed'}:
+        return None
+    return action
+
+
 def next_action(ctx, status=None):
     """The precise legal next host action and its evidence.
 
@@ -63,15 +79,55 @@ def next_action(ctx, status=None):
     if blocker := service_blocker(status):
         return {'action': 'agent', 'reason': 'the shared service is unusable; stop this batch',
                 'service_interrupted': blocker}
+    preparation = read_json(ctx.work_dir/'input/latest-preparation.json', {})
+    if preparation.get('error') == 'local_preparation_required' and media.get('blocked_clips'):
+        from .local_preparation import SOURCE_AUDIT_POLICY
+        cached = read_json(ctx.run_dir/'local-source-check.json', {})
+        if cached.get('policy') != SOURCE_AUDIT_POLICY:
+            return {'action': 'first_frames',
+                    'reason': 'Source audit policy or original evidence changed; revalidate before authored repair',
+                    'blocked': media['blocked_clips']}
+        return {'action': 'agent',
+                'reason': 'Current local source/input validation is unresolved. Verify the original evidence; use recheck_input '
+                          'for a false finding, otherwise write supported input or edit decisions in output/repair.json. '
+                          'Call check then apply before first_frames or render.',
+                'blocked': media['blocked_clips'],
+                **({'source_audit': preparation['source_audit']} if preparation.get('source_audit') else {})}
+    from .opening_source import source_blockers
+    opening_conflicts = source_blockers(ctx, plan)
+    if opening_conflicts:
+        from novel_manga.media.first_frames import review_problems
+        frame_rows = (status.get('first_frames') or {}).get('clips') or {}
+        source_conflicts = {}
+        for cid, findings in opening_conflicts.items():
+            saved = (frame_rows.get(cid) or {}).get('last_rejection') or {}
+            source_conflicts[cid] = saved if saved.get('source_conflicts') == findings else {
+                'candidate': 'source-preflight', 'problems': review_problems({'findings': findings}),
+                'source_conflicts': findings,
+                'evidence': f'input/first_frames/{cid}/source-preflight.json'}
+        return {'action':'agent',
+                'reason':'Current opening source fields conflict. Write source-supported action=input decisions in output/repair.json; '
+                         'call check then apply before first_frames or render. Reusing or redrawing an image cannot resolve the source conflict.',
+                'source_input_conflicts':source_conflicts,
+                'blocked':{cid:row.get('problems') or ['source input conflict'] for cid,row in source_conflicts.items()}}
     first = first_frame_blocks(ctx, plan)
     if first:
+        source_conflicts={cid:row.get('last_rejection') or {}
+                          for cid,row in ((status.get('first_frames') or {}).get('clips') or {}).items()
+                          if cid in first and row.get('repair_origin')=='source'}
+        if source_conflicts:
+            return {'action':'agent',
+                    'reason':'Current opening source fields conflict. Write source-supported action=input decisions in output/repair.json; '
+                             'call check then apply before first_frames. Reusing or redrawing an image cannot resolve the source conflict.',
+                    'source_input_conflicts':source_conflicts,
+                    'blocked':{cid:row.get('problems') or ['source input conflict'] for cid,row in source_conflicts.items()}}
         return {'action': 'first_frames',
                 'reason': 'accepted input/opening change needs a fresh reviewed opening before video',
                 'blocked': first}
     from novel_manga.application.review.execution import media_matches
     notes = read_json(ctx.episode_dir / 'review_feedback.json', {})
     videos = [c for c in plan.get('clips', []) if c.get('kind') == 'video']
-    if videos and not media_started(ctx.episode_dir):
+    if videos and (not media_started(ctx.episode_dir) or not media):
         return {'action': 'render', 'reason': 'opening and request inputs are current; no video has started'}
     if media and not media_matches(plan, media, notes=notes):
         return {'action': 'render', 'reason': 'current requests are newer than the selected takes'}
@@ -79,6 +135,9 @@ def next_action(ctx, status=None):
         return {'action': 'review', 'reason': 'review evidence is from an older policy or take'}
     if media.get('clips') and not review.get('clips'):
         return {'action': 'review', 'reason': 'selected takes have no current independent review'}
+    if (review.get('feedback') or media.get('failed_clips') or media.get('gate_failed_clips')
+            or any(row.get('severity') in {'fail','review_error'} for row in (review.get('clips') or {}).values())):
+        return {'action':'agent','reason':'current findings require an authored repair decision before acceptance'}
     from novel_manga.application.music_selection import episode_music_errors
     if errors := episode_music_errors(ctx.episode_dir, media):
         return {'action': 'select_music', 'reason': '; '.join(errors), 'blocked': errors}

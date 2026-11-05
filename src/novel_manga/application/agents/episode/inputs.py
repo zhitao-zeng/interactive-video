@@ -208,6 +208,13 @@ def _candidate_references(ctx, text, plan, script, *, bound_plan=False, fresh=Fa
         if name in names or name in text:
             references.append({'asset_id': f'voice_{name}', 'role': 'voice', 'name': name,
                                'path': f'series_assets/voices/{name}.wav'})
+    from novel_manga.media.reference_views import scope_of,supplied_wardrobe_views
+    supplied=[]
+    for ref in references:
+        if ref.get('role')!='character':continue
+        if scope:=scope_of(ctx.source_novel_dir,ref):ref['reference_scope']=scope
+        supplied.extend(supplied_wardrobe_views(ctx.source_novel_dir,ref))
+    references.extend(supplied)
     return references
 
 
@@ -227,7 +234,9 @@ def _catalog(ctx, references, *, fresh=False):
         else:
             relative = Path('series_assets/episode_refs') / f'{ctx.source_episode_dir.name}-{ctx.input_mode}' / f'asset_{len(assets)+1:03d}{source.suffix}'
         local_target = ctx.novel_dir / relative
-        target = local_target if local_target.is_file() else ctx.asset_snapshot_dir / relative
+        local_assets=ctx.novel_dir/'series_assets'
+        localized=local_assets.is_dir() and not local_assets.is_symlink()
+        target = local_target if local_target.is_file() or localized else ctx.asset_snapshot_dir / relative
         if not source.is_file() and not original.is_absolute():
             local = ctx.novel_dir/original
             if local.is_file():

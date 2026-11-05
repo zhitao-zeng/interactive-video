@@ -57,6 +57,9 @@ def prepare(root, novel, *, builder=None, checker=None):
                 raise ValueError(f"{clip['clip_id']}: opening reference_subjects must name registered source cards")
             refs=[r for r in refs if r['name'] in subjects]
         paths=[r['path'] for r in refs]
+        from novel_manga.media.reference_views import opening_references
+        refs=opening_references(ctx,clip,paths)
+        paths=[r['path'] for r in refs]
         if not paths:raise ValueError(f"{clip['clip_id']}: opening requires registered source cards")
         contract=current_contract(ctx,clip,paths,include_style=True)
         row={'image_prompt':opening['image_prompt'],'visible_characters':opening['visible_characters'],

@@ -31,7 +31,11 @@ def data_signature(novel):
 
 def chapter_inputs(directory):
     directory = Path(directory).resolve()
-    return {'data': data_signature(directory.parent), 'segments': read(directory / 'segments.json', [])}
+    result = {'data': data_signature(directory.parent), 'segments': read(directory / 'segments.json', [])}
+    authored = directory / 'authored_source.md'
+    if authored.is_file():
+        result['authored_source'] = authored.read_text(encoding='utf-8')
+    return result
 
 
 

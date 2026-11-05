@@ -75,6 +75,16 @@ def test_summary_completion_is_recorded_without_treating_it_as_work(tmp_path,mon
     assert result.produced==[]
 
 
+def test_native_attempt_records_reported_models_without_relabeling_the_requested_route(tmp_path,monkeypatch,config):
+    work=tmp_path/'episode'
+    fake_cli(monkeypatch,work,outputs={'episode.json':'{"title":"draft"}'},
+        result={'type':'assistant','message':{'model':'kimi-k2.6','content':[{'type':'text','text':'DONE'}]}})
+    result=session.run_session(work,'Write fixture',config=config)
+    assert result.record['model']=='configured-model'
+    assert result.record['response_models']==['kimi-k2.6']
+    assert 'private-test-token' not in json.dumps(result.record)
+
+
 def test_initial_session_uses_configured_model_only_workspace_and_file_tools(tmp_path, monkeypatch, config):
     work = tmp_path / "episode"
     calls = fake_cli(monkeypatch, work, outputs={"episode.json": '{"title":"draft"}'})
