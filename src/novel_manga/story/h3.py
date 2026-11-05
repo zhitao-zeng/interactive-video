@@ -226,6 +226,11 @@ def compose(clip: dict, english: list[str], stages: list, *, soundscape: str = "
     the statement that the on-screen characters' lips stay closed (the "wrong mouth moves" defect)."""
     from .voice_delivery import visual_request
     clip = visual_request(clip)
+    if clip.get('music_delivery')=='postmix'and music.strip().lower().rstrip('.')not in {'','none'}:
+        raise ValueError('postmix story music belongs to assembly, not the native video request')
+    from .voice_delivery import native_speech_errors, native_speech_selected
+    if errors := native_speech_errors(clip):
+        raise ValueError('; '.join(errors))
     defs, subject_of = subject_lines(clip)
     speaker_ids: dict = {}
 
@@ -282,6 +287,8 @@ def compose(clip: dict, english: list[str], stages: list, *, soundscape: str = "
             if who in voice_refs and who not in heard_voices:
                 said += f" The speaking voice follows the timbre referenced from <Audio {voice_refs[who]}>."
                 heard_voices.add(who)
+            if native_speech_selected(clip):
+                body.append(str(rest[0]).strip())
             inner = bool(rest[1]) if len(rest) > 1 else False
             if inner and who in subject_of:
                 # The reaction follows the shot's own framing: a close-up of hands carries it in
@@ -350,12 +357,13 @@ def compose(clip: dict, english: list[str], stages: list, *, soundscape: str = "
         summary += (' in ' + ' and '.join(locations) if locations else '') + '.'
     if has_audio:
         summary += ' The referenced audio guides the identified speakers\' vocal timbres.'
-    return ("subject_definitions:\n" + "\n".join(defs + voice_lines(clip, subject_of, speaker_ids))
+    prompt = ("subject_definitions:\n" + "\n".join(defs + voice_lines(clip, subject_of, speaker_ids))
             + f"\n\nsummary:\n{task} " + summary + "\n\n"
               "retention_analysis:\n" + "\n".join(retention) + "\n\n"
               "detailed_description:\n" + (animation.strip() + '\n' if animation.strip() else '') + "\n".join(body)
             + "\n\noverall_soundscape:\n" + (soundscape.strip() or 'None.') + "\n\n"
               "non_diegetic_music:\n" + (music.strip() or 'None.'))
+    return first_frame_prompt(clip,prompt)
 
 
 def tag_names(text: str, naming: str) -> str:
@@ -467,7 +475,10 @@ def request_issues(clip: dict) -> list[str]:
     # Positive phrasing is authoring advice. A legacy sentence such as
     # "no other person has this face" does not invalidate its identities or words.
     # Callers may surface positive_direction_issues separately from hard failures.
-    return issues + final_dialogue_issues(clip)
+    from .voice_delivery import native_speech_errors
+    if clip.get('music_delivery')=='postmix'and text.split('non_diegetic_music:',1)[-1].strip().lower().rstrip('.')not in {'','none'}:
+        issues.append('postmix story music must leave native non_diegetic_music empty/None')
+    return issues + final_dialogue_issues(clip) + native_speech_errors(clip,prompt=text)
 
 
 def identity_issues(clip: dict) -> list[str]:
@@ -520,3 +531,23 @@ def correction(clip: dict) -> str:
             '不要把集体称呼当一个具名人物放进 in_frame、characters 或 actions 的 actor/target，'
             '否则同一张脸会被强制复制。用事件句描述配角的共同动作，保留原文人数和行为。'
             '如果原文只有一人，改回一个人物，不增加人。')
+
+
+def first_frame_prompt(clip,prompt):
+    """Keep source Subject/Audio identities while compiling actual opening/supplement slots."""
+    frame=clip.get('first_frame')
+    if not frame:return prompt
+    originals=[r for r in clip.get('references',[]) if r.get('role')!='voice']
+    extras={path:i for i,path in enumerate(frame.get('extra_references',[]),2)}
+    mapping={i:extras.get(r['path'],1) for i,r in enumerate(originals,1)}
+    visible=set(frame.get('visible_characters',[]))
+    for name,number in subject_map(clip).items():
+        own=[r for r in originals if r.get('role')=='character' and r.get('name')==name]
+        if name not in visible and not any(r['path'] in extras for r in own):
+            prompt=re.sub(r'(?m)^<Subject '+str(number)+r'>[^\n]*',
+                '<Subject '+str(number)+'> is the source-identified offscreen speaker; voice only.',prompt,count=1)
+    chunks=re.split(r'(<d>.*?</d>)',prompt,flags=re.S)
+    remapped=''.join(chunk if i%2 else re.sub(r'<Picture (\d+)>',
+        lambda m:f'<Picture {mapping[int(m[1])]}>' ,chunk) for i,chunk in enumerate(chunks))
+    return remapped.replace('\n\nretention_analysis:',
+        ' The complete opening composition follows <Picture 1>.\n\nretention_analysis:',1)

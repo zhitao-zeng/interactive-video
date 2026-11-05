@@ -5,6 +5,7 @@ from pathlib import Path
 
 from novel_manga.application.configuration import h3_request_check_endpoint
 from novel_manga.llm.client import ask_json, image_part, obj
+from novel_manga.media.first_frames import video_metadata
 from novel_manga.util import read_json, atomic_write_json
 
 POLICY = 'request-reference-v10-grounded-conflict-recheck'
@@ -108,7 +109,11 @@ def recheck_scope(answer, lines, legend, *, images=()):
 
 def request_consistency(clip: dict, novel_dir: Path, *, request=None) -> dict:
     """The images are input evidence, not character descriptions substituted for the images."""
-    metadata = [r for r in clip.get('references', []) if r.get('role') != 'voice']
+    from novel_manga.story.voice_delivery import native_speech_errors, native_speech_selected
+    policy_errors=native_speech_errors(clip,prompt=(request or{}).get('prompt',clip.get('prompt_h3','')),
+                                       audios=(request or{}).get('reference_audios'))
+    if policy_errors:return {'consistent':False,'problems':policy_errors,'observations':[]}
+    metadata = video_metadata(clip)
     paths = ([Path(p) for p in request['references']] if request is not None
              else [Path(novel_dir) / r['path'] for r in metadata])
     parts, legend = [], []
@@ -117,7 +122,7 @@ def request_consistency(clip: dict, novel_dir: Path, *, request=None) -> dict:
         parts.append(image_part(path, 1024))
         legend.append({'picture': i, 'name': ref.get('name'), 'role': ref.get('role'),
                        'view': ref.get('view'), 'wearers': ref.get('wearers', []),
-                       'reference_scope': reference_scope(path)})
+                       'reference_scope': ref.get('reference_scope') or reference_scope(path)})
     english = str(request['prompt'] if request is not None else clip.get('prompt_h3', ''))
     # These are explicit compiler-owned style/metadata fields, not character instructions. The
     # actual generation request stays untouched. A generic "fabric surfaces" style sentence
@@ -126,7 +131,14 @@ def request_consistency(clip: dict, novel_dir: Path, *, request=None) -> dict:
     lines = [('中文', s) for s in str(clip.get('prompt', '')).splitlines()
              if not english and s.strip() and not s.startswith(('【生成目标】', '【视觉语法】', '画面呈现', '【不要】'))]
     lines += [('英文', s) for s in english.splitlines() if s.strip() and not (style and style in s)]
-    prompt = ('核对实际即将发给视频模型的请求与参考图，不评价尚未生成的视频，不改台词。'
+    performance_rules=('当前任务选择无音色参考和表演前置。每句emotion是绑定到原句前的英文表演指令；核对它与当前发现或回应是否相符，'
+        '不能用年龄、音色和总语速说明替代本句演法。普通句只需相关细节，不强求每句大幅转折。'
+        '语气、重音和情绪停顿应位于台词旁，overall_soundscape只描述物理声，不是第二套对白演法。'
+        '本检查评价请求可执行性，不声称听过尚未生成的声音。\n'if native_speech_selected(clip)else'')
+    music_rules=('本任务配乐将在后期按剧情装配，原生non_diegetic_music应为None；不能因原生请求没有背景配乐而报缺失。物理环境声和对白仍须保留。\n'if clip.get('music_delivery')=='postmix'else'')
+    prompt = ('核对实际即将发给视频模型的请求与参考图，不评价尚未生成的视频，不改台词。'+performance_rules+music_rules+
+              '图例role=first_frame是完整开场画面，并非人物卡；开场机位/姿态/可见人物受它约束，后续动作允许变化。'
+              '未在首帧出现且有额外人物卡的新人可以在后续按剧情入镜。'
               '最终英文是实际执行的画面和声音要求，中文仅提供剧情和身份背景；不要用过期的中文机位/状态否定已确认的英文修正。'
               '先在observations逐图记录可见的衣物款式、主色、配饰、物件类型，再比较本镜文字。'
               '图例reference_scope=identity_portrait是来源指定的身份肖像，不是全身服饰清单；'
@@ -182,7 +194,7 @@ def cached_consistency(novel_dir, work, clip, request, *, require_cached=False):
     inputs = {'policy': POLICY, 'chinese': clip.get('prompt', ''), 'english': request['prompt'],
               'references': request['references'], 'reference_sha256': request.get('reference_sha256'),
               'roles': [{k: r.get(k) for k in ('name', 'role', 'view', 'wearers')}
-                        for r in clip.get('references', []) if r.get('role') != 'voice']}
+                        for r in video_metadata(clip)]}
     scopes=[reference_scope(p) for p in request['references']]
     if any(scopes):
         inputs['reference_scopes']=scopes
@@ -215,13 +227,17 @@ def cached_consistency(novel_dir, work, clip, request, *, require_cached=False):
 def current_request(directory, clip):
     """Diagnose an already rendered request using the same input check as new submissions."""
     from novel_manga.media.common import reference_digests
-    refs = tuple(directory.parent / r['path'] for r in clip.get('references', []) if r.get('role') != 'voice')
+    from novel_manga.media.generation import image_paths
+    from types import SimpleNamespace
+    refs = image_paths(SimpleNamespace(novel_dir=directory.parent),clip)
     request = {'prompt': clip.get('prompt_h3', ''), 'references': [str(p) for p in refs],
                'reference_sha256': reference_digests(refs)}
     return cached_consistency(directory.parent, directory / 'work', clip, request)
 
 
 def before_generation(ctx, clip, request):
+    from novel_manga.story.voice_delivery import require_native_speech
+    require_native_speech(ctx,clip,request)
     answer = cached_consistency(ctx.novel_dir, ctx.work, clip, request,
                                 require_cached=ctx.options.prepared_requests_only)
     if answer.get('consistent') is not True or answer.get('problems'):

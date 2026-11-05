@@ -33,6 +33,7 @@ class AssetStyle:
     # separately from how its characters are.
     scene_style: str = ''
     scene_direction: str = ''
+    prop_direction: str = ''
     # True when the style states its own render_direction, and so already says how it
     # is drawn: appending the genre's wording on top only repeats it.
     speaks_for_itself: bool = False
@@ -52,6 +53,7 @@ class AssetStyle:
 
     @classmethod
     def for_genre(cls, genre, *, frame_text='竖屏9:16', style=None, backend=''):
+        from novel_manga.style_packs import asset_direction
         style = dict(style or {})
         # 模型方言独立于画风包:同一画风对不同模型要说不同的话,但那是模型的耳朵,不是画风。
         # 方言文件的键覆盖画风包顶层;画风包只保留画风本身(纯美学,模型中立)。
@@ -70,11 +72,12 @@ class AssetStyle:
                     style['card_brief'] = style['card_brief'].replace('{background}', card_background)
         return cls(frame_text=frame_text,
             render_family=style.get('render_family', ''),
-            render_direction=style.get('render_direction', ''),
+            render_direction=asset_direction(style, 'character', style.get('render_direction', '')),
             prompt_fingerprint=bool(style.get('prompt_fingerprint', True)),
             declares_card_suffix=bool(style.get('card_suffix')),
             scene_style=style.get('scene_style', ''),
-            scene_direction=style.get('scene_direction', ''),
+            scene_direction=asset_direction(style, 'location', style.get('scene_direction', '')),
+            prop_direction=asset_direction(style, 'prop', style.get('render_direction', '')),
             speaks_for_itself=bool(style.get('render_direction')),
             tidy_prompts=bool(style.get('tidy_prompts', False)),
             card_brief=style.get('card_brief', ''),

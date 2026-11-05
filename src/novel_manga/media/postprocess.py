@@ -223,7 +223,17 @@ def story_segments(ctx, results: list[dict]) -> list[dict]:
         selected = record["selected"]
         clip_video = Path(selected.get('postmix_video') or selected["video"])
         wav = inner_voice_audio(ctx, clip, clip_video.parent / "native.wav")
-        segment, duration = ctx.renderer.mux_visual_group(clip_video, wav, ctx.work / "segments" / f"{record['clip_id']}.mp4")
+        options={}
+        source_shots={s['index']:s for s in (getattr(ctx,'script',None) or {}).get('shots',[])}
+        indexes=clip.get('shot_indexes',[])
+        shots=[source_shots[i] for i in indexes if i in source_shots]
+        if ((getattr(ctx,'profile',None) or {}).get('h3_input_mode')=='first-frame' and len(shots)==1
+                and len(indexes)==1 and not clip.get('spoken_text') and not clip.get('dialogue_bindings')
+                and not any(t.get('text') for t in shots[0].get('turns',[]))):
+            source_seconds=float(shots[0].get('duration_seconds') or 0)
+            if 0<source_seconds<4 and float(clip.get('request_seconds') or 0)>=4:
+                options['duration_limit']=source_seconds
+        segment, duration = ctx.renderer.mux_visual_group(clip_video, wav, ctx.work / "segments" / f"{record['clip_id']}.mp4",**options)
         segments.extend(chat_segments(ctx, record["clip_id"], clip_video))
         segments.append({"unit_id": record["clip_id"], "role": "dialogue", "segment": str(segment), "duration": duration, "audio_source": selected.get("audio_source", "native_dialogue"), "subtitle_events": subtitles.subtitle_events(ctx, record["clip_id"], selected)})
     return segments
