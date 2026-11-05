@@ -243,7 +243,8 @@ def worn_pairs(clip: dict, script: dict | None = None) -> set[tuple[str, str]]:
 
 def worn_reference_pairs(plan, script: dict | None = None):
     for clip in plan.get('clips', []):
-        refs = {ref['name']: ref for ref in clip.get('references', []) if ref.get('role') == 'character'}
+        refs = {ref['name']: ref for ref in clip.get('references', [])
+                if ref.get('role') == 'character' and ref.get('reference_scope') != 'identity_portrait'}
         for wearer, prop in sorted(worn_pairs(clip, script)):
             if wearer in refs:
                 yield refs[wearer], prop
@@ -309,7 +310,8 @@ def render_risks(clip: dict, novel_dir: Path, accepted: dict | None = None, *, s
     worn = worn_pairs(clip, script)
     for wearer, prop in sorted(worn):
         ref = refs.get(wearer)
-        if ref and ref.get("role") == "character" and wearer not in (accepted.get("wearer_card") or []):
+        if (ref and ref.get("role") == "character" and ref.get('reference_scope') != 'identity_portrait'
+                and wearer not in (accepted.get("wearer_card") or [])):
             from novel_manga.application.preparation.wearer_cards import reviewed
             answer = reviewed(novel_dir, ref, prop)
             if (answer or {}).get('wearing') != 'matches':

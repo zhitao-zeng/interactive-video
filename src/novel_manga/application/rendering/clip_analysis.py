@@ -45,7 +45,10 @@ def analyse_clip(ctx, clip: dict, video: Path) -> dict:
         return {**speech_gate_result(ctx.novel_dir, final, ctx.episode_dir),
                 **sampling, 'video': str(video), 'postmix_video': str(mixed), 'audio_source': 'postmixed_inner_voice'}
     raw = media_analysis.analyse_clip(ctx, clip, video)
-    return {**speech_gate_result(ctx.novel_dir, check_clip_black(ctx, clip, recheck_speech(ctx, clip, raw, video), video), ctx.episode_dir),
+    raw=check_clip_black(ctx,clip,recheck_speech(ctx,clip,raw,video),video)
+    from novel_manga.media.retained import silent_insert_seconds,speech_in_retained_window
+    raw=speech_in_retained_window(raw,silent_insert_seconds(clip,getattr(ctx,'profile',None)or{},getattr(ctx,'script',None)or{}))
+    return {**speech_gate_result(ctx.novel_dir, raw, ctx.episode_dir),
             **sampling}
 
 

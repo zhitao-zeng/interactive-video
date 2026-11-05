@@ -15,6 +15,17 @@ def setup(tmp_path):
     return image, ref, clip
 
 
+def test_identity_portrait_does_not_claim_to_supply_the_authored_wardrobe(tmp_path):
+    _,ref,clip=setup(tmp_path)
+    ref['reference_scope']='identity_portrait'
+    assert list(readiness.worn_reference_pairs({'clips':[clip]}))==[]
+    assert readiness.render_risks(clip,tmp_path)[0]==[]
+    assert '黑色披风' in clip['prompt']
+    ref.pop('reference_scope')
+    assert list(readiness.worn_reference_pairs({'clips':[clip]}))
+    assert readiness.render_risks(clip,tmp_path)[0]
+
+
 def test_already_worn_regular_clothing_clears_only_after_seeing_the_image(tmp_path, monkeypatch):
     image, ref, clip = setup(tmp_path)
     assert readiness.render_risks(clip, tmp_path)[0]
