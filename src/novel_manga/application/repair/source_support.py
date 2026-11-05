@@ -47,6 +47,8 @@ def source_check(source, quote, shots, phases, locations=None, scoped_shots=None
             '现在独立核实这份初审结论，初审文字不是事实。只返回实际成立的原文与候选冲突。'
             '剔除肯定说明、合法缩写、旧稿未改字段和无证据推断；不能因初审不通过而维持拒绝。'
             '每项conflicts必须给逐字source_quote和具体problem，说明候选哪个字段与原文哪项事实相反。'
+            'source_quote只能逐字复制source字段中的原文，不能复制候选的fields、after、characters或设计文字；'
+            '找不到对应原文原句时，不得把候选自己的描述伪造为源引文或输出该conflict。'
             '如果全部有据或只有肯定说明，conflicts=[]；无确定矛盾不补造问题。\n'
             + json.dumps({'initial': result}, ensure_ascii=False)}],
             obj({'conflicts': {'type': 'array', 'items': obj({
