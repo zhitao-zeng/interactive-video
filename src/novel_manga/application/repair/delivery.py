@@ -82,11 +82,14 @@ def publish_if_ready(directory: Path, review: dict, takes: dict) -> bool:
     # without overwriting the previous movie's backup with the new movie.
     copy_complete(candidate, final)
     assembly.update(final_video=str(final), pending_publish=False, published_at=time.strftime("%F %T"))
+    mix=assembly.get('episode_ambience_mix')or{}
+    if mix.get('output')==str(candidate):mix['output']=str(final)
     if final_review is not None:
         from novel_manga.application.review import final_cut
         relocated = copy.deepcopy(final_review)
-        relocated['movie'] = str(final)
-        relocated['context'] = final_cut.context(directory, media, final)
+        if Path(relocated['movie']).resolve()==candidate.resolve():
+            relocated['movie'] = str(final)
+        relocated['context'] = final_cut.context(directory, media, relocated['movie'])
         from novel_manga.application.review import independent
         independent.relocate(directory, relocated)
         media['final_cut_review'] = relocated

@@ -33,7 +33,10 @@ def prepared_shots(script: dict, episode_dir: Path, *, identity_data=None, postu
     from novel_manga.util import read_json
     states = posture_states if posture_states is not None else read_json(episode_dir / FILE, {})
     segments = identity_data.segments if identity_data is not None else read_json(episode_dir / 'segments.json', [])
-    return attach(resolved.shots, script, states, segments)
+    shots=attach(resolved.shots, script, states, segments)
+    if script.get('music_plan'):
+        for shot in shots:shot['audio_plan']={**(shot.get('audio_plan')or{}),'music_delivery':'postmix'}
+    return shots
 
 
 def clip_entry(clip: dict, clip_id: str, ctx: dict, override: dict | None = None) -> dict:
@@ -51,6 +54,13 @@ def clip_entry(clip: dict, clip_id: str, ctx: dict, override: dict | None = None
             "request_seconds": 3,
             "text": "\n".join(turn["text"] for turn in clip["shots"][0]["turns"]),
         }
+    from novel_manga.story.voice_delivery import native_speech_selected
+    native_speech=native_speech_selected(ctx.get('profile',{}))
+    source_turns=[t for shot in clip['shots']for t in shot.get('turns',[])]
+    postmixed_thought=(ctx.get('profile',{}).get('inner_voice_delivery')=='postmix'and any(t.get('inner_monologue')for t in source_turns))
+    if native_speech and not postmixed_thought:
+        from dataclasses import replace
+        options=replace(options,voices={})
     bible = ctx["bible"]
     override = ctx["overrides"].get(clip_id, {}) if override is None else override
     if override.get('request_seconds') is not None:
@@ -59,9 +69,12 @@ def clip_entry(clip: dict, clip_id: str, ctx: dict, override: dict | None = None
             raise ValueError(f'{clip_id}: request_seconds override outside clip limits')
         clip['seconds'] = seconds
     if 'shot_timing' in clip:
+        source_seconds=sum(t['seconds'] for t in clip['shot_timing'])
+        allowed_floor=(any(ctx.get('profile',{}).get(key)=='first-frame' for key in ('h3_input_mode','sd_input_mode'))
+                       and len(clip['shots'])==1 and 0 < source_seconds < 4 and clip['request_seconds']==4)
         if (len(clip['shot_timing']) != len(clip['shots'])
                 or not 3 <= clip['request_seconds'] <= options.max_clip_seconds
-                or abs(sum(t['seconds'] for t in clip['shot_timing']) - clip['request_seconds']) > .01):
+                or (abs(source_seconds - clip['request_seconds']) > .01 and not allowed_floor)):
             raise ValueError('authored request timing does not match the preserved shots')
         clip['seconds'] = clip['request_seconds']
     else:
@@ -198,12 +211,15 @@ def clip_entry(clip: dict, clip_id: str, ctx: dict, override: dict | None = None
         "render_family": ctx.get('render_family') or '',
         "h3_style_line": ctx.get('h3_style_line') or '',
     }
+    if native_speech:entry['h3_speech_policy']=ctx['profile']['h3_speech_policy']
     weights = [ClipCompiler(options).shot_seconds(s) for s in clip['shots']]
     music = [{'stage': i, 'cue': str((shot.get('audio_plan') or {}).get('music_cue') or '').strip()}
              for i, shot in enumerate(clip['shots'], 1)
              if (shot.get('audio_plan') or {}).get('music_cue')]
-    if music:
-        entry['music_cues'] = music
+    if any((s.get('audio_plan')or{}).get('music_delivery')=='postmix'for s in clip['shots']):
+        entry['music_delivery']='postmix'
+        if music:entry['external_music_cues']=music
+    elif music:entry['music_cues'] = music
     if inner_voice:
         entry.update(audio_delivery='postmix', inner_voice=inner_voice)
     total_weight = sum(weights) or len(weights)

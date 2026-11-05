@@ -1,0 +1,77 @@
+{
+  "name": "《心动待定》EP01｜完整小屋真人恋综",
+  "video_kind": "现代真人恋爱观察综艺完整剧集",
+  "render_family": "photo",
+  "visual_style": "现代真人恋综摄影，真实自然皮肤、头发和织物；海边共居小屋的厨房、餐厅、露台和独立采访角，材质取各自原场景。备餐为同日较早自然/实用光，露台晚餐为19:00傍晚，采访为安静固定灯光。",
+  "render_direction": "Photorealistic observational live-action with distinct adult Chinese identities, restrained responsive performance and natural fabric/skin. Respect each scene’s practical architecture and time; no fashion posing or generic outdoor-adventure look.",
+  "scene_style": "One lived-in coastal shared house with four distinct source-backed spaces: compact kitchen, initial grouping dining room, roofed sea-view terrace and quiet interview corner.",
+  "scene_direction": "Preserve each supplied room’s architecture and its authored geography. Cooking uses the real kitchen worktop; the repaired terrace hosts dinner with the fixed six-person seat map; interviews use the supplied single-chair corner. First frames show only the current chronological state.",
+  "h3_style_line": "Photorealistic contemporary Chinese dating-reality footage in the same coastal shared house. Match the source kitchen, dining room, roofed terrace or quiet interview corner and its authored time, without carrying one room’s cabinets, lighting or layout into another.",
+  "card_suffix": "",
+  "prompt_fingerprint": false,
+  "tidy_prompts": true,
+  "location_empty_suffix": "Empty source room only, no people or silhouettes. Preserve that room’s actual materials, doors, windows and scale.",
+  "pack_version": "ep01-full-fast-firstframe-author-candidate-20261021",
+  "art_direction": {
+    "intent": "Let practical acts, genuine listening and concrete invitations reveal three different ways of getting along, without manufacturing jealousy or a winner.",
+    "suitable_for": [
+      "Contemporary relationship reality scenes",
+      "Task-based small-group conversation",
+      "One-house interior/terrace continuity"
+    ],
+    "palette": {
+      "base": [
+        "natural skin",
+        "warm wood",
+        "pale tile",
+        "coastal evening blue",
+        "neutral interview wall"
+      ],
+      "accent": [
+        "ivory and forest green",
+        "brick red and ivory",
+        "grey-blue linen",
+        "light-blue cotton",
+        "charcoal grey"
+      ],
+      "use": "Preserve each guest’s written outfit and each room’s real materials; do not tint all rooms like the kitchen."
+    },
+    "lighting": [
+      "Earlier group work uses the matching soft natural/practical light of that space.",
+      "The 19:00 terrace meal is dusk with house practical fill; retain realistic skin.",
+      "Interview chair and lamp remain fixed across guests."
+    ],
+    "composition": [
+      "One source exchange per continuous camera take, with actual listeners present.",
+      "Establish the fixed six-seat dinner map before the diagonal invitations; never move seats for framing.",
+      "Use side/back profiles when working at the real counter; do not invent a frontal countertop to display full faces.",
+      "Props and camera moves reveal completed practical changes rather than illustrating abstract thoughts."
+    ],
+    "motifs": [
+      "One mild dish left by Lu Chuan and later eaten only by Xia Ning.",
+      "One table-leg shim and two cloth clips installed in the visible order.",
+      "The two invitation cards are placed only after acceptance and remain equal at the open vote."
+    ],
+    "asset_guidance": {
+      "character": [
+        "Portraits bind face and hair only; written character-card clothing is repeated at each opening. Zhou Xu’s work apron appears only in dessert preparation and is absent after the dinner transition."
+      ],
+      "location": [
+        "Use the supplied space for materials and practical geography, without claiming a measured survey. Temporal movable prop states override the empty-room reference if it shows a later repaired table."
+      ],
+      "prop": [
+        "Use ordinary supplied-house bowls, cutlery, cards and fixtures; do not invent professional gear, extra actors, duplicate portions or additional vote choices."
+      ]
+    }
+  },
+  "examples": [],
+  "validation": {
+    "image": "Existing independent portraits and four room photographs actually viewed in this authoring workflow (the Xia Ning/Lu Chuan/kitchen inputs were viewed earlier in this same task lineage).",
+    "video": "No image or video generation in this authoring pass.",
+    "notes": [
+      "This is an unrendered full-episode authoring candidate, not media acceptance.",
+      "Original source.md is copied unchanged.",
+      "The 41 units retain all 90 speaker/text pairs, three 2-second silent inserts and 435.5 seconds planned body time."
+    ]
+  }
+}

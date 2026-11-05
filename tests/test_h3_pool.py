@@ -127,11 +127,15 @@ def first_listed_first(monkeypatch):
 
 
 def test_a_clip_moves_to_another_instance_when_its_own_disappears(tmp_path, monkeypatch):
+    failed_lookup = []
     def handler(request):
         if request.url.host == "10.0.0.1":
             if request.method == "POST":
                 return httpx.Response(200, json={"id": "t1"})
-            raise httpx.ConnectError("gone", request=request)
+            if not failed_lookup:
+                failed_lookup.append(True)
+                raise httpx.ConnectError("gone", request=request)
+            return httpx.Response(404)
         if request.method == "POST":
             return httpx.Response(200, json={"id": "t2"})
         if request.url.path.endswith("/content"):
@@ -140,6 +144,7 @@ def test_a_clip_moves_to_another_instance_when_its_own_disappears(tmp_path, monk
 
     provider, card = make_provider(tmp_path, handler)
     monkeypatch.setattr(provider.pool, "problem", lambda target: None)
+    monkeypatch.setattr(local_h3, "POLL_SECONDS", 0.01)
     first_listed_first(monkeypatch)
     output = tmp_path / "clip.mp4"
     provider.create_video("prompt", None, output, 5.0, additional_images=(card,))
@@ -149,9 +154,11 @@ def test_a_clip_moves_to_another_instance_when_its_own_disappears(tmp_path, monk
     assert provider.pool.cooling("http://10.0.0.1:1")
 
 
-def test_a_clip_that_sits_too_long_is_given_to_another_instance(tmp_path, monkeypatch):
+def test_a_stuck_known_task_keeps_its_receipt_without_duplicate_submission(tmp_path, monkeypatch):
+    posts = []
     def handler(request):
         if request.method == "POST":
+            posts.append(str(request.url))
             return httpx.Response(200, json={"id": "t-" + request.url.host})
         if request.url.path.endswith("/content"):
             return httpx.Response(200, content=b"mp4")
@@ -162,8 +169,10 @@ def test_a_clip_that_sits_too_long_is_given_to_another_instance(tmp_path, monkey
     monkeypatch.setattr(local_h3, "POLL_SECONDS", 0.01)
     first_listed_first(monkeypatch)
     output = tmp_path / "clip.mp4"
-    provider.create_video("prompt", None, output, 5.0, additional_images=(card,))
-    assert json.loads((tmp_path / "clip.mp4.task.json").read_text(encoding="utf-8"))["endpoint"].startswith("http://10.0.0.2:2")
+    with pytest.raises(TimeoutError, match='receipt retained'):
+        provider.create_video("prompt", None, output, 5.0, additional_images=(card,))
+    assert len(posts) == 1
+    assert json.loads((tmp_path / "clip.mp4.task.json").read_text(encoding="utf-8"))["endpoint"].startswith("http://10.0.0.1:1")
     assert provider.pool.cooling("http://10.0.0.1:1")
 
 
@@ -204,15 +213,23 @@ def test_before_submit_hook_has_no_pool_slot_and_is_not_called_on_resume(tmp_pat
 
 
 @pytest.mark.parametrize('resumed', [False, True])
-def test_polling_502_moves_both_new_and_resumed_tasks(tmp_path, monkeypatch, resumed):
+@pytest.mark.parametrize('failure', ['502', 'transport'])
+def test_transient_poll_failure_keeps_new_and_resumed_task_ids(tmp_path, monkeypatch, resumed, failure):
     status = {'broken': not resumed}
+    posts = []
     def handler(request):
         if request.method == 'POST':
+            posts.append(str(request.url))
             return httpx.Response(200, json={'id': request.url.host})
         if request.url.path.endswith('/content'):
             return httpx.Response(200, content=b'mp4')
         if request.url.host == '10.0.0.1':
-            return httpx.Response(502) if status['broken'] else httpx.Response(200, json={'status':'queued'})
+            if status['broken']:
+                status['broken'] = False
+                if failure == 'transport':
+                    raise httpx.ReadTimeout('temporary status failure', request=request)
+                return httpx.Response(502)
+            return httpx.Response(200, json={'status':'queued' if status.get('preparing') else 'completed'})
         return httpx.Response(200, json={'status':'completed'})
     provider, card = make_provider(tmp_path, handler)
     monkeypatch.setattr(provider.pool, 'problem', lambda target: None)
@@ -220,16 +237,41 @@ def test_polling_502_moves_both_new_and_resumed_tasks(tmp_path, monkeypatch, res
     first_listed_first(monkeypatch)
     output = tmp_path / 'clip.mp4'
     if resumed:
+        status['preparing'] = True
         provider.settings.poll_timeout = 0.05
         with pytest.raises(TimeoutError):
             provider.create_video('prompt', None, output, 5, additional_images=(card,))
         status['broken'] = True
+        status['preparing'] = False
     provider.settings.poll_timeout = 5
     # Public image traffic must not accidentally be used for any H3 request.
     provider.client = httpx.Client(transport=httpx.MockTransport(lambda r: pytest.fail('wrong client')))
     provider.create_video('prompt', None, output, 5, additional_images=(card,))
     assert output.read_bytes() == b'mp4'
-    assert json.loads(output.with_suffix('.mp4.task.json').read_text())['endpoint'].startswith('http://10.0.0.2:2')
+    assert json.loads(output.with_suffix('.mp4.task.json').read_text())['endpoint'].startswith('http://10.0.0.1:1')
+    assert len(posts) == 1
+
+
+def test_cached_pool_health_cannot_discard_a_task_which_just_answered(tmp_path, monkeypatch):
+    posts, polls, health = [], [], []
+    def handler(request):
+        if request.method == 'POST':
+            posts.append(1)
+            return httpx.Response(200, json={'id': 'known'})
+        if request.url.path.endswith('/content'):
+            return httpx.Response(200, content=b'mp4')
+        polls.append(1)
+        return httpx.Response(200, json={'status': 'queued' if len(polls) == 1 else 'completed'})
+    provider, card = make_provider(tmp_path, handler)
+    def problem(_):
+        health.append(1)
+        return 'cached health probe failed' if len(health) == 2 else None
+    monkeypatch.setattr(provider.pool, 'problem', problem)
+    monkeypatch.setattr(local_h3, 'POLL_SECONDS', 0.01)
+    first_listed_first(monkeypatch)
+    output = tmp_path/'clip.mp4'
+    provider.create_video('prompt', None, output, 5, additional_images=(card,))
+    assert output.read_bytes() == b'mp4' and len(posts) == 1
 
 
 def test_retries_change_only_seed_without_narrating_retry_instructions(tmp_path):
@@ -357,6 +399,33 @@ def test_a_clip_can_queue_longer_than_its_polling_budget_then_generate(tmp_path,
     for _,handle in held:h3_pool.release(handle)
     worker.join(timeout=3)
     assert result==[tmp_path/'clip.mp4']
+
+
+@pytest.mark.parametrize('terminal', ['failed', 'error', 'cancelled', 'canceled'])
+def test_resumed_terminal_failure_is_archived_on_the_first_lookup(tmp_path, monkeypatch, terminal):
+    mode, posts, lookups = {'terminal': False}, [], []
+    def handler(request):
+        if request.method == 'POST':
+            posts.append(1)
+            return httpx.Response(200, json={'id': 'known'})
+        if request.url.path.endswith('/content'):
+            return httpx.Response(200, content=b'mp4')
+        if mode['terminal']:
+            lookups.append(1)
+            if len(lookups) > 1:
+                raise httpx.ReadTimeout('must not ask twice after terminal state', request=request)
+            return httpx.Response(200, json={'status': terminal, 'error': 'ended'})
+        return httpx.Response(200, json={'status': 'completed'})
+    provider, card = make_provider(tmp_path, handler)
+    monkeypatch.setattr(provider.pool, 'problem', lambda _: None)
+    output = tmp_path/'clip.mp4'
+    provider.create_video('prompt', None, output, 5, additional_images=(card,))
+    output.unlink(); mode['terminal'] = True; provider.settings.poll_timeout = .03
+    with pytest.raises(RuntimeError, match=terminal):
+        provider.create_video('prompt', None, output, 5, additional_images=(card,))
+    assert len(posts) == 1 and len(lookups) == 1
+    assert output.with_suffix('.mp4.task.failed.json').is_file()
+    assert not output.with_suffix('.mp4.task.json').exists()
 
 
 def test_a_failed_task_is_set_aside_and_the_next_call_submits_again(tmp_path, monkeypatch):

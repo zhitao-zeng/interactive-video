@@ -1,0 +1,473 @@
+{
+  "profile": {
+    "frame": "9:16",
+    "resolution": "480p",
+    "native_h3_short_edge": 768,
+    "h3_speech_policy": "no_reference_performance_first",
+    "expressions": false,
+    "two_views": "off",
+    "genre": "generic",
+    "style": "modern-live"
+  },
+  "bible": {
+    "novel_title": "《心动待定》EP01｜今晚很合拍，明天换个人？",
+    "genre": "写实恋爱观察综艺",
+    "visual_style": "Photorealistic contemporary dating reality show; natural skin texture, lived-in shared house, restrained performance, practical evening light, documentary camera language.",
+    "palette": "soft warm neutrals, graphite gray, muted green, brick red, natural wood and realistic evening whites",
+    "style_fingerprint": "xindong-waiting-real-reality-v1",
+    "characters": [
+      {
+        "name": "夏宁",
+        "role": "餐饮品牌策划",
+        "gender": "女",
+        "age": "27",
+        "appearance": "柔和方圆鹅蛋脸，深棕杏眼，深栗棕7:3侧分过肩直发，左眼外下方有极小浅褐痣。",
+        "wardrobe": "奶白细针织短袖上衣、墨绿过膝A字裙、珍珠耳钉、米白平底鞋。",
+        "visual_archetype": "成年中国嘉宾；身份与脸按独立脸部参考锁定。",
+        "face_anchors": [
+          "柔和方圆鹅蛋脸，深棕杏眼，深栗棕7:3侧分过肩直发，左眼外下方有极小浅褐痣。"
+        ],
+        "voice_profile_id": ""
+      },
+      {
+        "name": "乔伊",
+        "role": "小剧场灯光师",
+        "gender": "女",
+        "age": "26",
+        "appearance": "高颧菱形偏心形脸，略上挑深棕杏眼，红调深栗棕8:2侧分上胸松卷，一侧露耳。",
+        "wardrobe": "砖红无袖上衣、米白直筒长裤、细长金色耳饰、深棕低跟短靴。",
+        "visual_archetype": "成年中国嘉宾；身份与脸按独立脸部参考锁定。",
+        "face_anchors": [
+          "高颧菱形偏心形脸，略上挑深棕杏眼，红调深栗棕8:2侧分上胸松卷，一侧露耳。"
+        ],
+        "voice_profile_id": ""
+      },
+      {
+        "name": "陶然",
+        "role": "旧家具修复师",
+        "gender": "女",
+        "age": "29",
+        "appearance": "偏长鹅蛋脸，狭长深棕眼，黑色中分无刘海长发固定低马尾。",
+        "wardrobe": "灰蓝棉麻衬衫卷至前臂、米白直筒裤、灰白低帮帆布鞋、小银耳钉。",
+        "visual_archetype": "成年中国嘉宾；身份与脸按独立脸部参考锁定。",
+        "face_anchors": [
+          "偏长鹅蛋脸，狭长深棕眼，黑色中分无刘海长发固定低马尾。"
+        ],
+        "voice_profile_id": ""
+      },
+      {
+        "name": "程越",
+        "role": "自由摄影师",
+        "gender": "男",
+        "age": "28",
+        "appearance": "窄长脸，灵动深棕眼，黑色蓬松短发与碎直刘海，干净无胡须。",
+        "wardrobe": "浅蓝棉质衬衫作外搭、白T恤、海军蓝直筒长裤、白色低帮鞋。",
+        "visual_archetype": "成年中国嘉宾；身份与脸按独立脸部参考锁定。",
+        "face_anchors": [
+          "窄长脸，灵动深棕眼，黑色蓬松短发与碎直刘海，干净无胡须。"
+        ],
+        "voice_profile_id": ""
+      },
+      {
+        "name": "陆川",
+        "role": "建筑设计师",
+        "gender": "男",
+        "age": "30",
+        "appearance": "宽矩形脸与方下颌，平直浓眉，黑色短直8:2偏分且完整露额。",
+        "wardrobe": "深石墨灰开领短袖衬衫、黑色直筒长裤、左腕黑皮圆面表、黑色乐福鞋。",
+        "visual_archetype": "成年中国嘉宾；身份与脸按独立脸部参考锁定。",
+        "face_anchors": [
+          "宽矩形脸与方下颌，平直浓眉，黑色短直8:2偏分且完整露额。"
+        ],
+        "voice_profile_id": ""
+      },
+      {
+        "name": "周叙",
+        "role": "小烘焙店主",
+        "gender": "男",
+        "age": "27",
+        "appearance": "偏圆暖眼，短黑C卷发，面部干净。",
+        "wardrobe": "米色圆领T恤、深灰长裤、灰白运动鞋；厨房甜点操作时穿深棕围裙。",
+        "visual_archetype": "成年中国嘉宾；身份与脸按独立脸部参考锁定。",
+        "face_anchors": [
+          "偏圆暖眼，短黑C卷发，面部干净。"
+        ],
+        "voice_profile_id": ""
+      }
+    ],
+    "locations": [
+      "厨房：小屋西侧封闭式备餐区；厨房主门正对餐厅北墙中心。冰箱沿西墙，料理台沿北墙；汤锅与菜板固定在北台面。厨房门内看向餐厅时，餐厅在正前方。",
+      "餐厅：厨房门正对餐厅北侧；六人长桌位于餐厅中央，露台侧门在东墙。晚餐近镜一侧从左至右陶然、夏宁、乔伊；对面从左至右周叙、陆川、程越。桌面中心为菜与花瓶。",
+      "露台：由餐厅东墙侧门进入；长桌沿南北轴，朝海的一侧无遮挡。靠厨房方向的长桌左侧桌腿下固定一块深灰垫片；花瓶置桌面中央偏内，桌布夹子固定迎风两角。",
+      "采访角：与餐厅同一小屋，设在餐厅西南内墙一处独立安静角；单人坐面朝东，镜头从东南方向拍向西北内墙，背景为暖灰墙和一盏固定落地灯；不改变其他房间门窗。"
+    ],
+    "props": [
+      {
+        "name": "晚餐桌椅",
+        "appearance": "餐厅中央六人长桌与六把固定椅，按固定座次摆放。",
+        "category": "其他"
+      },
+      {
+        "name": "深灰垫片",
+        "appearance": "单块深灰色小垫片，放在露台长桌左侧一条不平桌腿下并全片保持。",
+        "category": "其他"
+      },
+      {
+        "name": "露台桌布与夹子",
+        "appearance": "浅色桌布和两只普通夹子，夹住迎风两角。",
+        "category": "其他"
+      },
+      {
+        "name": "微辣小碟",
+        "appearance": "夏宁个人微辣份小碟，由陆川先行留出，不被他人尝用。",
+        "category": "其他"
+      }
+    ],
+    "continuity_rules": [
+      "厨房门正对餐厅；露台只能由餐厅东侧门进入；采访角在同一小屋内。",
+      "晚餐近镜侧陶然、夏宁、乔伊；对面周叙、陆川、程越，座位不互换。",
+      "露台长桌左侧同一条不平桌腿持续使用同一块深灰垫片。",
+      "陆川先放下空碗再扶桌；乔伊决定保留露台，程越取夹子固定桌布两角。",
+      "陆川先替夏宁留微辣小碟；程越只提醒她坐下吃饭并端汤。",
+      "人物、事件与关系只按EP01发生；邀请已接受但尚未出发，互动投票未揭晓。"
+    ]
+  },
+  "script": {
+    "video_title": "厨房里先问自己的口味｜EP01小样",
+    "source_title": "EP01原镜组06—07，原对白14—19",
+    "episode_index": 1,
+    "profile": {
+      "frame": "9:16",
+      "resolution": "480p",
+      "native_h3_short_edge": 768,
+      "h3_speech_policy": "no_reference_performance_first",
+      "expressions": false,
+      "two_views": "off",
+      "genre": "generic",
+      "style": "modern-live"
+    },
+    "shots": [
+      {
+        "index": 1,
+        "origin_index": 14,
+        "shot_id": "PILOT-S01",
+        "label": "PILOT-S01",
+        "segment_id": "ep01_turn_14",
+        "source_quote": "辣椒放多少？",
+        "source_shot": "原镜组06—07",
+        "location": "厨房",
+        "scene_id": "kitchen",
+        "scene_time": "入住第1天，晚餐准备期间；厨房分工场景，非采访、非冷开场。",
+        "characters": [
+          "夏宁",
+          "陆川"
+        ],
+        "in_frame": [
+          "夏宁",
+          "陆川"
+        ],
+        "wears": {},
+        "props": [],
+        "visual_prompt": "Photorealistic contemporary Chinese dating-reality footage in the already established small-house kitchen. 陆川站在厨房北侧连续料理台东段，身体朝北台面；夏宁站在同一料理台西段，面向北侧菜谱与葱碗。两人保持约一臂距离，面朝略向彼此转三分之一；从厨房南侧门口斜向北拍，陆川画面右侧、夏宁画面左侧。北侧灶台在两人之间偏东，切好的食材和辣椒碗位置固定。两人不离开厨房，不换左右位置。 陆川看向夏宁并指一下辣椒碗问用量；夏宁仍看着眼前的菜和碗，听完抬眼。先以两人及共用台面同框交代问题。 Preserve the identities and written outfits of Xia Ning and Lu Chuan. Natural evening practical light, unforced timing, visible food-task context, no additional people or dialogue.",
+        "motion_prompt": "陆川看向夏宁并指一下辣椒碗问用量；夏宁仍看着眼前的菜和碗，听完抬眼。先以两人及共用台面同框交代问题。",
+        "start_state": "陆川站在厨房北侧连续料理台东段，身体朝北台面；夏宁站在同一料理台西段，面向北侧菜谱与葱碗。两人保持约一臂距离，面朝略向彼此转三分之一；从厨房南侧门口斜向北拍，陆川画面右侧、夏宁画面左侧。北侧灶台在两人之间偏东，切好的食材和辣椒碗位置固定。两人不离开厨房，不换左右位置。 备菜已在进行：陆川在东侧灶台与菜板间，夏宁在西侧查看菜谱；葱碗与辣椒碗在北台面上可见，汤锅在灶上。",
+        "event": "陆川看向夏宁并指一下辣椒碗问用量；夏宁仍看着眼前的菜和碗，听完抬眼。先以两人及共用台面同框交代问题。",
+        "end_state": "陆川问辣椒用量，夏宁尚未回答；双方站位和台面物件建立。",
+        "camera": "同一双人中景持续，问题落在两人之间，切菜与灶火保持轻微真实环境声。",
+        "light": "Consistent soft practical kitchen evening light, brighter at the north counter and stove, with believable skin tones; no dramatic shift.",
+        "shot_scale": "stable medium two-shot",
+        "duration_seconds": 3.8,
+        "sfx": "Continuous quiet kitchen room tone and source-appropriate cutting/cooking sounds under the line; no music cue.",
+        "turns": [
+          {
+            "speaker_name": "陆川",
+            "delivery_mode": "visible_dialogue",
+            "text": "辣椒放多少？",
+            "emotion": "Casual and practical; Lu Chuan asks while still attending to the food, genuinely leaving the amount to Xia Ning."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "origin_index": 15,
+        "shot_id": "PILOT-S02",
+        "label": "PILOT-S02",
+        "segment_id": "ep01_turn_15",
+        "source_quote": "大家都能吃吗？乔伊刚说想吃辣，陶然呢？我去问问。",
+        "source_shot": "原镜组06—07",
+        "location": "厨房",
+        "scene_id": "kitchen",
+        "scene_time": "入住第1天，晚餐准备期间；厨房分工场景，非采访、非冷开场。",
+        "characters": [
+          "夏宁",
+          "陆川"
+        ],
+        "in_frame": [
+          "夏宁",
+          "陆川"
+        ],
+        "wears": {},
+        "props": [],
+        "visual_prompt": "Photorealistic contemporary Chinese dating-reality footage in the already established small-house kitchen. 陆川站在厨房北侧连续料理台东段，身体朝北台面；夏宁站在同一料理台西段，面向北侧菜谱与葱碗。两人保持约一臂距离，面朝略向彼此转三分之一；从厨房南侧门口斜向北拍，陆川画面右侧、夏宁画面左侧。北侧灶台在两人之间偏东，切好的食材和辣椒碗位置固定。两人不离开厨房，不换左右位置。 夏宁视线先扫过台面与厨房门方向，提到乔伊和陶然时仍对陆川说话；“我去问问”时手从菜谱边抬起但尚未离位。陆川看见她要转向门口。 Preserve the identities and written outfits of Xia Ning and Lu Chuan. Natural evening practical light, unforced timing, visible food-task context, no additional people or dialogue.",
+        "motion_prompt": "夏宁视线先扫过台面与厨房门方向，提到乔伊和陶然时仍对陆川说话；“我去问问”时手从菜谱边抬起但尚未离位。陆川看见她要转向门口。",
+        "start_state": "陆川站在厨房北侧连续料理台东段，身体朝北台面；夏宁站在同一料理台西段，面向北侧菜谱与葱碗。两人保持约一臂距离，面朝略向彼此转三分之一；从厨房南侧门口斜向北拍，陆川画面右侧、夏宁画面左侧。北侧灶台在两人之间偏东，切好的食材和辣椒碗位置固定。两人不离开厨房，不换左右位置。 承接同一双人中景，陆川停在东侧菜板，夏宁仍在西侧；厨房门在两人身后偏南，不遮挡出口。",
+        "event": "夏宁视线先扫过台面与厨房门方向，提到乔伊和陶然时仍对陆川说话；“我去问问”时手从菜谱边抬起但尚未离位。陆川看见她要转向门口。",
+        "end_state": "夏宁先按全桌习惯盘算口味，准备去问其他人；尚未离开厨房。",
+        "camera": "保持双人中景和既定左右关系，避免切成夏宁单人正脸；让观众同时看到她的目光变化和陆川注意到她的动作。",
+        "light": "Consistent soft practical kitchen evening light, brighter at the north counter and stove, with believable skin tones; no dramatic shift.",
+        "shot_scale": "stable medium two-shot",
+        "duration_seconds": 4.3,
+        "sfx": "Continuous quiet kitchen room tone and source-appropriate cutting/cooking sounds under the line; no music cue.",
+        "turns": [
+          {
+            "speaker_name": "夏宁",
+            "delivery_mode": "visible_dialogue",
+            "text": "大家都能吃吗？乔伊刚说想吃辣，陶然呢？我去问问。",
+            "emotion": "Xia Ning starts from her habit of checking everyone’s needs, then notices she is about to step away before answering for herself; lightly self-aware, not flustered."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "origin_index": 16,
+        "shot_id": "PILOT-S03",
+        "label": "PILOT-S03",
+        "segment_id": "ep01_turn_16",
+        "source_quote": "等等，我问你呢。",
+        "source_shot": "原镜组06—07",
+        "location": "厨房",
+        "scene_id": "kitchen",
+        "scene_time": "入住第1天，晚餐准备期间；厨房分工场景，非采访、非冷开场。",
+        "characters": [
+          "夏宁",
+          "陆川"
+        ],
+        "in_frame": [
+          "夏宁",
+          "陆川"
+        ],
+        "wears": {},
+        "props": [],
+        "visual_prompt": "Photorealistic contemporary Chinese dating-reality footage in the already established small-house kitchen. 陆川站在厨房北侧连续料理台东段，身体朝北台面；夏宁站在同一料理台西段，面向北侧菜谱与葱碗。两人保持约一臂距离，面朝略向彼此转三分之一；从厨房南侧门口斜向北拍，陆川画面右侧、夏宁画面左侧。北侧灶台在两人之间偏东，切好的食材和辣椒碗位置固定。两人不离开厨房，不换左右位置。 陆川停止切菜，转头看向夏宁，用平常音量说“等等，我问你呢”；夏宁在迈步前停住并回看他。动作是一个明确的轻微打断，不碰触、不拦路。 Preserve the identities and written outfits of Xia Ning and Lu Chuan. Natural evening practical light, unforced timing, visible food-task context, no additional people or dialogue.",
+        "motion_prompt": "陆川停止切菜，转头看向夏宁，用平常音量说“等等，我问你呢”；夏宁在迈步前停住并回看他。动作是一个明确的轻微打断，不碰触、不拦路。",
+        "start_state": "陆川站在厨房北侧连续料理台东段，身体朝北台面；夏宁站在同一料理台西段，面向北侧菜谱与葱碗。两人保持约一臂距离，面朝略向彼此转三分之一；从厨房南侧门口斜向北拍，陆川画面右侧、夏宁画面左侧。北侧灶台在两人之间偏东，切好的食材和辣椒碗位置固定。两人不离开厨房，不换左右位置。 夏宁手刚离开菜谱边，身体开始朝厨房门方向偏转；陆川仍在她右侧的东段菜板处。",
+        "event": "陆川停止切菜，转头看向夏宁，用平常音量说“等等，我问你呢”；夏宁在迈步前停住并回看他。动作是一个明确的轻微打断，不碰触、不拦路。",
+        "end_state": "夏宁停下询问别人的动作，注意力回到陆川的问题。",
+        "camera": "仍在同一双人中景，保持陆川画面右、夏宁画面左及南北轴，不用反打切断“停住—回看”关系。",
+        "light": "Consistent soft practical kitchen evening light, brighter at the north counter and stove, with believable skin tones; no dramatic shift.",
+        "shot_scale": "stable medium two-shot",
+        "duration_seconds": 3.9,
+        "sfx": "Continuous quiet kitchen room tone and source-appropriate cutting/cooking sounds under the line; no music cue.",
+        "turns": [
+          {
+            "speaker_name": "陆川",
+            "delivery_mode": "visible_dialogue",
+            "text": "等等，我问你呢。",
+            "emotion": "Lu Chuan’s “wait” is a gentle, direct interruption that brings the question back to Xia Ning; no scolding. She stops and looks back."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "origin_index": 17,
+        "shot_id": "PILOT-S04",
+        "label": "PILOT-S04",
+        "segment_id": "ep01_turn_17",
+        "source_quote": "我啊？微辣。刚才差点又说都行。",
+        "source_shot": "原镜组06—07",
+        "location": "厨房",
+        "scene_id": "kitchen",
+        "scene_time": "入住第1天，晚餐准备期间；厨房分工场景，非采访、非冷开场。",
+        "characters": [
+          "夏宁",
+          "陆川"
+        ],
+        "in_frame": [
+          "夏宁",
+          "陆川"
+        ],
+        "wears": {},
+        "props": [],
+        "visual_prompt": "Photorealistic contemporary Chinese dating-reality footage in the already established small-house kitchen. 陆川站在厨房北侧连续料理台东段，身体朝北台面；夏宁站在同一料理台西段，面向北侧菜谱与葱碗。两人保持约一臂距离，面朝略向彼此转三分之一；从厨房南侧门口斜向北拍，陆川画面右侧、夏宁画面左侧。北侧灶台在两人之间偏东，切好的食材和辣椒碗位置固定。两人不离开厨房，不换左右位置。 夏宁短暂意外地看他一眼，意识到问题是问自己的；“我啊？”后肩颈松下来，明确说微辣，并带一点自我察觉的笑意。陆川安静听，不抢答。 Preserve the identities and written outfits of Xia Ning and Lu Chuan. Natural evening practical light, unforced timing, visible food-task context, no additional people or dialogue.",
+        "motion_prompt": "夏宁短暂意外地看他一眼，意识到问题是问自己的；“我啊？”后肩颈松下来，明确说微辣，并带一点自我察觉的笑意。陆川安静听，不抢答。",
+        "start_state": "陆川站在厨房北侧连续料理台东段，身体朝北台面；夏宁站在同一料理台西段，面向北侧菜谱与葱碗。两人保持约一臂距离，面朝略向彼此转三分之一；从厨房南侧门口斜向北拍，陆川画面右侧、夏宁画面左侧。北侧灶台在两人之间偏东，切好的食材和辣椒碗位置固定。两人不离开厨房，不换左右位置。 承接她停步回看；两人仍在北侧台面前，菜板与辣椒碗未移动。",
+        "event": "夏宁短暂意外地看他一眼，意识到问题是问自己的；“我啊？”后肩颈松下来，明确说微辣，并带一点自我察觉的笑意。陆川安静听，不抢答。",
+        "end_state": "夏宁说出自己的微辣偏好，且意识到刚才又差点替所有人说“都行”。",
+        "camera": "连续双人中景，给她一句话的完整节奏；陆川保留在画面内作为真实听者。",
+        "light": "Consistent soft practical kitchen evening light, brighter at the north counter and stove, with believable skin tones; no dramatic shift.",
+        "shot_scale": "stable medium two-shot",
+        "duration_seconds": 3.8,
+        "sfx": "Continuous quiet kitchen room tone and source-appropriate cutting/cooking sounds under the line; no music cue.",
+        "turns": [
+          {
+            "speaker_name": "夏宁",
+            "delivery_mode": "visible_dialogue",
+            "text": "我啊？微辣。刚才差点又说都行。",
+            "emotion": "Briefly surprised, then relaxed and specific as she names her own mild preference; a small smile at catching her “whatever” reflex."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "origin_index": 18,
+        "shot_id": "PILOT-S05",
+        "label": "PILOT-S05",
+        "segment_id": "ep01_turn_18",
+        "source_quote": "那我记住了。你的先盛，剩下的再加。",
+        "source_shot": "原镜组06—07",
+        "location": "厨房",
+        "scene_id": "kitchen",
+        "scene_time": "入住第1天，晚餐准备期间；厨房分工场景，非采访、非冷开场。",
+        "characters": [
+          "夏宁",
+          "陆川"
+        ],
+        "in_frame": [
+          "夏宁",
+          "陆川"
+        ],
+        "wears": {},
+        "props": [],
+        "visual_prompt": "Photorealistic contemporary Chinese dating-reality footage in the already established small-house kitchen. 陆川站在厨房北侧连续料理台东段，身体朝北台面；夏宁站在同一料理台西段，面向北侧菜谱与葱碗。两人保持约一臂距离，面朝略向彼此转三分之一；从厨房南侧门口斜向北拍，陆川画面右侧、夏宁画面左侧。北侧灶台在两人之间偏东，切好的食材和辣椒碗位置固定。两人不离开厨房，不换左右位置。 陆川看她一眼后将正在做的菜分出她的一小份到干净小碟，再把辣椒留给其余菜；说完“你的先盛，剩下的再加”。仅在分份动作处短暂看见两人手、锅沿和小碟，夏宁的声音若延续则不被切断。 Preserve the identities and written outfits of Xia Ning and Lu Chuan. Natural evening practical light, unforced timing, visible food-task context, no additional people or dialogue.",
+        "motion_prompt": "陆川看她一眼后将正在做的菜分出她的一小份到干净小碟，再把辣椒留给其余菜；说完“你的先盛，剩下的再加”。仅在分份动作处短暂看见两人手、锅沿和小碟，夏宁的声音若延续则不被切断。",
+        "start_state": "陆川站在厨房北侧连续料理台东段，身体朝北台面；夏宁站在同一料理台西段，面向北侧菜谱与葱碗。两人保持约一臂距离，面朝略向彼此转三分之一；从厨房南侧门口斜向北拍，陆川画面右侧、夏宁画面左侧。北侧灶台在两人之间偏东，切好的食材和辣椒碗位置固定。两人不离开厨房，不换左右位置。 夏宁刚说完微辣；陆川停下刀具，二人仍各在台面东、西段。灶上菜尚未加额外辣椒。",
+        "event": "陆川看她一眼后将正在做的菜分出她的一小份到干净小碟，再把辣椒留给其余菜；说完“你的先盛，剩下的再加”。仅在分份动作处短暂看见两人手、锅沿和小碟，夏宁的声音若延续则不被切断。",
+        "end_state": "夏宁的微辣份被先留出；其余份稍后再加辣。份量归属明确，没有人试吃。",
+        "camera": "一次有因果的锅边手部细节，不切单人正脸；画外对话声音连续，随后回到两人同框确认她看到并接受这个回应。",
+        "light": "Consistent soft practical kitchen evening light, brighter at the north counter and stove, with believable skin tones; no dramatic shift.",
+        "shot_scale": "brief cookware-and-hands detail within the same axis; both characters remain the speakers, dialogue continues off-camera",
+        "duration_seconds": 4.1,
+        "sfx": "Continuous quiet kitchen room tone and source-appropriate cutting/cooking sounds under the line; no music cue.",
+        "turns": [
+          {
+            "speaker_name": "陆川",
+            "delivery_mode": "visible_dialogue",
+            "text": "那我记住了。你的先盛，剩下的再加。",
+            "emotion": "Quietly considerate and concrete: Lu Chuan follows through by setting her mild portion aside before seasoning the rest. No grand gesture."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "origin_index": 19,
+        "shot_id": "PILOT-S06",
+        "label": "PILOT-S06",
+        "segment_id": "ep01_turn_19",
+        "source_quote": "你很适合跟我一起干活。",
+        "source_shot": "原镜组06—07",
+        "location": "厨房",
+        "scene_id": "kitchen",
+        "scene_time": "入住第1天，晚餐准备期间；厨房分工场景，非采访、非冷开场。",
+        "characters": [
+          "夏宁",
+          "陆川"
+        ],
+        "in_frame": [
+          "夏宁",
+          "陆川"
+        ],
+        "wears": {},
+        "props": [],
+        "visual_prompt": "Photorealistic contemporary Chinese dating-reality footage in the already established small-house kitchen. 陆川站在厨房北侧连续料理台东段，身体朝北台面；夏宁站在同一料理台西段，面向北侧菜谱与葱碗。两人保持约一臂距离，面朝略向彼此转三分之一；从厨房南侧门口斜向北拍，陆川画面右侧、夏宁画面左侧。北侧灶台在两人之间偏东，切好的食材和辣椒碗位置固定。两人不离开厨房，不换左右位置。 夏宁看一眼被留出的微辣小碟，再转向陆川，说他很适合和她一起干活，语气真诚里带一点打趣；陆川听到后抬眼，嘴角微动，不在本段追加台词。 Preserve the identities and written outfits of Xia Ning and Lu Chuan. Natural evening practical light, unforced timing, visible food-task context, no additional people or dialogue.",
+        "motion_prompt": "夏宁看一眼被留出的微辣小碟，再转向陆川，说他很适合和她一起干活，语气真诚里带一点打趣；陆川听到后抬眼，嘴角微动，不在本段追加台词。",
+        "start_state": "陆川站在厨房北侧连续料理台东段，身体朝北台面；夏宁站在同一料理台西段，面向北侧菜谱与葱碗。两人保持约一臂距离，面朝略向彼此转三分之一；从厨房南侧门口斜向北拍，陆川画面右侧、夏宁画面左侧。北侧灶台在两人之间偏东，切好的食材和辣椒碗位置固定。两人不离开厨房，不换左右位置。 陆川已把夏宁的小碟先放在台面西段安全落点，辣椒碗仍在锅旁；两人保持原站位。",
+        "event": "夏宁看一眼被留出的微辣小碟，再转向陆川，说他很适合和她一起干活，语气真诚里带一点打趣；陆川听到后抬眼，嘴角微动，不在本段追加台词。",
+        "end_state": "分工默契转成对陆川个人做法的肯定；夏宁的判断发生在具体照顾之后。",
+        "camera": "回到稳定双人中景并让小碟留在两人之间的台面上；用自然停顿结束，不插无关反应。",
+        "light": "Consistent soft practical kitchen evening light, brighter at the north counter and stove, with believable skin tones; no dramatic shift.",
+        "shot_scale": "stable medium two-shot",
+        "duration_seconds": 4.1,
+        "sfx": "Continuous quiet kitchen room tone and source-appropriate cutting/cooking sounds under the line; no music cue.",
+        "turns": [
+          {
+            "speaker_name": "夏宁",
+            "delivery_mode": "visible_dialogue",
+            "text": "你很适合跟我一起干活。",
+            "emotion": "Warm, appreciative teasing rooted in the just-seen practical response; Xia Ning means the compliment, without declaring romance."
+          }
+        ]
+      }
+    ],
+    "skipped_segments": [],
+    "summary": "同一段连续厨房交流，三模型比较共用这六句原文；每组三阶段，共约12秒。小样停在厨房默契玩笑处，不代表整集后续已发生。"
+  },
+  "groups": [
+    {
+      "source_segment": "ep01_turn_14",
+      "source_shot": "原镜组06—07",
+      "shot_indexes": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "source_segment": "ep01_turn_17",
+      "source_shot": "原镜组06—07",
+      "shot_indexes": [
+        4,
+        5,
+        6
+      ]
+    }
+  ],
+  "voice_specs": {},
+  "interaction": {
+    "id": "ep01-pilot-context",
+    "series_title": "《心动待定》EP01",
+    "question": "首张双人加场卡，给哪一组？",
+    "seconds": 3,
+    "ambience_shot_index": 6,
+    "options": [
+      {
+        "id": "A",
+        "label": "早市搭档：夏宁×程越",
+        "next": "未制作"
+      },
+      {
+        "id": "B",
+        "label": "旧物搭档：乔伊×陆川",
+        "next": "未制作"
+      }
+    ],
+    "selected": null,
+    "context": "保留整集互动选项作为项目上下文；小样没有进行到片尾投票。"
+  },
+  "overlays": [],
+  "reference_images": [
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/inputs/packages/xindongdaiding-v1/心动待定-视频制作包-v1.0/01-角色参考/夏宁/脸部参考.png",
+      "path": "series_assets/characters/character_001/turnaround.jpeg",
+      "scope": "夏宁本人独立脸部肖像，仅用于身份与面部锁定；服装取角色卡明确文字及多格卡中的造型核对，不将多格卡当作真人或整图场景。"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/inputs/packages/xindongdaiding-v1/心动待定-视频制作包-v1.0/01-角色参考/陆川/脸部参考.png",
+      "path": "series_assets/characters/character_005/turnaround.jpeg",
+      "scope": "陆川本人独立脸部肖像，仅用于身份与面部锁定；服装取角色卡明确文字及多格卡中的造型核对，不将多格卡当作真人或整图场景。"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/.runtime/xindong-pilot-20261020/scenes/kitchen.png",
+      "path": "series_assets/locations/location_001/establishing.jpeg",
+      "scope": "Agent-designed shared-house empty location reference; not a first-frame or measured layout"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/.runtime/xindong-pilot-20261020/scenes/dinner.png",
+      "path": "series_assets/locations/location_002/establishing.jpeg",
+      "scope": "Agent-designed shared-house empty location reference; not a first-frame or measured layout"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/.runtime/xindong-pilot-20261020/scenes-v2/terrace.png",
+      "path": "series_assets/locations/location_003/establishing.jpeg",
+      "scope": "Agent-designed shared-house empty location reference; not a first-frame or measured layout"
+    },
+    {
+      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/.runtime/xindong-pilot-20261020/scenes/interview.png",
+      "path": "series_assets/locations/location_004/establishing.jpeg",
+      "scope": "Agent-designed shared-house empty location reference; not a first-frame or measured layout"
+    }
+  ],
+  "reference_audios": [],
+  "source_seconds": 24,
+  "source_shot_groups": 1,
+  "source_archive": "/mnt/disk1/zengzhitao/interactive-video-worktrees/xindong-pilot-20261020/inputs/archives/心动待定-视频制作包-v1.0.zip"
+}
