@@ -38,11 +38,11 @@ FastH3-Omni（可选 UniServe lane）：`action="fasth3"`，lane 也固定为 `F
 {"action":"fasth3","endpoint":"http://127.0.0.1:30027","prompt":"原样保留当前 H3 英文提示词","references":["input/corridor.png"],"audios":[],"seconds":5,"ratio":"9:16","short_edge":768,"seed":2101,"output":"media/fasth3-take-v1.mp4"}
 ```
 
-Fast 请求使用 `model=FastH3-Omni`、`task=ref2va` 和原 prompt；图片/音频按给定顺序以原字节 data URI 发送，不隐藏缩放或换格式。只接受普通 `reference`：显式 `first_frame` 会拒绝，`first_frame_policy=required` 不兼容；`selective` 只表示由 Agent 选择，不等于已验证 keyframe。实际 target、seed、附件 SHA、task id、状态历史和耗时写入 `.task.json` 与 `.wire/`。相同 request SHA 且已有 task id 时只查询/下载原任务；404 表示任务过期，不能隐式再 POST。服务重启会清 jobs/content，过期后如决定新 take 必须换输出名并受原任务预算约束。Fast 不表示普遍优于 Turbo。
+Fast 请求使用 `model=FastH3-Omni`、`task=ref2va`。显式填写 `purposes` 时，会按实际图序把用途说明加到 prompt，原正文不改；未填写时原样传 prompt，需在正文自己绑定图片用途。`purposes` 是文字说明，不是模型的身份锁定参数；图片/音频按给定顺序以原字节 data URI 发送，不隐藏缩放或换格式。只接受普通 `reference`：显式 `first_frame` 会拒绝，`first_frame_policy=required` 不兼容；`selective` 只表示由 Agent 选择，不等于已验证 keyframe。实际 target、seed、附件 SHA、task id、状态历史和耗时写入 `.task.json` 与 `.wire/`。相同 request SHA 且已有 task id 时只查询/下载原任务；404 表示任务过期，不能隐式再 POST。服务重启会清 jobs/content，过期后如决定新 take 必须换输出名并受原任务预算约束。Fast 不表示普遍优于 Turbo。
 
 H3 实测风险与硬约束（2026-10-29，W30/W33/W36）：
 
-- `summary` 是导演备注，不是口播稿。只写场景和动作概述；不要放可朗读的台词、角色名、牌面文字、英文标题、选项名或完整英文句子。模型会把 `summary` 里的英文直接念出来。
+- `summary` 是导演备注，不是口播稿。只写场景和动作概述；不要复述台词、牌面文字、场号或选项名。用简短英文场景/动作备注即可；已有样本把英文摘要误念出来，但这不是所有英文描述的必然结果。具体格式见 `skills/episode-production/references/h3-format.md`。
 - 所有要说的中文逐字放在 `<d>[Chinese] …</d>` 里；无对白镜头显式写 `No spoken words / 无任何人声`，否则模型可能自报场号或念英文摘要。
 - 优先一个主要动作、尽量一个说话人。已有样本出现多人交接、连续多句或多动作失真时，可以减少并发事件、改构图或拆镜；拆镜是可选修复，不是所有镜头的固定结构。
 - 每个会说话的角色在 `subject_definitions` 里写一次固定英文声线（音高/音色/年龄感/说话方式），

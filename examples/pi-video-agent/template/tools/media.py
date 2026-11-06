@@ -401,8 +401,12 @@ def execute(request):
             if sum(float(probe(audio)['format']['duration']) for audio in audios) > 15.2:
                 raise ValueError('SD reference audio total must be <=15.2s before submission.')
         first = file(request['first_frame']) if request.get('first_frame') else None
+        first_frame_bound = bool(first) and not (action == 'h3' and CONFIG.get('h3_mode') == 'cloud')
         if first:
-            prompt = 'Picture 1 is the actual opening image at t=0. Continue its state.\n' + prompt
+            opening_role = ('Picture 1 is the actual opening image at t=0. Continue its state.'
+                            if first_frame_bound else
+                            'Picture 1 is an ordinary image reference for the intended opening state; no keyframe is bound.')
+            prompt = opening_role + '\n' + prompt
         if first and (not refs or refs[0] != first):
             raise ValueError('The first_frame must be the first explicitly supplied reference file.')
         if action == 'video' and first and (len(refs) != 1 or audios):
@@ -429,7 +433,7 @@ def execute(request):
                 fast = FastH3MediaProvider(settings(), fasth3_endpoint, ratio=request.get('ratio', '9:16'))
                 try:
                     record_submission(fast.fast_client, output, refs, 'fasth3', False, audios)
-                    fast.create_video(original_prompt, None, output, request['seconds'],
+                    fast.create_video(prompt if request.get('purposes') else original_prompt, None, output, request['seconds'],
                         additional_images=tuple(refs), reference_audios=audios,
                         seed=request.get('seed'), short_edge=int(request.get('short_edge', 768)))
                 finally:
@@ -465,7 +469,7 @@ def execute(request):
                 provider.create_video(prompt, None, output, request['seconds'], additional_images=tuple(refs), reference_audios=audios, **({'first_frame': first} if first else {}))
         else:
             raise ValueError(f'Unknown action: {action}')
-        return {'path': str(output), 'first_frame_bound': bool(first),
+        return {'path': str(output), 'first_frame_bound': first_frame_bound,
                 'reference_order': [str(p) for p in refs],
                 'receipt': str(output.with_suffix(output.suffix + '.task.json')),
                 'wire_directory': str(output.with_suffix(output.suffix + '.wire'))}

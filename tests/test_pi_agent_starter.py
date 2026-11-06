@@ -235,6 +235,30 @@ def test_sd_library_and_actual_first_frame_role(media, monkeypatch, workspace):
     assert wire['first_frame_bound'] is True and wire['attachments'][0]['asset_uri'] == 'asset://asset-1'
 
 
+def test_cloud_h3_opening_reference_does_not_claim_a_bound_keyframe(media, monkeypatch, workspace):
+    media.CONFIG.update(media_lane='MiniMax-H3', h3_mode='cloud')
+    posted = []
+    def handler(req):
+        if req.method == 'POST':
+            posted.append(json.loads(req.content))
+            return httpx.Response(200, json={'task_id': 'cloud-1'})
+        if '/tasks/' in req.url.path:
+            return httpx.Response(200, json={'status': 'succeeded', 'url': 'https://mock.invalid/cloud.mp4'})
+        return httpx.Response(200, content=b'fake-video-download')
+    mock_provider(media, monkeypatch, handler)
+    result = media.execute({'action': 'h3', 'endpoint': 'pool', 'prompt': 'Picture 1 intended opening',
+        'first_frame': 'input/identity.png', 'references': ['input/identity.png'],
+        'seconds': 6, 'output': 'media/cloud.mp4'})
+    assert len(posted) == 1
+    text = '\n'.join(part['text'] for part in posted[0]['content'] if part['type'] == 'text')
+    assert 'is the actual opening image at t=0' not in text
+    assert 'ordinary image reference' in text
+    assert [part['role'] for part in posted[0]['content'] if part['type'] == 'image_url'] == ['reference_image']
+    wire = json.loads((workspace / 'media/cloud.mp4.wire/request.json').read_text())
+    assert wire['first_frame_bound'] is False
+    assert result['first_frame_bound'] is False
+
+
 def test_unknown_submission_does_not_repost(media, monkeypatch, workspace):
     posted = []
     def handler(req):
@@ -734,7 +758,8 @@ def test_fasth3_init_freezes_endpoint(tmp_path):
     assert 'FastH3-Omni' in (work / 'PRODUCTION.md').read_text()
 
 
-def test_fasth3_media_preserves_bytes_nested_duration_and_lane_rules(media, monkeypatch, workspace):
+@pytest.mark.parametrize('purposes', [[], ['face identity only; not the scene or pose']])
+def test_fasth3_media_preserves_bytes_nested_duration_and_lane_rules(media, monkeypatch, workspace, purposes):
     config = json.loads((workspace / 'local.json').read_text())
     config.update(media_lane='FastH3-Omni', fasth3_endpoint='http://127.0.0.1:30027', h3_mode='cloud')
     (workspace / 'local.json').write_text(json.dumps(config))
@@ -759,12 +784,16 @@ def test_fasth3_media_preserves_bytes_nested_duration_and_lane_rules(media, monk
         return provider
 
     monkeypatch.setattr(fast_h3, 'FastH3MediaProvider', create)
-    media.execute({'action': 'fasth3', 'prompt': 'Picture 1 corridor', 'references': ['input/identity.png'],
+    media.execute({'action': 'fasth3', 'prompt': 'Picture 1 corridor', 'references': ['input/identity.png'], 'purposes': purposes,
                    'seconds': 5, 'seed': 2101, 'ratio': '9:16', 'output': 'media/fast.mp4'})
     assert len(posted) == 1
     payload = posted[0]
     assert payload['model'] == 'FastH3-Omni' and payload['task'] == 'ref2va'
-    assert payload['prompt'] == 'Picture 1 corridor'
+    if purposes:
+        assert 'Picture 1 / @图片1: identity.png; ' + purposes[0] in payload['prompt']
+        assert payload['prompt'].endswith('Picture 1 corridor')
+    else:
+        assert payload['prompt'] == 'Picture 1 corridor'
     assert payload['target'] == {'short_edge': 768, 'aspect_ratio': '9:16', 'duration_seconds': 5.0}
     assert payload['seed'] == 2101
     uri = payload['conditions'][0]['uri']
@@ -772,9 +801,10 @@ def test_fasth3_media_preserves_bytes_nested_duration_and_lane_rules(media, monk
     assert base64.b64decode(uri.split(',', 1)[1]) == (workspace / 'input/identity.png').read_bytes()
     wire = json.loads((workspace / 'media/fast.mp4.wire/request.json').read_text())
     assert wire['kind'] == 'fasth3' and wire['duration'] == 5.0
+    assert wire['prompt'] == payload['prompt']
     assert wire['target']['short_edge'] == 768 and wire['seed'] == 2101
     assert json.loads((workspace / 'media/fast.mp4.wire/response.json').read_text())['task_id'] == 'fast-task'
-    media.execute({'action': 'fasth3', 'prompt': 'Picture 1 corridor', 'references': ['input/identity.png'],
+    media.execute({'action': 'fasth3', 'prompt': 'Picture 1 corridor', 'references': ['input/identity.png'], 'purposes': purposes,
                    'seconds': 5, 'seed': 2101, 'ratio': '9:16', 'output': 'media/fast.mp4'})
     assert len(posted) == 1
     with pytest.raises(ValueError, match='first_frame'):

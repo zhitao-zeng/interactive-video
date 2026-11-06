@@ -54,7 +54,7 @@
       "path": "template/CAPABILITIES.md",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/CAPABILITIES.md",
       "source_sha256": "078280fbfb2f5b9ee936b84877a1b980814997985a481d0129eead72e8b2a369",
-      "merged_sha256": "62ea89f5a7d79cb6e9c3b031b97f716f1754b349ccd87092ebcbba03296f58d2"
+      "merged_sha256": "80663e5d4b845832aa2eff5b15ed3fa2ade660b8176f7d6731e59bd8216ecea8"
     },
     {
       "path": "template/REVIEWER-SYSTEM.md",
@@ -67,13 +67,13 @@
       "path": "template/SKILL.md",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/SKILL.md",
       "source_sha256": "1541b343524e01a42ec625a0836a3fea6e220317e1b59c9253d077a805bb2a53",
-      "merged_sha256": "1541b343524e01a42ec625a0836a3fea6e220317e1b59c9253d077a805bb2a53"
+      "merged_sha256": "23d346bbe24f65e05dbc55553e6be96109b4f0bc6f1d67de837984411fb29a8a"
     },
     {
       "path": "template/SYSTEM.md",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/SYSTEM.md",
       "source_sha256": "bef71c9a0cf0342402435f9b1665c6727f03f296254fc40f589cece78836b85f",
-      "merged_sha256": "61d553764c079c6c2b1d7fc3d39fe82fddab09f7694f81a4145a58f5e700e593"
+      "merged_sha256": "f55f2efafd475667e4cca56795cfab48a59f777b88a1bbd0e91e93c630d2f834"
     },
     {
       "path": "template/TASK.md",
@@ -85,7 +85,7 @@
       "path": "template/TOOLS.md",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/TOOLS.md",
       "source_sha256": "1554741e832ecd02a98e0732e86f708b53d348a281066e44bb4ac27993829f31",
-      "merged_sha256": "7e6624195a99cf4e17556a363e09b44d79e47d6564f46373b4bd4f79082d0468"
+      "merged_sha256": "371595185b01fa42feb413430d6ce010bc2cb21d17cce543441936a640f7a1d1"
     },
     {
       "path": "template/audio-runtime.example.json",
@@ -104,7 +104,7 @@
       "path": "template/skill-extra/references/director-feedback.md",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/skill-extra/references/director-feedback.md",
       "source_sha256": "398e94d94c52132dba202190a28c58aa461c63c34e46ea7a01abe56909215724",
-      "merged_sha256": "398e94d94c52132dba202190a28c58aa461c63c34e46ea7a01abe56909215724"
+      "merged_sha256": "fd0b6bbc2d0c6dd4c6c8339361d1d7329dc8902ec10a539b81db9e1583d9bd54"
     },
     {
       "path": "template/skill-extra/references/experience-applicability.md",
@@ -116,7 +116,7 @@
       "path": "template/skill-extra/references/h3-pitfalls.md",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/skill-extra/references/h3-pitfalls.md",
       "source_sha256": "c6346296bb9e95076e41c1489b5572f8b6f12dacda3ff19471b584b92dd971d8",
-      "merged_sha256": "c6346296bb9e95076e41c1489b5572f8b6f12dacda3ff19471b584b92dd971d8"
+      "merged_sha256": "98de116883f656bcca851b9acabbbd79b9b852a0ce2ef38a29e86d682bcc1fa8"
     },
     {
       "path": "template/skill-extra/references/interactive-leaderboard.md",
@@ -195,7 +195,7 @@
       "path": "template/tools/media.py",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/tools/media.py",
       "source_sha256": "0307bf9b1beda097f4fb66b03bd1c015356be26f5a5260fa98e6c8ac5402e3ff",
-      "merged_sha256": "4a8d202eee173efecc6d5c4bfa54cf0bc30d860e472498e28f874a69f81e8134"
+      "merged_sha256": "3129863a95cdee2af509bd6f31f847f9084216c2eeb1f8a9c5c9d9ff514716ed"
     },
     {
       "path": "template/tools/plan.example.py",
@@ -252,9 +252,23 @@
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/tools/transcribe.py",
       "source_sha256": "136f5ae8f33565208c1aff95a94412652d6d3430fa140b1bba01652c433ef1c7",
       "merged_sha256": "136f5ae8f33565208c1aff95a94412652d6d3430fa140b1bba01652c433ef1c7"
+    },
+    {
+      "path": "template/skill-extra/references/h3-format.md",
+      "source": null,
+      "source_sha256": null,
+      "note": "Pi-specific reference; overrides the legacy host guide in initialized workspaces.",
+      "merged_sha256": "686ed80841b4b29147817719be6b968b75eb8046b54a390ce2b7f28eb039e024"
+    },
+    {
+      "path": "template/skill-extra/references/sound-direction.md",
+      "source": null,
+      "source_sha256": null,
+      "note": "Pi-specific reference; overrides the legacy host guide in initialized workspaces.",
+      "merged_sha256": "a8ce8989e3a4f6b510702ebe57a14390ce7b5ee2b6ca1038891c9ddbc0cdfec5"
     }
   ],
-  "updated_at": "2026-11-04",
+  "updated_at": "2026-11-06",
   "roles": {
     "producer": "default; unchanged behaviour",
     "reviewer": "judges one finished export; media_actions=[inspect,audio]; skill_path=skills/episode-review"
