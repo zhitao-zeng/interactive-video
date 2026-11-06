@@ -26,10 +26,10 @@ SD 首帧：v2 允许，但只接受一个开场图片并使用原生声音；`r
 {"action":"video","prompt":"从所附首帧的状态开始，人物转身……","first_frame":"media/opening-v1.png","references":["media/opening-v1.png"],"seconds":10,"output":"media/take-framed-v1.mp4"}
 ```
 
-H3：`action="h3"`，显式给 `endpoint`（现有池名/地址，如 `"pool"`），用项目 H3 写法；`references` 为实际图序，指定 `first_frame` 时必须位于首项，也可加其他图。不需要 SD 素材库。已验证的最小形态：
+H3：`action="h3"`，显式给 `endpoint`（现有池名/地址，如 `"pool"`），用项目 H3 写法；`references` 为实际图序，指定 `first_frame` 时必须位于首项，也可加其他图。不需要 SD 素材库。参考图按本镜需要选择，不默认“身份肖像＋综合视觉卡”整套发送。下面示意一张单幅人物参考和一张场景参考，路径换成本任务实际文件；需要更多视图或只有文字场景时由你取舍，不固定图数：
 
 ```json
-{"action":"h3","endpoint":"pool","prompt":"subject_definitions … <Picture 1> … <Audio 1> … summary … detailed_description … Planned duration: 7 seconds.","references":["input/知遥-身份基准-v1.1.png","input/知遥-综合视觉卡-v1.1.png"],"purposes":["face identity","body and clothing"],"audios":["media/voices/zhiyao-anchor-a.wav"],"seconds":7,"ratio":"9:16","output":"media/test-h3-v1.mp4"}
+{"action":"h3","endpoint":"pool","prompt":"subject_definitions … <Picture 1> … <Audio 1> … summary … detailed_description … Planned duration: 7 seconds.","references":["input/traveller-single.png","input/river-evening.png"],"purposes":["one traveller: face and clothing only","current riverside setting and evening light"],"audios":["media/voices/zhiyao-anchor-a.wav"],"seconds":7,"ratio":"9:16","output":"media/test-h3-v1.mp4"}
 ```
 
 FastH3-Omni（可选 UniServe lane）：`action="fasth3"`，lane 也固定为 `FastH3-Omni`。init 必须显式传 `--fasth3-endpoint`，或在请求中显式给 `endpoint`；没有机器默认值，`h3_mode` 不影响这条路线。请求中的 endpoint 规范化后必须与冻结值完全相等，不能换服务；含 userinfo/query/fragment 的 URL 会在写 config/request 前拒绝。此版只接受**无需 Bearer 的内部 UniServe 端点**，不增加密钥配置。UniServe 服务须另行启动，本脚本不启停服务。
@@ -46,9 +46,10 @@ H3 实测风险与硬约束（2026-10-29，W30/W33/W36）：
 - 所有要说的中文逐字放在 `<d>[Chinese] …</d>` 里；无对白镜头显式写 `No spoken words / 无任何人声`，否则模型可能自报场号或念英文摘要。
 - 优先一个主要动作、尽量一个说话人。已有样本出现多人交接、连续多句或多动作失真时，可以减少并发事件、改构图或拆镜；拆镜是可选修复，不是所有镜头的固定结构。
 - 每个会说话的角色在 `subject_definitions` 里写一次固定英文声线（音高/音色/年龄感/说话方式），
-  每句只写该句的情绪。不要只靠 `<Audio>` 锚：没有锚时这句是唯一的声音身份，有锚时它防止换 take
-  重新选角。实测（2026-10-31，同一请求只加一句声线）：254 Hz / 5.07 字每秒 →
+  同一角色后续保持已选声线，每句只写该句的情绪；不把“childish cute girl”套给所有女角色。
+  没有 `<Audio>` 锚时用文字提供声型线索，有锚时辅助保持一致，都不是绝对锁定。实测（2026-10-31，同一请求只加一句声线）：254 Hz / 5.07 字每秒 →
   296 Hz / 4.67 字每秒；他的参考 take 是 286 / 3.65（句子数量不同，只作方向）。
+  这是一次受控样本的音高/节奏变化，不证明完整音色一致，也不能推出“声线不改发声位置”。
 - `first_frame` 表达 t=0 状态，不是最终状态；云 H3 不支持 keyframe，`first_frame` 只作为首张参考图；本地 H3 才按 t=0 使用。
 
 ## 已验证的硬限制

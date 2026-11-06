@@ -479,3 +479,15 @@ main已包含Agent产线（8a4a12c）、配置/缓存/Phanthy（704da0f）、恢
 | Codex 最后三部授权收尾与第二季发布20261105 | 用户批准03A30min、06C/10C各15min，45部通过后新ModelScope数据集 | codex/authorized-resume-20261105 | 原会话授权恢复入口、回归；批次授权历史与发布目录 | 2026-11-05 | 已完成22:33：45/45成片和独审accepted，原03A/06C/10C按新1800/900/900秒授权原会话收尾，原256上限与全部历史保全；37相关回归通过。新ModelScope Flame4pd/zhiyao-season2-episodes已核实45视频/45封面/10署名，索引下载一致；用户追加的45节点126边关系图/可播放导航已发布。最终W08两目录项缺失有真实证据，使用已存LFS只补缺项并接入本次脚本对账，成因未冒认。原S140部未改；最终证据media/runs/modelscope-season2-publication-20261105/final-report.json。 |
 
 | codex（Pi 提示词与参考语义） | 已授权：修 FastH3 图片用途传递、云 H3 普通参考说明、Pi 技能旧宿主冲突；已有问题镜头两版小范围对照 | codex/pi-prompt-refs-20261106；worktrees/pi-prompt-refs-20261106 | examples/pi-video-agent/template/{tools/media.py,SYSTEM.md,SKILL.md,TOOLS.md,CAPABILITIES.md,skill-extra/references/*}、PROVENANCE、tests/test_pi_agent_starter.py；media/runs/20261106-prompt-reference-ab；不修改旧任务 | 2026-11-06 | 已收尾：相关离线回归通过，修改已同步 main；用户随后授权本地提交，未 push。新 FastH3 两次真实请求均成功；独立画面审查 A 复制人物、B 更清楚且视觉通过。音频感知/备用转录失败，声音未验收，不记整片 accepted。报告 docs/pi-prompt-reference-alignment-20261106.md；未改旧任务或额度。 |
+
+| codex（参考选用根因收口） | 用户要求追溯 Skill 对重影/异常场景的引导，并从默认示例修复；保留 Agent 自主选择 | codex/pi-reference-selection-20261106 | Pi template SKILL/TOOLS/h3-format、PROVENANCE、现有验证文档；不动旧任务或新生成 | 2026-11-06 | 已收尾：原会话工具读取与实际参考脚本已溯源；默认示例、SKILL 选图原则和 Pi H3 指导已同步 main 工作副本。相关打包/初始化回归通过；本次未生成媒体、未提交/推送，不宣称根治模型失真。详见 docs/pi-prompt-reference-alignment-20261106.md 追加记录。 |
+
+| codex（光斑经验加载修复） | 用户追问视觉 Prompt 过度修饰；已定位 2555895 通用视觉修正被 Pi 同名副本覆盖 | codex/pi-reference-selection-20261106 | skills/episode-production/references 通用经验、Pi 重复副本/PROVENANCE、starter 初始化回归；不改旧任务、不新生成 | 2026-11-06 | 已收尾：六份通用经验被同名模板覆盖的问题已用真实初始化复现并修复；原有有效内容归回共享 Skill，只保留 Pi 专用格式/声音适配。新增六项传播、原生恢复与打包回归通过；已同步 main 工作副本，未提交/推送，未新增生成；画面效果未新复验。 |
+
+| codex（真实 Prompt 与声线核对） | 用户要求直接审查请求，核对 P00 单变量声线经验 | codex/pi-reference-selection-20261106 | Pi/共享 sound-direction、h3-format、TOOLS、V2-NOTES/PROVENANCE、现有验证文档 | 2026-11-06 | 已完成：核对当前 A/B wire 和三项历史请求；固定声线已在真实请求中。补跨镜头保持声型与完整请求一致性指导；纠正“声线不改语音分布”过强结论，记录起点实际提前0.30s与证据边界。打包/初始化回归通过；未新生成、未改旧请求、未提交/推送。 |
+
+| codex（新版 Skill 文本前向验证） | 用户批准试现有失败请求，导演独立重写＋独立文本复核；为覆盖已提到的问题纳入空间/声线/光影/动作四例 | codex/pi-reference-selection-20261106；media/runs/20261106-prompt-text-validation | 隔离候选、复核和现有验证记录；不改旧任务、不调媒体模型 | 2026-11-06 | 已完成文本阶段：四案独立文本复核通过，原对白/附件/参数保留。本阶段零媒体生成；后续代表镜头单独run见下。不是生产DS/K3或整集无人值守验证。 |
+
+| codex（光影代表镜头匿名实拍） | 文本通过后按批准方案选一个代表镜头同条件A/B | media/runs/20261106-prompt-lighting-ab；codex/pi-reference-selection-20261106 | 2×5秒现有FastH3；正常提交回执/原片/匿名独审，零生图、零重拍 | 2026-11-06 | 已完成：B完整圆盘与鱼群构图更持续，A局部鱼/机械细节更清楚，无总体清晰度胜者；两版均未清楚呈现相对固定轨道上升，未复现严重光斑，声音未验，不报accepted。未改旧任务、代码/服务或额度；记录未提交/推送。 |
+
+| codex（当前修复提交推送） | 用户明确要求先 push 当前版本，暂停后续生成 | main；codex/pi-reference-selection-20261106 | 本轮已核对源码/Skill/测试/实验记录；不含媒体与无关 reviews/ | 2026-11-06 | 提交前相关初始化/原生恢复/打包检查已通过；自动生成缓存已移出源码包保留。用户授权本地提交并推送 GitHub main，不启动新生成、不更改旧任务或额度。 |

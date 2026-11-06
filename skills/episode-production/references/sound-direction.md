@@ -59,7 +59,7 @@ Keep the phrase identical in every shot of the episode. The voice phrase says wh
 is speaking; the per-line `emotion` says what this line is doing. Without an audio
 reference this phrase is the only voice identity the model receives. With an
 `<Audio>` reference the reference supplies timbre and prosody; the phrase still
-keeps a new take from silently re-casting the character.
+helps a new take keep the intended character voice, without guaranteeing a lock.
 
 Evidence (2026-10-31, same service, same scene and line, P00 of the candy short):
 adding only `Her voice is a high-pitched, bubbly, childish cute girl voice.` moved
@@ -68,6 +68,10 @@ pitch spread from 8.5 to 8.0 semitones (SD 2.8 to 2.5). The reference take whose
 prompt named the voice and an emotion measured 286 Hz / 3.65; that take had a
 different line count, so the cross-project number is directional. The 254 to 296
 shift is the controlled result: only the voice phrase changed.
+The reported line onset moved from 6.06s to 5.76s (0.30s earlier), still later than
+the reference onset at 5.04s. This pair does not establish that a voice phrase
+cannot affect speech placement or that only editing/shot design can change it.
+Pitch statistics alone do not establish complete timbre or voice-identity matching.
 
 ## Physical sound and private thought
 

@@ -6,6 +6,7 @@ import json
 import math
 import os
 from pathlib import Path
+import shutil
 import struct
 import subprocess
 import sys
@@ -69,6 +70,19 @@ def module_at(name, path):
     sys.modules[name] = module
     spec.loader.exec_module(module)
     return module
+
+
+@pytest.mark.parametrize('name', [
+    'h3-pitfalls.md', 'reference-film-visual-craft.md', 'director-feedback.md',
+    'reference-film-craft.md', 'experience-applicability.md', 'interactive-leaderboard.md',
+])
+def test_shared_skill_reference_updates_reach_initialized_workspace(workspace, tmp_path, name):
+    source = tmp_path / 'updated-skill'
+    shutil.copytree(SDK / 'skills/episode-production', source)
+    reference = source / 'references' / name
+    reference.write_text(reference.read_text() + '\nCurrent source revision for this task.\n')
+    work = starter.initialize(tmp_path / 'current-source', SDK, DEPS, skills=source)
+    assert (work / 'skills/episode-production/references' / name).read_bytes() == reference.read_bytes()
 
 
 def test_native_agent_edits_and_runs_working_copy_and_resumes(workspace, tmp_path):

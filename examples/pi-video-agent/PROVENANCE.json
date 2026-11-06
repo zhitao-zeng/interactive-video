@@ -18,7 +18,7 @@
       "path": "V2-NOTES.md",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/V2-NOTES.md",
       "source_sha256": "9f9d6992bf5e6527796f8862ac25ddf808d62b3707044bab2c9e566e8d8c8e07",
-      "merged_sha256": "ce7d9c3af181543e3bd421b5580759d0146ca885ed6541146534492afc289356"
+      "merged_sha256": "3c112877432d5f73bd0aa32f382b316b719761a2a6f5b57ce608162a823478f0"
     },
     {
       "path": "VALIDATION.md",
@@ -67,7 +67,7 @@
       "path": "template/SKILL.md",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/SKILL.md",
       "source_sha256": "1541b343524e01a42ec625a0836a3fea6e220317e1b59c9253d077a805bb2a53",
-      "merged_sha256": "23d346bbe24f65e05dbc55553e6be96109b4f0bc6f1d67de837984411fb29a8a"
+      "merged_sha256": "743c1042103451e41af5bee874398dde24e83023c4cc91bf2e9d403603cc2d5b"
     },
     {
       "path": "template/SYSTEM.md",
@@ -85,7 +85,7 @@
       "path": "template/TOOLS.md",
       "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/TOOLS.md",
       "source_sha256": "1554741e832ecd02a98e0732e86f708b53d348a281066e44bb4ac27993829f31",
-      "merged_sha256": "371595185b01fa42feb413430d6ce010bc2cb21d17cce543441936a640f7a1d1"
+      "merged_sha256": "45038b2f89588f9863f6b8d6d085afedcc91f92c1a29c07da7f21796aa55da03"
     },
     {
       "path": "template/audio-runtime.example.json",
@@ -99,42 +99,6 @@
       "source_sha256": null,
       "merged_sha256": "3677e7b6d3cb37f39a50a56f6d629caf508961e6b1e7bf4870f25d0e31fea81d",
       "note": "New in this project: independent review skill. No upstream source."
-    },
-    {
-      "path": "template/skill-extra/references/director-feedback.md",
-      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/skill-extra/references/director-feedback.md",
-      "source_sha256": "398e94d94c52132dba202190a28c58aa461c63c34e46ea7a01abe56909215724",
-      "merged_sha256": "fd0b6bbc2d0c6dd4c6c8339361d1d7329dc8902ec10a539b81db9e1583d9bd54"
-    },
-    {
-      "path": "template/skill-extra/references/experience-applicability.md",
-      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/skill-extra/references/experience-applicability.md",
-      "source_sha256": "da0864557a377624a4e3574680cf7bb54576a012b4cac19d91f30a6896c54b97",
-      "merged_sha256": "da0864557a377624a4e3574680cf7bb54576a012b4cac19d91f30a6896c54b97"
-    },
-    {
-      "path": "template/skill-extra/references/h3-pitfalls.md",
-      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/skill-extra/references/h3-pitfalls.md",
-      "source_sha256": "c6346296bb9e95076e41c1489b5572f8b6f12dacda3ff19471b584b92dd971d8",
-      "merged_sha256": "98de116883f656bcca851b9acabbbd79b9b852a0ce2ef38a29e86d682bcc1fa8"
-    },
-    {
-      "path": "template/skill-extra/references/interactive-leaderboard.md",
-      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/skill-extra/references/interactive-leaderboard.md",
-      "source_sha256": "627f4900b30074a2cb97c8cc8e42e59fc39b4462e6717e1ffcbdce16c53540a5",
-      "merged_sha256": "627f4900b30074a2cb97c8cc8e42e59fc39b4462e6717e1ffcbdce16c53540a5"
-    },
-    {
-      "path": "template/skill-extra/references/reference-film-craft.md",
-      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/skill-extra/references/reference-film-craft.md",
-      "source_sha256": "c9a44443241d5be5ca3a97c2461de252f92f1f0d3feb061b5661d2b78adaa986",
-      "merged_sha256": "c9a44443241d5be5ca3a97c2461de252f92f1f0d3feb061b5661d2b78adaa986"
-    },
-    {
-      "path": "template/skill-extra/references/reference-film-visual-craft.md",
-      "source": "/mnt/disk1/zengzhitao/interactive-video-worktrees/pi-agent-efficiency-20261028/experiments/pi-agent-kit-v2-20261028/template/skill-extra/references/reference-film-visual-craft.md",
-      "source_sha256": "78ec3d9deccae9001f0b0803f07dbb8aba92f4881a0f19932ce385250ccee9b7",
-      "merged_sha256": "78ec3d9deccae9001f0b0803f07dbb8aba92f4881a0f19932ce385250ccee9b7"
     },
     {
       "path": "template/tools/add_music.py",
@@ -258,14 +222,14 @@
       "source": null,
       "source_sha256": null,
       "note": "Pi-specific reference; overrides the legacy host guide in initialized workspaces.",
-      "merged_sha256": "686ed80841b4b29147817719be6b968b75eb8046b54a390ce2b7f28eb039e024"
+      "merged_sha256": "f427b1c033efba6507ac130ae80e9b5c01d453f9b8978969635756cc89ae2c17"
     },
     {
       "path": "template/skill-extra/references/sound-direction.md",
       "source": null,
       "source_sha256": null,
       "note": "Pi-specific reference; overrides the legacy host guide in initialized workspaces.",
-      "merged_sha256": "a8ce8989e3a4f6b510702ebe57a14390ce7b5ee2b6ca1038891c9ddbc0cdfec5"
+      "merged_sha256": "157fc177016b08e6debb4a966cc7b4866125735acb9cbf2f2d837b7716d81aea"
     }
   ],
   "updated_at": "2026-11-06",
